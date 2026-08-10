@@ -1,0 +1,122 @@
+import ExcelJS from 'exceljs';
+import type { Dealership } from './types';
+import { VISIT_STATUS_LABEL } from './types';
+
+function flatten(d: Dealership): Record<string, string | number> {
+  return {
+    id: d.id,
+    name_en: d.nameEn,
+    name_ar: d.nameAr,
+    lat: d.lat,
+    lng: d.lng,
+    listed_phone: d.listedPhone,
+    visit_status: VISIT_STATUS_LABEL[d.visitStatus],
+    visit_date: d.visitDate ?? '',
+    surveyor: d.surveyor ?? '',
+    cr_number: d.crNumber,
+    showroom_size_sqm: d.showroomSizeSqm ?? '',
+    size_basis: d.sizeBasis ?? '',
+    vehicle_type: d.vehicleType ?? '',
+    inventory_age_mix: d.inventoryAgeMix ?? '',
+    poc_name: d.pocName,
+    poc_role: d.pocRole,
+    poc_mobile: d.pocMobile,
+    decision_maker: d.decisionMaker,
+    num_salesmen: d.numSalesmen ?? '',
+    main_brands: d.mainBrands.join('; '),
+    authorised: d.authorised ?? '',
+    authorised_brand: d.authorisedBrand,
+    inventory_sellable_units: d.inventorySellableUnits.value ?? '',
+    inventory_sellable_units_basis: d.inventorySellableUnits.basis ?? '',
+    inventory_count_basis: d.inventoryCountBasis ?? '',
+    avg_selling_price_sar: d.avgSellingPriceSar.value ?? '',
+    avg_selling_price_basis: d.avgSellingPriceSar.basis ?? '',
+    avg_monthly_sold: d.avgMonthlySold.value ?? '',
+    avg_monthly_sold_basis: d.avgMonthlySold.basis ?? '',
+    avg_monthly_financed: d.avgMonthlyFinanced.value ?? '',
+    avg_monthly_financed_basis: d.avgMonthlyFinanced.basis ?? '',
+    financing_lost_per_month: d.financingLostPerMonth.value ?? '',
+    financing_lost_per_month_basis: d.financingLostPerMonth.basis ?? '',
+    main_fail_reason: d.mainFailReason,
+    financing_workaround: d.financingWorkaround,
+    banks_partnered: d.banksPartnered.join('; '),
+    bank_on_site: d.bankOnSite ?? '',
+    buyer_mix: d.buyerMix ?? '',
+    lead_mix_online_pct: d.leadMixOnlinePct ?? '',
+    volume_figures_basis: d.volumeFiguresBasis ?? '',
+    open_to_pilot: d.openToPilot ?? '',
+    notes: d.notes,
+    photo_count: d.photoIds.length,
+    updated_at: d.updatedAt,
+  };
+}
+
+const HEADERS = [
+  'id', 'name_en', 'name_ar', 'lat', 'lng', 'listed_phone', 'visit_status', 'visit_date',
+  'surveyor', 'cr_number', 'showroom_size_sqm', 'size_basis', 'vehicle_type', 'inventory_age_mix',
+  'poc_name', 'poc_role', 'poc_mobile', 'decision_maker', 'num_salesmen', 'main_brands',
+  'authorised', 'authorised_brand', 'inventory_sellable_units', 'inventory_sellable_units_basis',
+  'inventory_count_basis', 'avg_selling_price_sar', 'avg_selling_price_basis', 'avg_monthly_sold',
+  'avg_monthly_sold_basis', 'avg_monthly_financed', 'avg_monthly_financed_basis',
+  'financing_lost_per_month', 'financing_lost_per_month_basis', 'main_fail_reason',
+  'financing_workaround', 'banks_partnered', 'bank_on_site', 'buyer_mix', 'lead_mix_online_pct',
+  'volume_figures_basis', 'open_to_pilot', 'notes', 'photo_count', 'updated_at',
+];
+
+function csvEscape(v: string | number): string {
+  const s = String(v);
+  if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+
+export function toCsv(dealerships: Dealership[]): string {
+  const rows = dealerships.map(flatten);
+  const lines = [HEADERS.join(',')];
+  for (const row of rows) {
+    lines.push(HEADERS.map((h) => csvEscape(row[h] ?? '')).join(','));
+  }
+  return lines.join('\n');
+}
+
+export async function toXlsxBuffer(dealerships: Dealership[]): Promise<ArrayBuffer> {
+  const workbook = new ExcelJS.Workbook();
+  const sheet = workbook.addWorksheet('Dealerships');
+  sheet.columns = HEADERS.map((h) => ({ header: h, key: h, width: 18 }));
+  sheet.getRow(1).font = { bold: true };
+  sheet.views = [{ state: 'frozen', ySplit: 1 }];
+
+  for (const d of dealerships) {
+    sheet.addRow(flatten(d));
+  }
+
+  // Highlight self-reported numeric columns so nobody mixes them into
+  // "observed" averages by accident.
+  const basisCols = ['inventory_sellable_units_basis', 'avg_selling_price_basis',
+    'avg_monthly_sold_basis', 'avg_monthly_financed_basis', 'financing_lost_per_month_basis'];
+  for (const key of basisCols) {
+    const colIdx = HEADERS.indexOf(key) + 1;
+    sheet.getColumn(colIdx).eachCell((cell, rowNumber) => {
+      if (rowNumber === 1) return;
+      if (cell.value === 'self_reported') {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFDE68A' } };
+      } else if (cell.value === 'observed') {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBBF7D0' } };
+      }
+    });
+  }
+
+  const buf = await workbook.xlsx.writeBuffer();
+  return buf as ArrayBuffer;
+}
+
+export function downloadFile(filename: string, data: string | ArrayBuffer, mime: string) {
+  const blob = new Blob([data], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
