@@ -126,11 +126,15 @@ function buildMappingSeedDealerships(): Dealership[] {
       photoIds: [],
       dirty: false,
     };
-    return {
+    const merged = {
       ...d,
       ...(MASTER_ENRICHMENT[row.nameEn] ?? {}),
       ...(EXPANDED_ENRICHMENT[row.nameEn] ?? {}),
     };
+    // A competitor/refused/closed status is a deliberate field call — later
+    // enrichment data must never silently downgrade it back to "surveyed".
+    if (d.visitStatus === 'competitor') merged.visitStatus = 'competitor';
+    return merged;
   });
 }
 
