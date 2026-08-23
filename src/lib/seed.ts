@@ -118,6 +118,10 @@ function buildMappingSeedDealerships(): Dealership[] {
 
       buyerMix: null,
       leadMixOnlinePct: null,
+      networkRole: null,
+      subDealerOfName: '',
+      suppliesSubDealerNames: [],
+      sellThroughUnitsPerMonth: { value: null, basis: null },
 
       volumeFiguresBasis: null,
       openToPilot: null,
@@ -198,6 +202,10 @@ function buildMasterSurveyDealerships(): Dealership[] {
 
       buyerMix: row.buyerMix,
       leadMixOnlinePct: row.leadMixOnlinePct,
+      networkRole: null,
+      subDealerOfName: '',
+      suppliesSubDealerNames: [],
+      sellThroughUnitsPerMonth: { value: null, basis: null },
 
       volumeFiguresBasis: row.volumeFiguresBasis,
       openToPilot: null,
@@ -797,6 +805,10 @@ function buildExpandedSurveyDealerships(): Dealership[] {
 
       buyerMix: row.buyerMix,
       leadMixOnlinePct: row.leadMixOnlinePct,
+      networkRole: null,
+      subDealerOfName: '',
+      suppliesSubDealerNames: [],
+      sellThroughUnitsPerMonth: { value: null, basis: null },
 
       volumeFiguresBasis: row.volumeFiguresBasis,
       openToPilot: null,

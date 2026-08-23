@@ -24,6 +24,14 @@ export type VolumeFiguresBasis = 'observed' | 'self_reported' | 'mixed';
 export type PilotInterest = 'yes' | 'maybe' | 'no' | 'too_early';
 export type BankOnSite = 'yes_permanent' | 'yes_weekly' | 'no';
 
+// Wholesale layer: some showrooms in this market don't only sell to end
+// customers — they supply inventory to smaller sub-dealers, who then sell
+// on to the actual buyer. This is distinct from "sell-out" (dealer→
+// end customer, already covered by avgMonthlySold) and matters because a
+// hub supplier's financing needs and risk profile differ from a retail-only
+// storefront.
+export type NetworkRole = 'retail_only' | 'supplies_sub_dealers' | 'sub_dealer_of_another' | 'both';
+
 // Every business-figure value is wrapped with its provenance flag so
 // analysis can never silently blend observed and self-reported numbers.
 export interface FlaggedValue<T> {
@@ -93,6 +101,13 @@ export interface Dealership {
   // Customers
   buyerMix: BuyerMix | null;
   leadMixOnlinePct: number | null;
+
+  // Dealer network (wholesale layer — dealership to sub-dealer, not to the
+  // end customer)
+  networkRole: NetworkRole | null;
+  subDealerOfName: string; // if sub_dealer_of_another / both: who they buy from
+  suppliesSubDealerNames: string[]; // if supplies_sub_dealers / both: who they supply
+  sellThroughUnitsPerMonth: FlaggedValue<number>; // units moved to sub-dealers/month
 
   // Data quality (mandatory)
   volumeFiguresBasis: VolumeFiguresBasis | null;

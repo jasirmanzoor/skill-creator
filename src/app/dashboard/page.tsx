@@ -110,6 +110,16 @@ export default function DashboardPage() {
   const partnered = useMemo(() => dealerships.filter((d) => d.banksPartnered.length > 0), [dealerships]);
   const competitors = useMemo(() => dealerships.filter((d) => d.visitStatus === 'competitor'), [dealerships]);
 
+  const network = useMemo(() => {
+    const hubs = surveyable.filter((d) => d.networkRole === 'supplies_sub_dealers' || d.networkRole === 'both');
+    const subDealers = surveyable.filter((d) => d.networkRole === 'sub_dealer_of_another' || d.networkRole === 'both');
+    const sellThroughUnits = surveyable
+      .map((d) => (observedOnly && d.sellThroughUnitsPerMonth.basis !== 'observed' ? null : d.sellThroughUnitsPerMonth.value))
+      .filter((v): v is number => v !== null)
+      .reduce((a, b) => a + b, 0);
+    return { hubs, subDealers, sellThroughUnits };
+  }, [surveyable, observedOnly]);
+
   const doExport = async (format: 'csv' | 'xlsx') => {
     setExporting(format);
     const today = new Date().toISOString().slice(0, 10);
@@ -253,6 +263,34 @@ export default function DashboardPage() {
               </div>
             ))}
           </div>
+        </section>
+
+        {/* Dealer network: sell-through to sub-dealers, not end customers */}
+        <section className="rounded-2xl border border-border bg-surface p-4">
+          <h2 className="text-sm font-semibold text-foreground">Dealer network</h2>
+          <p className="mt-0.5 text-xs text-muted">
+            The wholesale layer — dealerships moving cars to sub-dealers, not to end customers.
+          </p>
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <Stat label="Hub suppliers" value={String(network.hubs.length)} sub="Supply sub-dealers" />
+            <Stat label="Known sub-dealers" value={String(network.subDealers.length)} sub="Source from a hub" />
+          </div>
+          <div className="mt-3 rounded-xl bg-accent/10 p-3">
+            <div className="text-xs font-medium text-accent">Sell-through to sub-dealers / month</div>
+            <div className="mt-1 text-2xl font-bold text-accent">{network.sellThroughUnits.toLocaleString()}</div>
+          </div>
+          {network.hubs.length > 0 && (
+            <div className="mt-3 divide-y divide-border">
+              {network.hubs.map((d) => (
+                <div key={d.id} className="py-2 text-sm">
+                  <div className="font-medium text-foreground">{d.nameEn}</div>
+                  {d.suppliesSubDealerNames.length > 0 && (
+                    <div className="text-xs text-muted">supplies: {d.suppliesSubDealerNames.join(', ')}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Partnered & competitors */}
