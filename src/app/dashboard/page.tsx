@@ -5,6 +5,7 @@ import { getAllDealerships } from '@/lib/db';
 import type { Dealership, PilotInterest, VisitStatus } from '@/lib/types';
 import { VISIT_STATUS_COLOR, VISIT_STATUS_LABEL } from '@/lib/types';
 import { downloadFile, toCsv, toXlsxBuffer } from '@/lib/export';
+import ResearchAlerts from '@/components/research/ResearchAlerts';
 
 function bandMidpoint(band: string | null): number | null {
   switch (band) {
@@ -132,6 +133,15 @@ export default function DashboardPage() {
       </header>
 
       <div className="space-y-6 px-4 py-5">
+        {/* Research alerts */}
+        <section className="rounded-2xl border border-border bg-surface p-4">
+          <h2 className="text-sm font-semibold text-foreground">Research alerts</h2>
+          <p className="mt-0.5 text-xs text-muted">Changed findings and suspected duplicate dealerships.</p>
+          <div className="mt-3">
+            <ResearchAlerts />
+          </div>
+        </section>
+
         {/* Progress */}
         <section className="rounded-2xl border border-border bg-surface p-4">
           <div className="flex items-baseline justify-between">

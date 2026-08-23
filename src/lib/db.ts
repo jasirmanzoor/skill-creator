@@ -196,12 +196,15 @@ const DEFAULT_SETTINGS: AppSettings = {
   surveyorName: null,
   darkMode: false,
   remoteEndpoint: null,
+  dailyResearchCap: 50,
 };
 
 export async function getSettings(): Promise<AppSettings> {
   const db = await getDB();
   const s = await db.get('settings', 'singleton');
-  return s ?? DEFAULT_SETTINGS;
+  // Merge with defaults so records saved before a settings field existed
+  // (e.g. dailyResearchCap) don't come back with it missing.
+  return { ...DEFAULT_SETTINGS, ...s };
 }
 
 export async function saveSettings(s: AppSettings): Promise<void> {

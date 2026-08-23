@@ -117,6 +117,7 @@ export interface AppSettings {
   surveyorName: string | null;
   darkMode: boolean;
   remoteEndpoint: string | null; // optional future backend sync target
+  dailyResearchCap: number; // Phase 2: max research-agent runs per day
 }
 
 export const VISIT_STATUS_LABEL: Record<VisitStatus, string> = {

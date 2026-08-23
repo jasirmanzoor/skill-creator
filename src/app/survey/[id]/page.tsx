@@ -31,6 +31,7 @@ import BasisToggle from '@/components/survey/BasisToggle';
 import ChipMultiSelect from '@/components/survey/ChipMultiSelect';
 import PhotoCapture from '@/components/survey/PhotoCapture';
 import VoiceNotes from '@/components/survey/VoiceNotes';
+import DealershipResearchPanel from '@/components/research/DealershipResearchPanel';
 
 const STEPS = [
   'Identity',
@@ -54,6 +55,7 @@ export default function SurveyPage() {
   const [photoCount, setPhotoCount] = useState(0);
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [missingBasisWarning, setMissingBasisWarning] = useState<string[]>([]);
+  const [researchOpen, setResearchOpen] = useState(false);
   const loadedOnce = useRef(false);
 
   useEffect(() => {
@@ -145,13 +147,18 @@ export default function SurveyPage() {
   };
 
   return (
-    <div className="safe-top flex h-full flex-col bg-background">
+    <div className="safe-top relative flex h-full flex-col bg-background">
       <header className="border-b border-border px-4 py-3">
         <div className="flex items-center justify-between gap-2">
           <button onClick={() => router.push('/')} className="text-sm font-medium text-muted">
             ← Map
           </button>
-          <SaveIndicator state={saveState} />
+          <div className="flex items-center gap-3">
+            <button onClick={() => setResearchOpen(true)} className="text-sm font-medium text-accent">
+              🔍 Research
+            </button>
+            <SaveIndicator state={saveState} />
+          </div>
         </div>
         <h1 className="mt-1 truncate text-base font-semibold text-foreground">{draft.nameEn || 'Unnamed dealership'}</h1>
         <div className="mt-2 flex gap-1">
@@ -220,6 +227,17 @@ export default function SurveyPage() {
           </>
         )}
       </div>
+
+      {researchOpen && (
+        <DealershipResearchPanel
+          dealershipId={draft.id}
+          onClose={async () => {
+            setResearchOpen(false);
+            const fresh = await getDealership(draft.id);
+            if (fresh) setDraft(fresh);
+          }}
+        />
+      )}
     </div>
   );
 }
