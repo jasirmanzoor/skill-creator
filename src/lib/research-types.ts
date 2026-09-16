@@ -6,6 +6,12 @@
 
 export type ResearchSchedule = 'on_demand' | 'daily' | 'weekly';
 
+/** Window event fired when research tasks are added/edited, so other panels refresh. */
+export const RESEARCH_TASKS_CHANGED = 'research-tasks-changed';
+
+/** Which dealerships a batch or scheduled run covers. */
+export type ResearchScope = 'all' | 'not_visited' | 'missing_cr';
+
 export type ResearchTargetField =
   | 'crNumber'
   | 'listedPhone'
@@ -32,6 +38,8 @@ export interface ResearchTask {
   targetField: ResearchTargetField;
   sources: ResearchSource[];
   schedule: ResearchSchedule;
+  /** Dealerships a scheduled run covers. Older tasks without it mean 'all'. */
+  scope?: ResearchScope;
   enabled: boolean;
   createdAt: string;
   lastRunAt: string | null;
@@ -57,6 +65,10 @@ export interface AgentFinding {
   /** Set when this finding's value differs from the immediately prior finding for the same dealership+field — powers the change-detection notifications feed. */
   changedFromPrevious: boolean;
   previousValue: string | null;
+  /** Actual billed cost of the run that produced this finding. */
+  costUsd?: number;
+  /** User cleared the "changed" alert without accepting/rejecting the finding. */
+  alertDismissed?: boolean;
 }
 
 export interface ResearchRunLogEntry {

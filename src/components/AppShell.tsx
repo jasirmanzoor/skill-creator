@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSettings } from '@/lib/settings-context';
 import BottomNav from './BottomNav';
+import ResearchScheduler from './research/ResearchScheduler';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const { loaded, surveyorName } = useSettings();
@@ -37,6 +38,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     <div className="flex h-dvh flex-col bg-background">
       <div className="flex-1 overflow-hidden">{children}</div>
       <BottomNav />
+      <ResearchScheduler />
     </div>
   );
 }

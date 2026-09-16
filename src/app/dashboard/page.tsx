@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { getAllDealerships } from '@/lib/db';
+import { getAllDealerships, getAllFindings } from '@/lib/db';
 import type { Dealership, PilotInterest, VisitStatus } from '@/lib/types';
 import { VISIT_STATUS_COLOR, VISIT_STATUS_LABEL } from '@/lib/types';
 import { downloadFile, toCsv, toXlsxBuffer } from '@/lib/export';
@@ -25,6 +25,8 @@ export default function DashboardPage() {
   const [dealerships, setDealerships] = useState<Dealership[]>([]);
   const [observedOnly, setObservedOnly] = useState(true);
   const [exporting, setExporting] = useState<'csv' | 'xlsx' | null>(null);
+
+  const reload = async () => setDealerships(await getAllDealerships());
 
   useEffect(() => {
     (async () => {
@@ -126,7 +128,7 @@ export default function DashboardPage() {
     if (format === 'csv') {
       downloadFile(`qadisiyah-survey-${today}.csv`, toCsv(dealerships), 'text/csv');
     } else {
-      const buf = await toXlsxBuffer(dealerships);
+      const buf = await toXlsxBuffer(dealerships, await getAllFindings());
       downloadFile(
         `qadisiyah-survey-${today}.xlsx`,
         buf,
@@ -148,7 +150,7 @@ export default function DashboardPage() {
           <h2 className="text-sm font-semibold text-foreground">Research alerts</h2>
           <p className="mt-0.5 text-xs text-muted">Changed findings and suspected duplicate dealerships.</p>
           <div className="mt-3">
-            <ResearchAlerts />
+            <ResearchAlerts onChanged={reload} />
           </div>
         </section>
 

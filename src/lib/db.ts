@@ -1,6 +1,8 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 import type { AppSettings, Dealership, Photo, SyncQueueItem } from './types';
 import { buildSeedDealerships } from './seed';
+import { mergeDealershipRecords } from './merge-dealerships';
+import { duplicatePairId } from './duplicate-detection';
 import type { AgentFinding, DuplicateFlag, ResearchRunLogEntry, ResearchTask } from './research-types';
 
 const DB_NAME = 'qadisiyah-survey';
@@ -197,6 +199,8 @@ const DEFAULT_SETTINGS: AppSettings = {
   darkMode: false,
   remoteEndpoint: null,
   dailyResearchCap: 50,
+  researchAccessToken: null,
+  scheduledResearchPaused: false,
 };
 
 export async function getSettings(): Promise<AppSettings> {
@@ -217,6 +221,11 @@ export async function resetAllData(): Promise<void> {
   await db.clear('dealerships');
   await db.clear('photos');
   await db.clear('syncQueue');
+  // Research tasks are configuration and survive a reset; everything they
+  // produced refers to the wiped records, so it goes too.
+  await db.clear('agentFindings');
+  await db.clear('researchRuns');
+  await db.clear('duplicateFlags');
   await ensureSeeded();
 }
 
@@ -235,6 +244,14 @@ export async function saveResearchTask(task: ResearchTask): Promise<void> {
 export async function deleteResearchTask(id: string): Promise<void> {
   const db = await getDB();
   await db.delete('researchTasks', id);
+}
+
+/** Stamp lastRunAt without overwriting any edits made to the task meanwhile. */
+export async function touchResearchTask(id: string, ranAt: string): Promise<void> {
+  const db = await getDB();
+  const t = await db.get('researchTasks', id);
+  if (!t) return;
+  await db.put('researchTasks', { ...t, lastRunAt: ranAt });
 }
 
 // ---------- Phase 2: agent-sourced findings ----------
@@ -261,11 +278,23 @@ export async function updateFindingStatus(id: string, status: AgentFinding['stat
   await db.put('agentFindings', { ...f, status });
 }
 
+export async function dismissFindingAlert(id: string): Promise<void> {
+  const db = await getDB();
+  const f = await db.get('agentFindings', id);
+  if (!f) return;
+  await db.put('agentFindings', { ...f, alertDismissed: true });
+}
+
 // ---------- Phase 2: run log / cost tracking ----------
 
 export async function logResearchRun(entry: ResearchRunLogEntry): Promise<void> {
   const db = await getDB();
   await db.put('researchRuns', entry);
+}
+
+export async function getAllResearchRuns(): Promise<ResearchRunLogEntry[]> {
+  const db = await getDB();
+  return db.getAll('researchRuns');
 }
 
 export async function getRunsToday(): Promise<ResearchRunLogEntry[]> {
@@ -278,10 +307,35 @@ export async function getRunsToday(): Promise<ResearchRunLogEntry[]> {
 
 // ---------- Phase 2: suspected duplicates ----------
 
-export async function saveDuplicateFlags(flags: DuplicateFlag[]): Promise<void> {
+/**
+ * Store a fresh scan. Flags are keyed by the dealership pair, so re-scanning
+ * never creates copies and a pair you dismissed or merged stays that way.
+ * Pending flags the new scan no longer finds (e.g. a record was renamed) are
+ * removed.
+ */
+export async function saveDuplicateScan(flags: DuplicateFlag[]): Promise<void> {
   const db = await getDB();
   const tx = db.transaction('duplicateFlags', 'readwrite');
-  for (const f of flags) await tx.store.put(f);
+  const existing = await tx.store.getAll();
+  // Key by pair, not stored id: flags saved before pair ids existed had random ids.
+  const byPair = new Map(existing.map((f) => [duplicatePairId(f.dealershipIdA, f.dealershipIdB), f]));
+  const scanned = new Set(flags.map((f) => f.id));
+  for (const f of flags) {
+    const prev = byPair.get(f.id);
+    if (!prev) {
+      await tx.store.put(f);
+    } else if (prev.id !== f.id) {
+      // Migrate a legacy flag to its pair id, keeping its status.
+      await tx.store.delete(prev.id);
+      await tx.store.put({ ...f, status: prev.status, createdAt: prev.createdAt });
+    } else if (prev.status === 'pending') {
+      await tx.store.put({ ...f, createdAt: prev.createdAt });
+    }
+  }
+  for (const prev of existing) {
+    const pair = duplicatePairId(prev.dealershipIdA, prev.dealershipIdB);
+    if (prev.status === 'pending' && !scanned.has(pair)) await tx.store.delete(prev.id);
+  }
   await tx.done;
 }
 
@@ -298,4 +352,58 @@ export async function updateDuplicateFlagStatus(
   const f = await db.get('duplicateFlags', id);
   if (!f) return;
   await db.put('duplicateFlags', { ...f, status });
+}
+
+/**
+ * Merge `removeId` into `keepId`: the kept record's values win, the other
+ * fills gaps; its photos, findings and run history move across; then it is
+ * deleted. One transaction, so a failure leaves both records untouched.
+ */
+export async function mergeDealerships(keepId: string, removeId: string, flagId: string | null): Promise<Dealership> {
+  if (keepId === removeId) throw new Error('Cannot merge a dealership into itself');
+  const db = await getDB();
+  const tx = db.transaction(
+    ['dealerships', 'photos', 'agentFindings', 'researchRuns', 'duplicateFlags', 'syncQueue'],
+    'readwrite'
+  );
+  const dealerships = tx.objectStore('dealerships');
+  const keep = await dealerships.get(keepId);
+  const other = await dealerships.get(removeId);
+  if (!keep || !other) {
+    tx.abort();
+    throw new Error('One of the dealerships no longer exists');
+  }
+
+  const merged = mergeDealershipRecords(keep, other);
+  await dealerships.put(merged);
+  await dealerships.delete(removeId);
+
+  const photos = tx.objectStore('photos');
+  for (const p of await photos.index('by-dealership').getAll(removeId)) {
+    await photos.put({ ...p, dealershipId: keepId });
+  }
+  const findings = tx.objectStore('agentFindings');
+  for (const f of await findings.index('by-dealership').getAll(removeId)) {
+    await findings.put({ ...f, dealershipId: keepId });
+  }
+  const runs = tx.objectStore('researchRuns');
+  for (const r of await runs.getAll()) {
+    if (r.dealershipId === removeId) await runs.put({ ...r, dealershipId: keepId });
+  }
+  const flags = tx.objectStore('duplicateFlags');
+  for (const f of await flags.getAll()) {
+    if (f.id === flagId) {
+      await flags.put({ ...f, status: 'merged' });
+    } else if (f.dealershipIdA === removeId || f.dealershipIdB === removeId) {
+      // The removed record is gone; its other pairings are resolved by the merge.
+      await flags.delete(f.id);
+    }
+  }
+  const queue = tx.objectStore('syncQueue');
+  for (const q of await queue.getAll()) {
+    if (q.entityId === removeId) await queue.delete(q.id);
+  }
+  await tx.done;
+  await queueSync('dealership', keepId);
+  return merged;
 }

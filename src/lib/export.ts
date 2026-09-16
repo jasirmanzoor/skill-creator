@@ -1,5 +1,6 @@
 import ExcelJS from 'exceljs';
 import type { Dealership } from './types';
+import type { AgentFinding } from './research-types';
 import { VISIT_STATUS_LABEL } from './types';
 
 function flatten(d: Dealership): Record<string, string | number> {
@@ -85,7 +86,12 @@ export function toCsv(dealerships: Dealership[]): string {
   return lines.join('\n');
 }
 
-export async function toXlsxBuffer(dealerships: Dealership[]): Promise<ArrayBuffer> {
+const FINDING_HEADERS = [
+  'dealership_id', 'name_en', 'task', 'target_field', 'found', 'value', 'confidence', 'status',
+  'changed_from_previous', 'previous_value', 'source_url', 'summary', 'model', 'cost_usd', 'retrieved_at',
+];
+
+export async function toXlsxBuffer(dealerships: Dealership[], findings: AgentFinding[] = []): Promise<ArrayBuffer> {
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet('Dealerships');
   sheet.columns = HEADERS.map((h) => ({ header: h, key: h, width: 18 }));
@@ -110,6 +116,36 @@ export async function toXlsxBuffer(dealerships: Dealership[]): Promise<ArrayBuff
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBBF7D0' } };
       }
     });
+  }
+
+  // Agent-sourced research lives on its own sheet — never blended into the
+  // field-collected columns above.
+  if (findings.length > 0) {
+    const names = new Map(dealerships.map((d) => [d.id, d.nameEn]));
+    const fs = workbook.addWorksheet('Agent findings');
+    fs.columns = FINDING_HEADERS.map((h) => ({ header: h, key: h, width: h === 'summary' ? 60 : 18 }));
+    fs.getRow(1).font = { bold: true };
+    fs.views = [{ state: 'frozen', ySplit: 1 }];
+    const sorted = [...findings].sort((a, b) => (a.retrievedAt < b.retrievedAt ? 1 : -1));
+    for (const f of sorted) {
+      fs.addRow({
+        dealership_id: f.dealershipId,
+        name_en: names.get(f.dealershipId) ?? '(deleted record)',
+        task: f.taskName,
+        target_field: f.targetField,
+        found: f.found ? 'yes' : 'no',
+        value: f.value ?? '',
+        confidence: f.confidence,
+        status: f.status,
+        changed_from_previous: f.changedFromPrevious ? 'yes' : '',
+        previous_value: f.previousValue ?? '',
+        source_url: f.sourceUrl ?? '',
+        summary: f.summary,
+        model: f.model,
+        cost_usd: f.costUsd ?? '',
+        retrieved_at: f.retrievedAt,
+      });
+    }
   }
 
   const buf = await workbook.xlsx.writeBuffer();

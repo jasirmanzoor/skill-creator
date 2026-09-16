@@ -69,6 +69,8 @@ export default function SurveyPage() {
       }
       setDraft(d);
       loadedOnce.current = true;
+      // Deep link from Dashboard → Research alerts → Review.
+      if (new URLSearchParams(window.location.search).get('research') === '1') setResearchOpen(true);
     })();
   }, [params.id, router]);
 
