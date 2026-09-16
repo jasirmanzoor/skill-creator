@@ -12,22 +12,48 @@ const CONFIDENCE_STYLE: Record<AgentFinding['confidence'], string> = {
   low: 'bg-red-500/15 text-red-500',
 };
 
-function applyFindingToDealership(d: Dealership, f: AgentFinding): Dealership {
-  const stamp = `[Agent, ${new Date(f.retrievedAt).toLocaleDateString()}, ${f.taskName}]`;
+function currentValueFor(d: Dealership, f: AgentFinding): string {
   switch (f.targetField) {
     case 'crNumber':
-      return { ...d, crNumber: f.value ?? d.crNumber };
+      return d.crNumber;
     case 'listedPhone':
-      return { ...d, listedPhone: f.value ?? d.listedPhone };
+      return d.listedPhone;
     case 'authorised':
-      return { ...d, authorisedBrand: f.value ?? d.authorisedBrand };
-    case 'mainBrands':
-      return f.value ? { ...d, mainBrands: Array.from(new Set([...d.mainBrands, f.value])) } : d;
+      return d.authorisedBrand;
+    default:
+      return '';
+  }
+}
+
+/**
+ * Accepting writes the value into the record AND leaves a provenance line in
+ * the notes, so an agent-sourced CR number or phone can always be told apart
+ * from one collected in the field.
+ */
+function applyFindingToDealership(d: Dealership, f: AgentFinding): Dealership {
+  const date = new Date(f.retrievedAt).toISOString().slice(0, 10);
+  const provenance = `[Agent-sourced, ${date}, ${f.taskName}, ${f.confidence} confidence${f.sourceUrl ? `, ${f.sourceUrl}` : ''}]`;
+  const withNote = (rec: Dealership, text: string) => ({
+    ...rec,
+    notes: [rec.notes, `${provenance} ${text}`].filter((x) => x && x.trim()).join('\n'),
+  });
+  const value = f.value ?? '';
+  switch (f.targetField) {
+    case 'crNumber':
+      return withNote({ ...d, crNumber: value || d.crNumber }, `CR number: ${value}`);
+    case 'listedPhone':
+      return withNote({ ...d, listedPhone: value || d.listedPhone }, `Listed phone: ${value}`);
+    case 'authorised':
+      return withNote({ ...d, authorisedBrand: value || d.authorisedBrand }, `Authorised: ${value}`);
+    case 'mainBrands': {
+      const brands = value.split(/[,،;/]|\s+and\s+/).map((b) => b.trim()).filter(Boolean);
+      return withNote({ ...d, mainBrands: Array.from(new Set([...d.mainBrands, ...brands])) }, `Brands: ${value}`);
+    }
     case 'socialPresence':
     case 'reviewsNote':
     case 'noteAppend':
     default:
-      return { ...d, notes: [d.notes, `${stamp} ${f.value ?? f.summary}`].filter(Boolean).join('\n') };
+      return withNote(d, value || f.summary);
   }
 }
 
@@ -38,6 +64,7 @@ export default function DealershipResearchPanel({ dealershipId, onClose }: { dea
   const [running, setRunning] = useState<string | null>(null);
   const [cap, setCap] = useState({ used: 0, cap: 0, remaining: 0 });
   const [error, setError] = useState<string | null>(null);
+  const [confirmReplace, setConfirmReplace] = useState<string | null>(null);
 
   const load = async () => {
     const [d, t, f, c] = await Promise.all([
@@ -72,13 +99,25 @@ export default function DealershipResearchPanel({ dealershipId, onClose }: { dea
     setError(null);
     setRunning(task.id);
     const outcome = await runResearchTask(dealership, task);
-    if (!outcome.ok) setError(outcome.error ?? 'Research run failed.');
+    if (!outcome.ok) {
+      setError(
+        outcome.fatal
+          ? `${outcome.error ?? 'Research is not configured.'} (Settings → Research access code)`
+          : (outcome.error ?? 'Research run failed.')
+      );
+    }
     setRunning(null);
     await load();
   };
 
   const accept = async (f: AgentFinding) => {
     if (!dealership) return;
+    const current = currentValueFor(dealership, f).trim();
+    if (current && f.value && current !== f.value.trim() && confirmReplace !== f.id) {
+      setConfirmReplace(f.id);
+      return;
+    }
+    setConfirmReplace(null);
     const updated = applyFindingToDealership(dealership, f);
     await saveDealership(updated);
     await updateFindingStatus(f.id, 'applied');
@@ -162,12 +201,13 @@ export default function DealershipResearchPanel({ dealershipId, onClose }: { dea
                       <p className="mt-1 text-sm text-foreground">
                         {f.found ? f.value || f.summary : 'Not found'}
                       </p>
-                      {f.summary && f.found && <p className="mt-0.5 text-xs text-muted">{f.summary}</p>}
+                      {f.summary && <p className="mt-0.5 text-xs text-muted">{f.summary}</p>}
                       {f.changedFromPrevious && (
                         <p className="mt-0.5 text-xs text-purple-500">Previously: {f.previousValue || '(nothing)'}</p>
                       )}
                       <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-muted">
                         <span>{new Date(f.retrievedAt).toLocaleString()}</span>
+                        {typeof f.costUsd === 'number' && f.costUsd > 0 && <span>${f.costUsd.toFixed(3)}</span>}
                         {f.sourceUrl && (
                           <a href={f.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-accent underline">
                             source
@@ -182,7 +222,9 @@ export default function DealershipResearchPanel({ dealershipId, onClose }: { dea
                         onClick={() => accept(f)}
                         className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white"
                       >
-                        Accept into record
+                        {confirmReplace === f.id && dealership
+                          ? `Replace "${currentValueFor(dealership, f)}"?`
+                          : 'Accept into record'}
                       </button>
                       <button onClick={() => reject(f)} className="rounded-lg bg-surface-2 px-3 py-1.5 text-xs font-medium text-foreground">
                         Reject

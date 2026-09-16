@@ -5,7 +5,9 @@ import { v4 as uuid } from 'uuid';
 import { deleteResearchTask, getAllResearchTasks, saveResearchTask } from '@/lib/db';
 import {
   RESEARCH_SOURCES,
+  RESEARCH_TASKS_CHANGED,
   type ResearchSchedule,
+  type ResearchScope,
   type ResearchSource,
   type ResearchTargetField,
   type ResearchTask,
@@ -25,6 +27,12 @@ const SCHEDULE_LABELS: Record<ResearchSchedule, string> = {
   on_demand: 'On-demand only',
   daily: 'Daily (when app is open)',
   weekly: 'Weekly (when app is open)',
+};
+
+const SCOPE_LABELS: Record<ResearchScope, string> = {
+  all: 'All surveyable dealerships',
+  not_visited: 'Not yet visited',
+  missing_cr: 'Missing CR number',
 };
 
 const STARTER_TEMPLATES: Array<Pick<ResearchTask, 'name' | 'instruction' | 'targetField' | 'sources'>> = [
@@ -69,8 +77,12 @@ export default function ResearchTasksManager() {
   const [targetField, setTargetField] = useState<ResearchTargetField>('noteAppend');
   const [sources, setSources] = useState<ResearchSource[]>([]);
   const [schedule, setSchedule] = useState<ResearchSchedule>('on_demand');
+  const [scope, setScope] = useState<ResearchScope>('all');
 
-  const load = async () => setTasks(await getAllResearchTasks());
+  const load = async () => {
+    setTasks(await getAllResearchTasks());
+    window.dispatchEvent(new Event(RESEARCH_TASKS_CHANGED));
+  };
   useEffect(() => {
     (async () => {
       setTasks(await getAllResearchTasks());
@@ -83,6 +95,7 @@ export default function ResearchTasksManager() {
     setTargetField('noteAppend');
     setSources([]);
     setSchedule('on_demand');
+    setScope('all');
     setShowForm(false);
   };
 
@@ -107,6 +120,7 @@ export default function ResearchTasksManager() {
       targetField,
       sources,
       schedule,
+      scope,
       enabled: true,
       createdAt: new Date().toISOString(),
       lastRunAt: null,
@@ -118,6 +132,11 @@ export default function ResearchTasksManager() {
 
   const toggleEnabled = async (t: ResearchTask) => {
     await saveResearchTask({ ...t, enabled: !t.enabled });
+    await load();
+  };
+
+  const updateTask = async (t: ResearchTask, patch: Partial<ResearchTask>) => {
+    await saveResearchTask({ ...t, ...patch });
     await load();
   };
 
@@ -136,9 +155,37 @@ export default function ResearchTasksManager() {
                 <div className="min-w-0">
                   <div className="text-sm font-medium text-foreground">{t.name}</div>
                   <div className="mt-0.5 text-xs text-muted line-clamp-2">{t.instruction}</div>
-                  <div className="mt-1.5 flex flex-wrap gap-1.5 text-[10px] text-muted">
+                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px] text-muted">
                     <span className="rounded-full bg-surface px-2 py-0.5">{TARGET_FIELD_LABELS[t.targetField]}</span>
-                    <span className="rounded-full bg-surface px-2 py-0.5">{SCHEDULE_LABELS[t.schedule]}</span>
+                    <select
+                      aria-label="Schedule"
+                      value={t.schedule}
+                      onChange={(e) => updateTask(t, { schedule: e.target.value as ResearchSchedule })}
+                      className="rounded-full border border-border bg-surface px-2 py-0.5 text-[10px] text-foreground"
+                    >
+                      {(Object.keys(SCHEDULE_LABELS) as ResearchSchedule[]).map((s) => (
+                        <option key={s} value={s}>
+                          {SCHEDULE_LABELS[s]}
+                        </option>
+                      ))}
+                    </select>
+                    {t.schedule !== 'on_demand' && (
+                      <select
+                        aria-label="Scheduled scope"
+                        value={t.scope ?? 'all'}
+                        onChange={(e) => updateTask(t, { scope: e.target.value as ResearchScope })}
+                        className="rounded-full border border-border bg-surface px-2 py-0.5 text-[10px] text-foreground"
+                      >
+                        {(Object.keys(SCOPE_LABELS) as ResearchScope[]).map((s) => (
+                          <option key={s} value={s}>
+                            {SCOPE_LABELS[s]}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+                  <div className="mt-1 text-[10px] text-muted">
+                    {t.lastRunAt ? `Last run ${new Date(t.lastRunAt).toLocaleString()}` : 'Never run'}
                   </div>
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-1.5">
@@ -247,10 +294,25 @@ export default function ResearchTasksManager() {
               ))}
             </select>
             {schedule !== 'on_demand' && (
-              <p className="mt-1 text-[11px] text-amber-500">
-                Runs when you open the app and a run is due — not a background service. For true
-                always-on scheduling, wire up a server cron against /api/research/run.
-              </p>
+              <>
+                <label className="mb-1 mt-3 block text-xs font-medium text-foreground">Scheduled runs cover</label>
+                <select
+                  value={scope}
+                  onChange={(e) => setScope(e.target.value as ResearchScope)}
+                  className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm text-foreground"
+                >
+                  {(Object.keys(SCOPE_LABELS) as ResearchScope[]).map((s) => (
+                    <option key={s} value={s}>
+                      {SCOPE_LABELS[s]}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-1 text-[11px] text-amber-500">
+                  Runs while the app is open and online: each dealership is re-checked once per{' '}
+                  {schedule === 'daily' ? 'day' : 'week'}, oldest first, using up to 80% of the daily run cap (the rest
+                  stays free for manual runs). A large roster is worked through over several days.
+                </p>
+              </>
             )}
           </div>
           <div className="flex gap-2">

@@ -133,6 +133,8 @@ export interface AppSettings {
   darkMode: boolean;
   remoteEndpoint: string | null; // optional future backend sync target
   dailyResearchCap: number; // Phase 2: max research-agent runs per day
+  researchAccessToken: string | null; // Phase 2: must match RESEARCH_ACCESS_TOKEN on the server
+  scheduledResearchPaused: boolean; // Phase 2: stop daily/weekly tasks from auto-running
 }
 
 export const VISIT_STATUS_LABEL: Record<VisitStatus, string> = {

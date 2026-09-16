@@ -1,38 +1,33 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { getAllDealerships, getAllResearchTasks } from '@/lib/db';
-import { checkDailyCapRemaining, ESTIMATED_COST_PER_RUN_USD, runResearchTask } from '@/lib/research-run';
-import type { ResearchTask } from '@/lib/research-types';
-import type { Dealership } from '@/lib/types';
-
-type BatchScope = 'all' | 'not_visited' | 'missing_cr';
-
-async function scopedDealerships(targetScope: BatchScope): Promise<Dealership[]> {
-  const all = await getAllDealerships();
-  const surveyable = all.filter((d) => d.visitStatus !== 'competitor' && d.visitStatus !== 'closed_moved');
-  if (targetScope === 'not_visited') return surveyable.filter((d) => d.visitStatus === 'not_visited');
-  if (targetScope === 'missing_cr') return surveyable.filter((d) => !d.crNumber);
-  return surveyable;
-}
+import { useEffect, useRef, useState } from 'react';
+import { getAllResearchTasks } from '@/lib/db';
+import { checkDailyCapRemaining, getSpendSummary, runResearchTask, scopedDealerships } from '@/lib/research-run';
+import { RESEARCH_TASKS_CHANGED, type ResearchScope, type ResearchTask } from '@/lib/research-types';
 
 export default function BatchResearchRunner() {
   const [tasks, setTasks] = useState<ResearchTask[]>([]);
   const [selectedTaskId, setSelectedTaskId] = useState('');
-  const [scope, setScope] = useState<BatchScope>('missing_cr');
+  const [scope, setScope] = useState<ResearchScope>('missing_cr');
   const [cap, setCap] = useState({ used: 0, cap: 0, remaining: 0 });
   const [confirming, setConfirming] = useState(false);
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState({ done: 0, total: 0 });
   const [result, setResult] = useState<string | null>(null);
+  const [avgCost, setAvgCost] = useState(0);
+  const stopRequested = useRef(false);
 
   useEffect(() => {
-    (async () => {
-      const t = await getAllResearchTasks();
-      setTasks(t.filter((x) => x.enabled));
-      if (t.length > 0) setSelectedTaskId((prev) => prev || t[0].id);
+    const refresh = async () => {
+      const enabled = (await getAllResearchTasks()).filter((x) => x.enabled);
+      setTasks(enabled);
+      setSelectedTaskId((prev) => (enabled.some((t) => t.id === prev) ? prev : (enabled[0]?.id ?? '')));
       setCap(await checkDailyCapRemaining());
-    })();
+      setAvgCost((await getSpendSummary()).avgPerRunUsd);
+    };
+    refresh();
+    window.addEventListener(RESEARCH_TASKS_CHANGED, refresh);
+    return () => window.removeEventListener(RESEARCH_TASKS_CHANGED, refresh);
   }, []);
 
   const [previewCount, setPreviewCount] = useState<number | null>(null);
@@ -51,24 +46,44 @@ export default function BatchResearchRunner() {
 
     let succeeded = 0;
     let failed = 0;
+    let spent = 0;
+    let stopNote = '';
+    stopRequested.current = false;
     for (const d of dealerships) {
+      if (stopRequested.current) {
+        stopNote = ' Stopped by you.';
+        break;
+      }
       const outcome = await runResearchTask(d, task);
-      if (outcome.capReached) break;
-      if (outcome.ok) succeeded += 1;
-      else failed += 1;
+      if (outcome.capReached) {
+        stopNote = ' Daily cap reached.';
+        break;
+      }
+      if (outcome.fatal) {
+        failed += 1;
+        stopNote = ` Stopped: ${outcome.error}`;
+        break;
+      }
+      if (outcome.ok) {
+        succeeded += 1;
+        spent += outcome.finding?.costUsd ?? 0;
+      } else failed += 1;
       setProgress((p) => ({ ...p, done: p.done + 1 }));
     }
 
     setRunning(false);
-    setResult(`Done — ${succeeded} succeeded, ${failed} failed. Review results per-dealership from the Survey → Research panel.`);
+    setResult(
+      `Done — ${succeeded} succeeded, ${failed} failed, $${spent.toFixed(2)} spent.${stopNote} Review results per dealership from Survey → Research, or changed values on the Dashboard.`
+    );
     setCap(await checkDailyCapRemaining());
+    setAvgCost((await getSpendSummary()).avgPerRunUsd);
   };
 
   if (tasks.length === 0) {
     return <p className="text-xs text-muted">Add and enable at least one research task first.</p>;
   }
 
-  const estimatedCost = previewCount !== null ? previewCount * ESTIMATED_COST_PER_RUN_USD : 0;
+  const estimatedCost = previewCount !== null ? previewCount * avgCost : 0;
 
   return (
     <div className="space-y-3">
@@ -90,7 +105,7 @@ export default function BatchResearchRunner() {
         <label className="mb-1 block text-xs font-medium text-foreground">Which dealerships</label>
         <select
           value={scope}
-          onChange={(e) => setScope(e.target.value as typeof scope)}
+          onChange={(e) => setScope(e.target.value as ResearchScope)}
           className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm text-foreground"
         >
           <option value="missing_cr">Missing CR number</option>
@@ -102,12 +117,17 @@ export default function BatchResearchRunner() {
       <div className="rounded-lg bg-surface-2 px-3 py-2 text-xs text-muted">
         {cap.remaining} of {cap.cap} daily runs remaining · will process up to{' '}
         <b className="text-foreground">{previewCount ?? '…'}</b> dealerships · estimated cost{' '}
-        <b className="text-foreground">${estimatedCost.toFixed(2)}</b> (rough — actual cost is billed and logged per run)
+        <b className="text-foreground">${estimatedCost.toFixed(2)}</b> (at ~${avgCost.toFixed(2)}/run, from your past runs once there are a few; actual cost is logged per run)
       </div>
 
       {running ? (
-        <div className="rounded-lg bg-accent/10 px-3 py-2 text-xs text-accent">
-          Running {progress.done} / {progress.total}…
+        <div className="flex items-center justify-between rounded-lg bg-accent/10 px-3 py-2 text-xs text-accent">
+          <span>
+            Running {progress.done} / {progress.total}…
+          </span>
+          <button onClick={() => (stopRequested.current = true)} className="font-medium underline">
+            Stop
+          </button>
         </div>
       ) : !confirming ? (
         <button
