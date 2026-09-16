@@ -14,6 +14,7 @@ import type {
   InventoryCountBasis,
   MonthlyFinancedBand,
   MonthlySoldBand,
+  NetworkRole,
   PilotInterest,
   SizeBasis,
   VehicleType,
@@ -31,6 +32,7 @@ import BasisToggle from '@/components/survey/BasisToggle';
 import ChipMultiSelect from '@/components/survey/ChipMultiSelect';
 import PhotoCapture from '@/components/survey/PhotoCapture';
 import VoiceNotes from '@/components/survey/VoiceNotes';
+import DealershipResearchPanel from '@/components/research/DealershipResearchPanel';
 
 const STEPS = [
   'Identity',
@@ -39,6 +41,7 @@ const STEPS = [
   'People',
   'Commercial',
   'Financing pain',
+  'Network',
   'Customers',
   'Data quality',
   'Review',
@@ -54,6 +57,7 @@ export default function SurveyPage() {
   const [photoCount, setPhotoCount] = useState(0);
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [missingBasisWarning, setMissingBasisWarning] = useState<string[]>([]);
+  const [researchOpen, setResearchOpen] = useState(false);
   const loadedOnce = useRef(false);
 
   useEffect(() => {
@@ -145,13 +149,18 @@ export default function SurveyPage() {
   };
 
   return (
-    <div className="safe-top flex h-full flex-col bg-background">
+    <div className="safe-top relative flex h-full flex-col bg-background">
       <header className="border-b border-border px-4 py-3">
         <div className="flex items-center justify-between gap-2">
           <button onClick={() => router.push('/')} className="text-sm font-medium text-muted">
             ← Map
           </button>
-          <SaveIndicator state={saveState} />
+          <div className="flex items-center gap-3">
+            <button onClick={() => setResearchOpen(true)} className="text-sm font-medium text-accent">
+              🔍 Research
+            </button>
+            <SaveIndicator state={saveState} />
+          </div>
         </div>
         <h1 className="mt-1 truncate text-base font-semibold text-foreground">{draft.nameEn || 'Unnamed dealership'}</h1>
         <div className="mt-2 flex gap-1">
@@ -176,8 +185,9 @@ export default function SurveyPage() {
         {step === 3 && <PeopleStep draft={draft} update={update} />}
         {step === 4 && <CommercialStep draft={draft} update={update} updateFlagged={updateFlagged} />}
         {step === 5 && <FinancingStep draft={draft} update={update} updateFlagged={updateFlagged} />}
-        {step === 6 && <CustomersStep draft={draft} update={update} />}
-        {step === 7 && (
+        {step === 6 && <NetworkStep draft={draft} update={update} updateFlagged={updateFlagged} />}
+        {step === 7 && <CustomersStep draft={draft} update={update} />}
+        {step === 8 && (
           <DataQualityStep
             draft={draft}
             update={update}
@@ -186,7 +196,7 @@ export default function SurveyPage() {
             missingBasisWarning={missingBasisWarning}
           />
         )}
-        {step === 8 && (
+        {step === 9 && (
           <ReviewStep draft={draft} onEditStep={setStep} missingBasisWarning={checkMissingBasisFlags()} />
         )}
       </div>
@@ -220,6 +230,17 @@ export default function SurveyPage() {
           </>
         )}
       </div>
+
+      {researchOpen && (
+        <DealershipResearchPanel
+          dealershipId={draft.id}
+          onClose={async () => {
+            setResearchOpen(false);
+            const fresh = await getDealership(draft.id);
+            if (fresh) setDraft(fresh);
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -524,6 +545,73 @@ function FinancingStep({
 }
 
 // ---------- Step 7: Customers ----------
+// ---------- Step 7: Network (dealer → sub-dealer, not end customer) ----------
+function NetworkStep({
+  draft,
+  update,
+  updateFlagged,
+}: {
+  draft: Dealership;
+  update: <K extends keyof Dealership>(key: K, value: Dealership[K]) => void;
+  updateFlagged: <T>(key: keyof Dealership, patch: Partial<FlaggedValue<T>>) => void;
+}) {
+  const roleOpts: NetworkRole[] = ['retail_only', 'supplies_sub_dealers', 'sub_dealer_of_another', 'both'];
+  const suppliesTo = draft.networkRole === 'supplies_sub_dealers' || draft.networkRole === 'both';
+  const subDealerOf = draft.networkRole === 'sub_dealer_of_another' || draft.networkRole === 'both';
+
+  return (
+    <div className="space-y-5">
+      <div className="rounded-xl border border-border bg-surface-2 p-3 text-xs text-muted">
+        This is about the wholesale layer — does this dealership move cars to <b>other, smaller dealers</b>{' '}
+        who then resell them, separately from selling to the end customer (already covered under
+        Commercial / Financing pain)?
+      </div>
+
+      <Field label="Role in the dealer network">
+        <SegmentedControl
+          options={roleOpts.map((v) => ({ value: v, label: labelize(v) }))}
+          value={draft.networkRole}
+          onChange={(v) => update('networkRole', v)}
+        />
+      </Field>
+
+      {subDealerOf && (
+        <Field label="Buys stock from (hub / supplier)">
+          <TextInput
+            value={draft.subDealerOfName}
+            onChange={(e) => update('subDealerOfName', e.target.value)}
+            placeholder="Name of the dealership or importer they source from"
+          />
+        </Field>
+      )}
+
+      {suppliesTo && (
+        <>
+          <Field label="Supplies which sub-dealers" hint="Add each sub-dealer name">
+            <ChipMultiSelect
+              options={[]}
+              value={draft.suppliesSubDealerNames}
+              onChange={(v) => update('suppliesSubDealerNames', v)}
+              freeTextPlaceholder="Sub-dealer name…"
+            />
+          </Field>
+
+          <Field label="Sell-through to sub-dealers per month" hint="Units moved to sub-dealers, not to end customers">
+            <NumberInput
+              value={draft.sellThroughUnitsPerMonth.value}
+              onValueChange={(v) => updateFlagged<number>('sellThroughUnitsPerMonth', { value: v })}
+            />
+            <BasisToggle
+              basis={draft.sellThroughUnitsPerMonth.basis}
+              onChange={(b) => updateFlagged<number>('sellThroughUnitsPerMonth', { basis: b })}
+            />
+          </Field>
+        </>
+      )}
+    </div>
+  );
+}
+
 function CustomersStep({
   draft,
   update,
@@ -629,8 +717,9 @@ function ReviewStep({
     ['Brands', draft.mainBrands.join(', ') || '—', 4],
     ['Financing lost/month', String(draft.financingLostPerMonth.value ?? '—'), 5],
     ['Banks partnered', draft.banksPartnered.join(', ') || '—', 5],
-    ['Volume figures basis', draft.volumeFiguresBasis ? labelize(draft.volumeFiguresBasis) : '—', 7],
-    ['Open to pilot', draft.openToPilot ? labelize(draft.openToPilot) : '—', 7],
+    ['Network role', draft.networkRole ? labelize(draft.networkRole) : '—', 6],
+    ['Volume figures basis', draft.volumeFiguresBasis ? labelize(draft.volumeFiguresBasis) : '—', 8],
+    ['Open to pilot', draft.openToPilot ? labelize(draft.openToPilot) : '—', 8],
   ];
 
   return (

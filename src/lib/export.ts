@@ -43,6 +43,11 @@ function flatten(d: Dealership): Record<string, string | number> {
     bank_on_site: d.bankOnSite ?? '',
     buyer_mix: d.buyerMix ?? '',
     lead_mix_online_pct: d.leadMixOnlinePct ?? '',
+    network_role: d.networkRole ?? '',
+    sub_dealer_of: d.subDealerOfName,
+    supplies_sub_dealers: d.suppliesSubDealerNames.join('; '),
+    sell_through_units_per_month: d.sellThroughUnitsPerMonth.value ?? '',
+    sell_through_units_per_month_basis: d.sellThroughUnitsPerMonth.basis ?? '',
     volume_figures_basis: d.volumeFiguresBasis ?? '',
     open_to_pilot: d.openToPilot ?? '',
     notes: d.notes,
@@ -60,6 +65,8 @@ const HEADERS = [
   'avg_monthly_sold_basis', 'avg_monthly_financed', 'avg_monthly_financed_basis',
   'financing_lost_per_month', 'financing_lost_per_month_basis', 'main_fail_reason',
   'financing_workaround', 'banks_partnered', 'bank_on_site', 'buyer_mix', 'lead_mix_online_pct',
+  'network_role', 'sub_dealer_of', 'supplies_sub_dealers', 'sell_through_units_per_month',
+  'sell_through_units_per_month_basis',
   'volume_figures_basis', 'open_to_pilot', 'notes', 'photo_count', 'updated_at',
 ];
 

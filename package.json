@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.120.0",
     "exceljs": "^4.4.0",
     "idb": "^8.0.3",
     "leaflet": "^1.9.4",

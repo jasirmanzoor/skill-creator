@@ -1,9 +1,10 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 import type { AppSettings, Dealership, Photo, SyncQueueItem } from './types';
 import { buildSeedDealerships } from './seed';
+import type { AgentFinding, DuplicateFlag, ResearchRunLogEntry, ResearchTask } from './research-types';
 
 const DB_NAME = 'qadisiyah-survey';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 interface SurveyDB extends DBSchema {
   dealerships: {
@@ -23,6 +24,24 @@ interface SurveyDB extends DBSchema {
   settings: {
     key: string;
     value: AppSettings;
+  };
+  researchTasks: {
+    key: string;
+    value: ResearchTask;
+  };
+  agentFindings: {
+    key: string;
+    value: AgentFinding;
+    indexes: { 'by-dealership': string };
+  };
+  researchRuns: {
+    key: string;
+    value: ResearchRunLogEntry;
+    indexes: { 'by-date': string };
+  };
+  duplicateFlags: {
+    key: string;
+    value: DuplicateFlag;
   };
 }
 
@@ -46,6 +65,20 @@ function getDB(): Promise<IDBPDatabase<SurveyDB>> {
         }
         if (!db.objectStoreNames.contains('settings')) {
           db.createObjectStore('settings', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('researchTasks')) {
+          db.createObjectStore('researchTasks', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('agentFindings')) {
+          const store = db.createObjectStore('agentFindings', { keyPath: 'id' });
+          store.createIndex('by-dealership', 'dealershipId');
+        }
+        if (!db.objectStoreNames.contains('researchRuns')) {
+          const store = db.createObjectStore('researchRuns', { keyPath: 'id' });
+          store.createIndex('by-date', 'ranAt');
+        }
+        if (!db.objectStoreNames.contains('duplicateFlags')) {
+          db.createObjectStore('duplicateFlags', { keyPath: 'id' });
         }
       },
     });
@@ -163,12 +196,15 @@ const DEFAULT_SETTINGS: AppSettings = {
   surveyorName: null,
   darkMode: false,
   remoteEndpoint: null,
+  dailyResearchCap: 50,
 };
 
 export async function getSettings(): Promise<AppSettings> {
   const db = await getDB();
   const s = await db.get('settings', 'singleton');
-  return s ?? DEFAULT_SETTINGS;
+  // Merge with defaults so records saved before a settings field existed
+  // (e.g. dailyResearchCap) don't come back with it missing.
+  return { ...DEFAULT_SETTINGS, ...s };
 }
 
 export async function saveSettings(s: AppSettings): Promise<void> {
@@ -182,4 +218,84 @@ export async function resetAllData(): Promise<void> {
   await db.clear('photos');
   await db.clear('syncQueue');
   await ensureSeeded();
+}
+
+// ---------- Phase 2: research tasks ----------
+
+export async function getAllResearchTasks(): Promise<ResearchTask[]> {
+  const db = await getDB();
+  return db.getAll('researchTasks');
+}
+
+export async function saveResearchTask(task: ResearchTask): Promise<void> {
+  const db = await getDB();
+  await db.put('researchTasks', task);
+}
+
+export async function deleteResearchTask(id: string): Promise<void> {
+  const db = await getDB();
+  await db.delete('researchTasks', id);
+}
+
+// ---------- Phase 2: agent-sourced findings ----------
+
+export async function saveFinding(finding: AgentFinding): Promise<void> {
+  const db = await getDB();
+  await db.put('agentFindings', finding);
+}
+
+export async function getFindingsForDealership(dealershipId: string): Promise<AgentFinding[]> {
+  const db = await getDB();
+  return db.getAllFromIndex('agentFindings', 'by-dealership', dealershipId);
+}
+
+export async function getAllFindings(): Promise<AgentFinding[]> {
+  const db = await getDB();
+  return db.getAll('agentFindings');
+}
+
+export async function updateFindingStatus(id: string, status: AgentFinding['status']): Promise<void> {
+  const db = await getDB();
+  const f = await db.get('agentFindings', id);
+  if (!f) return;
+  await db.put('agentFindings', { ...f, status });
+}
+
+// ---------- Phase 2: run log / cost tracking ----------
+
+export async function logResearchRun(entry: ResearchRunLogEntry): Promise<void> {
+  const db = await getDB();
+  await db.put('researchRuns', entry);
+}
+
+export async function getRunsToday(): Promise<ResearchRunLogEntry[]> {
+  const db = await getDB();
+  const all = await db.getAll('researchRuns');
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  return all.filter((r) => new Date(r.ranAt) >= todayStart);
+}
+
+// ---------- Phase 2: suspected duplicates ----------
+
+export async function saveDuplicateFlags(flags: DuplicateFlag[]): Promise<void> {
+  const db = await getDB();
+  const tx = db.transaction('duplicateFlags', 'readwrite');
+  for (const f of flags) await tx.store.put(f);
+  await tx.done;
+}
+
+export async function getAllDuplicateFlags(): Promise<DuplicateFlag[]> {
+  const db = await getDB();
+  return db.getAll('duplicateFlags');
+}
+
+export async function updateDuplicateFlagStatus(
+  id: string,
+  status: DuplicateFlag['status']
+): Promise<void> {
+  const db = await getDB();
+  const f = await db.get('duplicateFlags', id);
+  if (!f) return;
+  await db.put('duplicateFlags', { ...f, status });
 }

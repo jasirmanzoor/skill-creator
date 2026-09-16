@@ -1,11 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSettings } from '@/lib/settings-context';
 import { resetAllData } from '@/lib/db';
 import ImportDealerships from '@/components/ImportDealerships';
 import DiscoverDealerships from '@/components/DiscoverDealerships';
+import ResearchTasksManager from '@/components/research/ResearchTasksManager';
+import BatchResearchRunner from '@/components/research/BatchResearchRunner';
+import { getSettings, saveSettings } from '@/lib/db';
 
 export default function SettingsPage() {
   const { surveyorName, darkMode, remoteEndpoint, logout, toggleDarkMode, setRemoteEndpoint } =
@@ -13,6 +16,17 @@ export default function SettingsPage() {
   const router = useRouter();
   const [endpointInput, setEndpointInput] = useState(remoteEndpoint ?? '');
   const [confirmingReset, setConfirmingReset] = useState(false);
+  const [dailyCap, setDailyCap] = useState(50);
+
+  useEffect(() => {
+    getSettings().then((s) => setDailyCap(s.dailyResearchCap));
+  }, []);
+
+  const saveDailyCap = async (n: number) => {
+    setDailyCap(n);
+    const s = await getSettings();
+    await saveSettings({ ...s, dailyResearchCap: n });
+  };
 
   return (
     <div className="safe-top h-full overflow-y-auto pb-24">
@@ -109,11 +123,50 @@ export default function SettingsPage() {
           </div>
         </section>
 
+        <section className="rounded-2xl border border-border bg-surface p-4">
+          <div className="text-sm font-medium text-foreground">Research tasks</div>
+          <p className="mt-1 text-xs text-muted">
+            Define what the research agent should look up, in your own words — no code. It
+            searches in English and Arabic and writes findings into a separate agent-sourced
+            layer that never overwrites what you collected in the field.
+          </p>
+          <div className="mt-3">
+            <ResearchTasksManager />
+          </div>
+        </section>
+
+        <section className="rounded-2xl border border-border bg-surface p-4">
+          <div className="text-sm font-medium text-foreground">Research cost control</div>
+          <p className="mt-1 text-xs text-muted">
+            Every run costs real money (Claude API tokens + web search). Cap how many runs can
+            happen per day.
+          </p>
+          <div className="mt-3 flex items-center gap-2">
+            <label className="text-xs text-muted">Max runs / day</label>
+            <input
+              type="number"
+              min={1}
+              value={dailyCap}
+              onChange={(e) => saveDailyCap(Math.max(1, Number(e.target.value) || 1))}
+              className="w-24 rounded-lg border border-border bg-surface-2 px-3 py-1.5 text-sm text-foreground outline-none focus:border-accent"
+            />
+          </div>
+          <p className="mt-2 text-[11px] text-muted">
+            Requires <code className="rounded bg-surface-2 px-1 py-0.5">ANTHROPIC_API_KEY</code>{' '}
+            set on your deployment. Without it, research runs return a clear error instead of
+            silently failing.
+          </p>
+          <div className="mt-4 border-t border-border pt-4">
+            <div className="mb-2 text-xs font-medium text-foreground">Run a task across many dealerships</div>
+            <BatchResearchRunner />
+          </div>
+        </section>
+
         <section className="rounded-2xl border border-red-500/30 bg-red-500/5 p-4">
           <div className="text-sm font-medium text-red-500">Reset all data</div>
           <p className="mt-1 text-xs text-muted">
-            Wipes every survey record, photo, and note on this device and reloads the
-            original 38-dealership roster. Cannot be undone — export first if unsure.
+            Wipes every survey record, photo, and note on this device and reloads the built-in
+            roster. Cannot be undone — export first if unsure.
           </p>
           {!confirmingReset ? (
             <button
