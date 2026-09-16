@@ -1,5 +1,6 @@
 import { haversineMeters } from './geo';
 import type { Dealership } from './types';
+import { marketOf } from './markets';
 import type { DuplicateFlag } from './research-types';
 
 const GENERIC_WORDS = new Set([
@@ -84,6 +85,8 @@ export function findSuspectedDuplicates(dealerships: Dealership[]): DuplicateFla
     const a = candidates[i];
     for (let j = i + 1; j < candidates.length; j++) {
       const b = candidates[j];
+      // The same operator with a desk in both markets is two real showrooms, not a duplicate.
+      if (marketOf(a.d) !== marketOf(b.d)) continue;
 
       let reason: string | null = null;
       const en = englishNameMatch(a.d.nameEn, b.d.nameEn);

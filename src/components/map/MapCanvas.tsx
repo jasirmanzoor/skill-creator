@@ -6,7 +6,6 @@ import type L from 'leaflet';
 import type { Dealership } from '@/lib/types';
 import { statusIcon, userLocationIcon } from '@/lib/icons';
 
-const AL_QADISIYAH_CENTER: [number, number] = [24.8260, 46.8230];
 
 const TILE_LAYERS = {
   street: {
@@ -27,6 +26,20 @@ function FlyTo({ target }: { target: [number, number] | null }) {
   return null;
 }
 
+/** Re-centres the map when the market changes (MapContainer's center is only read once). */
+function MarketView({ center, zoom }: { center: { lat: number; lng: number }; zoom: number }) {
+  const map = useMap();
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    map.setView([center.lat, center.lng], zoom, { animate: false });
+  }, [center.lat, center.lng, zoom, map]);
+  return null;
+}
+
 interface MapCanvasProps {
   dealerships: Dealership[];
   selectedId: string | null;
@@ -35,6 +48,8 @@ interface MapCanvasProps {
   userLocation: { lat: number; lng: number } | null;
   routeStops?: Dealership[];
   flyTarget: [number, number] | null;
+  center: { lat: number; lng: number };
+  zoom: number;
 }
 
 export default function MapCanvas({
@@ -45,18 +60,21 @@ export default function MapCanvas({
   userLocation,
   routeStops,
   flyTarget,
+  center,
+  zoom,
 }: MapCanvasProps) {
   const markerRefs = useRef<Record<string, L.Marker | null>>({});
 
   return (
     <MapContainer
-      center={AL_QADISIYAH_CENTER}
-      zoom={15}
+      center={[center.lat, center.lng]}
+      zoom={zoom}
       className="h-full w-full"
       zoomControl={false}
     >
       <TileLayer key={basemap} url={TILE_LAYERS[basemap].url} attribution={TILE_LAYERS[basemap].attribution} maxZoom={19} />
       <FlyTo target={flyTarget} />
+      <MarketView center={center} zoom={zoom} />
 
       {routeStops && routeStops.length > 1 && (
         <Polyline
@@ -73,7 +91,7 @@ export default function MapCanvas({
         <Marker
           key={d.id}
           position={[d.lat, d.lng]}
-          icon={statusIcon(d.visitStatus, d.id === selectedId)}
+          icon={statusIcon(d.visitStatus, d.id === selectedId, Boolean(d.needsGps))}
           ref={(el) => {
             markerRefs.current[d.id] = el;
           }}

@@ -1,6 +1,7 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 import type { AppSettings, Dealership, Photo, SyncQueueItem } from './types';
 import { buildSeedDealerships } from './seed';
+import { buildShifaDealerships } from './shifa-seed';
 import { mergeDealershipRecords } from './merge-dealerships';
 import { duplicatePairId } from './duplicate-detection';
 import type { AgentFinding, DuplicateFlag, ResearchRunLogEntry, ResearchTask } from './research-types';
@@ -93,10 +94,25 @@ export async function ensureSeeded(): Promise<void> {
   const count = await db.count('dealerships');
   if (count === 0) {
     const tx = db.transaction('dealerships', 'readwrite');
-    for (const d of buildSeedDealerships()) {
+    for (const d of [...buildSeedDealerships(), ...buildShifaDealerships()]) {
       await tx.store.put(d);
     }
     await tx.done;
+    const s = await getSettings();
+    await saveSettings({ ...s, shifaSeeded: true });
+    return;
+  }
+  // Devices that already had the Al Qadisiyah roster get the Al Shifa sheet
+  // added once. Never overwrites a record that already exists (e.g. one you
+  // surveyed), and never re-adds pins you removed afterwards.
+  const settings = await getSettings();
+  if (!settings.shifaSeeded) {
+    const tx = db.transaction('dealerships', 'readwrite');
+    for (const d of buildShifaDealerships()) {
+      if (!(await tx.store.get(d.id))) await tx.store.put(d);
+    }
+    await tx.done;
+    await saveSettings({ ...settings, shifaSeeded: true });
   }
 }
 
@@ -201,6 +217,8 @@ const DEFAULT_SETTINGS: AppSettings = {
   dailyResearchCap: 50,
   researchAccessToken: null,
   scheduledResearchPaused: false,
+  activeMarket: 'qadisiyah',
+  shifaSeeded: false,
 };
 
 export async function getSettings(): Promise<AppSettings> {
@@ -226,6 +244,8 @@ export async function resetAllData(): Promise<void> {
   await db.clear('agentFindings');
   await db.clear('researchRuns');
   await db.clear('duplicateFlags');
+  const s = await getSettings();
+  await saveSettings({ ...s, shifaSeeded: false });
   await ensureSeeded();
 }
 

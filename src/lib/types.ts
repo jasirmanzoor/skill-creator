@@ -1,4 +1,6 @@
-// Core domain types for the Al Qadisiyah Dealership Intelligence Platform.
+// Core domain types for the Riyadh dealership intelligence platform
+// (Al Qadisiyah and Al Shifa markets).
+import type { MarketId } from './markets';
 
 export type VisitStatus =
   | 'not_visited'
@@ -61,6 +63,10 @@ export interface Dealership {
   listedPhone: string;
   note?: string;
   isSeed: boolean; // came from the starting roster vs added in the field
+  market?: MarketId; // missing on older records = 'qadisiyah'
+  sdId?: string; // the sheet's SD ID (e.g. S0072), when imported from a sheet
+  street?: string; // street / corridor from the mapping sheet
+  needsGps?: boolean; // pin is approximate — confirm on site
 
   // Visit metadata
   visitStatus: VisitStatus;
@@ -135,6 +141,8 @@ export interface AppSettings {
   dailyResearchCap: number; // Phase 2: max research-agent runs per day
   researchAccessToken: string | null; // Phase 2: must match RESEARCH_ACCESS_TOKEN on the server
   scheduledResearchPaused: boolean; // Phase 2: stop daily/weekly tasks from auto-running
+  activeMarket: MarketId; // which market the map, dashboard and export show
+  shifaSeeded: boolean; // Al Shifa sheet has been added to this device's roster
 }
 
 export const VISIT_STATUS_LABEL: Record<VisitStatus, string> = {

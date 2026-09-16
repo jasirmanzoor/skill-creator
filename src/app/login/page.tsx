@@ -22,7 +22,7 @@ export default function LoginPage() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-accent text-2xl font-bold text-accent-contrast">
             AQ
           </div>
-          <h1 className="text-xl font-semibold text-foreground">Al Qadisiyah Dealership Survey</h1>
+          <h1 className="text-xl font-semibold text-foreground">Al Qadisiyah &amp; Al Shifa Dealership Survey</h1>
           <p className="mt-1 text-sm text-muted">Field intelligence for embedded auto-financing</p>
         </div>
 

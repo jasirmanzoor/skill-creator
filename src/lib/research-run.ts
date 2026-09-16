@@ -13,6 +13,7 @@ import {
 } from './db';
 import type { AgentFinding, ResearchRunLogEntry, ResearchScope, ResearchTask } from './research-types';
 import type { Dealership } from './types';
+import { marketOf, type MarketId } from './markets';
 
 // Fallback per-run estimate used before any real runs have been logged. Real
 // runs (Opus tokens + up to 5 searches at $10/1,000, with search results fed
@@ -67,8 +68,8 @@ export async function getSpendSummary(): Promise<{ todayUsd: number; last30Usd: 
   };
 }
 
-export async function scopedDealerships(scope: ResearchScope): Promise<Dealership[]> {
-  const all = await getAllDealerships();
+export async function scopedDealerships(scope: ResearchScope, market?: MarketId): Promise<Dealership[]> {
+  const all = (await getAllDealerships()).filter((d) => !market || marketOf(d) === market);
   const surveyable = all.filter((d) => d.visitStatus !== 'competitor' && d.visitStatus !== 'closed_moved');
   if (scope === 'not_visited') return surveyable.filter((d) => d.visitStatus === 'not_visited');
   if (scope === 'missing_cr') return surveyable.filter((d) => !d.crNumber);
@@ -111,7 +112,7 @@ export async function runResearchTask(dealership: Dealership, task: ResearchTask
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-research-token': settings.researchAccessToken ?? '' },
       body: JSON.stringify({
-        dealership: { id: dealership.id, nameEn: dealership.nameEn, nameAr: dealership.nameAr, lat: dealership.lat, lng: dealership.lng },
+        dealership: { id: dealership.id, nameEn: dealership.nameEn, nameAr: dealership.nameAr, lat: dealership.lat, lng: dealership.lng, market: marketOf(dealership) },
         task: { instruction: task.instruction, targetField: task.targetField, sources: task.sources },
       }),
     });

@@ -8,6 +8,7 @@ import {
   tokensMatch,
   verifySource,
 } from '@/lib/research-parse';
+import { MARKETS, isMarketId } from '@/lib/markets';
 
 export const runtime = 'nodejs';
 // A run with several web searches can take a while. 60s fits every Vercel
@@ -29,7 +30,7 @@ const MAX_CONTINUATIONS = 3;
 const LIMITS = { name: 200, instruction: 1000, source: 120, sources: 10 };
 
 interface RunRequestBody {
-  dealership: { id: string; nameEn: string; nameAr: string; lat: number; lng: number };
+  dealership: { id: string; nameEn: string; nameAr: string; lat: number; lng: number; market?: string };
   task: { instruction: string; targetField: string; sources: string[] };
 }
 
@@ -53,7 +54,14 @@ function validate(body: unknown): RunRequestBody | string {
     return 'Invalid sources list';
   }
   return {
-    dealership: { id: String(d.id ?? ''), nameEn: d.nameEn.trim(), nameAr: (d.nameAr ?? '').trim(), lat: d.lat, lng: d.lng },
+    dealership: {
+      id: String(d.id ?? ''),
+      nameEn: d.nameEn.trim(),
+      nameAr: (d.nameAr ?? '').trim(),
+      lat: d.lat,
+      lng: d.lng,
+      market: isMarketId(d.market) ? d.market : 'qadisiyah',
+    },
     task: { instruction: t.instruction.trim(), targetField: String(t.targetField ?? ''), sources },
   };
 }
@@ -94,10 +102,11 @@ export async function POST(req: Request) {
   const { dealership, task } = body;
 
   const client = new Anthropic({ apiKey });
+  const market = MARKETS[isMarketId(dealership.market) ? dealership.market : 'qadisiyah'];
 
-  const system = `You are a research assistant helping verify public information about small independent car dealerships in the Al Qadisiyah car market, East Riyadh, Saudi Arabia. You will be given one dealership's name and approximate location, and a specific research instruction.
+  const system = `You are a research assistant helping verify public information about small independent car dealerships in Riyadh's car markets (Al Qadisiyah in East Riyadh, Al Shifa in South Riyadh), Saudi Arabia. You will be given one dealership's name and approximate location, and a specific research instruction.
 
-Search the web — try both English and Arabic search terms, since these are small local businesses with a stronger Arabic footprint. A search combining the name with "Riyadh Qadisiyah" (or "الرياض القادسية") usually anchors results best; if the English transliteration finds nothing, switch to the Arabic name. Sources worth checking: Google Maps/Business listings, Saudi car marketplaces (Haraj, Motory, OpenSooq, Syarah, YallaMotor, Soum), Instagram, X/Twitter, WhatsApp Business, and the Saudi Ministry of Commerce registry where accessible.
+Search the web — try both English and Arabic search terms, since these are small local businesses with a stronger Arabic footprint. A search combining the name with the market's locality (given below) usually anchors results best; if the English transliteration finds nothing, switch to the Arabic name. Sources worth checking: Google Maps/Business listings, Saudi car marketplaces (Haraj, Motory, OpenSooq, Syarah, YallaMotor, Soum), Instagram, X/Twitter, WhatsApp Business, and the Saudi Ministry of Commerce registry where accessible.
 
 Rules:
 - Only report something you actually found on a page returned by your searches. Never guess, infer, or fabricate a value.
@@ -110,7 +119,8 @@ Rules:
 {"found": boolean, "value": string|null, "confidence": "high"|"medium"|"low", "sourceUrl": string|null, "summary": string}`;
 
   const userPrompt = `Dealership: ${dealership.nameEn}${dealership.nameAr ? ` (Arabic: ${dealership.nameAr})` : ''}
-Location: Al Qadisiyah district, East Riyadh, Saudi Arabia (approx. ${dealership.lat.toFixed(4)}, ${dealership.lng.toFixed(4)})
+Location: ${market.label} (${market.labelAr}) car market, ${market.area}, Saudi Arabia (approx. ${dealership.lat.toFixed(4)}, ${dealership.lng.toFixed(4)})
+Locality to add to searches: "${market.searchAnchor}" / "${market.searchAnchorAr}"
 Sources to prioritise: ${task.sources.join(', ') || 'any relevant public source'}
 
 Research task: ${task.instruction}`;

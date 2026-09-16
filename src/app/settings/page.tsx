@@ -10,9 +10,10 @@ import ResearchTasksManager from '@/components/research/ResearchTasksManager';
 import BatchResearchRunner from '@/components/research/BatchResearchRunner';
 import { getSettings, saveSettings } from '@/lib/db';
 import { getSpendSummary } from '@/lib/research-run';
+import { MARKETS } from '@/lib/markets';
 
 export default function SettingsPage() {
-  const { surveyorName, darkMode, remoteEndpoint, logout, toggleDarkMode, setRemoteEndpoint } =
+  const { surveyorName, darkMode, remoteEndpoint, logout, toggleDarkMode, setRemoteEndpoint, activeMarket } =
     useSettings();
   const router = useRouter();
   const [endpointInput, setEndpointInput] = useState(remoteEndpoint ?? '');
@@ -127,12 +128,12 @@ export default function SettingsPage() {
         <section className="rounded-2xl border border-border bg-surface p-4">
           <div className="text-sm font-medium text-foreground">Discover more dealerships</div>
           <p className="mt-1 text-xs text-muted">
-            Search OpenStreetMap for car dealerships near Al Qadisiyah that aren&apos;t on your
+            Search OpenStreetMap for car dealerships near {MARKETS[activeMarket].label} (the market selected on the Map) that aren&apos;t on your
             roster yet. This is how you grow toward the market&apos;s real size — real, sourced
             names and coordinates, never invented ones. Each result still needs a field visit.
           </p>
           <div className="mt-3">
-            <DiscoverDealerships onImported={() => {}} />
+            <DiscoverDealerships market={activeMarket} onImported={() => {}} />
           </div>
         </section>
 
@@ -140,10 +141,10 @@ export default function SettingsPage() {
           <div className="text-sm font-medium text-foreground">Import dealerships</div>
           <p className="mt-1 text-xs text-muted">
             Load a manually-surveyed CSV or Excel sheet — map its columns to fields and merge
-            it into the roster without overwriting existing records.
+            it into the {MARKETS[activeMarket].label} roster without overwriting existing records.
           </p>
           <div className="mt-3">
-            <ImportDealerships onImported={() => {}} />
+            <ImportDealerships market={activeMarket} onImported={() => {}} />
           </div>
         </section>
 

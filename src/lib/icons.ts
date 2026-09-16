@@ -3,8 +3,9 @@ import { VISIT_STATUS_COLOR, type VisitStatus } from './types';
 
 const cache = new Map<string, L.DivIcon>();
 
-export function statusIcon(status: VisitStatus, selected = false): L.DivIcon {
-  const key = `${status}-${selected}`;
+/** approximate = pin placed on the corridor, not a surveyed GPS fix (dashed white ring). */
+export function statusIcon(status: VisitStatus, selected = false, approximate = false): L.DivIcon {
+  const key = `${status}-${selected}-${approximate}`;
   const cached = cache.get(key);
   if (cached) return cached;
 
@@ -16,7 +17,7 @@ export function statusIcon(status: VisitStatus, selected = false): L.DivIcon {
         width:${size}px;height:${size}px;border-radius:50% 50% 50% 0;
         background:${color};
         transform:rotate(-45deg);
-        border:2px solid white;
+        border:2px ${approximate ? 'dashed' : 'solid'} white;${approximate ? 'opacity:.8;' : ''}
         box-shadow:0 1px 4px rgba(0,0,0,.45);
         ${selected ? 'outline:3px solid rgba(37,99,235,.55);' : ''}
       "></div>`,

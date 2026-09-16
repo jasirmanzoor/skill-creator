@@ -6,15 +6,15 @@ import { addDealership, getAllDealerships } from '@/lib/db';
 import { haversineMeters } from '@/lib/geo';
 import { queryOsmCarDealers, type OsmCandidate } from '@/lib/osmDiscovery';
 import type { Dealership } from '@/lib/types';
+import { MARKETS, type MarketId } from '@/lib/markets';
 
-const AL_QADISIYAH_CENTER = { lat: 24.826, lng: 46.823 };
 const DEDUPE_RADIUS_M = 25;
 
 function normaliseName(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9؀-ۿ]/g, '');
 }
 
-export default function DiscoverDealerships({ onImported }: { onImported: () => void }) {
+export default function DiscoverDealerships({ onImported, market }: { onImported: () => void; market: MarketId }) {
   const [radius, setRadius] = useState(1500);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +28,7 @@ export default function DiscoverDealerships({ onImported }: { onImported: () => 
     setCandidates(null);
     setResult(null);
     try {
-      const found = await queryOsmCarDealers(AL_QADISIYAH_CENTER, radius);
+      const found = await queryOsmCarDealers(MARKETS[market].center, radius);
       const existing = await getAllDealerships();
       const existingNames = new Set(existing.map((d) => normaliseName(d.nameEn)));
 
@@ -60,6 +60,7 @@ export default function DiscoverDealerships({ onImported }: { onImported: () => 
         listedPhone: c.osmPhone,
         note: 'Discovered via OpenStreetMap — unverified, needs field visit',
         isSeed: false,
+        market,
         visitStatus: 'not_visited',
         visitDate: null,
         surveyor: null,

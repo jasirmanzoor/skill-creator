@@ -2,15 +2,20 @@ import ExcelJS from 'exceljs';
 import type { Dealership } from './types';
 import type { AgentFinding } from './research-types';
 import { VISIT_STATUS_LABEL } from './types';
+import { marketOf } from './markets';
 
 function flatten(d: Dealership): Record<string, string | number> {
   return {
     id: d.id,
+    market: marketOf(d),
+    sd_id: d.sdId ?? '',
     name_en: d.nameEn,
     name_ar: d.nameAr,
     lat: d.lat,
     lng: d.lng,
     listed_phone: d.listedPhone,
+    street: d.street ?? '',
+    needs_gps: d.needsGps ? 'yes' : '',
     visit_status: VISIT_STATUS_LABEL[d.visitStatus],
     visit_date: d.visitDate ?? '',
     surveyor: d.surveyor ?? '',
@@ -58,7 +63,7 @@ function flatten(d: Dealership): Record<string, string | number> {
 }
 
 const HEADERS = [
-  'id', 'name_en', 'name_ar', 'lat', 'lng', 'listed_phone', 'visit_status', 'visit_date',
+  'id', 'market', 'sd_id', 'name_en', 'name_ar', 'lat', 'lng', 'listed_phone', 'street', 'needs_gps', 'visit_status', 'visit_date',
   'surveyor', 'cr_number', 'showroom_size_sqm', 'size_basis', 'vehicle_type', 'inventory_age_mix',
   'poc_name', 'poc_role', 'poc_mobile', 'decision_maker', 'num_salesmen', 'main_brands',
   'authorised', 'authorised_brand', 'inventory_sellable_units', 'inventory_sellable_units_basis',

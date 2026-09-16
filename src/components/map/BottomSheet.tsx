@@ -52,6 +52,8 @@ export default function BottomSheet({
               <span>{VISIT_STATUS_LABEL[d.visitStatus]}</span>
               {distance !== null && <span>· {formatDistance(distance)} away</span>}
               {d.listedPhone && <span>· {d.listedPhone}</span>}
+              {d.sdId && <span>· {d.sdId}</span>}
+              {d.street && <span>· {d.street}</span>}
             </div>
             {d.note && <p className="mt-1 text-xs font-medium text-amber-500">{d.note}</p>}
           </div>

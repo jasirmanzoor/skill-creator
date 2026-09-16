@@ -5,8 +5,9 @@ import { v4 as uuid } from 'uuid';
 import { addDealership, getAllDealerships } from '@/lib/db';
 import { guessMapping, parseCsvText, parseXlsxBuffer, TARGET_FIELDS, type ParsedSheet } from '@/lib/import';
 import type { AuthorisedStatus, Dealership, VisitStatus } from '@/lib/types';
+import { MARKETS, type MarketId } from '@/lib/markets';
 
-function emptyDealership(): Dealership {
+function emptyDealership(market: MarketId): Dealership {
   const now = new Date().toISOString();
   return {
     id: uuid(),
@@ -14,8 +15,9 @@ function emptyDealership(): Dealership {
     updatedAt: now,
     nameEn: '',
     nameAr: '',
-    lat: 24.826,
-    lng: 46.823,
+    lat: MARKETS[market].center.lat,
+    lng: MARKETS[market].center.lng,
+    market,
     listedPhone: '',
     note: '',
     isSeed: false,
@@ -77,7 +79,7 @@ function parseAuthorised(raw: string): AuthorisedStatus | null {
   return null;
 }
 
-export default function ImportDealerships({ onImported }: { onImported: () => void }) {
+export default function ImportDealerships({ onImported, market }: { onImported: () => void; market: MarketId }) {
   const [sheet, setSheet] = useState<ParsedSheet | null>(null);
   const [mapping, setMapping] = useState<Record<string, number | null>>({});
   const [importing, setImporting] = useState(false);
@@ -120,7 +122,7 @@ export default function ImportDealerships({ onImported }: { onImported: () => vo
         continue;
       }
 
-      const d = emptyDealership();
+      const d = emptyDealership(market);
       d.nameEn = name;
       if (mapping.nameAr !== null) d.nameAr = row[mapping.nameAr]?.trim() ?? '';
       if (latIdx !== null && row[latIdx]) d.lat = Number(row[latIdx]) || d.lat;

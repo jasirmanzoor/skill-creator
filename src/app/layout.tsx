@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Al Qadisiyah Dealership Survey",
-  description: "Field survey and intelligence tool for the Al Qadisiyah dealership market.",
+  description: "Field survey and intelligence tool for the Al Qadisiyah and Al Shifa dealership markets.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,

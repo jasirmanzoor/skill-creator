@@ -6,6 +6,9 @@ import type { Dealership, PilotInterest, VisitStatus } from '@/lib/types';
 import { VISIT_STATUS_COLOR, VISIT_STATUS_LABEL } from '@/lib/types';
 import { downloadFile, toCsv, toXlsxBuffer } from '@/lib/export';
 import ResearchAlerts from '@/components/research/ResearchAlerts';
+import MarketSwitcher from '@/components/MarketSwitcher';
+import { useSettings } from '@/lib/settings-context';
+import { MARKETS, marketOf, type MarketId } from '@/lib/markets';
 
 function bandMidpoint(band: string | null): number | null {
   switch (band) {
@@ -22,7 +25,8 @@ function bandMidpoint(band: string | null): number | null {
 }
 
 export default function DashboardPage() {
-  const [dealerships, setDealerships] = useState<Dealership[]>([]);
+  const { activeMarket, setActiveMarket } = useSettings();
+  const [allDealerships, setDealerships] = useState<Dealership[]>([]);
   const [observedOnly, setObservedOnly] = useState(true);
   const [exporting, setExporting] = useState<'csv' | 'xlsx' | null>(null);
 
@@ -33,6 +37,16 @@ export default function DashboardPage() {
       setDealerships(await getAllDealerships());
     })();
   }, []);
+
+  const dealerships = useMemo(
+    () => allDealerships.filter((d) => marketOf(d) === activeMarket),
+    [allDealerships, activeMarket]
+  );
+  const marketCounts = useMemo(() => {
+    const c: Record<MarketId, number> = { qadisiyah: 0, shifa: 0 };
+    for (const d of allDealerships) c[marketOf(d)] += 1;
+    return c;
+  }, [allDealerships]);
 
   const surveyable = useMemo(() => dealerships.filter((d) => d.visitStatus !== 'competitor'), [dealerships]);
 
@@ -125,12 +139,14 @@ export default function DashboardPage() {
   const doExport = async (format: 'csv' | 'xlsx') => {
     setExporting(format);
     const today = new Date().toISOString().slice(0, 10);
+    const slug = activeMarket === 'shifa' ? 'al-shifa' : 'al-qadisiyah';
     if (format === 'csv') {
-      downloadFile(`qadisiyah-survey-${today}.csv`, toCsv(dealerships), 'text/csv');
+      downloadFile(`${slug}-survey-${today}.csv`, toCsv(dealerships), 'text/csv');
     } else {
-      const buf = await toXlsxBuffer(dealerships, await getAllFindings());
+      const ids = new Set(dealerships.map((d) => d.id));
+      const buf = await toXlsxBuffer(dealerships, (await getAllFindings()).filter((f) => ids.has(f.dealershipId)));
       downloadFile(
-        `qadisiyah-survey-${today}.xlsx`,
+        `${slug}-survey-${today}.xlsx`,
         buf,
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       );
@@ -142,6 +158,7 @@ export default function DashboardPage() {
     <div className="safe-top h-full overflow-y-auto pb-24">
       <header className="sticky top-0 z-10 border-b border-border bg-surface/95 px-4 py-4 backdrop-blur">
         <h1 className="text-lg font-semibold text-foreground">Dashboard</h1>
+        <MarketSwitcher value={activeMarket} onChange={setActiveMarket} counts={marketCounts} className="mt-3 shadow-none" />
       </header>
 
       <div className="space-y-6 px-4 py-5">
@@ -320,7 +337,9 @@ export default function DashboardPage() {
         {/* Export */}
         <section className="rounded-2xl border border-border bg-surface p-4">
           <h2 className="text-sm font-semibold text-foreground">Export</h2>
-          <p className="mt-0.5 text-xs text-muted">Preserves observed/self-reported flags and all metadata.</p>
+          <p className="mt-0.5 text-xs text-muted">
+            {MARKETS[activeMarket].label} only — switch market above to export the other. Preserves observed/self-reported flags and all metadata.
+          </p>
           <div className="mt-3 flex gap-2">
             <button
               onClick={() => doExport('csv')}

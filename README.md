@@ -74,6 +74,24 @@ every run. The route allows up to 5 searches per run and `maxDuration = 60` seco
 time out and your hosting plan allows longer functions, raise `maxDuration` in
 `src/app/api/research/run/route.ts`.
 
+## Markets: Al Qadisiyah and Al Shifa
+
+The Map and Dashboard have a two-option market selector — **Al Qadisiyah** (East Riyadh) and
+**Al Shifa** (South Riyadh). The choice is remembered per device and scopes the map pins, list,
+route planner, dashboard figures, CSV/Excel export, batch research, OpenStreetMap discovery
+and sheet import. New dealerships are tagged with the market you're in. Research searches use
+that market's locality. Duplicate scans only compare dealerships within the same market (an
+operator with a desk in both markets is two real showrooms).
+
+The Al Shifa roster (98 records) comes from the **"al shifa - MAPPING"** sheet of
+`qadisiyah and shifa mapping.xlsx`, converted by `scripts/import-shifa.py` into
+`src/lib/shifa-seed.json` — only values present in the sheet, blanks left empty. Pins the sheet
+marks as not GPS-confirmed show with a dashed outline and a "Needs GPS" filter in the list;
+updating the position from the survey's Identity step clears the flag. Devices that already had
+the Al Qadisiyah roster get Al Shifa added once on next open, without touching existing records.
+
+To refresh Al Shifa from a newer sheet: `python3 scripts/import-shifa.py "path/to/file.xlsx"`.
+
 ## The core data rule
 
 Every business figure (inventory, price, monthly sold, monthly financed, financing losses) is

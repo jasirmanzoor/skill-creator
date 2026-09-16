@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { ensureSeeded, getSettings, saveSettings } from './db';
+import type { MarketId } from './markets';
 
 interface SettingsContextValue {
   loaded: boolean;
@@ -12,6 +13,8 @@ interface SettingsContextValue {
   logout: () => Promise<void>;
   toggleDarkMode: () => Promise<void>;
   setRemoteEndpoint: (url: string | null) => Promise<void>;
+  activeMarket: MarketId;
+  setActiveMarket: (m: MarketId) => Promise<void>;
 }
 
 const SettingsContext = createContext<SettingsContextValue | null>(null);
@@ -25,6 +28,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const [surveyorName, setSurveyorName] = useState<string | null>(null);
   const [darkMode, setDarkMode] = useState(false);
   const [remoteEndpoint, setRemoteEndpointState] = useState<string | null>(null);
+  const [activeMarket, setActiveMarketState] = useState<MarketId>('qadisiyah');
 
   useEffect(() => {
     (async () => {
@@ -33,6 +37,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       setSurveyorName(s.surveyorName);
       setDarkMode(s.darkMode);
       setRemoteEndpointState(s.remoteEndpoint);
+      setActiveMarketState(s.activeMarket);
       applyDarkClass(s.darkMode);
       setLoaded(true);
     })();
@@ -68,9 +73,15 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setRemoteEndpointState(url);
   };
 
+  const setActiveMarket = async (m: MarketId) => {
+    setActiveMarketState(m);
+    const s = await getSettings();
+    await saveSettings({ ...s, activeMarket: m });
+  };
+
   return (
     <SettingsContext.Provider
-      value={{ loaded, surveyorName, darkMode, remoteEndpoint, login, logout, toggleDarkMode, setRemoteEndpoint }}
+      value={{ loaded, surveyorName, darkMode, remoteEndpoint, login, logout, toggleDarkMode, setRemoteEndpoint, activeMarket, setActiveMarket }}
     >
       {children}
     </SettingsContext.Provider>

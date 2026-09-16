@@ -6,10 +6,11 @@ import { v4 as uuid } from 'uuid';
 import { addDealership } from '@/lib/db';
 import type { Dealership } from '@/lib/types';
 import { useSettings } from '@/lib/settings-context';
+import { MARKETS } from '@/lib/markets';
 
 export default function AddDealershipPage() {
   const router = useRouter();
-  const { surveyorName } = useSettings();
+  const { surveyorName, activeMarket } = useSettings();
   const [nameEn, setNameEn] = useState('');
   const [nameAr, setNameAr] = useState('');
   const [phone, setPhone] = useState('');
@@ -47,6 +48,7 @@ export default function AddDealershipPage() {
       listedPhone: phone.trim(),
       note: '',
       isSeed: false,
+      market: activeMarket,
       visitStatus: 'not_visited',
       visitDate: null,
       surveyor: surveyorName,
@@ -94,7 +96,10 @@ export default function AddDealershipPage() {
     <div className="safe-top flex h-full flex-col bg-background">
       <header className="border-b border-border px-4 py-4">
         <h1 className="text-lg font-semibold text-foreground">Add dealership</h1>
-        <p className="mt-0.5 text-xs text-muted">Found one that isn&apos;t on the roster — capture it now.</p>
+        <p className="mt-0.5 text-xs text-muted">
+          Found one that isn&apos;t on the roster — capture it now. It&apos;s added to{' '}
+          <b className="text-foreground">{MARKETS[activeMarket].label}</b> (switch market on the Map).
+        </p>
       </header>
 
       <div className="flex-1 space-y-4 overflow-y-auto px-4 py-5">

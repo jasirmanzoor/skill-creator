@@ -269,6 +269,10 @@ function IdentityStep({
     navigator.geolocation.getCurrentPosition((pos) => {
       update('lat', pos.coords.latitude);
       update('lng', pos.coords.longitude);
+      if (draft.needsGps) {
+        update('needsGps', false);
+        if (draft.note === 'Approximate pin — confirm GPS on site') update('note', '');
+      }
     });
   };
 
@@ -284,6 +288,11 @@ function IdentityStep({
         <div className="flex items-center gap-2 rounded-xl border border-border bg-surface-2 px-4 py-3.5 text-sm text-muted">
           {draft.lat.toFixed(6)}, {draft.lng.toFixed(6)}
         </div>
+        {draft.needsGps && (
+          <p className="mt-1 text-xs font-medium text-amber-500">
+            Approximate pin from the mapping sheet — stand at the showroom entrance and update it.
+          </p>
+        )}
         <button
           type="button"
           onClick={updateGps}

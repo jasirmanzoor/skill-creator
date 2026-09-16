@@ -3,9 +3,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { getAllResearchTasks } from '@/lib/db';
 import { checkDailyCapRemaining, getSpendSummary, runResearchTask, scopedDealerships } from '@/lib/research-run';
+import { useSettings } from '@/lib/settings-context';
+import { MARKETS } from '@/lib/markets';
 import { RESEARCH_TASKS_CHANGED, type ResearchScope, type ResearchTask } from '@/lib/research-types';
 
 export default function BatchResearchRunner() {
+  const { activeMarket } = useSettings();
   const [tasks, setTasks] = useState<ResearchTask[]>([]);
   const [selectedTaskId, setSelectedTaskId] = useState('');
   const [scope, setScope] = useState<ResearchScope>('missing_cr');
@@ -32,8 +35,8 @@ export default function BatchResearchRunner() {
 
   const [previewCount, setPreviewCount] = useState<number | null>(null);
   useEffect(() => {
-    scopedDealerships(scope).then((d) => setPreviewCount(Math.min(d.length, cap.remaining)));
-  }, [scope, cap.remaining]);
+    scopedDealerships(scope, activeMarket).then((d) => setPreviewCount(Math.min(d.length, cap.remaining)));
+  }, [scope, cap.remaining, activeMarket]);
 
   const runBatch = async () => {
     const task = tasks.find((t) => t.id === selectedTaskId);
@@ -41,7 +44,7 @@ export default function BatchResearchRunner() {
     setConfirming(false);
     setRunning(true);
     setResult(null);
-    const dealerships = (await scopedDealerships(scope)).slice(0, cap.remaining);
+    const dealerships = (await scopedDealerships(scope, activeMarket)).slice(0, cap.remaining);
     setProgress({ done: 0, total: dealerships.length });
 
     let succeeded = 0;
@@ -102,7 +105,9 @@ export default function BatchResearchRunner() {
         </select>
       </div>
       <div>
-        <label className="mb-1 block text-xs font-medium text-foreground">Which dealerships</label>
+        <label className="mb-1 block text-xs font-medium text-foreground">
+          Which dealerships <span className="font-normal text-muted">in {MARKETS[activeMarket].label}</span>
+        </label>
         <select
           value={scope}
           onChange={(e) => setScope(e.target.value as ResearchScope)}

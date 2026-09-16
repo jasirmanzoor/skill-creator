@@ -8,6 +8,9 @@ import BottomSheet from '@/components/map/BottomSheet';
 import ListDrawer from '@/components/map/ListDrawer';
 import RoutePanel from '@/components/map/RoutePanel';
 import OnlineStatusBadge from '@/components/OnlineStatusBadge';
+import MarketSwitcher from '@/components/MarketSwitcher';
+import { useSettings } from '@/lib/settings-context';
+import { MARKETS, marketOf, type MarketId } from '@/lib/markets';
 
 const MapCanvas = dynamic(() => import('@/components/map/MapCanvas'), {
   ssr: false,
@@ -17,7 +20,8 @@ const MapCanvas = dynamic(() => import('@/components/map/MapCanvas'), {
 });
 
 export default function MapPage() {
-  const [dealerships, setDealerships] = useState<Dealership[]>([]);
+  const { activeMarket, setActiveMarket } = useSettings();
+  const [allDealerships, setDealerships] = useState<Dealership[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [basemap, setBasemap] = useState<'street' | 'satellite'>('street');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -59,6 +63,25 @@ export default function MapPage() {
     );
     return () => navigator.geolocation.clearWatch(watchId);
   }, []);
+
+  const dealerships = useMemo(
+    () => allDealerships.filter((d) => marketOf(d) === activeMarket),
+    [allDealerships, activeMarket]
+  );
+  const counts = useMemo(() => {
+    const c: Record<MarketId, number> = { qadisiyah: 0, shifa: 0 };
+    for (const d of allDealerships) c[marketOf(d)] += 1;
+    return c;
+  }, [allDealerships]);
+
+  const switchMarket = (m: MarketId) => {
+    setSelectedId(null);
+    setListOpen(false);
+    setRouteMode(false);
+    setRoutePlanned(null);
+    setRouteSelectedIds(new Set());
+    setActiveMarket(m);
+  };
 
   const selected = useMemo(
     () => dealerships.find((d) => d.id === selectedId) ?? null,
@@ -108,10 +131,19 @@ export default function MapPage() {
         userLocation={userLocation}
         routeStops={routePlanned ?? undefined}
         flyTarget={flyTarget}
+        center={MARKETS[activeMarket].center}
+        zoom={MARKETS[activeMarket].zoom}
       />
 
       {/* Top controls */}
-      <div className="safe-top pointer-events-none absolute inset-x-0 top-0 z-[800] flex items-start justify-between gap-2 p-3">
+      <div className="safe-top pointer-events-none absolute inset-x-0 top-0 z-[800] space-y-2 p-3">
+        <MarketSwitcher
+          value={activeMarket}
+          onChange={switchMarket}
+          counts={counts}
+          className="pointer-events-auto mx-auto max-w-md"
+        />
+        <div className="flex items-start justify-between gap-2">
         <div className="pointer-events-auto flex gap-2">
           <OnlineStatusBadge />
         </div>
@@ -135,6 +167,7 @@ export default function MapPage() {
           >
             Route
           </button>
+        </div>
         </div>
       </div>
 
