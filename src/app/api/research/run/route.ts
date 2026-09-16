@@ -143,10 +143,16 @@ Research task: ${task.instruction}`;
       messages.push({ role: 'assistant', content: response.content });
     }
   } catch (err) {
-    if (err instanceof Anthropic.AuthenticationError) return fail('Invalid ANTHROPIC_API_KEY.', 401, 'bad_api_key');
-    if (err instanceof Anthropic.RateLimitError) return fail('Rate limited — try again shortly.', 429, 'rate_limited');
-    if (err instanceof Anthropic.APIError) return fail(`API error: ${err.message}`, 502, 'api_error');
-    return fail('Research run failed unexpectedly.', 500);
+    // Match on the error's shape rather than instanceof: bundlers can load a
+    // second copy of the SDK's error classes, which makes instanceof miss.
+    const e = err as { status?: unknown; message?: unknown; name?: unknown };
+    const status = typeof e?.status === 'number' ? e.status : null;
+    const message = typeof e?.message === 'string' ? e.message : String(err);
+    console.error('[research/run] Anthropic call failed', { status, name: e?.name, message });
+    if (status === 401) return fail('Invalid ANTHROPIC_API_KEY.', 401, 'bad_api_key');
+    if (status === 429) return fail('Rate limited — try again shortly.', 429, 'rate_limited');
+    if (status !== null) return fail(`API error (${status}): ${message}`, 502, 'api_error');
+    return fail(`Research run failed: ${message}`, 500, 'unexpected');
   }
 
   const { costUsd, searches } = costFromUsage(usages, PRICING);
