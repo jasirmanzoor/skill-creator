@@ -3,6 +3,8 @@ import { getDictionary, isLocale } from "@/content/i18n";
 import { PlanProvider } from "@/components/PlanContext";
 import SiteHeader from "@/components/SiteHeader";
 import Hero from "@/components/hero/Hero";
+import NetworkPanel from "@/components/hero/NetworkPanel";
+import HorizonBackdrop from "@/components/HorizonBackdrop";
 import Planner from "@/components/sections/Planner";
 import TrustBar from "@/components/sections/TrustBar";
 import Sellers from "@/components/sections/Sellers";
@@ -24,9 +26,11 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
   // what MSG does → how it runs → proof → act.
   return (
     <PlanProvider>
+      <HorizonBackdrop />
       <SiteHeader t={t} lang={lang} />
       <main id="main">
         <Hero t={t} />
+        <NetworkPanel t={t} />
         <TrustBar t={t} />
         <Planner t={t} />
         <Sellers t={t} lang={lang} />

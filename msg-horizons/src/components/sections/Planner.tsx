@@ -112,7 +112,7 @@ export default function Planner({ t }: { t: Dictionary }) {
     : { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -6 }, transition: { duration: 0.28, ease: [0.16, 1, 0.3, 1] as const } };
 
   return (
-    <section id="planner" aria-labelledby="planner-title" className="scroll-mt-16 bg-paper py-24 lg:py-32">
+    <section id="planner" aria-labelledby="planner-title" className="scroll-mt-16 bg-paper/80 py-24 lg:py-32">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-[1fr_1fr] lg:items-end">
           <div>

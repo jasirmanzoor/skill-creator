@@ -49,7 +49,7 @@ html {
   text-rendering: optimizeLegibility;
 }
 body {
-  background: var(--color-paper);
+  background: transparent; /* the fixed HorizonBackdrop (z -10) must paint above the body box */
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;

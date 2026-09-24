@@ -11,7 +11,7 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const on = () => setScrolled(window.scrollY > 8);
+    const on = () => setScrolled(window.scrollY > window.innerHeight * 0.3);
     on();
     window.addEventListener("scroll", on, { passive: true });
     return () => window.removeEventListener("scroll", on);
@@ -37,11 +37,13 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
     ["#contact", t.nav.contact],
   ] as const;
   const other = lang === "en" ? "ar" : "en";
+  const solid = scrolled || open;
+  const linkCls = solid ? "text-muted hover:text-ink" : "text-white/85 hover:text-white";
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 border-b bg-paper/90 backdrop-blur-md transition-colors duration-300 ${
-        scrolled || open ? "border-line" : "border-transparent"
+      className={`fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300 ${
+        solid ? "border-line bg-paper/90 backdrop-blur-md" : "border-transparent bg-transparent"
       }`}
     >
       <a
@@ -52,14 +54,14 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
       </a>
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-5 lg:px-8">
         <a href={`/${lang}`} className="rounded" aria-label="MSG Horizons">
-          <Logo />
+          <Logo inverted={!solid} />
         </a>
 
         <nav aria-label="Primary" className="hidden lg:block">
           <ul className="flex items-center gap-7">
             {links.map(([href, label]) => (
               <li key={href}>
-                <a href={href} className="text-[15px] text-muted transition-colors hover:text-ink">
+                <a href={href} className={`text-[15px] transition-colors ${linkCls}`}>
                   {label}
                 </a>
               </li>
@@ -74,20 +76,22 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
             lang={other}
             aria-label={t.nav.langSwitchLabel}
             onClick={() => track("lang_switch", { to: other })}
-            className="text-[15px] text-muted transition-colors hover:text-ink"
+            className={`text-[15px] transition-colors ${linkCls}`}
           >
             {t.nav.langSwitch}
           </a>
           <a
             href="#planner"
             onClick={() => track("cta_click", { cta: "plan", location: "header" })}
-            className="hidden rounded-md bg-ink px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ink-3 sm:inline-flex"
+            className={`hidden rounded-md px-4 py-2 text-sm font-medium transition-colors sm:inline-flex ${
+              solid ? "bg-ink text-white hover:bg-ink-3" : "bg-white text-ink hover:bg-white/90"
+            }`}
           >
             {t.nav.ctaShort}
           </a>
           <button
             type="button"
-            className="inline-flex size-10 items-center justify-center rounded-md text-ink lg:hidden"
+            className={`inline-flex size-10 items-center justify-center rounded-md lg:hidden ${solid ? "text-ink" : "text-white"}`}
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? t.nav.close : t.nav.menu}

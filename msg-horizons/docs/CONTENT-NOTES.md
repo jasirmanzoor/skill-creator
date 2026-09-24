@@ -37,3 +37,10 @@ and what needs **confirmation** before it can be used.
 - **Numbers or facts:** update `src/content/facts.ts` first, then the copy in `src/content/dictionaries/{en,ar}.ts`.
 - **Photos:** see `src/content/media.ts`. Adding entries automatically turns on the "On the ground"
   gallery and replaces the illustrative fleet visual.
+
+## Imagery in use
+- **Backdrop horizon** (`public/media/brand/horizon-*.jpg`): Unsplash photo `photo-1604954433815-28af57d7501a`
+  ("brown sand under blue sky during daytime"), free under the Unsplash License (commercial use allowed,
+  no attribution required). It is used purely as an atmospheric landscape and is **not** presented as an MSG
+  location, vehicle or operation. It can be swapped for MSG's own horizon or desert photography at any time
+  (keep the horizon near 50.8% of the image height, or update `HORIZON` in `HorizonBackdrop.tsx`).
