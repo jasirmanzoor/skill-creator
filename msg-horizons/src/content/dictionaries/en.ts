@@ -33,11 +33,11 @@ export const en = {
     partnersLead: "Delivery and logistics partner alongside",
     eyebrow: "Last-mile delivery and logistics in Saudi Arabia",
     title: "Last-mile delivery across Saudi Arabia, run by 1,000+ couriers.",
-    caption: "Each dot is one MSG courier. Moving lines are vehicles in operation.",
+    caption: "Each grey dot is one MSG courier. Blue markers are vehicles on their routes.",
     lead: "MSG Horizons is the delivery and logistics partner for online sellers, growing e-commerce brands and enterprises, from a first order to peak season. Based in Riyadh, operating 24/7.",
     ctaPlan: "Build my logistics plan",
     ctaTalk: "Talk to MSG on WhatsApp",
-    legend: { courier: "1 dot = 1 courier", vehicle: "Vehicles in motion", sweep: "Operating 24/7" },
+    legend: { courier: "1 dot = 1 courier", vehicle: "Vehicles on route", sweep: "Operating 24/7" },
     stats: [
       { value: "1,000+", label: "couriers" },
       { value: "100+", label: "vehicles" },

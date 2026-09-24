@@ -8,13 +8,12 @@ import { KSA_DOTS, KSA_HEIGHT, KSA_WIDTH, RIYADH } from "@/lib/ksa-geo";
  * CourierField — a data graphic, not decoration.
  *   • 1,000 dots  = MSG's 1,000+ couriers; they settle into the Kingdom outward from Riyadh HQ
  *   • 100 lines   = MSG's 100+ vehicles in motion
- *   • a slow wave of brand colour around HQ = operations that never stop (24/7)
+ *   • a pale ping where a vehicle arrives = a delivery completed
  * Canvas 2D; pauses offscreen and in background tabs; static final frame for reduced motion.
  */
 
 const COURIERS = 1000;
 const VEHICLES = 100;
-const WAVE_PERIOD = 10;
 const T_GATHER = 0.2;
 const T_VEHICLES = 2.2;
 
@@ -23,9 +22,10 @@ const BRAND = [31, 67, 224] as const; // --color-brand
 
 type Dot = {
   sx: number; sy: number; tx: number; ty: number; nx: number; ny: number;
-  delay: number; dur: number; theta: number; lit: number; x: number; y: number;
+  delay: number; dur: number; lit: number; x: number; y: number;
 };
-type Vehicle = { ax: number; ay: number; bx: number; by: number; cx: number; cy: number; start: number; dur: number };
+type Vehicle = { ax: number; ay: number; bx: number; by: number; cx: number; cy: number; start: number; dur: number; dest: number };
+type Ping = { x: number; y: number; t0: number };
 
 function mulberry32(a: number) {
   return () => {
@@ -54,10 +54,10 @@ export default function CourierField({ ariaLabel, hqLabel }: { ariaLabel: string
       sx: 0, sy: 0, tx: 0, ty: 0, nx: x, ny: y, x: 0, y: 0, lit: 0,
       delay: (Math.hypot(x - RIYADH[0], y - RIYADH[1]) / maxD) * 1.4 + rand() * 0.25,
       dur: 0.9 + rand() * 0.4,
-      theta: Math.atan2(y - RIYADH[1], x - RIYADH[0]),
     }));
     const seeds = dots.map(() => [rand(), rand()] as const);
     const vehicles: Vehicle[] = [];
+    const pings: Ping[] = [];
     let W = 0, H = 0, S = 1, MX = 0, MY = 0, R = 2, hqX = 0, hqY = 0;
     const start = performance.now();
 
@@ -84,14 +84,15 @@ export default function CourierField({ ariaLabel, hqLabel }: { ariaLabel: string
 
     function leg(from: [number, number] | null, t: number): Vehicle {
       const A = from ?? (rand() < 0.45 ? [hqX, hqY] : [dots[(rand() * dots.length) | 0].tx, dots[(rand() * dots.length) | 0].ty]);
-      const B = dots[(rand() * dots.length) | 0];
+      const dest = (rand() * dots.length) | 0;
+      const B = dots[dest];
       const len = Math.hypot(B.tx - A[0], B.ty - A[1]) || 1;
       const k = (rand() - 0.5) * 0.5;
       return {
         ax: A[0], ay: A[1], bx: B.tx, by: B.ty,
         cx: (A[0] + B.tx) / 2 - ((B.ty - A[1]) / len) * len * k,
         cy: (A[1] + B.ty) / 2 + ((B.tx - A[0]) / len) * len * k,
-        start: t, dur: 2.4 + (len / (KSA_WIDTH * S)) * 5 + rand(),
+        start: t, dur: 2.6 + (len / (KSA_WIDTH * S)) * 6 + rand(), dest,
       };
     }
     const bez = (v: Vehicle, u: number) => {
@@ -111,8 +112,6 @@ export default function CourierField({ ariaLabel, hqLabel }: { ariaLabel: string
       ctx.clearRect(0, 0, W, H);
 
       // couriers
-      const waveOn = t > T_VEHICLES;
-      const waveA = ((t / WAVE_PERIOD) * Math.PI * 2) % (Math.PI * 2) - Math.PI;
       ctx.fillStyle = INK_DOT;
       ctx.beginPath();
       const lit: Dot[] = [];
@@ -121,42 +120,61 @@ export default function CourierField({ ariaLabel, hqLabel }: { ariaLabel: string
         const e = easeOut(p);
         d.x = d.sx + (d.tx - d.sx) * e; d.y = d.sy + (d.ty - d.sy) * e;
         if (p === 0) continue; // not yet deployed: still at HQ
-        if (waveOn && p >= 1) {
-          let diff = waveA - d.theta;
-          diff = Math.atan2(Math.sin(diff), Math.cos(diff));
-          if (diff > 0 && diff < 0.6) d.lit = Math.max(d.lit, 1 - diff / 0.6);
-        }
-        d.lit *= 0.975;
+        d.lit *= 0.97;
         ctx.moveTo(d.x + R, d.y); ctx.arc(d.x, d.y, R, 0, Math.PI * 2);
         if (d.lit > 0.05) lit.push(d);
       }
       ctx.fill();
       for (const d of lit) {
-        ctx.fillStyle = `rgba(${BRAND[0]},${BRAND[1]},${BRAND[2]},${Math.min(1, d.lit) * 0.9})`;
+        ctx.fillStyle = `rgba(${BRAND[0]},${BRAND[1]},${BRAND[2]},${Math.min(1, d.lit) * 0.4})`; // pale: never mistaken for a vehicle
         ctx.beginPath(); ctx.arc(d.x, d.y, R, 0, Math.PI * 2); ctx.fill();
       }
 
-      // vehicles
+      // vehicles: a tracking marker gliding along its route, with the remaining route shown ahead
       if (t > T_VEHICLES) {
         const due = Math.min(VEHICLES, Math.floor((t - T_VEHICLES) / 0.025));
         while (vehicles.length < due) vehicles.push(leg(null, t));
-        ctx.lineCap = "round";
+        const brand = BRAND.join(",");
+        // routes ahead (one batched dashed stroke)
+        ctx.setLineDash([1.5, 3.5]);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = `rgba(${brand},0.28)`;
+        ctx.beginPath();
+        const heads: [number, number][] = [];
         for (let i = 0; i < vehicles.length; i++) {
           let v = vehicles[i];
           let u = (t - v.start) / v.dur;
-          if (u >= 1) { v = vehicles[i] = leg([v.bx, v.by], t); u = 0; }
+          if (u >= 1) {
+            pings.push({ x: v.bx, y: v.by, t0: t });
+            dots[v.dest].lit = 1;
+            v = vehicles[i] = leg([v.bx, v.by], t);
+            u = 0;
+          }
           const ue = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
-          const tail = Math.max(0, ue - 0.12);
-          const [ax, ay] = bez(v, tail);
-          const [mx, my] = bez(v, (tail + ue) / 2);
-          const [bx, by] = bez(v, ue);
-          const g = ctx.createLinearGradient(ax, ay, bx, by);
-          g.addColorStop(0, `rgba(${BRAND.join(",")},0)`);
-          g.addColorStop(1, `rgba(${BRAND.join(",")},0.85)`);
-          ctx.strokeStyle = g; ctx.lineWidth = 1.4;
-          ctx.beginPath(); ctx.moveTo(ax, ay); ctx.quadraticCurveTo(mx, my, bx, by); ctx.stroke();
-          ctx.fillStyle = `rgb(${BRAND.join(",")})`;
-          ctx.beginPath(); ctx.arc(bx, by, 1.8, 0, Math.PI * 2); ctx.fill();
+          const [hx, hy] = bez(v, ue);
+          heads.push([hx, hy]);
+          // remaining path from the marker to the destination
+          const [mx, my] = bez(v, (ue + 1) / 2);
+          const cx2 = 2 * mx - (hx + v.bx) / 2, cy2 = 2 * my - (hy + v.by) / 2;
+          ctx.moveTo(hx, hy);
+          ctx.quadraticCurveTo(cx2, cy2, v.bx, v.by);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+        // delivery pings
+        for (let i = pings.length - 1; i >= 0; i--) {
+          const k = (t - pings[i].t0) / 0.9;
+          if (k >= 1) { pings.splice(i, 1); continue; }
+          ctx.strokeStyle = `rgba(${brand},${0.55 * (1 - k)})`;
+          ctx.lineWidth = 1.2;
+          ctx.beginPath(); ctx.arc(pings[i].x, pings[i].y, 2 + k * 9, 0, Math.PI * 2); ctx.stroke();
+        }
+        // markers
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = "#ffffff";
+        ctx.fillStyle = `rgb(${brand})`;
+        for (const [hx, hy] of heads) {
+          ctx.beginPath(); ctx.arc(hx, hy, 3, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
         }
       }
       drawHQ();
@@ -169,10 +187,16 @@ export default function CourierField({ ariaLabel, hqLabel }: { ariaLabel: string
       ctx.beginPath();
       for (const d of dots) { ctx.moveTo(d.tx + R, d.ty); ctx.arc(d.tx, d.ty, R, 0, Math.PI * 2); }
       ctx.fill();
-      ctx.strokeStyle = `rgba(${BRAND.join(",")},0.5)`; ctx.lineWidth = 1;
-      for (let i = 0; i < VEHICLES; i++) {
-        const v = leg(null, 0);
-        ctx.beginPath(); ctx.moveTo(v.ax, v.ay); ctx.quadraticCurveTo(v.cx, v.cy, v.bx, v.by); ctx.stroke();
+      const legs = Array.from({ length: VEHICLES }, () => leg(null, 0));
+      ctx.setLineDash([1.5, 3.5]); ctx.lineWidth = 1;
+      ctx.strokeStyle = `rgba(${BRAND.join(",")},0.28)`;
+      ctx.beginPath();
+      for (const v of legs) { ctx.moveTo(v.ax, v.ay); ctx.quadraticCurveTo(v.cx, v.cy, v.bx, v.by); }
+      ctx.stroke(); ctx.setLineDash([]);
+      ctx.lineWidth = 1.5; ctx.strokeStyle = "#ffffff"; ctx.fillStyle = `rgb(${BRAND.join(",")})`;
+      for (const v of legs) {
+        const [hx, hy] = bez(v, 0.35);
+        ctx.beginPath(); ctx.arc(hx, hy, 3, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
       }
       drawHQ();
     }

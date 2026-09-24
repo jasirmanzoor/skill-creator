@@ -66,7 +66,7 @@ export default function Hero({ t }: { t: Dictionary }) {
           <NetworkStats labels={{ couriers: h.stats[0].label, vehicles: h.stats[1].label, operations: h.stats[2].label }} />
           <figcaption className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-line bg-paper px-5 py-3 text-xs text-muted">
             <span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-ink/50" />{h.legend.courier}</span>
-            <span className="flex items-center gap-1.5"><span className="h-px w-3 bg-brand" />{h.legend.vehicle}</span>
+            <span className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-brand ring-[1.5px] ring-white shadow-[0_0_0_2.5px_rgba(31,67,224,0.25)]" />{h.legend.vehicle}</span>
             <span className="text-faint">{h.caption}</span>
           </figcaption>
         </figure>
