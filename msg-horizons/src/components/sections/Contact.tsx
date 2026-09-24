@@ -9,13 +9,13 @@ export default function Contact({ t, lang }: { t: Dictionary; lang: Locale }) {
   const c = t.contact;
   const ch = c.channels;
   return (
-    <section id="contact" aria-labelledby="contact-title" className="relative scroll-mt-16 overflow-hidden bg-ink py-24 lg:py-32">
+    <section id="contact" aria-labelledby="contact-title" className="section-glow relative scroll-mt-16 overflow-hidden bg-ink py-24 lg:py-32">
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-96 bg-[radial-gradient(ellipse_60%_80%_at_50%_100%,rgba(246,166,35,0.14),transparent_70%)]" />
       <div className="relative mx-auto grid max-w-7xl gap-12 px-5 lg:grid-cols-[1fr_1.25fr] lg:px-8">
         <Reveal>
           <p className="eyebrow text-sun">{c.eyebrow}</p>
           <h2 id="contact-title" className="mt-4 font-display text-5xl font-semibold tracking-tight text-balance sm:text-6xl rtl:tracking-normal">
-            {c.title}
+            <span className="text-sun-gradient">{c.title}</span>
           </h2>
           <p className="mt-6 max-w-md text-lg text-mist">{c.lead}</p>
 

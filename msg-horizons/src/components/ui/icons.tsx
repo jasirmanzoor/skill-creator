@@ -51,3 +51,28 @@ export const ServiceIcon = ({ id, className = "size-6" }: P & { id: string }) =>
     </svg>
   );
 };
+
+/** Planner option glyphs. */
+export const OptionIcon = ({ id, className = "size-5" }: P & { id: string }) => {
+  const paths: Record<string, React.ReactNode> = {
+    seller: (<><path d="M5 8h14l-1 12H6z" /><path d="M9 8a3 3 0 0 1 6 0" /></>),
+    startup: (<><path d="M12 3c3 2 5 5.5 5 9.5L15 16H9l-2-3.5C7 8.5 9 5 12 3Z" /><circle cx="12" cy="10" r="1.6" /><path d="M9 16l-2 4 3-1.5M15 16l2 4-3-1.5" /></>),
+    ecommerce: (<><path d="M3 4h3l2.2 10.5h10L20 7H7" /><circle cx="9.5" cy="19" r="1.5" /><circle cx="17" cy="19" r="1.5" /></>),
+    enterprise: (<><path d="M4 21V5l8-2v18M12 9l8 2.5V21M3 21h18" /><path d="M7.5 8h1M7.5 12h1M7.5 16h1M15.5 14h1M15.5 17.5h1" /></>),
+    platform: (<><circle cx="12" cy="5" r="2" /><circle cx="5" cy="18" r="2" /><circle cx="19" cy="18" r="2" /><path d="M12 7v4M12 11l-5.5 5.5M12 11l5.5 5.5" /></>),
+    parcels: (<><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z" /><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9M7.5 5.3l8.5 4.5" /></>),
+    b2b: (<><rect x="2.5" y="8" width="6" height="8" rx="1" /><rect x="15.5" y="8" width="6" height="8" rx="1" /><path d="M9.5 10.5h5l-1.5-1.5M14.5 13.5h-5l1.5 1.5" /></>),
+    freight: (<><path d="M2 6h12v10H2zM14 9h5l3 4v3h-8" /><circle cx="6" cy="17.5" r="1.8" /><circle cx="18" cy="17.5" r="1.8" /></>),
+    storage: (<><path d="M3 10 12 4l9 6v10H3z" /><path d="M7 20v-6h10v6M7 17h10" /></>),
+    people: (<><circle cx="9" cy="8" r="3" /><path d="M3.5 19a5.5 5.5 0 0 1 11 0" /><circle cx="17" cy="9" r="2.3" /><path d="M16 14.2a4.5 4.5 0 0 1 5 4.8" /></>),
+    starting: (<><rect x="4" y="15" width="3" height="5" rx="1" fill="currentColor" /><rect x="10.5" y="11" width="3" height="9" rx="1" opacity=".35" /><rect x="17" y="6" width="3" height="14" rx="1" opacity=".35" /></>),
+    steady: (<><rect x="4" y="15" width="3" height="5" rx="1" fill="currentColor" /><rect x="10.5" y="11" width="3" height="9" rx="1" fill="currentColor" /><rect x="17" y="6" width="3" height="14" rx="1" opacity=".35" /></>),
+    scaling: (<><rect x="4" y="15" width="3" height="5" rx="1" fill="currentColor" /><rect x="10.5" y="11" width="3" height="9" rx="1" fill="currentColor" /><rect x="17" y="6" width="3" height="14" rx="1" fill="currentColor" /></>),
+    high: (<><rect x="3" y="14" width="3" height="6" rx="1" fill="currentColor" /><rect x="8.3" y="10" width="3" height="10" rx="1" fill="currentColor" /><rect x="13.6" y="6" width="3" height="14" rx="1" fill="currentColor" /><path d="M19 9V3m0 0-2.2 2.2M19 3l2.2 2.2" /></>),
+  };
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true" {...base}>
+      {paths[id]}
+    </svg>
+  );
+};

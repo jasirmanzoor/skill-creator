@@ -1,65 +1,38 @@
 import CourierField from "./CourierField";
+import NetworkStats from "./NetworkStats";
+import QuickStart from "./QuickStart";
 import TrackedLink from "../ui/TrackedLink";
-import { ArrowIcon, WhatsAppIcon } from "../ui/icons";
+import { WhatsAppIcon } from "../ui/icons";
 import { whatsappLink } from "@/content/facts";
-import type { Dictionary, Locale } from "@/content/i18n";
+import type { Dictionary } from "@/content/i18n";
 
-export default function Hero({ t, lang }: { t: Dictionary; lang: Locale }) {
+export default function Hero({ t }: { t: Dictionary }) {
   const h = t.hero;
-  const rtl = lang === "ar";
   return (
-    <section aria-labelledby="hero-title" className="grain relative isolate min-h-[100svh] overflow-hidden bg-ink">
-      {/* horizon glow */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[45%] bg-[radial-gradient(ellipse_70%_60%_at_50%_100%,rgba(246,166,35,0.20),transparent_70%)]" />
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_50%_at_70%_40%,rgba(79,227,193,0.06),transparent_70%)]" />
-
-      <CourierField
-        rtl={rtl}
-        ariaLabel={h.canvasLabel}
-        labels={{
-          ...h.legend,
-          hq: h.hq,
-          replay: h.replay,
-          couriersWord: h.stats[0].label,
-          vehiclesWord: h.stats[1].label,
-          couriersFinal: h.stats[0].value,
-          vehiclesFinal: h.stats[1].value,
-        }}
-      />
-
-      {/* readability scrims behind the copy (mobile: from below; desktop: from the text side) */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 lg:hidden"
-        style={{ background: "linear-gradient(to top, #05070d 0%, #05070d 38%, rgba(5,7,13,0.72) 52%, rgba(5,7,13,0) 68%)" }}
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 hidden lg:block"
-        style={{
-          background: `linear-gradient(${rtl ? "to left" : "to right"}, rgba(5,7,13,0.94) 0%, rgba(5,7,13,0.78) 30%, rgba(5,7,13,0.35) 46%, rgba(5,7,13,0) 60%)`,
-        }}
-      />
-
-      <div className="pointer-events-none relative mx-auto flex min-h-[100svh] max-w-7xl flex-col justify-end px-5 pb-10 pt-[52svh] lg:justify-center lg:px-8 lg:pb-16 lg:pt-24">
-        <div className="pointer-events-auto max-w-xl">
-          <h1 id="hero-title">
-            <span className="eyebrow block animate-rise text-sun">{h.eyebrow}</span>
-            <span className="mt-4 block animate-rise font-display text-[clamp(2.6rem,7vw,5.6rem)] font-semibold leading-[0.95] tracking-[-0.03em] text-balance [animation-delay:120ms] rtl:leading-[1.15] rtl:tracking-normal">
+    <section aria-labelledby="hero-title" className="relative bg-paper pt-28 pb-16 lg:pt-36 lg:pb-24">
+      <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 lg:grid-cols-[1fr_1.05fr] lg:gap-16 lg:px-8">
+        <div>
+          <h1 id="hero-title" className="animate-rise">
+            <span className="label">{h.eyebrow}</span>
+            <span className="mt-5 block font-display text-[clamp(2.4rem,5.2vw,4.25rem)] font-semibold leading-[1.04] tracking-[-0.022em] text-ink text-balance rtl:leading-[1.25] rtl:tracking-normal">
               {h.title}
             </span>
           </h1>
-          <p className="mt-6 max-w-lg animate-rise text-lg leading-relaxed text-mist text-pretty [animation-delay:240ms]">{h.lead}</p>
+          <p className="mt-6 max-w-xl animate-rise text-lg leading-relaxed text-muted text-pretty [animation-delay:100ms]">{h.lead}</p>
 
-          <div className="mt-8 flex animate-rise flex-col gap-3 [animation-delay:360ms] sm:flex-row">
+          <div className="mt-9 animate-rise [animation-delay:200ms]">
+            <p className="text-sm font-semibold text-ink">{h.quickStart}</p>
+            <QuickStart options={t.planner.steps.persona.options} />
+          </div>
+
+          <div className="mt-7 flex animate-rise flex-wrap items-center gap-x-6 gap-y-3 [animation-delay:300ms]">
             <TrackedLink
               href="#planner"
               event="cta_click"
               props={{ cta: "plan", location: "hero" }}
-              className="group inline-flex items-center justify-center gap-2 rounded-full bg-sun px-6 py-3.5 font-semibold text-ink shadow-[0_0_40px_-8px_rgba(246,166,35,0.7)] transition hover:bg-sun-soft"
+              className="inline-flex items-center justify-center rounded-md bg-ink px-5 py-3 font-medium text-white transition-colors hover:bg-ink-3"
             >
               {h.ctaPlan}
-              <ArrowIcon className="size-4 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
             </TrackedLink>
             <TrackedLink
               href={whatsappLink(t.wa.general)}
@@ -67,28 +40,36 @@ export default function Hero({ t, lang }: { t: Dictionary; lang: Locale }) {
               rel="noopener noreferrer"
               event="whatsapp_click"
               props={{ location: "hero" }}
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3.5 font-semibold text-white backdrop-blur transition hover:border-white/30 hover:bg-white/10"
+              className="inline-flex items-center gap-2 font-medium text-ink underline decoration-line-strong underline-offset-4 transition-colors hover:decoration-ink"
             >
-              <WhatsAppIcon className="size-5 text-signal" />
+              <WhatsAppIcon className="size-5 text-whatsapp" />
               {h.ctaTalk}
             </TrackedLink>
           </div>
-
-          {/* Stats as real text (SEO, screen readers, no-JS). Visual counters live beside the map on desktop. */}
-          <dl className="mt-10 grid animate-rise grid-cols-3 gap-4 border-t border-line pt-6 [animation-delay:480ms] lg:hidden">
-            {h.stats.map((s) => (
-              <div key={s.label}>
-                <dt className="sr-only">{s.label}</dt>
-                <dd>
-                  <span className="num block font-display text-2xl font-semibold text-white">{s.value}</span>
-                  <span className="text-sm text-fog">{s.label}</span>
-                </dd>
-              </div>
-            ))}
-          </dl>
-          {/* Desktop: the stats are drawn beside the map (aria-hidden), so expose them to assistive tech here. */}
-          <p className="sr-only hidden lg:block">{h.stats.map((s) => `${s.value} ${s.label}`).join(" · ")}</p>
         </div>
+
+        {/* Network panel — a product-style view of MSG's real scale */}
+        <figure className="animate-rise overflow-hidden rounded-xl border border-line bg-surface shadow-[0_1px_2px_rgba(12,14,17,0.04),0_24px_48px_-24px_rgba(12,14,17,0.18)] [animation-delay:150ms]">
+          <div className="flex items-center justify-between gap-4 border-b border-line px-5 py-3.5">
+            <span className="text-sm font-semibold text-ink">{h.panelTitle}</span>
+            <span className="flex items-center gap-2 text-sm text-muted">
+              <span className="relative flex size-2">
+                <span className="absolute inset-0 rounded-full bg-brand opacity-60 motion-safe:animate-ping" />
+                <span className="relative size-2 rounded-full bg-brand" />
+              </span>
+              {h.panelLive}
+            </span>
+          </div>
+          <div className="relative aspect-[1000/860] bg-[radial-gradient(circle_at_58%_48%,rgba(31,67,224,0.05),transparent_60%)] p-4 sm:p-6">
+            <CourierField ariaLabel={h.canvasLabel} hqLabel={h.hq} />
+          </div>
+          <NetworkStats labels={{ couriers: h.stats[0].label, vehicles: h.stats[1].label, operations: h.stats[2].label }} />
+          <figcaption className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-line bg-paper px-5 py-3 text-xs text-muted">
+            <span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-ink/50" />{h.legend.courier}</span>
+            <span className="flex items-center gap-1.5"><span className="h-px w-3 bg-brand" />{h.legend.vehicle}</span>
+            <span className="text-faint">{h.caption}</span>
+          </figcaption>
+        </figure>
       </div>
     </section>
   );

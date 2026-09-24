@@ -1,97 +1,80 @@
 @import "tailwindcss";
 
-/* ---------- Design tokens ---------- */
+/*
+ * MSG Horizons design system — editorial / industrial.
+ * Light, restrained, typographic. One brand colour ("horizon" cobalt) used only for data and key accents.
+ * To adopt MSG's official brand colour, change the --color-brand* tokens only.
+ */
 @theme {
-  --color-ink: #05070d;
-  --color-ink-2: #0a0f1c;
-  --color-ink-3: #111829;
-  --color-line: rgb(255 255 255 / 0.09);
-  --color-fog: #9aa4b8;
-  --color-mist: #c9d0dc;
-  --color-paper: #f4efe6;
-  --color-paper-2: #ebe4d8;
-  --color-paper-ink: #17140f;
-  --color-paper-fog: #5d564b;
-  --color-sun: #f6a623;
-  --color-sun-deep: #9a5c00;
-  --color-sun-soft: #ffd48a;
-  --color-signal: #4fe3c1;
-  --color-signal-deep: #0b7a64;
+  --color-paper: #fafaf7;
+  --color-surface: #ffffff;
+  --color-subtle: #f1f0eb;
+  --color-line: #e3e1da;
+  --color-line-strong: #cfccc3;
+  --color-ink: #0c0e11;
+  --color-ink-2: #1b1e23;
+  --color-ink-3: #2a2e35;
+  --color-muted: #585e67;
+  --color-faint: #8b9098;
+  --color-brand: #1f43e0;
+  --color-brand-strong: #1633b5;
+  --color-brand-soft: #eceffd;
+  --color-brand-bright: #8ea2ff; /* on dark backgrounds only */
+  --color-whatsapp: #128c4a;
+  --color-danger: #b42318;
 
   --font-display: var(--font-display-latin), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-sans-latin), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-mono-latin), ui-monospace, monospace;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-rise: rise 0.9s var(--ease-out-expo) both;
-  --animate-marquee: marquee 40s linear infinite;
-  --animate-pulse-ring: pulse-ring 2.4s var(--ease-out-expo) infinite;
+  --animate-rise: rise 0.8s var(--ease-out-expo) both;
 
   @keyframes rise {
-    from { opacity: 0; transform: translateY(18px); }
+    from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: none; }
-  }
-  @keyframes marquee {
-    to { transform: translateX(-50%); }
-  }
-  @keyframes pulse-ring {
-    0% { transform: scale(0.6); opacity: 0.9; }
-    100% { transform: scale(2.4); opacity: 0; }
   }
 }
 
-/* Arabic: one family for display and body, slightly more generous leading. */
 :root:lang(ar) {
   --font-display: var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
 }
 
 html {
-  background: var(--color-ink);
-  color: #fff;
+  background: var(--color-paper);
+  color: var(--color-ink);
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;
   -webkit-text-size-adjust: 100%;
   text-rendering: optimizeLegibility;
 }
 body {
-  background: var(--color-ink);
+  background: var(--color-paper);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
 }
-:lang(ar) body { line-height: 1.7; }
+:lang(ar) body { line-height: 1.75; }
 
-::selection { background: var(--color-sun); color: var(--color-ink); }
+::selection { background: var(--color-brand); color: #fff; }
 
 :focus-visible {
-  outline: 2px solid var(--color-sun);
+  outline: 2px solid var(--color-brand);
   outline-offset: 3px;
-  border-radius: 6px;
+  border-radius: 4px;
 }
 
 .text-balance { text-wrap: balance; }
 .text-pretty { text-wrap: pretty; }
 
-/* Subtle film grain for depth on dark surfaces (pure CSS, no image request). */
-.grain::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.05;
-  background-image: radial-gradient(rgb(255 255 255 / 0.6) 0.5px, transparent 0.5px);
-  background-size: 3px 3px;
-  mix-blend-mode: overlay;
+/* Section label: small, sentence case, brand colour. */
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-brand);
 }
-
-.eyebrow {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-:lang(ar) .eyebrow { font-family: var(--font-sans); letter-spacing: 0; font-size: 0.875rem; font-weight: 600; }
+.on-dark .label { color: var(--color-brand-bright); }
 
 /* Numbers always render LTR, even inside Arabic text. */
 .num { direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums; }
@@ -104,8 +87,3 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
-
-/* Parcels moving along a route (services card). */
-.route-pulse { animation: route 2.8s ease-in-out infinite; }
-[dir="rtl"] .route-pulse { animation-direction: reverse; }
-@keyframes route { 0% { transform: translateX(-110%); } 100% { transform: translateX(320%); } }

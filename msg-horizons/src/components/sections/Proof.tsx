@@ -1,11 +1,12 @@
 import Reveal from "../ui/Reveal";
+import CountUp from "../ui/CountUp";
 import { facts } from "@/content/facts";
 import type { Dictionary } from "@/content/i18n";
 
 export default function Proof({ t }: { t: Dictionary }) {
   const p = t.proof;
   return (
-    <section aria-labelledby="proof-title" className="relative overflow-hidden bg-ink-2 py-24 lg:py-32">
+    <section aria-labelledby="proof-title" className="section-glow relative overflow-hidden bg-ink-2 py-24 lg:py-32">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal className="max-w-2xl">
           <p className="eyebrow text-sun">{p.eyebrow}</p>
@@ -16,10 +17,10 @@ export default function Proof({ t }: { t: Dictionary }) {
 
         <dl className="mt-14 grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
           {p.metrics.map((m, i) => (
-            <Reveal key={m.label} delay={i * 80} className="bg-ink-2 p-8">
+            <Reveal key={m.label} delay={i * 80} className="bg-ink-2 p-8 transition-colors hover:bg-ink-3">
               <dt className="text-sm text-fog">{m.label}</dt>
               <dd className="mt-3">
-                <span className="num block font-display text-5xl font-semibold tracking-tight text-white">{m.value}</span>
+                <CountUp value={m.value} className={`num block font-display text-5xl font-semibold tracking-tight ${i % 2 === 0 ? "text-sun-gradient" : "text-white"}`} />
                 <span className="mt-2 block text-sm text-mist">{m.d}</span>
               </dd>
             </Reveal>

@@ -4,6 +4,7 @@ import { PlanProvider } from "@/components/PlanContext";
 import SiteHeader from "@/components/SiteHeader";
 import Hero from "@/components/hero/Hero";
 import Planner from "@/components/sections/Planner";
+import TrustBar from "@/components/sections/TrustBar";
 import Sellers from "@/components/sections/Sellers";
 import Services from "@/components/sections/Services";
 import Fleet from "@/components/sections/Fleet";
@@ -25,9 +26,10 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
     <PlanProvider>
       <SiteHeader t={t} lang={lang} />
       <main id="main">
-        <Hero t={t} lang={lang} />
+        <Hero t={t} />
+        <TrustBar t={t} />
         <Planner t={t} />
-        <Sellers t={t} />
+        <Sellers t={t} lang={lang} />
         <Services t={t} />
         <Fleet t={t} lang={lang} />
         <Enterprise t={t} />

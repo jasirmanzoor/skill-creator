@@ -1,16 +1,15 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
-import { Bricolage_Grotesque, Geist, Geist_Mono, IBM_Plex_Sans_Arabic } from "next/font/google";
+import { IBM_Plex_Sans_Arabic, Inter, Inter_Tight } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { LOCALES, dirOf, getDictionary, isLocale, type Locale } from "@/content/i18n";
 import { SITE_URL, facts } from "@/content/facts";
 import "../globals.css";
 
-const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-display-latin", display: "swap" });
-const sans = Geist({ subsets: ["latin"], variable: "--font-sans-latin", display: "swap" });
-const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono-latin", display: "swap" });
+const display = Inter_Tight({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-display-latin", display: "swap" });
+const sans = Inter({ subsets: ["latin"], variable: "--font-sans-latin", display: "swap" });
 const arabic = IBM_Plex_Sans_Arabic({
   subsets: ["arabic"],
   weight: ["400", "500", "600", "700"],
@@ -59,8 +58,8 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 }
 
 export const viewport: Viewport = {
-  themeColor: "#05070d",
-  colorScheme: "dark",
+  themeColor: "#fafaf7",
+  colorScheme: "light",
   width: "device-width",
   initialScale: 1,
 };
@@ -142,7 +141,7 @@ export default async function RootLayout({ children, params }: Props) {
     <html
       lang={lang}
       dir={dirOf(lang)}
-      className={`${display.variable} ${sans.variable} ${mono.variable} ${arabic.variable}`}
+      className={`${display.variable} ${sans.variable} ${arabic.variable}`}
     >
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(lang) }} />

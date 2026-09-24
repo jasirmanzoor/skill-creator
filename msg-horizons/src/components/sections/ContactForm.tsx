@@ -154,7 +154,7 @@ export default function ContactForm({ t, lang }: { t: Dictionary; lang: Locale }
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="rounded-3xl border border-line bg-ink/60 p-6 sm:p-8" aria-describedby={`${uid}-privacy`}>
+    <form onSubmit={onSubmit} noValidate className="glass rounded-3xl border border-line bg-ink/60 p-6 sm:p-8" aria-describedby={`${uid}-privacy`}>
       {plan ? (
         <div className="mb-6 flex items-center justify-between gap-3 rounded-2xl border border-signal/30 bg-signal/10 px-4 py-3 text-sm">
           <span className="text-signal">✓ {f.planAttached}: <strong className="text-white">{t.planner.result.models[operatingModel(plan)].name}</strong></span>

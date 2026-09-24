@@ -11,7 +11,7 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const on = () => setScrolled(window.scrollY > 24);
+    const on = () => setScrolled(window.scrollY > 8);
     on();
     window.addEventListener("scroll", on, { passive: true });
     return () => window.removeEventListener("scroll", on);
@@ -40,26 +40,26 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-[background,border-color,backdrop-filter] duration-300 ${
-        scrolled || open ? "border-b border-line bg-ink/75 backdrop-blur-xl" : "border-b border-transparent"
+      className={`fixed inset-x-0 top-0 z-50 border-b bg-paper/90 backdrop-blur-md transition-colors duration-300 ${
+        scrolled || open ? "border-line" : "border-transparent"
       }`}
     >
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-3 focus:z-50 focus:rounded-lg focus:bg-sun focus:px-4 focus:py-2 focus:text-ink"
+        className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-3 focus:z-50 focus:rounded-md focus:bg-ink focus:px-4 focus:py-2 focus:text-white"
       >
         {t.nav.skip}
       </a>
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-5 lg:px-8">
-        <a href={`/${lang}`} className="rounded-lg" aria-label="MSG Horizons">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-5 lg:px-8">
+        <a href={`/${lang}`} className="rounded" aria-label="MSG Horizons">
           <Logo />
         </a>
 
         <nav aria-label="Primary" className="hidden lg:block">
-          <ul className="flex items-center gap-1">
+          <ul className="flex items-center gap-7">
             {links.map(([href, label]) => (
               <li key={href}>
-                <a href={href} className="rounded-full px-3 py-2 text-sm text-mist transition hover:bg-white/5 hover:text-white">
+                <a href={href} className="text-[15px] text-muted transition-colors hover:text-ink">
                   {label}
                 </a>
               </li>
@@ -67,27 +67,27 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
           </ul>
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <a
             href={`/${other}`}
             hrefLang={other}
             lang={other}
             aria-label={t.nav.langSwitchLabel}
             onClick={() => track("lang_switch", { to: other })}
-            className="rounded-full border border-line px-3 py-1.5 text-sm text-mist transition hover:border-white/30 hover:text-white"
+            className="text-[15px] text-muted transition-colors hover:text-ink"
           >
             {t.nav.langSwitch}
           </a>
           <a
             href="#planner"
             onClick={() => track("cta_click", { cta: "plan", location: "header" })}
-            className="hidden rounded-full bg-sun px-4 py-2 text-sm font-semibold text-ink transition hover:bg-sun-soft sm:inline-flex"
+            className="hidden rounded-md bg-ink px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ink-3 sm:inline-flex"
           >
             {t.nav.ctaShort}
           </a>
           <button
             type="button"
-            className="inline-flex size-10 items-center justify-center rounded-full border border-line text-white lg:hidden"
+            className="inline-flex size-10 items-center justify-center rounded-md text-ink lg:hidden"
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? t.nav.close : t.nav.menu}
@@ -100,12 +100,12 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
         </div>
       </div>
 
-      <div id="mobile-nav" hidden={!open} className="h-[calc(100dvh-4rem)] overflow-y-auto border-t border-line bg-ink px-5 pb-10 lg:hidden">
+      <div id="mobile-nav" hidden={!open} className="h-[calc(100dvh-4rem)] overflow-y-auto border-t border-line bg-paper px-5 pb-10 lg:hidden">
         <nav aria-label="Mobile">
           <ul className="divide-y divide-line">
             {links.map(([href, label]) => (
               <li key={href}>
-                <a href={href} onClick={() => setOpen(false)} className="block py-4 font-display text-2xl text-white">
+                <a href={href} onClick={() => setOpen(false)} className="block py-4 font-display text-2xl font-medium text-ink">
                   {label}
                 </a>
               </li>
@@ -116,7 +116,7 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
           <a
             href="#planner"
             onClick={() => { setOpen(false); track("cta_click", { cta: "plan", location: "mobile_menu" }); }}
-            className="rounded-full bg-sun px-5 py-3.5 text-center font-semibold text-ink"
+            className="rounded-md bg-ink px-5 py-3.5 text-center font-medium text-white"
           >
             {t.nav.cta}
           </a>
@@ -125,7 +125,7 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => track("whatsapp_click", { location: "mobile_menu" })}
-            className="rounded-full border border-line px-5 py-3.5 text-center font-semibold text-white"
+            className="rounded-md border border-line-strong px-5 py-3.5 text-center font-medium text-ink"
           >
             {t.nav.talk} · {t.nav.whatsapp}
           </a>

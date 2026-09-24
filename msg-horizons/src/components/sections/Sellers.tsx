@@ -1,10 +1,10 @@
 import Reveal from "../ui/Reveal";
 import TrackedLink from "../ui/TrackedLink";
 import { ArrowIcon } from "../ui/icons";
-import type { Dictionary } from "@/content/i18n";
+import type { Dictionary, Locale } from "@/content/i18n";
 
 /** Approachable, light section: "this is for me" for sellers and small businesses. */
-export default function Sellers({ t }: { t: Dictionary }) {
+export default function Sellers({ t, lang }: { t: Dictionary; lang: Locale }) {
   const s = t.sellers;
   return (
     <section id="sellers" aria-labelledby="sellers-title" className="scroll-mt-16 bg-paper py-24 text-paper-ink lg:py-32">
@@ -18,7 +18,7 @@ export default function Sellers({ t }: { t: Dictionary }) {
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-paper-fog text-pretty">{s.lead}</p>
           </Reveal>
           <Reveal delay={120}>
-            <OrderJourney />
+            <div data-lang={lang} />
           </Reveal>
         </div>
 
@@ -62,46 +62,5 @@ export default function Sellers({ t }: { t: Dictionary }) {
         </div>
       </div>
     </section>
-  );
-}
-
-/** A parcel travelling store → MSG → customer. Pure SVG + CSS, direction-agnostic. */
-function OrderJourney() {
-  return (
-    <div className="relative rounded-3xl bg-paper-2 p-6" aria-hidden="true">
-      <svg viewBox="0 0 360 150" className="w-full rtl:-scale-x-100">
-        <defs>
-          <path id="oj-path" d="M40 95 C 110 20, 170 20, 180 75 S 270 140, 320 60" />
-        </defs>
-        <use href="#oj-path" fill="none" stroke="#d8cdbb" strokeWidth="2" strokeDasharray="4 6" />
-        <use href="#oj-path" fill="none" stroke="#f6a623" strokeWidth="2.5" strokeDasharray="420" strokeDashoffset="420" className="[animation:oj-draw_3.6s_ease-in-out_infinite]" />
-        {/* store */}
-        <g transform="translate(18 88)">
-          <rect width="44" height="36" rx="6" fill="#17140f" />
-          <path d="M4 10h36" stroke="#f6a623" strokeWidth="3" />
-          <rect x="16" y="18" width="12" height="18" rx="2" fill="#f4efe6" />
-        </g>
-        {/* hub */}
-        <g transform="translate(162 58)">
-          <circle cx="18" cy="18" r="20" fill="#17140f" />
-          <path d="M8 22a10 10 0 0 1 20 0Z" fill="#f6a623" />
-          <path d="M5 25h26" stroke="#4fe3c1" strokeWidth="2" strokeLinecap="round" />
-        </g>
-        {/* customer home */}
-        <g transform="translate(300 34)">
-          <path d="M0 18 20 2l20 16v22H0z" fill="#17140f" />
-          <rect x="15" y="24" width="10" height="16" rx="1.5" fill="#f6a623" />
-        </g>
-        {/* parcel */}
-        <g>
-          <rect x="-7" y="-7" width="14" height="14" rx="2.5" fill="#f6a623" stroke="#17140f" strokeWidth="1.5" />
-          <path d="M-7 -1h14" stroke="#17140f" strokeWidth="1.2" />
-          <animateMotion dur="3.6s" repeatCount="indefinite" rotate="0" keyPoints="0;1;1" keyTimes="0;0.85;1" calcMode="linear">
-            <mpath href="#oj-path" />
-          </animateMotion>
-        </g>
-      </svg>
-      <style>{`@keyframes oj-draw{0%{stroke-dashoffset:420}85%,100%{stroke-dashoffset:0}}@media (prefers-reduced-motion:reduce){animateMotion{display:none}}`}</style>
-    </div>
   );
 }

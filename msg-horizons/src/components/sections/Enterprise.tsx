@@ -10,8 +10,8 @@ export default function Enterprise({ t }: { t: Dictionary }) {
   const e = t.enterprise;
   const wf = e.workforce;
   return (
-    <section id="enterprise" aria-labelledby="enterprise-title" className="relative scroll-mt-16 bg-ink py-24 lg:py-32">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+    <section id="enterprise" aria-labelledby="enterprise-title" className="section-glow relative scroll-mt-16 bg-ink py-24 lg:py-32">
+      <div aria-hidden="true" className="pointer-events-none absolute -top-32 end-0 h-96 w-96 rounded-full bg-signal/[0.06] blur-3xl" />
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal className="max-w-3xl">
           <p className="eyebrow text-signal">{e.eyebrow}</p>
