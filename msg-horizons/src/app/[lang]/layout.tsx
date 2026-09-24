@@ -147,8 +147,13 @@ export default async function RootLayout({ children, params }: Props) {
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(lang) }} />
         {children}
-        <Analytics />
-        <SpeedInsights />
+        {/* Enable Web Analytics + Speed Insights in the Vercel dashboard, then set NEXT_PUBLIC_VERCEL_ANALYTICS=1. */}
+        {process.env.NEXT_PUBLIC_VERCEL_ANALYTICS === "1" ? (
+          <>
+            <Analytics />
+            <SpeedInsights />
+          </>
+        ) : null}
         {gaId ? (
           <>
             <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />

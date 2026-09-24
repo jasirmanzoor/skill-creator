@@ -9,7 +9,11 @@ import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const AXE = readFileSync(require.resolve("axe-core/axe.min.js"), "utf8");
 const BASE = (process.env.BASE_URL || "http://localhost:3100").replace(/\/$/, "");
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
+const isLocal = /localhost|127\.0\.0\.1/.test(BASE);
+const proxy = !isLocal && process.env.HTTPS_PROXY ? { server: process.env.HTTPS_PROXY } : undefined; // honour egress proxies
+// TRUST_SPKI: base64 SPKI hash of a proxy CA to trust (sandboxes that re-sign TLS). Verification stays on.
+const args = process.env.TRUST_SPKI ? [`--ignore-certificate-errors-spki-list=${process.env.TRUST_SPKI}`] : [];
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, proxy, args });
 let failed = 0;
 const results = [];
 

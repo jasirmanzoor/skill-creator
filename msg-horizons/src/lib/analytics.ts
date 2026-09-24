@@ -3,7 +3,7 @@
 import { track as vercelTrack } from "@vercel/analytics";
 
 /**
- * Conversion analytics. One call fans out to Vercel Web Analytics custom events and,
+ * Conversion analytics. One call fans out to Vercel Web Analytics custom events (when enabled) and,
  * if configured, Google Analytics 4 / GTM via window.dataLayer.
  *
  * Event taxonomy (keep stable — dashboards depend on it):

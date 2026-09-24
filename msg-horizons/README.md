@@ -28,7 +28,7 @@ npm run dev            # http://localhost:3000
 npm run lint && npm run typecheck && npm test
 npm run build && npx next start -p 3100 &
 BASE_URL=http://localhost:3100 npm run test:e2e      # e2e + axe accessibility audit
-BASE_URL=https://<production-domain> SKIP_LEAD_POST=1 npm run test:e2e   # verify production
+BASE_URL=https://msg-horizons.vercel.app npm run test:e2e   # verify production (honeypot lead, never delivered)
 ```
 
 ## Environment variables (Vercel → Project → Settings → Environment Variables)
@@ -36,7 +36,9 @@ See `.env.example`.
 - `NEXT_PUBLIC_SITE_URL`: canonical domain (used for SEO tags, sitemap and Open Graph).
 - `LEAD_WEBHOOK_URL` and/or `RESEND_API_KEY` (+ `LEAD_EMAIL_TO`, `LEAD_EMAIL_FROM`): where form leads go.
   **Until one is set, the form hands leads off to WhatsApp or email**, so none are lost.
-- `NEXT_PUBLIC_GA_ID` (optional): GA4. Vercel Web Analytics and Speed Insights are always on.
+- `NEXT_PUBLIC_VERCEL_ANALYTICS=1`: loads Vercel Web Analytics and Speed Insights. **First enable both in
+  Vercel → Project → Analytics / Speed Insights**, otherwise their scripts 404.
+- `NEXT_PUBLIC_GA_ID` (optional): GA4.
 
 ## Analytics events
 `cta_click`, `planner_step`, `planner_complete`, `plan_share`, `lead_submit`, `whatsapp_click`,
