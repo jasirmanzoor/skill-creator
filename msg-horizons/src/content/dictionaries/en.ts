@@ -49,6 +49,12 @@ export const en = {
     scroll: "Scroll to explore",
     replay: "Replay",
   },
+  interludes: {
+    scale: ["1,000+ couriers.", "100+ vehicles.", "One network, operating around the clock."],
+    scaleLabel: "MSG Horizons at a glance",
+    growth: ["From your first order", "to your biggest peak season,", "MSG moves with you."],
+    growthLabel: "Growing with MSG Horizons",
+  },
   planner: {
     eyebrow: "Build your logistics",
     title: "What are you trying to move?",
@@ -165,7 +171,6 @@ export const en = {
     },
   },
   sellers: {
-    journey: { store: "Your store", msg: "MSG Horizons", customer: "Your customer", delivered: "Delivered" },
     eyebrow: "For sellers, startups and growing stores",
     title: "Selling online? Your delivery team is already here.",
     lead: "You don't need a logistics department to deliver like a big brand. Whether it's your first order from home or your hundredth from a new store, MSG Horizons takes care of delivery so you can focus on what you sell.",
@@ -185,6 +190,15 @@ export const en = {
     launchpad: "Your launchpad for selling online in Saudi Arabia.",
   },
   services: {
+    facts: {
+      "last-mile": { v: "1,000+", l: "couriers behind every delivery" },
+      warehousing: { v: "Secure", l: "storage with smart inventory control" },
+      "land-freight": { v: "Door to door", l: "within cities and across regions" },
+      fleet: { v: "100+", l: "specialised vehicles, last-mile to heavy freight" },
+      manpower: { v: "7 roles", l: "from couriers to site supervisors, ready for peaks" },
+      tracking: { v: "24/7", l: "real-time monitoring and responsive support" },
+      account: { v: "1 team", l: "dedicated to your operation" },
+    },
     eyebrow: "One accountable partner",
     title: "One seamless logistics ecosystem.",
     lead: "End-to-end services designed around control, speed and a single accountable partner. Use one, or combine them.",

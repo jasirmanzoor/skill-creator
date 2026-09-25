@@ -13,12 +13,12 @@ export default function NetworkStats({ labels }: { labels: { couriers: string; v
     const el = ref.current;
     if (!el) return;
     const io = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { window.setTimeout(() => setOn(true), reduced ? 0 : 500); io.disconnect(); }
-    }, { threshold: 0.4 });
+      if (e.isIntersecting) { window.setTimeout(() => setOn(true), reduced ? 0 : 150); io.disconnect(); }
+    }, { threshold: 0.15 });
     io.observe(el);
     return () => io.disconnect();
   }, [reduced]);
-  const flow = { transformTiming: { duration: 1600, easing: "cubic-bezier(0.16, 1, 0.3, 1)" } };
+  const flow = { transformTiming: { duration: 1200, easing: "cubic-bezier(0.16, 1, 0.3, 1)" } };
   const rows = [
     { n: 1000, suffix: "+", l: labels.couriers },
     { n: 100, suffix: "+", l: labels.vehicles },

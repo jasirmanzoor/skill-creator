@@ -54,20 +54,20 @@ export default function PeakFlow({ stages, labels }: { stages: Stage[]; labels: 
             className="flex min-h-[40vh] items-center lg:min-h-[50vh]"
           >
             <div className="transition-colors duration-500">
-              <span className={`num font-mono text-sm transition-colors ${step === i ? "text-sun" : "text-fog"}`}>0{i + 1} / 05</span>
-              <h4 className={`mt-2 font-display text-3xl font-semibold transition-colors sm:text-4xl ${step === i ? "text-white" : "text-fog"}`}>{s.t}</h4>
-              <p className={`mt-3 max-w-sm text-lg transition-colors ${step === i ? "text-mist" : "text-fog"}`}>{s.d}</p>
+              <span className={`num text-sm transition-colors ${step === i ? "text-brand-bright" : "text-white/55"}`}>0{i + 1} / 05</span>
+              <h4 className={`mt-2 font-display text-3xl font-semibold transition-colors sm:text-4xl ${step === i ? "text-white" : "text-white/55"}`}>{s.t}</h4>
+              <p className={`mt-3 max-w-sm text-lg transition-colors ${step === i ? "text-white/80" : "text-white/55"}`}>{s.d}</p>
             </div>
           </li>
         ))}
       </ol>
 
       <div className="order-1 lg:order-2">
-        <div className="sticky top-20 z-10 rounded-3xl border border-line bg-ink/90 p-4 backdrop-blur sm:p-6 lg:top-28">
-          <div className="mb-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-fog">
+        <div className="sticky top-20 z-10 rounded-xl border border-white/10 bg-ink-2/90 p-4 backdrop-blur sm:p-6 lg:top-28">
+          <div className="mb-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-white/65">
             <span className="flex items-center gap-2"><span className="h-0.5 w-5 bg-white" />{labels.demand}</span>
-            <span className="flex items-center gap-2"><span className="h-3 w-2.5 rounded-sm bg-sun" />{labels.capacity}</span>
-            <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-signal" />{labels.standby}</span>
+            <span className="flex items-center gap-2"><span className="h-3 w-2.5 rounded-sm bg-brand-bright" />{labels.capacity}</span>
+            <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-white" />{labels.standby}</span>
           </div>
           <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label={`${stages[step].t}: ${stages[step].d}. ${labels.illustrative}`}>
             {/* grid */}
@@ -86,7 +86,7 @@ export default function PeakFlow({ stages, labels }: { stages: Stage[]; labels: 
                   y={y(v)}
                   height={H - PAD - y(v)}
                   rx={3}
-                  fill={released ? "rgba(246,166,35,0.55)" : "#f6a623"}
+                  fill={released ? "rgba(142,162,255,0.4)" : "#8ea2ff"}
                   opacity={0.85}
                   style={{ transition: `y .8s cubic-bezier(.16,1,.3,1) ${i * 30}ms, height .8s cubic-bezier(.16,1,.3,1) ${i * 30}ms, fill .6s` }}
                 />
@@ -97,7 +97,7 @@ export default function PeakFlow({ stages, labels }: { stages: Stage[]; labels: 
               <path
                 key={`c${i}`}
                 d={`M${x(i) - 4} ${y(capacity(i)) - 10} l3 3 l6 -6`}
-                stroke="#4fe3c1"
+                stroke="#ffffff"
                 strokeWidth="1.8"
                 fill="none"
                 strokeLinecap="round"
@@ -118,7 +118,7 @@ export default function PeakFlow({ stages, labels }: { stages: Stage[]; labels: 
                   cx={W - PAD - 8 - (k % 6) * 11}
                   cy={PAD + 6 + Math.floor(k / 6) * 11}
                   r="3.2"
-                  fill="#4fe3c1"
+                  fill="#ffffff"
                   style={{
                     opacity: step === 2 && k % 3 === 0 ? 0.25 : 1,
                     transition: "opacity .6s",
@@ -128,14 +128,14 @@ export default function PeakFlow({ stages, labels }: { stages: Stage[]; labels: 
             </g>
             {/* review badge */}
             <g style={{ opacity: step >= 4 ? 1 : 0, transition: "opacity .6s .6s" }}>
-              <rect x={W - PAD - 92} y={PAD - 4} width="92" height="26" rx="13" fill="rgba(79,227,193,0.12)" stroke="#4fe3c1" />
-              <text x={W - PAD - 46} y={PAD + 13} textAnchor="middle" className="fill-signal text-[12px] font-semibold">✓ {stages[4].t}</text>
+              <rect x={W - PAD - 92} y={PAD - 4} width="92" height="26" rx="13" fill="rgba(79,227,193,0.12)" stroke="#ffffff" />
+              <text x={W - PAD - 46} y={PAD + 13} textAnchor="middle" className="fill-white text-[12px] font-semibold">✓ {stages[4].t}</text>
             </g>
           </svg>
-          <p className="mt-3 text-xs text-fog">{labels.illustrative}</p>
+          <p className="mt-3 text-xs text-white/65">{labels.illustrative}</p>
           <div className="mt-4 flex gap-1.5" aria-hidden="true">
             {stages.map((s, i) => (
-              <span key={s.t} className={`h-1 flex-1 rounded-full transition-colors duration-500 ${i <= step ? "bg-sun" : "bg-white/10"}`} />
+              <span key={s.t} className={`h-1 flex-1 rounded-full transition-colors duration-500 ${i <= step ? "bg-brand-bright" : "bg-white/10"}`} />
             ))}
           </div>
         </div>

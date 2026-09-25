@@ -9,7 +9,7 @@ export default function TrustBar({ t }: { t: Dictionary }) {
         <p className="shrink-0 text-sm text-muted lg:max-w-[14rem]">{t.hero.partnersLead}</p>
         <ul className="grid flex-1 grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-5" dir="ltr">
           {facts.partners.map((p) => (
-            <li key={p} className="font-display text-xl font-semibold tracking-[-0.02em] text-ink/45 transition-colors hover:text-ink sm:text-center">
+            <li key={p} className="font-display text-xl font-semibold tracking-[-0.02em] text-ink/60 transition-colors hover:text-ink sm:text-center">
               {p}
             </li>
           ))}

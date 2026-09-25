@@ -8,10 +8,19 @@ import type { Dictionary, Locale } from "@/content/i18n";
 
 export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale }) {
   const [scrolled, setScrolled] = useState(false);
+  const [overDark, setOverDark] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const on = () => setScrolled(window.scrollY > window.innerHeight * 0.3);
+    const on = () => {
+      setScrolled(window.scrollY > window.innerHeight * 0.3);
+      // adapt to the section currently under the header
+      const y = 32;
+      setOverDark([...document.querySelectorAll<HTMLElement>('[data-theme="dark"]')].some((el) => {
+        const r = el.getBoundingClientRect();
+        return r.top <= y && r.bottom >= y;
+      }));
+    };
     on();
     window.addEventListener("scroll", on, { passive: true });
     return () => window.removeEventListener("scroll", on);
@@ -37,13 +46,14 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
     ["#contact", t.nav.contact],
   ] as const;
   const other = lang === "en" ? "ar" : "en";
-  const solid = scrolled || open;
-  const linkCls = solid ? "text-muted hover:text-ink" : "text-white/85 hover:text-white";
+  const solid = (scrolled || open) && !overDark;
+  const dark = overDark && !open;
+  const linkCls = solid ? "text-muted hover:text-ink" : "text-white/80 hover:text-white";
 
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300 ${
-        solid ? "border-line bg-paper/90 backdrop-blur-md" : "border-transparent bg-transparent"
+        dark ? "border-white/10 bg-ink/80 backdrop-blur-md" : solid ? "border-line bg-paper/90 backdrop-blur-md" : "border-transparent bg-transparent"
       }`}
     >
       <a

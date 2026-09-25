@@ -5,70 +5,54 @@ import { MailIcon, PhoneIcon, PinIcon, WhatsAppIcon } from "../ui/icons";
 import { facts, whatsappLink } from "@/content/facts";
 import type { Dictionary, Locale } from "@/content/i18n";
 
+/** Arrives at night: set directly on the night sky, with the form as a lit card. */
 export default function Contact({ t, lang }: { t: Dictionary; lang: Locale }) {
   const c = t.contact;
   const ch = c.channels;
+  const row = "flex items-center gap-4 border-b border-white/15 py-4 transition-colors";
   return (
-    <section id="contact" aria-labelledby="contact-title" className="section-glow relative scroll-mt-16 overflow-hidden bg-ink py-24 lg:py-32">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-96 bg-[radial-gradient(ellipse_60%_80%_at_50%_100%,rgba(246,166,35,0.14),transparent_70%)]" />
-      <div className="relative mx-auto grid max-w-7xl gap-12 px-5 lg:grid-cols-[1fr_1.25fr] lg:px-8">
+    <section id="contact" data-theme="dark" aria-labelledby="contact-title" className="on-dark scroll-mt-16 bg-[#07090f]/80 py-28 text-white backdrop-blur-[2px] lg:py-40">
+      <div className="mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-[1fr_1.15fr] lg:px-8">
         <Reveal>
-          <p className="eyebrow text-sun">{c.eyebrow}</p>
-          <h2 id="contact-title" className="mt-4 font-display text-5xl font-semibold tracking-tight text-balance sm:text-6xl rtl:tracking-normal">
-            <span className="text-sun-gradient">{c.title}</span>
+          <span className="label">{c.eyebrow}</span>
+          <h2 id="contact-title" className="mt-4 font-display text-5xl font-semibold tracking-[-0.03em] text-balance sm:text-6xl rtl:tracking-normal">
+            {c.title}
           </h2>
-          <p className="mt-6 max-w-md text-lg text-mist">{c.lead}</p>
+          <p className="mt-6 max-w-md text-lg text-white/75">{c.lead}</p>
 
-          <ul className="mt-10 grid gap-3">
+          <ul className="mt-10 border-t border-white/15">
             <li>
-              <TrackedLink
-                href={whatsappLink(t.wa.general)}
-                target="_blank"
-                rel="noopener noreferrer"
-                event="whatsapp_click"
-                props={{ location: "contact" }}
-                className="group flex items-center gap-4 rounded-2xl border border-signal/30 bg-signal/10 p-4 transition hover:border-signal"
-              >
-                <span className="inline-flex size-11 items-center justify-center rounded-xl bg-signal text-ink"><WhatsAppIcon /></span>
-                <span>
-                  <span className="block font-semibold text-white">{ch.whatsapp}</span>
-                  <span className="text-sm text-signal">{ch.whatsappD}</span>
+              <TrackedLink href={whatsappLink(t.wa.general)} target="_blank" rel="noopener noreferrer" event="whatsapp_click" props={{ location: "contact" }} className={`${row} hover:text-white`}>
+                <span className="inline-flex size-10 items-center justify-center rounded-md bg-[#25d366] text-white"><WhatsAppIcon /></span>
+                <span className="flex-1">
+                  <span className="block font-semibold">{ch.whatsapp}</span>
+                  <span className="text-sm text-white/65">{ch.whatsappD}</span>
                 </span>
               </TrackedLink>
             </li>
             <li>
-              <TrackedLink
-                href={`tel:${facts.contact.phoneE164}`}
-                event="cta_click"
-                props={{ cta: "call", location: "contact" }}
-                className="flex items-center gap-4 rounded-2xl border border-line p-4 transition hover:border-white/25"
-              >
-                <span className="inline-flex size-11 items-center justify-center rounded-xl bg-white/5 text-sun"><PhoneIcon /></span>
+              <TrackedLink href={`tel:${facts.contact.phoneE164}`} event="cta_click" props={{ cta: "call", location: "contact" }} className={row}>
+                <span className="inline-flex size-10 items-center justify-center rounded-md bg-white/10"><PhoneIcon /></span>
                 <span>
-                  <span className="block text-sm text-fog">{ch.call}</span>
-                  <span className="num block font-semibold text-white">{facts.contact.phoneDisplay}</span>
+                  <span className="block text-sm text-white/65">{ch.call}</span>
+                  <span className="num block font-semibold">{facts.contact.phoneDisplay}</span>
                 </span>
               </TrackedLink>
             </li>
             <li>
-              <TrackedLink
-                href={`mailto:${facts.contact.email}`}
-                event="cta_click"
-                props={{ cta: "email", location: "contact" }}
-                className="flex items-center gap-4 rounded-2xl border border-line p-4 transition hover:border-white/25"
-              >
-                <span className="inline-flex size-11 items-center justify-center rounded-xl bg-white/5 text-sun"><MailIcon /></span>
+              <TrackedLink href={`mailto:${facts.contact.email}`} event="cta_click" props={{ cta: "email", location: "contact" }} className={row}>
+                <span className="inline-flex size-10 items-center justify-center rounded-md bg-white/10"><MailIcon /></span>
                 <span>
-                  <span className="block text-sm text-fog">{ch.email}</span>
-                  <span className="block font-semibold text-white" dir="ltr">{facts.contact.email}</span>
+                  <span className="block text-sm text-white/65">{ch.email}</span>
+                  <span className="block font-semibold" dir="ltr">{facts.contact.email}</span>
                 </span>
               </TrackedLink>
             </li>
-            <li className="flex items-center gap-4 rounded-2xl border border-line p-4">
-              <span className="inline-flex size-11 items-center justify-center rounded-xl bg-white/5 text-sun"><PinIcon /></span>
+            <li className={row}>
+              <span className="inline-flex size-10 items-center justify-center rounded-md bg-white/10"><PinIcon /></span>
               <span>
-                <span className="block text-sm text-fog">{ch.visit}</span>
-                <address className="not-italic font-semibold text-white">
+                <span className="block text-sm text-white/65">{ch.visit}</span>
+                <address className="not-italic font-semibold">
                   {lang === "ar" ? "الملز، الرياض 12836، المملكة العربية السعودية" : facts.contact.addressDisplay}
                 </address>
               </span>
@@ -76,7 +60,7 @@ export default function Contact({ t, lang }: { t: Dictionary; lang: Locale }) {
           </ul>
         </Reveal>
 
-        <Reveal delay={120}>
+        <Reveal delay={100}>
           <ContactForm t={t} lang={lang} />
         </Reveal>
       </div>

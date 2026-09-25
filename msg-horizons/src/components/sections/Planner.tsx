@@ -1,6 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion as useMotionReduced } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { useEffect, useRef, useState } from "react";
 import {
   CARGO, PERSONAS, PRIORITIES, VOLUMES, buildPlan, decodePlan, encodePlan,
@@ -27,7 +28,7 @@ export default function Planner({ t }: { t: Dictionary }) {
   const [copied, setCopied] = useState(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const firstRender = useRef(true);
-  const reduce = useMotionReduced();
+  const reduce = useReducedMotion();
 
   // Restore a shared plan from ?plan=
   useEffect(() => {

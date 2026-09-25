@@ -1,4 +1,5 @@
 import QuickStart from "./QuickStart";
+import HeroLift from "./HeroLift";
 import TrackedLink from "../ui/TrackedLink";
 import { WhatsAppIcon } from "../ui/icons";
 import { whatsappLink } from "@/content/facts";
@@ -14,6 +15,7 @@ export default function Hero({ t }: { t: Dictionary }) {
     <section aria-labelledby="hero-title" className="relative min-h-[100svh] pt-[54svh]">
       {/* soft paper lift on the sand for legibility (keeps the tyre-track texture visible) */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 top-[50.8svh] bg-gradient-to-b from-paper/0 via-paper/55 to-paper/80" />
+      <HeroLift>
       <div className="relative mx-auto grid max-w-7xl gap-8 px-5 pb-16 lg:grid-cols-[1.15fr_1fr] lg:gap-16 lg:px-8">
         <h1 id="hero-title" className="animate-rise [animation-delay:500ms]">
           <span className="label">{h.eyebrow}</span>
@@ -48,6 +50,7 @@ export default function Hero({ t }: { t: Dictionary }) {
           </div>
         </div>
       </div>
+      </HeroLift>
     </section>
   );
 }

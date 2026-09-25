@@ -8,13 +8,13 @@ export default function Gallery({ t, lang }: { t: Dictionary; lang: Locale }) {
   const items = [...media.warehouse, ...media.operations, ...media.team, ...media.fleet.slice(1)];
   if (!items.length) return null;
   return (
-    <section aria-labelledby="gallery-title" className="bg-ink py-24">
+    <section aria-labelledby="gallery-title" className="border-t border-line bg-surface/92 py-24 backdrop-blur">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <p className="eyebrow text-sun">{t.gallery.eyebrow}</p>
-        <h2 id="gallery-title" className="mt-4 font-display text-4xl font-semibold">{t.gallery.title}</h2>
+        <span className="label">{t.gallery.eyebrow}</span>
+        <h2 id="gallery-title" className="mt-4 font-display text-4xl font-semibold tracking-[-0.025em] text-ink">{t.gallery.title}</h2>
         <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((m) => (
-            <li key={m.src} className="overflow-hidden rounded-3xl border border-line">
+            <li key={m.src} className="overflow-hidden rounded-xl border border-line">
               <Image src={m.src} width={m.width} height={m.height} alt={m.alt[lang]} className="h-full w-full object-cover" sizes="(min-width:1024px) 33vw, (min-width:640px) 50vw, 100vw" />
             </li>
           ))}

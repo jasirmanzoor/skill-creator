@@ -26,7 +26,7 @@ export default function NetworkPanel({ t }: { t: Dictionary }) {
           <figcaption className="mt-auto grid gap-2 border-t border-line bg-paper px-6 py-4 text-sm text-muted">
             <span className="flex items-center gap-2"><span className="size-1.5 rounded-full bg-ink/50" />{h.legend.courier}</span>
             <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-brand ring-[1.5px] ring-white shadow-[0_0_0_2.5px_rgba(31,67,224,0.25)]" />{h.legend.vehicle}</span>
-            <span className="text-xs text-faint">{h.caption}</span>
+            <span className="text-xs text-muted">{h.caption}</span>
           </figcaption>
         </div>
       </figure>

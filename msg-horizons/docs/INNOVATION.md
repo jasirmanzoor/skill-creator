@@ -1,5 +1,23 @@
 # Innovation R&D log
 
+> **Current design (v2).** The first dark/amber iteration was retired after review because it read as a
+> generic "AI landing page". v2 is light and editorial, and it is built around a real horizon photograph.
+> It was benchmarked against Flexport, ShipBob, Stuart, Onfleet, Salasa, Aramex and Naqel.
+>
+> **Cinematic system (v2):**
+> - *One scene, one camera.* A fixed horizon photo is aligned with object-position so the horizon sits at the
+>   same viewport height on every device. "MSG" stands on it as a sand-toned land-art landmark with depth, haze,
+>   grain and a contact shadow, so it belongs to the photograph.
+> - *Dolly.* The camera pushes in toward the horizon over the first screen, and the hero copy lifts away.
+> - *A day in one scroll.* Golden hour peaks at Fleet, dusk arrives with Enterprise, and night (with stars and a
+>   softly lit landmark) settles over Contact. The keyframes are measured from live section positions.
+>   This is the 24/7 story, told without words.
+> - *Interludes.* Pinned full-screen statements reveal line by line, and the landmark cuts out of frame.
+> - *Network panel.* 1,000 courier dots and tracking-style vehicle markers with delivery pings; no fading trails.
+>
+> Sections below describe the original R&D; items superseded by v2 are marked.
+
+
 The rule for this site: **motion has to explain something.** Every interactive element has to either
 encode a verified fact or move the visitor toward a decision. Anything that only decorates was cut.
 

@@ -76,6 +76,10 @@ body {
 }
 .on-dark .label { color: var(--color-brand-bright); }
 
+/* Cinematic cut: the MSG landmark steps out of frame while an interlude statement is pinned. */
+.msg-landmark { transition: opacity 0.7s var(--ease-out-expo); }
+html[data-interlude] .msg-landmark { opacity: 0; }
+
 /* Numbers always render LTR, even inside Arabic text. */
 .num { direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums; }
 

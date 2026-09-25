@@ -6,7 +6,7 @@ import { whatsappLink } from "@/content/facts";
 import type { Dictionary } from "@/content/i18n";
 import { WhatsAppIcon } from "./ui/icons";
 
-/** Thumb-reach CTA bar on mobile, shown once the visitor has scrolled past the hero. */
+/** Thumb-reach actions on mobile, shown after the hero and hidden over the contact section. */
 export default function MobileBar({ t }: { t: Dictionary }) {
   const [show, setShow] = useState(false);
   useEffect(() => {
@@ -21,28 +21,18 @@ export default function MobileBar({ t }: { t: Dictionary }) {
   }, []);
   return (
     <div
-      className={`fixed inset-x-3 bottom-3 z-40 grid grid-cols-[1fr_auto] gap-2 rounded-full border border-line bg-ink/85 p-1.5 shadow-2xl backdrop-blur-xl transition-all duration-500 lg:hidden ${
+      className={`fixed inset-x-3 bottom-3 z-40 grid grid-cols-[1fr_auto] gap-2 rounded-xl border border-line bg-surface/95 p-2 shadow-[0_20px_50px_-20px_rgba(12,14,17,0.35)] backdrop-blur transition-all duration-500 lg:hidden ${
         show ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-24 opacity-0"
       }`}
       aria-hidden={!show}
     >
-      <a
-        href="#planner"
-        tabIndex={show ? 0 : -1}
-        onClick={() => track("cta_click", { cta: "plan", location: "mobile_bar" })}
-        className="rounded-full bg-sun px-5 py-3 text-center font-semibold text-ink"
-      >
+      <a href="#planner" tabIndex={show ? 0 : -1} onClick={() => track("cta_click", { cta: "plan", location: "mobile_bar" })}
+        className="rounded-md bg-ink px-5 py-3 text-center font-medium text-white">
         {t.mobileBar.plan}
       </a>
-      <a
-        href={whatsappLink(t.wa.general)}
-        target="_blank"
-        rel="noopener noreferrer"
-        tabIndex={show ? 0 : -1}
+      <a href={whatsappLink(t.wa.general)} target="_blank" rel="noopener noreferrer" tabIndex={show ? 0 : -1}
         onClick={() => track("whatsapp_click", { location: "mobile_bar" })}
-        className="inline-flex items-center gap-2 rounded-full bg-signal px-4 py-3 font-semibold text-ink"
-        aria-label={t.mobileBar.whatsapp}
-      >
+        className="inline-flex items-center gap-2 rounded-md bg-[#128c4a] px-4 py-3 font-medium text-white" aria-label={t.mobileBar.whatsapp}>
         <WhatsAppIcon className="size-5" />
         <span className="sr-only sm:not-sr-only">{t.mobileBar.whatsapp}</span>
       </a>

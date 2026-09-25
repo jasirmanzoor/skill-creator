@@ -4,16 +4,23 @@ An interactive digital experience for **MSG Horizons**, a last-mile delivery and
 based in Riyadh. It is bilingual (English / Arabic RTL), built on Next.js 16 and deployed on Vercel.
 
 ## What's inside
-| Section | Purpose |
+| Moment | Purpose |
 |---|---|
-| Hero: "Every dot is a courier" | 1,000 dots (one per courier) assemble into Saudi Arabia from Riyadh HQ, with 100 vehicle trails and a 24/7 sweep |
-| Planner: "What are you trying to move?" | Four-step configurator → a shareable MSG configuration (no pricing) → WhatsApp or lead form |
-| Sellers | Approachable "this is for me" path for individual sellers, startups and growing stores |
-| Services | The seven promoted services (Customs Clearance is excluded by instruction) |
-| Fleet & operations | 100+ vehicles, a live Riyadh 24/7 dial, fleet visuals (swap in real photos via `media.ts`) |
-| Enterprise | Workforce pipeline, scroll-driven peak-demand flow, governance |
-| Proof | Key metrics, partners, 10 pillars, vision |
-| Contact | Lead form with a WhatsApp/email fallback, WhatsApp, phone, email, HQ |
+| Horizon backdrop | A real desert horizon fixed behind the page, with "MSG" standing on it as a sand-toned landmark. The camera pushes in on scroll, and the scene moves from day to golden hour, dusk and night (the 24/7 story) |
+| Hero | The brand in the sky, the message on the sand; the "Who are you?" quick-start opens the planner |
+| Network panel | 1,000 dots (one per courier) and tracking-style vehicle markers from Riyadh HQ, with rolling counters |
+| Interludes | Full-screen, pinned statements that reveal line by line (verified facts only); the landmark steps out of frame |
+| Planner | Four-step configurator with a live preview → a shareable MSG configuration (no pricing) → WhatsApp or lead form |
+| Sellers, Services, Fleet | Approachable seller path, a service index with key facts, and a live Riyadh 24/7 clock |
+| Enterprise (dusk) | Workforce pipeline, scroll-driven peak-demand flow, governance |
+| Proof | Metrics, 10 pillars, vision |
+| Contact (night) | Lead form with a WhatsApp/email fallback, plus WhatsApp, phone, email and HQ |
+
+## Design system
+Light, editorial, industrial: paper and ink, one cobalt brand colour (tokens in `src/app/globals.css`;
+swap `--color-brand*` for MSG's official colour), Inter Tight and Inter, and IBM Plex Sans Arabic.
+Motion uses [Motion](https://motion.dev) and [NumberFlow](https://number-flow.barvian.me) (both MIT).
+All motion respects `prefers-reduced-motion`, and all content stays legible without JavaScript.
 
 ## Content rules
 - **All facts** live in `src/content/facts.ts` (traceable to the source pack).
