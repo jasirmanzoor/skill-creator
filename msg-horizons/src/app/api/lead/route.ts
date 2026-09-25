@@ -55,16 +55,24 @@ export async function POST(req: Request) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
   if (rateLimited(ip)) return Response.json({ ok: false, error: "rate_limited" }, { status: 429 });
 
+
+  // Progressive enhancement: the form also works before JavaScript loads (native POST).
+  // Native posts get a 303 redirect back to the page; personal data never goes into a URL.
+  const type = req.headers.get("content-type") || "";
+  const isForm = type.includes("application/x-www-form-urlencoded") || type.includes("multipart/form-data");
   let body: Record<string, unknown>;
   try {
-    body = await req.json();
+    body = isForm ? Object.fromEntries((await req.formData()).entries()) : await req.json();
   } catch {
-    return Response.json({ ok: false, error: "bad_json" }, { status: 400 });
+    return Response.json({ ok: false, error: "bad_body" }, { status: 400 });
   }
-  if (typeof body.website === "string" && body.website) return Response.json({ ok: true, delivered: true }); // honeypot
+  const back = (state: "sent" | "handoff" | "invalid") =>
+    Response.redirect(new URL(`/${body.lang === "ar" ? "ar" : "en"}?lead=${state}#contact`, req.url), 303);
+
+  if (typeof body.website === "string" && body.website) return isForm ? back("sent") : Response.json({ ok: true, delivered: true }); // honeypot
 
   const { lead, errors } = validateLead(body);
-  if (!lead) return Response.json({ ok: false, errors }, { status: 422 });
+  if (!lead) return isForm ? back("invalid") : Response.json({ ok: false, errors }, { status: 422 });
 
   const planInput = decodePlan(lead.plan);
   const record = {
@@ -80,5 +88,6 @@ export async function POST(req: Request) {
   const results = await Promise.all(tasks);
   const delivered = results.some(Boolean);
   if (tasks.length && !delivered) console.error("[lead] all delivery channels failed");
+  if (isForm) return back(delivered ? "sent" : "handoff");
   return Response.json({ ok: true, delivered }, { status: 200 });
 }

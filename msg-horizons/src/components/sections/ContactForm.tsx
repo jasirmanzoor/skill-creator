@@ -24,6 +24,7 @@ export default function ContactForm({ t, lang }: { t: Dictionary; lang: Locale }
   const f = t.contact.form;
   const { plan, setPlan } = usePlan();
   const [status, setStatus] = useState<Status>("idle");
+  const [ready, setReady] = useState(false);
   const [errors, setErrors] = useState<LeadErrors>({});
   // Interest: the visitor's explicit pick wins; otherwise it follows the attached plan.
   const [picked, setPicked] = useState<string | null>(null);
@@ -38,6 +39,16 @@ export default function ContactForm({ t, lang }: { t: Dictionary; lang: Locale }
   const uid = useId();
 
   // Pre-select interest from "[data-interest]" CTAs elsewhere on the page.
+  // Hydrated: take over from the native (no-JS) form post, and show the result of one if we just had it.
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- one-time sync with the URL after a no-JS submit */
+    setReady(true);
+    const result = new URLSearchParams(window.location.search).get("lead");
+    if (result === "sent") setStatus("sent");
+    if (result === "handoff") { setHandoffText(t.wa.leadIntro); setStatus("handoff"); }
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [t.wa.leadIntro]);
+
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       const el = (e.target as HTMLElement).closest<HTMLElement>("[data-interest]");
@@ -154,7 +165,13 @@ export default function ContactForm({ t, lang }: { t: Dictionary; lang: Locale }
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="rounded-xl bg-surface p-6 text-ink shadow-[0_40px_100px_-30px_rgba(0,0,0,0.6)] sm:p-8" aria-describedby={`${uid}-privacy`}>
+    <form
+      onSubmit={onSubmit}
+      method="post"
+      action="/api/lead"
+      data-ready={ready || undefined}
+      noValidate={ready}
+      className="rounded-xl bg-surface p-6 text-ink shadow-[0_40px_100px_-30px_rgba(0,0,0,0.6)] sm:p-8" aria-describedby={`${uid}-privacy`}>
       {plan ? (
         <div className="mb-6 flex items-center justify-between gap-3 rounded-md border border-brand/25 bg-brand-soft px-4 py-3 text-sm">
           <span className="text-brand-strong">✓ {f.planAttached}: <strong className="text-ink">{t.planner.result.models[operatingModel(plan)].name}</strong></span>
@@ -212,6 +229,9 @@ export default function ContactForm({ t, lang }: { t: Dictionary; lang: Locale }
           <label htmlFor="lead-message" className="text-sm font-medium text-ink">{f.message}</label>
           <textarea id="lead-message" name="message" rows={4} className={`${field} resize-y border-line`} />
         </div>
+        <input type="hidden" name="lang" value={lang} />
+        <input type="hidden" name="source" value={ready ? "website" : "website-nojs"} />
+        {plan ? <input type="hidden" name="plan" value={encodePlan(plan)} /> : null}
         {/* honeypot */}
         <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
           <label>Website<input name="website" tabIndex={-1} autoComplete="off" /></label>

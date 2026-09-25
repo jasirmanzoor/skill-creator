@@ -134,6 +134,7 @@ await test("shared plan link opens directly on the result", async () => {
 
 await test("contact form: validation, then graceful WhatsApp/email hand-off", async () => {
   const { page, ctx } = await open("/en#contact");
+  await page.locator("form[data-ready]").waitFor(); // hydrated (before this, the form posts natively)
   await page.getByRole("button", { name: "Send to MSG" }).click();
   assert.ok(await page.getByText("This field is required").first().isVisible());
   assert.equal(await page.locator("#lead-name").evaluate((el) => el === document.activeElement), true, "focus moves to first error");
@@ -150,6 +151,17 @@ await test("contact form: validation, then graceful WhatsApp/email hand-off", as
     assert.match(decodeURIComponent(href), /Test Seller/);
     assert.match(decodeURIComponent(href), /0551234567/);
   }
+  await ctx.close();
+});
+
+await test("contact form works without JavaScript (native POST, no PII in URL)", async () => {
+  const { page, ctx } = await open("/en#contact", { javaScriptEnabled: false });
+  await page.fill("#lead-name", "No JS (ignore)");
+  await page.fill("#lead-phone", "0550000000");
+  await page.fill("input[name=website]", "hp", { force: true }); // honeypot: never delivered
+  await Promise.all([page.waitForURL(/lead=/), page.getByRole("button", { name: "Send to MSG" }).click()]);
+  assert.match(page.url(), /\/en\?lead=sent#contact$/);
+  assert.ok(!/0550000000|No%20JS/.test(page.url()), "no personal data in the URL");
   await ctx.close();
 });
 
