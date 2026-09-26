@@ -1,0 +1,177 @@
+@import "tailwindcss";
+
+/*
+ * MSG Horizons design system — editorial / industrial.
+ * Light, restrained, typographic. One brand colour ("horizon" cobalt) used only for data and key accents.
+ * To adopt MSG's official brand colour, change the --color-brand* tokens only.
+ */
+@theme {
+  --color-paper: #fafaf7;
+  --color-surface: #ffffff;
+  --color-subtle: #f1f0eb;
+  --color-line: #e3e1da;
+  --color-line-strong: #cfccc3;
+  --color-ink: #0c0e11;
+  --color-ink-2: #1b1e23;
+  --color-ink-3: #2a2e35;
+  --color-muted: #585e67;
+  --color-faint: #8b9098;
+  --color-brand: #1f43e0;
+  --color-brand-strong: #1633b5;
+  --color-brand-soft: #eceffd;
+  --color-brand-bright: #8ea2ff; /* on dark backgrounds only */
+  --color-whatsapp: #128c4a;
+  --color-danger: #b42318;
+
+  --font-display: var(--font-display-latin), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-sans-latin), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-rise: rise 0.8s var(--ease-out-expo) both;
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: none; }
+  }
+}
+
+:root:lang(ar) {
+  --font-display: var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  scroll-behavior: smooth;
+  scroll-padding-top: 7rem;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+body {
+  background: transparent; /* the fixed HorizonBackdrop (z -10) must paint above the body box */
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+:lang(ar) body { line-height: 1.75; }
+
+::selection { background: var(--color-brand); color: #fff; }
+
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.text-balance { text-wrap: balance; }
+.text-pretty { text-wrap: pretty; }
+
+/* Section label: small, sentence case, brand colour. */
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-brand);
+}
+.on-dark .label { color: var(--color-brand-bright); }
+
+/* Cinematic cut: the MSG landmark steps out of frame while an interlude statement is pinned. */
+.msg-landmark { transition: opacity 0.7s var(--ease-out-expo); }
+html[data-interlude] .msg-landmark { opacity: 0; }
+
+/* Service scenes (components/scenes/ServiceScene.tsx). Loops are slow and quiet by design. */
+.svc-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: svc-draw 3.4s var(--ease-out-expo) infinite; }
+@keyframes svc-draw { 0% { stroke-dashoffset: 1; } 70%, 100% { stroke-dashoffset: 0; } }
+.svc-ride, .svc-truck, .svc-flow { offset-rotate: 0deg; animation: svc-ride 3.4s cubic-bezier(0.45, 0, 0.2, 1) infinite; }
+.svc-truck { offset-rotate: auto; animation: svc-truck 5s ease-in-out infinite; }
+.svc-flow { animation: svc-ride 3.5s linear infinite; opacity: 0.9; }
+@keyframes svc-ride { from { offset-distance: 0%; } 70%, to { offset-distance: 100%; } }
+@keyframes svc-truck { 0%, 8% { offset-distance: 0%; } 46%, 54% { offset-distance: 100%; } 92%, 100% { offset-distance: 0%; } }
+.svc-door { opacity: 0.25; animation: svc-door 3.4s ease-out infinite; }
+@keyframes svc-door { 0% { opacity: 0.25; } 8%, 80% { opacity: 1; } 100% { opacity: 0.25; } }
+.svc-fill { opacity: 0; transform-box: fill-box; transform-origin: bottom; animation: svc-fill 4.8s var(--ease-out-expo) infinite; }
+@keyframes svc-fill { 0% { opacity: 0; transform: scaleY(0.3); } 12%, 85% { opacity: 0.85; transform: none; } 100% { opacity: 0; } }
+.svc-scan { animation: svc-scan 3.2s ease-in-out infinite alternate; opacity: 0.7; }
+@keyframes svc-scan { to { transform: translateY(128px); } }
+.svc-road { animation: svc-road 1.2s linear infinite; }
+@keyframes svc-road { to { stroke-dashoffset: -14; } }
+.svc-ping { transform-box: fill-box; transform-origin: center; animation: svc-ping 2.7s ease-out infinite; }
+@keyframes svc-ping { 0% { transform: scale(1); opacity: 0.9; } 60%, 100% { transform: scale(4.5); opacity: 0; } }
+.svc-tick { opacity: 0.2; animation: svc-tick 2.4s var(--ease-out-expo) both; }
+@keyframes svc-tick { to { opacity: 1; } }
+.svc-hand { transform-origin: 262px 52px; animation: svc-hand 6s linear infinite; }
+@keyframes svc-hand { to { transform: rotate(360deg); } }
+.svc-link { stroke-dasharray: 1; stroke-dashoffset: 1; animation: svc-link 3.6s var(--ease-out-expo) infinite; }
+@keyframes svc-link { 0% { stroke-dashoffset: 1; } 40%, 100% { stroke-dashoffset: 0; } }
+.svc-pulse { transform-box: fill-box; transform-origin: center; animation: svc-pulse 2.4s ease-in-out infinite; }
+@keyframes svc-pulse { 50% { transform: scale(1.35); opacity: 0.05; } }
+@media (prefers-reduced-motion: reduce) {
+  [class^="svc-"], [class*=" svc-"] { animation: none !important; opacity: 1; stroke-dashoffset: 0; offset-distance: 60%; }
+}
+
+/* Numbers always render LTR, even inside Arabic text. */
+.num { direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums; }
+
+/* Planner operating canvas — parcel journey animatics. */
+@keyframes plan-dash {
+  to { stroke-dashoffset: -32; }
+}
+.plan-dash {
+  animation: plan-dash 1.15s linear infinite;
+}
+@keyframes plan-ping {
+  0% { transform: scale(0.45); opacity: 0.65; }
+  100% { transform: scale(2.7); opacity: 0; }
+}
+.plan-ping {
+  animation: plan-ping 1.8s var(--ease-out-expo) infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+@keyframes plan-glow {
+  0%, 100% { opacity: 0.14; }
+  50% { opacity: 0.4; }
+}
+.plan-glow {
+  animation: plan-glow 2.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Network sizer range inputs: thin track, filled to the thumb via --fill (set inline where needed). */
+.sizer-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 22px;
+  background: transparent;
+  cursor: pointer;
+  accent-color: var(--color-brand);
+}
+.sizer-range::-webkit-slider-runnable-track { height: 3px; border-radius: 99px; background: var(--color-line-strong); }
+.sizer-range::-moz-range-track { height: 3px; border-radius: 99px; background: var(--color-line-strong); }
+.sizer-range::-moz-range-progress { height: 3px; border-radius: 99px; background: var(--color-ink); }
+.sizer-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  margin-top: -8.5px;
+  width: 20px; height: 20px; border-radius: 99px;
+  background: var(--color-surface);
+  border: 2px solid var(--color-ink);
+  box-shadow: 0 2px 8px rgba(12, 14, 17, 0.18);
+  transition: transform 0.15s var(--ease-out-expo);
+}
+.sizer-range::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 99px;
+  background: var(--color-surface);
+  border: 2px solid var(--color-ink);
+}
+.sizer-range:active::-webkit-slider-thumb { transform: scale(1.15); }
+.sizer-range:focus-visible { outline: none; }
+.sizer-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(31, 67, 224, 0.25); }
