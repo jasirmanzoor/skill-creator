@@ -33,7 +33,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         <Hero t={t} lang={lang} />
         <NetworkPanel t={t} />
         <TrustBar t={t} />
-        <Planner t={t} />
+        <Planner t={t} lang={lang} />
         <Interlude lines={t.interludes.scale} label={t.interludes.scaleLabel} />
         <Sellers t={t} />
         <Services t={t} />
