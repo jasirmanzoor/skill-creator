@@ -8,7 +8,7 @@ export default function Gallery({ t, lang }: { t: Dictionary; lang: Locale }) {
   const items = [...media.warehouse, ...media.operations, ...media.team, ...media.fleet.slice(1)];
   if (!items.length) return null;
   return (
-    <section aria-labelledby="gallery-title" className="border-t border-line bg-surface/92 py-24 backdrop-blur">
+    <section id="gallery" aria-labelledby="gallery-title" className="scroll-mt-24 border-t border-line bg-surface/92 py-24 backdrop-blur">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <span className="label">{t.gallery.eyebrow}</span>
         <h2 id="gallery-title" className="mt-4 font-display text-4xl font-semibold tracking-[-0.025em] text-ink">{t.gallery.title}</h2>
