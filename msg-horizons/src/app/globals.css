@@ -115,3 +115,33 @@ html[data-interlude] .msg-landmark { opacity: 0; }
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Network sizer range inputs: thin track, filled to the thumb via --fill (set inline where needed). */
+.sizer-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 22px;
+  background: transparent;
+  cursor: pointer;
+  accent-color: var(--color-brand);
+}
+.sizer-range::-webkit-slider-runnable-track { height: 3px; border-radius: 99px; background: var(--color-line-strong); }
+.sizer-range::-moz-range-track { height: 3px; border-radius: 99px; background: var(--color-line-strong); }
+.sizer-range::-moz-range-progress { height: 3px; border-radius: 99px; background: var(--color-ink); }
+.sizer-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  margin-top: -8.5px;
+  width: 20px; height: 20px; border-radius: 99px;
+  background: var(--color-surface);
+  border: 2px solid var(--color-ink);
+  box-shadow: 0 2px 8px rgba(12, 14, 17, 0.18);
+  transition: transform 0.15s var(--ease-out-expo);
+}
+.sizer-range::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 99px;
+  background: var(--color-surface);
+  border: 2px solid var(--color-ink);
+}
+.sizer-range:active::-webkit-slider-thumb { transform: scale(1.15); }
+.sizer-range:focus-visible { outline: none; }
+.sizer-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(31, 67, 224, 0.25); }

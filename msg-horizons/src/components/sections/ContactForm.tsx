@@ -68,7 +68,7 @@ export default function ContactForm({ t, lang }: { t: Dictionary; lang: Locale }
       d.company ? `${f.company.replace(/\s*\(.*\)$/, "")}: ${d.company}` : "",
       `${f.interest}: ${f.interestOptions[d.interest as keyof typeof f.interestOptions] ?? d.interest}`,
       d.message ? `\n${d.message}` : "",
-      plan ? `\n${planSummary(t, plan)}` : "",
+      plan ? `\n${planSummary(t, plan, lang)}` : "",
     ]
       .filter(Boolean)
       .join("\n");

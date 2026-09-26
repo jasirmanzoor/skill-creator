@@ -4,9 +4,11 @@ import { AnimatePresence, motion } from "motion/react";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { useEffect, useRef, useState } from "react";
 import {
-  CARGO, PERSONAS, PRIORITIES, VOLUMES, buildPlan, decodePlan, encodePlan,
-  type Cargo, type Persona, type PlanInput, type Priority, type Volume,
+  CARGO, PERSONAS, PRIORITIES, buildPlan, decodePlan, encodePlan,
+  type Cargo, type Persona, type PlanInput, type Priority,
 } from "@/lib/planner";
+import { DEFAULT_SIZER, volumeBand, type SizerInput } from "@/lib/sizer";
+import { sizerCopy } from "@/content/sizerCopy";
 import { planSummary } from "@/lib/plan-summary";
 import { track } from "@/lib/analytics";
 import { whatsappLink } from "@/content/facts";
@@ -15,6 +17,16 @@ import { usePlan } from "../PlanContext";
 import { ArrowIcon, CheckIcon, OptionIcon, ServiceIcon, WhatsAppIcon } from "../ui/icons";
 import PlanStage from "../planner/PlanStage";
 import PlanModules from "../planner/PlanPreview";
+import { SizerControls, SizerDecisions, SizerLive, useStructure } from "../planner/Sizer";
+
+/** Starting numbers per persona, so the sizer opens on a realistic picture instead of a blank. */
+const PRESET: Record<Persona, Partial<SizerInput>> = {
+  seller: { orders: 15, peak: 2, cod: 40 },
+  startup: { orders: 60, peak: 2.5, cod: 30 },
+  ecommerce: { orders: 600, peak: 2.5, cod: 25, area: "multi" },
+  enterprise: { orders: 3000, peak: 2, cod: 15, area: "kingdom", profile: "mixed" },
+  platform: { orders: 5000, peak: 1.5, cod: 20, window: "sameday" },
+};
 
 type Step = 0 | 1 | 2 | 3 | 4;
 const TOTAL = 4;
@@ -25,7 +37,9 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
   const [step, setStep] = useState<Step>(0);
   const [persona, setPersona] = useState<Persona | null>(null);
   const [cargo, setCargo] = useState<Cargo[]>([]);
-  const [volume, setVolume] = useState<Volume | null>(null);
+  const [net, setNet] = useState<SizerInput>(DEFAULT_SIZER);
+  const [netTouched, setNetTouched] = useState(false);
+  const volume = step >= 2 || netTouched ? volumeBand(net.orders) : null;
   const [priorities, setPriorities] = useState<Priority[]>([]);
   const [copied, setCopied] = useState(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -38,7 +52,7 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
       /* eslint-disable react-hooks/set-state-in-effect -- one-time hydration from the URL */
       setPersona(shared.persona);
       setCargo(shared.cargo);
-      setVolume(shared.volume);
+      if (shared.net) { setNet(shared.net); setNetTouched(true); }
       setPriorities(shared.priorities);
       setStep(4);
       /* eslint-enable react-hooks/set-state-in-effect */
@@ -49,6 +63,7 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
   if (seed && seed.n !== seenSeed) {
     setSeenSeed(seed.n);
     setPersona(seed.persona);
+    if (!netTouched) setNet({ ...DEFAULT_SIZER, ...PRESET[seed.persona] });
     setStep(1);
     track("planner_step", { step: 1, value: seed.persona });
   }
@@ -58,10 +73,11 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
     headingRef.current?.focus({ preventScroll: true });
   }, [step]);
 
-  const input: PlanInput | null = persona && volume ? { persona, cargo, volume, priorities } : null;
+  const input: PlanInput | null = persona && volume ? { persona, cargo, volume, priorities, net } : null;
   const liveInput: PlanInput | null = persona
-    ? { persona, cargo, volume: volume ?? "starting", priorities }
+    ? { persona, cargo, volume: volume ?? "starting", priorities, ...(volume ? { net } : {}) }
     : null;
+  const structure = useStructure(net, persona);
   const plan = input ? buildPlan(input) : null;
 
   const go = (s: Step, detail?: string) => {
@@ -70,8 +86,8 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
   };
 
   const finish = () => {
-    if (!persona || !volume) return;
-    const i = { persona, cargo, volume, priorities };
+    if (!persona) return;
+    const i: PlanInput = { persona, cargo, volume: volumeBand(net.orders), priorities, net };
     const built = buildPlan(i);
     track("planner_complete", { model: built.model, modules: built.modules.map((m) => m.id).join(",") });
     const url = new URL(window.location.href);
@@ -82,7 +98,7 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
   };
 
   const restart = () => {
-    setPersona(null); setCargo([]); setVolume(null); setPriorities([]);
+    setPersona(null); setCargo([]); setPriorities([]); setNet(DEFAULT_SIZER); setNetTouched(false);
     const url = new URL(window.location.href);
     url.searchParams.delete("plan");
     window.history.replaceState(null, "", url);
@@ -110,7 +126,9 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
     list.includes(v) ? list.filter((x) => x !== v) : list.length >= max ? list : [...list, v];
 
   const stepKeys = ["persona", "cargo", "volume", "priorities"] as const;
-  const question = p.steps[stepKeys[Math.min(step, 3) as 0 | 1 | 2 | 3]];
+  const sz = sizerCopy[lang];
+  const question = step === 2 ? { q: sz.title, hint: sz.hint } : p.steps[stepKeys[Math.min(step, 3) as 0 | 1 | 2 | 3]];
+  const onNet = (v: SizerInput) => { setNet(v); setNetTouched(true); };
   const anim = reduce
     ? {}
     : { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -6 }, transition: { duration: 0.28, ease: [0.16, 1, 0.3, 1] as const } };
@@ -156,7 +174,11 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
                           {PERSONAS.map((k) => (
                             <Option key={k} role="radio" icon={k} checked={persona === k}
                               title={p.steps.persona.options[k].t} desc={p.steps.persona.options[k].d}
-                              onClick={() => { setPersona(k); go(1, k); }} />
+                              onClick={() => {
+                                setPersona(k);
+                                if (!netTouched) setNet({ ...DEFAULT_SIZER, ...PRESET[k] });
+                                go(1, k);
+                              }} />
                           ))}
                         </div>
                       )}
@@ -170,13 +192,13 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
                         </div>
                       )}
                       {step === 2 && (
-                        <div role="radiogroup" aria-label={p.steps.volume.q} className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
-                          {VOLUMES.map((k) => (
-                            <Option key={k} role="radio" icon={k} checked={volume === k}
-                              title={p.steps.volume.options[k].t} desc={p.steps.volume.options[k].d}
-                              onClick={() => { setVolume(k); go(3, k); }} />
-                          ))}
-                        </div>
+                        <>
+                          <SizerControls value={net} onChange={onNet} lang={lang} />
+                          {/* below lg the live readout sits under the controls */}
+                          <div className="mt-8 border-t border-line pt-6 lg:hidden">
+                            <SizerLive input={net} structure={structure} lang={lang} compact />
+                          </div>
+                        </>
                       )}
                       {step === 3 && (
                         <div role="group" aria-label={p.steps.priorities.q} className="flex flex-wrap gap-2">
@@ -219,6 +241,11 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
                       {p.next} <ArrowIcon />
                     </button>
                   )}
+                  {step === 2 && (
+                    <button type="button" onClick={() => go(3, String(net.orders))} className="inline-flex items-center gap-2 rounded-md bg-ink px-5 py-2.5 font-medium text-white transition-colors hover:bg-ink-3">
+                      {p.next} <ArrowIcon />
+                    </button>
+                  )}
                   {step === 3 && (
                     <button type="button" onClick={finish} className="inline-flex items-center gap-2 rounded-md bg-brand px-5 py-2.5 font-medium text-white transition-colors hover:bg-brand-strong">
                       {p.build} <ArrowIcon />
@@ -226,11 +253,19 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
                   )}
                 </div>
               </div>
-              <PlanModules t={t} input={liveInput} />
+              {step === 2 ? (
+                <aside aria-label={sz.live} className="hidden border-s border-line bg-paper p-7 lg:block">
+                  <div className="lg:sticky lg:top-24">
+                    <SizerLive input={net} structure={structure} lang={lang} />
+                  </div>
+                </aside>
+              ) : (
+                <PlanModules t={t} input={liveInput} />
+              )}
             </div>
           ) : plan && input ? (
             <motion.div {...anim}>
-              <Result t={t} input={input} plan={plan} headingRef={headingRef} onRestart={restart} onSend={sendToContact} onCopy={copyLink} copied={copied} />
+              <Result t={t} lang={lang} input={input} plan={plan} headingRef={headingRef} onRestart={restart} onSend={sendToContact} onCopy={copyLink} copied={copied} />
             </motion.div>
           ) : null}
         </div>
@@ -273,9 +308,10 @@ function Option({
 }
 
 function Result({
-  t, input, plan, headingRef, onRestart, onSend, onCopy, copied,
+  t, lang, input, plan, headingRef, onRestart, onSend, onCopy, copied,
 }: {
   t: Dictionary;
+  lang: Locale;
   input: PlanInput;
   plan: ReturnType<typeof buildPlan>;
   headingRef: React.RefObject<HTMLHeadingElement | null>;
@@ -286,7 +322,10 @@ function Result({
 }) {
   const r = t.planner.result;
   const model = r.models[plan.model];
-  const summary = planSummary(t, input);
+  const summary = planSummary(t, input, lang);
+  const net = input.net ?? DEFAULT_SIZER;
+  const structure = useStructure(net, input.persona);
+  const sz = sizerCopy[lang];
   return (
     <div className="grid lg:grid-cols-[1.4fr_1fr]">
       <div className="p-6 sm:p-10">
@@ -295,7 +334,15 @@ function Result({
           {model.name}
         </h3>
         <p className="mt-3 max-w-lg text-muted">{model.desc}</p>
-        <ol className="mt-8 divide-y divide-line border-y border-line">
+        <div className="mt-8">
+          <SizerLive input={net} structure={structure} lang={lang} />
+        </div>
+        <h4 className="mt-10 font-display text-xl font-semibold text-ink">{sz.whyTitle}</h4>
+        <div className="mt-4">
+          <SizerDecisions input={net} structure={structure} lang={lang} />
+        </div>
+        <h4 className="mt-10 font-display text-xl font-semibold text-ink">{sz.servicesTitle}</h4>
+        <ol className="mt-4 divide-y divide-line border-y border-line">
           {plan.modules.map((m) => {
             const s = t.planner.services[m.id];
             const reasons = m.reasons.map((k) => t.planner.reasons[k]).filter(Boolean);

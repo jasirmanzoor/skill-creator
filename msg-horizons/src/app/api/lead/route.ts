@@ -1,5 +1,6 @@
 import { validateLead, type Lead } from "@/lib/lead";
 import { decodePlan, buildPlan } from "@/lib/planner";
+import { size } from "@/lib/sizer";
 
 /**
  * Lead intake. Delivery channels (configure in Vercel env vars):
@@ -19,9 +20,11 @@ function rateLimited(ip: string) {
   return recent.length > 8;
 }
 
+type LeadRecord = Lead & { planModules?: string[]; network?: object; receivedAt: string };
+
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
-async function toWebhook(url: string, lead: Lead & { planModules?: string[]; receivedAt: string }) {
+async function toWebhook(url: string, lead: LeadRecord) {
   const r = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -31,10 +34,10 @@ async function toWebhook(url: string, lead: Lead & { planModules?: string[]; rec
   return r.ok;
 }
 
-async function toEmail(key: string, lead: Lead & { planModules?: string[]; receivedAt: string }) {
+async function toEmail(key: string, lead: LeadRecord) {
   const rows = Object.entries(lead)
     .filter(([, v]) => v !== undefined && v !== "")
-    .map(([k, v]) => `<tr><td style="padding:4px 12px 4px 0;color:#666">${esc(k)}</td><td>${esc(Array.isArray(v) ? v.join(", ") : String(v))}</td></tr>`)
+    .map(([k, v]) => `<tr><td style="padding:4px 12px 4px 0;color:#666">${esc(k)}</td><td>${esc(Array.isArray(v) ? v.join(", ") : typeof v === "object" ? JSON.stringify(v) : String(v))}</td></tr>`)
     .join("");
   const r = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -78,6 +81,7 @@ export async function POST(req: Request) {
   const record = {
     ...lead,
     planModules: planInput ? buildPlan(planInput).modules.map((m) => m.id) : undefined,
+    network: planInput?.net ? { inputs: planInput.net, ...pick(size(planInput.net, planInput.persona)) } : undefined,
     receivedAt: new Date().toISOString(),
   };
 
@@ -90,4 +94,10 @@ export async function POST(req: Request) {
   if (tasks.length && !delivered) console.error("[lead] all delivery channels failed");
   if (isForm) return back(delivered ? "sent" : "handoff");
   return Response.json({ ok: true, delivered }, { status: 200 });
+}
+
+/** The sizing numbers MSG's team needs first on a new enquiry. */
+function pick(s: ReturnType<typeof size>) {
+  const { baseRoutes, baseCouriers, peakCouriers, flex, pickup, cadence, linehaul } = s;
+  return { baseRoutes, baseCouriers, peakCouriers, flex, pickup, cadence, linehaul };
 }

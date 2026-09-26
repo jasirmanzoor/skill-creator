@@ -1,4 +1,5 @@
 import type { ServiceId } from "@/content/facts";
+import { decodeSizer, encodeSizer, type SizerInput } from "./sizer.ts";
 
 /**
  * "Build your logistics" engine.
@@ -21,6 +22,8 @@ export type PlanInput = {
   cargo: Cargo[];
   volume: Volume;
   priorities: Priority[];
+  /** The visitor's real numbers from the network sizer (optional: older links have none). */
+  net?: SizerInput;
 };
 
 export type Reason =
@@ -28,7 +31,10 @@ export type Reason =
   | `cargo.${Cargo}`
   | `priority.${Priority}`
   | `persona.${Persona}`
-  | `volume.${Volume}`;
+  | `volume.${Volume}`
+  | "net.linehaul"
+  | "net.stock"
+  | "net.peak";
 
 export type PlanModule = { id: ServiceId; core: boolean; reasons: Reason[] };
 
@@ -98,6 +104,14 @@ export function buildPlan(input: PlanInput): Plan {
   }
   if (input.volume === "scaling") add("account", "volume.scaling");
 
+  // The visitor's real numbers: city-to-city orders need road linehaul, held stock needs a warehouse,
+  // and a sharp peak needs peak manpower on top of the everyday team.
+  if (input.net) {
+    if (input.net.area !== "riyadh") add("land-freight", "net.linehaul", true);
+    if (input.net.stock) add("warehousing", "net.stock", true);
+    if (input.net.peak >= 1.8) add("manpower", "net.peak");
+  }
+
   // Every MSG configuration includes real-time tracking and responsive support.
   add("tracking", "baseline");
 
@@ -109,12 +123,14 @@ export function buildPlan(input: PlanInput): Plan {
 
 /** Compact, URL-safe encoding so a plan can be shared or attached to a lead. */
 export function encodePlan(i: PlanInput): string {
-  return [i.persona, i.cargo.join("."), i.volume, i.priorities.join(".")].join("~");
+  const parts = [i.persona, i.cargo.join("."), i.volume, i.priorities.join(".")];
+  if (i.net) parts.push(encodeSizer(i.net));
+  return parts.join("~");
 }
 
 export function decodePlan(s: string | null | undefined): PlanInput | null {
   if (!s) return null;
-  const [persona, cargo = "", volume, pr = ""] = s.split("~");
+  const [persona, cargo = "", volume, pr = "", net = ""] = s.split("~");
   const list = <T extends string>(raw: string, allowed: readonly T[]) =>
     raw.split(".").filter((x): x is T => (allowed as readonly string[]).includes(x));
   if (!(PERSONAS as readonly string[]).includes(persona)) return null;
@@ -124,5 +140,6 @@ export function decodePlan(s: string | null | undefined): PlanInput | null {
     cargo: list(cargo, CARGO),
     volume: volume as Volume,
     priorities: list(pr, PRIORITIES).slice(0, 3),
+    ...(net ? { net: decodeSizer(net) ?? undefined } : {}),
   };
 }

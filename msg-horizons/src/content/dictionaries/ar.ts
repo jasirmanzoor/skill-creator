@@ -197,6 +197,9 @@ export const ar: Dictionary = {
       "volume.steady": "",
       "volume.scaling": "لأنك تنمو بسرعة، والفريق المخصص يواكبك",
       "volume.high": "لأن أحجامك تتطلب طاقة استيعابية مخصصة",
+      "net.linehaul": "طلباتك تتجاوز الرياض",
+      "net.stock": "تريد أن تحفظ MSG مخزونك",
+      "net.peak": "أكثر أيامك ازدحاماً يفوق اليوم العادي بكثير",
     },
   },
   sellers: {

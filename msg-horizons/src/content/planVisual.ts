@@ -27,8 +27,8 @@ export const planVisual: Record<
     live: "Live network",
     idleStatus: "Waiting on the first answer",
     hq: "Riyadh · Al Malaz",
-    ops: "24/7",
-    trackingOn: "Tracking armed",
+    ops: "operations",
+    trackingOn: "Live tracking on",
     trackingOff: "Tracking on every shipment",
     stages: [
       { id: "origin", label: "Pickup" },
@@ -82,7 +82,7 @@ export const planVisual: Record<
     live: "شبكة حية",
     idleStatus: "بانتظار أول إجابة",
     hq: "الرياض · الملز",
-    ops: "٢٤/٧",
+    ops: "تشغيل",
     trackingOn: "التتبع مفعّل",
     trackingOff: "تتبع على كل شحنة",
     stages: [

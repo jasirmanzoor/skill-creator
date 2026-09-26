@@ -42,8 +42,13 @@ export default function PlanStage({ locale, input, complete = false }: Props) {
 
   const scans = copy.scans[phase];
   const [scanIx, setScanIx] = useState(0);
-  useEffect(() => {
+  // Restart the scan ticker whenever the parcel moves to a new phase.
+  const [scanPhase, setScanPhase] = useState(phase);
+  if (scanPhase !== phase) {
+    setScanPhase(phase);
     setScanIx(0);
+  }
+  useEffect(() => {
     if (reduce || scans.length < 2) return;
     const id = window.setInterval(() => setScanIx((n) => (n + 1) % scans.length), 2400);
     return () => window.clearInterval(id);

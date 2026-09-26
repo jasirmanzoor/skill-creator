@@ -199,6 +199,9 @@ export const en = {
       "volume.steady": "",
       "volume.scaling": "You're scaling, and a dedicated team keeps pace with you",
       "volume.high": "Your volumes call for dedicated capacity",
+      "net.linehaul": "Your orders travel beyond Riyadh",
+      "net.stock": "You want MSG to hold your stock",
+      "net.peak": "Your busiest day is well above a normal one",
     },
   },
   sellers: {
