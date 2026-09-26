@@ -23,8 +23,8 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
   if (!isLocale(lang)) notFound();
   const t = getDictionary(lang);
 
-  // Narrative order: feel the scale → "what are you moving?" → this is for me →
-  // what MSG does → how it runs → proof → act.
+  // First 20s is the product: decide who you are, see the live network, finish the plan.
+  // Story sections come after the visitor already has a named setup in motion.
   return (
     <PlanProvider>
       <HorizonBackdrop />
@@ -33,8 +33,8 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         <Hero t={t} />
         <NetworkPanel t={t} />
         <TrustBar t={t} />
-        <Interlude lines={t.interludes.scale} label={t.interludes.scaleLabel} />
         <Planner t={t} />
+        <Interlude lines={t.interludes.scale} label={t.interludes.scaleLabel} />
         <Sellers t={t} />
         <Services t={t} />
         <Fleet t={t} lang={lang} />
