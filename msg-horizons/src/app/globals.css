@@ -44,7 +44,7 @@ html {
   background: var(--color-paper);
   color: var(--color-ink);
   scroll-behavior: smooth;
-  scroll-padding-top: 5rem;
+  scroll-padding-top: 7rem;
   -webkit-text-size-adjust: 100%;
   text-rendering: optimizeLegibility;
 }
