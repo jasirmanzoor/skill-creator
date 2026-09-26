@@ -83,6 +83,30 @@ html[data-interlude] .msg-landmark { opacity: 0; }
 /* Numbers always render LTR, even inside Arabic text. */
 .num { direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums; }
 
+/* Planner operating canvas — parcel journey animatics. */
+@keyframes plan-dash {
+  to { stroke-dashoffset: -32; }
+}
+.plan-dash {
+  animation: plan-dash 1.15s linear infinite;
+}
+@keyframes plan-ping {
+  0% { transform: scale(0.45); opacity: 0.65; }
+  100% { transform: scale(2.7); opacity: 0; }
+}
+.plan-ping {
+  animation: plan-ping 1.8s var(--ease-out-expo) infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+@keyframes plan-glow {
+  0%, 100% { opacity: 0.14; }
+  50% { opacity: 0.4; }
+}
+.plan-glow {
+  animation: plan-glow 2.6s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
