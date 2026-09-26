@@ -36,7 +36,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         <Planner t={t} lang={lang} />
         <Interlude lines={t.interludes.scale} label={t.interludes.scaleLabel} scene="scale" />
         <Sellers t={t} />
-        <Services t={t} />
+        <Services t={t} lang={lang} />
         <Fleet t={t} lang={lang} />
         <Proof t={t} />
         <Gallery t={t} lang={lang} />

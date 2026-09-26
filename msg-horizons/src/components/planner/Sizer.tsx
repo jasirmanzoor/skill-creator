@@ -142,7 +142,7 @@ export function SizerLive({
         {kpis.map((x) => (
           <div key={x.k} className="bg-surface p-4">
             <dt className="text-xs text-muted">{x.k}</dt>
-            <dd className={`num mt-1 font-display text-3xl font-semibold tracking-[-0.03em] ${x.accent ? "text-brand" : "text-ink"}`}>
+            <dd data-value={x.v} className={`num mt-1 font-display text-3xl font-semibold tracking-[-0.03em] ${x.accent ? "text-brand" : "text-ink"}`}>
               <NumberFlow value={x.v} locales="en-US" format={{ useGrouping: true }} {...flow} />
             </dd>
           </div>

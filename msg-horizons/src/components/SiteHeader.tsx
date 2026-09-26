@@ -119,7 +119,7 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
         </nav>
 
         <div className="flex items-center gap-1.5 sm:gap-3">
-          <SiteSearch t={t} inverted={!solid} />
+          <SiteSearch t={t} lang={lang} inverted={!solid} />
           <a
             href={`/${other}`}
             hrefLang={other}

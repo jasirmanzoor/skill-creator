@@ -1,16 +1,17 @@
-import type { Dictionary } from "@/content/i18n";
+import type { Dictionary, Locale } from "@/content/i18n";
+import { SERVICE_SLUGS, servicePages } from "@/content/servicePages";
 import type { NavId } from "@/content/nav";
 import { facts } from "@/content/facts";
 
 export type SearchHit = {
   id: string;
-  href: `#${NavId}`;
+  href: `#${NavId}` | `/${string}`;
   title: string;
   description: string;
   group: string;
 };
 
-export function buildSearchIndex(t: Dictionary): SearchHit[] {
+export function buildSearchIndex(t: Dictionary, lang?: Locale): SearchHit[] {
   const hits: SearchHit[] = [
     { id: "planner", href: "#planner", title: t.nav.planFull, description: t.search.desc.planner, group: t.search.groups.tools },
     { id: "sellers", href: "#sellers", title: t.nav.sellers, description: t.search.desc.sellers, group: t.search.groups.who },
@@ -31,6 +32,14 @@ export function buildSearchIndex(t: Dictionary): SearchHit[] {
       description: desc,
       group: t.search.groups.services,
     });
+  }
+
+  // Service landing pages carry the search terms buyers use (warehouse, drivers, freight…).
+  if (lang) {
+    for (const slug of SERVICE_SLUGS) {
+      const pg = servicePages[lang][slug];
+      hits.push({ id: `page-${slug}`, href: `/${lang}/services/${slug}`, title: pg.h1, description: `${pg.metaDescription} ${pg.keywords.join(" ")}`, group: t.search.groups.services });
+    }
   }
 
   hits.push({

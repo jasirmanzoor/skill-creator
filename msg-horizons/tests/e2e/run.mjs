@@ -18,6 +18,7 @@ let failed = 0;
 const results = [];
 
 async function test(name, fn) {
+  if (process.env.E2E_VERBOSE) console.log("… " + name);
   const t0 = Date.now();
   try {
     await fn();
@@ -93,19 +94,22 @@ await test("planner: build a plan, share it, carry it into the contact form", as
   // live preview reacts before the plan is finished
   assert.ok(await page.locator("aside[aria-label='Your configuration, live']").getByText("Warehousing & Inventory").isVisible());
   await page.getByRole("button", { name: /Continue/ }).click();
-  await page.getByRole("radio", { name: /Scaling fast/ }).click();
+  // step 3: the network sizer — ~730 orders a day lands in the "scaling" band
+  await page.locator("#planner input[type=range]").first().fill("600");
+  await page.getByRole("button", { name: /Continue/ }).click();
   await page.getByRole("checkbox", { name: /Live tracking/ }).click();
   await page.getByRole("checkbox", { name: /Handling peaks/ }).click();
   await page.getByRole("button", { name: /Build my plan/ }).last().click();
   await page.getByRole("heading", { name: "Growth Engine" }).waitFor();
   const result = await page.locator("#planner").innerText();
-  for (const s of ["Shipping & Last-Mile Delivery", "Warehousing & Inventory", "Real-Time Tracking & Support", "Manpower & Peak Support", "Dedicated Account Management"])
+  for (const s of ["Shipping & Last-Mile Delivery", "Warehousing & Inventory", "Real-Time Tracking & Support", "Manpower & Peak Support", "Dedicated Account Management", "Why this structure", "Daily routes", "Couriers on your peak day"])
     assert.ok(result.includes(s), `missing ${s}`);
   assert.ok(!/SAR|﷼|price:/i.test(result.replace(/no prices here/i, "")), "no pricing in result");
   assert.match(decodeURIComponent(page.url()), /[?&]plan=ecommerce~parcels\.storage~scaling~visibility\.peaks/);
   const wa = await page.getByRole("link", { name: /Send on WhatsApp/ }).getAttribute("href");
   assert.match(wa, /^https:\/\/wa\.me\/966558951422\?text=/);
   assert.match(decodeURIComponent(wa), /Growth Engine/);
+  assert.match(decodeURIComponent(wa), /Orders a day: [\d,]{3,}/);
 
   await page.getByRole("button", { name: /Send this plan to MSG/ }).click();
   await page.getByText("Your logistics plan is attached").waitFor();
@@ -118,12 +122,48 @@ await test("planner: priorities are capped at three", async () => {
   const { page, ctx } = await open("/en?plan=");
   await page.getByRole("radio", { name: /New startup/ }).click();
   await page.getByRole("button", { name: /Continue/ }).click();
-  await page.getByRole("radio", { name: /Just starting/ }).click();
+  await page.getByRole("button", { name: /Continue/ }).click();
   for (const n of ["Fast execution", "On-time delivery", "Live tracking"])
     await page.getByRole("checkbox", { name: n }).click();
   assert.equal(await page.locator('#planner [role=checkbox][aria-checked="true"]').count(), 3);
   assert.equal(await page.getByRole("checkbox", { name: "Shipment security" }).getAttribute("aria-disabled"), "true");
   await ctx.close();
+});
+
+await test("network sizer recalculates live as inputs change", async () => {
+  const { page, ctx, errors } = await open("/en?persona=seller#planner");
+  await page.getByRole("button", { name: /Continue/ }).click();
+  const live = page.locator("#planner aside[aria-label='Calculated live']");
+  await live.waitFor();
+  const peak = () => live.locator("dd").nth(2).getAttribute("data-value");
+  const before = await peak();
+  await page.locator("#planner input[type=range]").first().fill("900");
+  await page.waitForTimeout(900);
+  assert.notEqual(await peak(), before, "peak couriers should change with orders");
+  await page.getByRole("radio", { name: "Across the Kingdom" }).click();
+  await page.getByRole("button", { name: /Continue/ }).click();
+  await page.getByRole("button", { name: /Build my plan/ }).last().click();
+  await page.getByText("Scheduled land freight between cities").waitFor();
+  assert.ok(await page.locator("#planner").getByText("Land Freight", { exact: true }).isVisible());
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+await test("service landing pages: indexable, one h1, FAQ + Service schema, in sitemap", async () => {
+  const sm = await (await fetch(BASE + "/sitemap.xml")).text();
+  for (const [lang, slug] of [["en", "last-mile-delivery-saudi-arabia"], ["ar", "warehousing-storage-riyadh"], ["en", "delivery-drivers-manpower-saudi-arabia"]]) {
+    const res = await fetch(`${BASE}/${lang}/services/${slug}`);
+    assert.equal(res.status, 200, slug);
+    const html = await res.text();
+    assert.equal((html.match(/<h1[\s>]/g) || []).length, 1, `${slug}: exactly one h1`);
+    assert.match(html, new RegExp(`<link rel="canonical" href="[^"]+/${lang}/services/${slug}"`));
+    const types = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)].flatMap((m) => JSON.parse(m[1])["@graph"].map((g) => g["@type"]));
+    for (const t of ["Service", "FAQPage", "BreadcrumbList"]) assert.ok(types.includes(t), `${slug}: ${t}`);
+    const text = html.replace(/<(script|style)[\s\S]*?<\/\1>/g, "").replace(/<[^>]+>/g, " ");
+    assert.ok(!/customs|تخليص جمركي|cash on delivery|الدفع عند الاستلام/i.test(text), `${slug}: excluded claims`);
+    assert.match(sm, new RegExp(`/${lang}/services/${slug}</loc>`));
+  }
+  assert.equal((await fetch(`${BASE}/en/services/not-a-service`)).status, 404);
 });
 
 await test("shared plan link opens directly on the result", async () => {
@@ -155,7 +195,9 @@ await test("contact form: validation, then graceful WhatsApp/email hand-off", as
 });
 
 await test("contact form works without JavaScript (native POST, no PII in URL)", async () => {
-  const { page, ctx } = await open("/en#contact", { javaScriptEnabled: false });
+  // reduced motion turns off smooth scrolling (globals.css); otherwise every Playwright
+  // scroll-into-view restarts the smooth scroll and the button never reads as "stable"
+  const { page, ctx } = await open("/en#contact", { javaScriptEnabled: false, reducedMotion: "reduce" });
   await page.fill("#lead-name", "No JS (ignore)");
   await page.fill("#lead-phone", "0550000000");
   await page.fill("input[name=website]", "hp", { force: true }); // honeypot: never delivered

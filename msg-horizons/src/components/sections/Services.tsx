@@ -6,10 +6,12 @@ import TrackedLink from "../ui/TrackedLink";
 import { ArrowIcon, ServiceIcon } from "../ui/icons";
 import { facts, type ServiceId } from "@/content/facts";
 import ServiceScene from "../scenes/ServiceScene";
+import { SLUG_FOR } from "@/content/servicePages";
+import type { Locale } from "@/content/i18n";
 import type { Dictionary } from "@/content/i18n";
 
 /** Flexport-style service index: a quiet list that opens one service at a time, with its key fact beside it. */
-export default function Services({ t }: { t: Dictionary }) {
+export default function Services({ t, lang }: { t: Dictionary; lang: Locale }) {
   const s = t.services;
   const [open, setOpen] = useState<ServiceId>("last-mile");
   const fact = t.services.facts[open];
@@ -59,7 +61,13 @@ export default function Services({ t }: { t: Dictionary }) {
                         transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                         className="overflow-hidden"
                       >
-                        <p className="max-w-lg pb-6 ps-[3.25rem] text-muted">{svc.desc}</p>
+                        <p className="max-w-lg ps-[3.25rem] text-muted">{svc.desc}</p>
+                        {SLUG_FOR[id] ? (
+                          <a href={`/${lang}/services/${SLUG_FOR[id]}`} className="mt-2 inline-block ps-[3.25rem] text-sm font-medium text-brand underline-offset-4 hover:underline">
+                            {lang === "ar" ? "تفاصيل الخدمة" : "Service details"}
+                          </a>
+                        ) : null}
+                        <div className="pb-6" />
                       </motion.div>
                     ) : null}
                   </AnimatePresence>

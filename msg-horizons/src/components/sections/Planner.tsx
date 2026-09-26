@@ -47,16 +47,23 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
   const reduce = useReducedMotion();
 
   useEffect(() => {
-    const shared = decodePlan(new URLSearchParams(window.location.search).get("plan"));
+    const params = new URLSearchParams(window.location.search);
+    const shared = decodePlan(params.get("plan"));
+    // Service landing pages link here with ?persona=… so the planner opens on the right path.
+    const start = params.get("persona");
+    /* eslint-disable react-hooks/set-state-in-effect -- one-time hydration from the URL */
     if (shared) {
-      /* eslint-disable react-hooks/set-state-in-effect -- one-time hydration from the URL */
       setPersona(shared.persona);
       setCargo(shared.cargo);
       if (shared.net) { setNet(shared.net); setNetTouched(true); }
       setPriorities(shared.priorities);
       setStep(4);
-      /* eslint-enable react-hooks/set-state-in-effect */
+    } else if (start && (PERSONAS as readonly string[]).includes(start)) {
+      setPersona(start as Persona);
+      setNet({ ...DEFAULT_SIZER, ...PRESET[start as Persona] });
+      setStep(1);
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
   const [seenSeed, setSeenSeed] = useState(0);

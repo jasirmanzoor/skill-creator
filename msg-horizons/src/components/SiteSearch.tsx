@@ -3,19 +3,21 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { track } from "@/lib/analytics";
 import { buildSearchIndex, searchSite } from "@/lib/site-search";
-import type { Dictionary } from "@/content/i18n";
+import type { Dictionary, Locale } from "@/content/i18n";
 
 export default function SiteSearch({
   t,
+  lang,
   inverted,
 }: {
   t: Dictionary;
+  lang: Locale;
   inverted?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
-  const index = useMemo(() => buildSearchIndex(t), [t]);
+  const index = useMemo(() => buildSearchIndex(t, lang), [t, lang]);
   const hits = useMemo(() => searchSite(index, q), [index, q]);
 
   useEffect(() => {
@@ -46,7 +48,8 @@ export default function SiteSearch({
     track("search_select", { q, id });
     setOpen(false);
     setQ("");
-    window.location.hash = href.replace("#", "");
+    if (href.startsWith("#")) window.location.hash = href.slice(1);
+    else window.location.href = href;
   };
 
   const triggerCls = inverted

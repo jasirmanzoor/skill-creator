@@ -2,6 +2,7 @@ import Logo from "./ui/Logo";
 import { facts, whatsappLink } from "@/content/facts";
 import { FOOTER_NAV } from "@/content/nav";
 import type { Dictionary, Locale } from "@/content/i18n";
+import { SERVICE_SLUGS, servicePages } from "@/content/servicePages";
 
 const LABEL: Record<string, keyof Dictionary["nav"]> = {
   services: "services",
@@ -28,23 +29,13 @@ export default function Footer({ t, lang }: { t: Dictionary; lang: Locale }) {
         <nav aria-label={f.services}>
           <p className="text-sm font-semibold">{f.services}</p>
           <ul className="mt-4 grid gap-2 text-sm text-white/65">
-            {FOOTER_NAV.services.map((item) => (
-              <li key={item.id}>
-                <a className="hover:text-white" href={item.href}>
-                  {t.nav[LABEL[item.id]]}
+            {SERVICE_SLUGS.map((slug) => (
+              <li key={slug}>
+                <a className="hover:text-white" href={`/${lang}/services/${slug}`}>
+                  {servicePages[lang][slug].eyebrow}
                 </a>
               </li>
             ))}
-            <li>
-              <a className="hover:text-white" href="#services">
-                {t.planner.services["last-mile"].name}
-              </a>
-            </li>
-            <li>
-              <a className="hover:text-white" href="#services">
-                {t.planner.services.warehousing.name}
-              </a>
-            </li>
           </ul>
         </nav>
 
@@ -53,7 +44,7 @@ export default function Footer({ t, lang }: { t: Dictionary; lang: Locale }) {
           <ul className="mt-4 grid gap-2 text-sm text-white/65">
             {FOOTER_NAV.company.map((item) => (
               <li key={item.id}>
-                <a className="hover:text-white" href={item.href}>
+                <a className="hover:text-white" href={`/${lang}${item.href}`}>
                   {t.nav[LABEL[item.id]]}
                 </a>
               </li>

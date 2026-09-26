@@ -44,7 +44,7 @@ export const en = {
       company: "Company",
     },
     desc: {
-      planner: "Answer four questions and get a named logistics setup.",
+      planner: "Enter your numbers and get routes, couriers and a delivery structure, calculated live.",
       sellers: "Last-mile delivery for online sellers and growing stores.",
       services: "Last-mile, warehousing, land freight, tracking and account management.",
       fleet: "100+ specialised vehicles, telematics and 24/7 operations.",
@@ -57,14 +57,14 @@ export const en = {
     quickStart: "Start your logistics plan. Who are you?",
     panelTitle: "MSG network · Saudi Arabia",
     panelLive: "Operating 24/7",
-    partnersLead: "Already moving orders alongside",
-    eyebrow: "Last-mile in Saudi Arabia",
-    title: "Your order left the store. Who owns the door?",
+    partnersLead: "Valued partners",
+    eyebrow: "Your order left the store. Who owns the door?",
+    title: "Last-mile delivery across Saudi Arabia, run by 1,000+ couriers.",
     caption: "Each grey dot is one MSG courier. Blue markers are vehicles on their routes.",
-    lead: "Most sellers stitch together riders, a warehouse and a WhatsApp thread — then lose the shipment when volume spikes. MSG Horizons is the Riyadh partner that already runs last-mile, warehousing, land freight and people as one accountable operation: 1,000+ couriers, 100+ vehicles, 24/7.",
+    lead: "MSG Horizons runs last-mile delivery, warehousing, land freight and people as one accountable operation, for online sellers, growing e-commerce brands and enterprises. From a first order to peak season. Based in Riyadh, operating 24/7.",
     forWhom: "For online sellers, growing stores and enterprises across the Kingdom.",
-    nextStep: "Four questions. A named operating model. No invented prices.",
-    ctaMicro: "No credit card. MSG confirms scope after they see your volumes.",
+    nextStep: "Enter your numbers. Get routes, couriers and a structure, calculated live.",
+    ctaMicro: "No sign-up. MSG confirms scope and pricing once they see your volumes.",
     proofBeside: "1,000+ couriers · 100+ vehicles · 24/7 · AJEX · Keeta · iMile · Logistiqa · J&T Express",
     ctaPlan: "Build my logistics plan",
     ctaTalk: "Talk to MSG on WhatsApp",
@@ -89,7 +89,7 @@ export const en = {
   planner: {
     eyebrow: "Build your logistics",
     title: "What are you trying to move?",
-    lead: "Answer four quick questions and get a logistics configuration built from MSG's real services. It takes under a minute, and there's no sign-up.",
+    lead: "Four steps: who you are, what you move, your real numbers and what matters. The structure is calculated live from MSG's real services. Under a minute, no sign-up.",
     stepOf: "Step {n} of {total}",
     steps: {
       persona: {
