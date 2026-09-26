@@ -61,7 +61,7 @@ await test("SEO: metadata, hreflang, JSON-LD, sitemap, robots, OG image", async 
     const ld = html.match(/<script type="application\/ld\+json">(.*?)<\/script>/s)?.[1];
     const json = JSON.parse(ld);
     assert.equal(json["@graph"][0]["@type"], "Organization");
-    assert.equal(json["@graph"][0].telephone, "+966558951422");
+    assert.equal(json["@graph"][0].telephone, "+966578061556");
     assert.ok(!/customs/i.test(ld), "customs clearance must not be promoted");
     const og = await fetch(`${BASE}/${lang}/opengraph-image`);
     assert.equal(og.status, 200);
@@ -107,7 +107,7 @@ await test("planner: build a plan, share it, carry it into the contact form", as
   assert.ok(!/SAR|﷼|price:/i.test(result.replace(/no prices here/i, "")), "no pricing in result");
   assert.match(decodeURIComponent(page.url()), /[?&]plan=ecommerce~parcels\.storage~scaling~visibility\.peaks/);
   const wa = await page.getByRole("link", { name: /Send on WhatsApp/ }).getAttribute("href");
-  assert.match(wa, /^https:\/\/wa\.me\/966558951422\?text=/);
+  assert.match(wa, /^https:\/\/wa\.me\/966578061556\?text=/);
   assert.match(decodeURIComponent(wa), /Growth Engine/);
   assert.match(decodeURIComponent(wa), /Orders a day: [\d,]{3,}/);
 

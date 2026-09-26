@@ -7,10 +7,13 @@ and what needs **confirmation** before it can be used.
 ## Needs confirmation from MSG
 | Item | Why | Where it would appear |
 |---|---|---|
-| WhatsApp on +966 55 895 1422 | The source lists this as the phone number. The site assumes it also receives WhatsApp (`wa.me/966558951422`). | Every WhatsApp CTA |
 | Lead delivery destination | The form needs `LEAD_WEBHOOK_URL` and/or `RESEND_API_KEY` set in Vercel. Until then it hands leads off to WhatsApp or email (no lead is lost). | Contact form |
 | Partner display | AJEX, Keeta, iMile, Logistiqa and J&T Express are shown as **text** under "Valued partners", exactly as the 2026 profile lists them. Logos need each partner's permission. | Proof section |
 | Arabic company name | The source spells it "مسج هورايزونز". Please confirm that is the official Arabic trade name. | Footer, JSON-LD |
+
+## Confirmed by MSG
+- **Enquiry and WhatsApp number: 057 806 1556** (`+966578061556`, `wa.me/966578061556`). It replaces the profile's
+  +966 55 895 1422 on every call, WhatsApp and structured-data touchpoint.
 
 ## Conflicts (not silently reconciled)
 - **Establishment date.** The source gives "11-04-1446 AH (01/12/2025)". 11 Rabiʿ II 1446 AH falls in

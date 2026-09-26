@@ -32,9 +32,10 @@ export const facts = {
   },
 
   contact: {
-    phoneDisplay: "+966 55 895 1422",
-    phoneE164: "+966558951422",
-    whatsapp: "966558951422", // same number as the published phone — confirm it is WhatsApp-enabled
+    // Enquiries and WhatsApp: 057 806 1556, confirmed by MSG (Sept 2026). Replaces the profile's 055 895 1422.
+    phoneDisplay: "+966 57 806 1556",
+    phoneE164: "+966578061556",
+    whatsapp: "966578061556",
     email: "info@msg-horizons.com",
     street: "Al Malaz",
     city: "Riyadh",
