@@ -22,12 +22,12 @@ export type NavItem = {
 };
 
 /** Top-level menu. Labels live in the dictionary (`t.nav.*`). */
-export const PRIMARY_NAV: readonly NavItem[] = [
+export const PRIMARY_NAV = [
   { id: "services", href: "#services" },
   { id: "fleet", href: "#fleet" },
   { id: "enterprise", href: "#enterprise" },
   { id: "contact", href: "#contact" },
-] as const;
+] as const satisfies readonly NavItem[];
 
 /** Sections observed for active-state + breadcrumb + search landing. */
 export const OBSERVED_SECTIONS: readonly NavId[] = [
