@@ -34,13 +34,13 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         <NetworkPanel t={t} />
         <TrustBar t={t} />
         <Planner t={t} lang={lang} />
-        <Interlude lines={t.interludes.scale} label={t.interludes.scaleLabel} />
+        <Interlude lines={t.interludes.scale} label={t.interludes.scaleLabel} scene="scale" />
         <Sellers t={t} />
         <Services t={t} />
         <Fleet t={t} lang={lang} />
         <Proof t={t} />
         <Gallery t={t} lang={lang} />
-        <Interlude lines={t.interludes.growth} label={t.interludes.growthLabel} />
+        <Interlude lines={t.interludes.growth} label={t.interludes.growthLabel} scene="growth" />
         <Enterprise t={t} />
         <Contact t={t} lang={lang} />
       </main>

@@ -5,6 +5,7 @@ import { useState } from "react";
 import TrackedLink from "../ui/TrackedLink";
 import { ArrowIcon, ServiceIcon } from "../ui/icons";
 import { facts, type ServiceId } from "@/content/facts";
+import ServiceScene from "../scenes/ServiceScene";
 import type { Dictionary } from "@/content/i18n";
 
 /** Flexport-style service index: a quiet list that opens one service at a time, with its key fact beside it. */
@@ -75,8 +76,10 @@ export default function Services({ t }: { t: Dictionary }) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.25 }}
-                className="rounded-xl border border-line bg-surface p-8 shadow-[0_1px_2px_rgba(12,14,17,0.04)]"
+                className="overflow-hidden rounded-xl border border-line bg-surface shadow-[0_1px_2px_rgba(12,14,17,0.04)]"
               >
+                <ServiceScene id={open} />
+                <div className="p-8">
                 <p className="text-sm font-semibold text-muted">{t.planner.services[open].name}</p>
                 <p className="num mt-6 font-display text-6xl font-semibold tracking-[-0.03em] text-ink rtl:tracking-normal">{fact.v}</p>
                 <p className="mt-3 text-lg text-muted">{fact.l}</p>
@@ -88,6 +91,7 @@ export default function Services({ t }: { t: Dictionary }) {
                 >
                   {s.explore} <ArrowIcon />
                 </TrackedLink>
+                </div>
               </motion.div>
             </AnimatePresence>
           </aside>

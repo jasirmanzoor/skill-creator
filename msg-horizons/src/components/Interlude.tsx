@@ -3,13 +3,17 @@
 import { motion, useMotionValueEvent, useScroll, useTransform, type MotionValue } from "motion/react";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { useRef } from "react";
+import ScaleScene from "./scenes/ScaleScene";
+import GrowthScene from "./scenes/GrowthScene";
 
 /**
  * A cinematic interlude: content steps aside, the horizon fills the screen, and a statement
  * reveals line by line as the visitor scrolls (pinned, Apple-keynote style). All lines are real
  * text in the DOM for SEO and screen readers; only their emphasis animates.
  */
-export default function Interlude({ lines, label, tone = "light" }: { lines: string[]; label: string; tone?: "light" | "dark" }) {
+export default function Interlude({
+  lines, label, tone = "light", scene,
+}: { lines: string[]; label: string; tone?: "light" | "dark"; scene?: "scale" | "growth" }) {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
@@ -25,6 +29,8 @@ export default function Interlude({ lines, label, tone = "light" }: { lines: str
       <div className="sticky top-0 flex h-[100svh] items-start overflow-hidden pt-[15svh]">
         {/* soft vignette so white type always reads over any time of day */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_75%_45%_at_40%_30%,rgba(5,10,28,0.22),transparent_75%)]" />
+        {scene === "scale" ? <ScaleScene progress={scrollYProgress} reduce={!!reduce} /> : null}
+        {scene === "growth" ? <GrowthScene progress={scrollYProgress} reduce={!!reduce} /> : null}
         <div className="relative mx-auto w-full max-w-6xl px-5 lg:px-8">
           {lines.map((line, i) => (
             <Line key={line} i={i} n={lines.length} progress={scrollYProgress} reduce={!!reduce} tone={tone}>
