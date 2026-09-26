@@ -9,15 +9,17 @@ import {
 } from "@/lib/planner";
 import { planSummary } from "@/lib/plan-summary";
 import { track } from "@/lib/analytics";
-import { facts, whatsappLink } from "@/content/facts";
-import { fmt, type Dictionary } from "@/content/i18n";
+import { whatsappLink } from "@/content/facts";
+import { fmt, type Dictionary, type Locale } from "@/content/i18n";
 import { usePlan } from "../PlanContext";
 import { ArrowIcon, CheckIcon, OptionIcon, ServiceIcon, WhatsAppIcon } from "../ui/icons";
+import PlanStage from "../planner/PlanStage";
+import PlanModules from "../planner/PlanPreview";
 
-type Step = 0 | 1 | 2 | 3 | 4; // 4 = result
+type Step = 0 | 1 | 2 | 3 | 4;
 const TOTAL = 4;
 
-export default function Planner({ t }: { t: Dictionary }) {
+export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
   const p = t.planner;
   const { setPlan, seed } = usePlan();
   const [step, setStep] = useState<Step>(0);
@@ -30,7 +32,6 @@ export default function Planner({ t }: { t: Dictionary }) {
   const firstRender = useRef(true);
   const reduce = useReducedMotion();
 
-  // Restore a shared plan from ?plan=
   useEffect(() => {
     const shared = decodePlan(new URLSearchParams(window.location.search).get("plan"));
     if (shared) {
@@ -44,7 +45,6 @@ export default function Planner({ t }: { t: Dictionary }) {
     }
   }, []);
 
-  // Hero quick-start: persona chosen outside the planner.
   const [seenSeed, setSeenSeed] = useState(0);
   if (seed && seed.n !== seenSeed) {
     setSeenSeed(seed.n);
@@ -59,6 +59,9 @@ export default function Planner({ t }: { t: Dictionary }) {
   }, [step]);
 
   const input: PlanInput | null = persona && volume ? { persona, cargo, volume, priorities } : null;
+  const liveInput: PlanInput | null = persona
+    ? { persona, cargo, volume: volume ?? "starting", priorities }
+    : null;
   const plan = input ? buildPlan(input) : null;
 
   const go = (s: Step, detail?: string) => {
@@ -126,6 +129,8 @@ export default function Planner({ t }: { t: Dictionary }) {
         </div>
 
         <div className="mt-12 overflow-hidden rounded-xl border border-line bg-surface shadow-[0_1px_2px_rgba(12,14,17,0.04)]">
+          <PlanStage locale={lang} input={liveInput} complete={step === 4} />
+
           {step < 4 ? (
             <div className="grid lg:grid-cols-[1.7fr_1fr]">
               <div className="p-6 sm:p-10">
@@ -206,28 +211,22 @@ export default function Planner({ t }: { t: Dictionary }) {
                 </AnimatePresence>
 
                 <div className={`mt-10 flex items-center justify-between gap-3 border-t border-line pt-6 ${step === 0 ? "hidden" : ""}`}>
-                  <button
-                    type="button"
-                    onClick={() => setStep((s) => (s > 0 ? ((s - 1) as Step) : s))}
-                    className="rounded-md px-3 py-2 text-sm text-muted transition-colors hover:text-ink"
-                  >
+                  <button type="button" onClick={() => setStep((s) => (s > 0 ? ((s - 1) as Step) : s))} className="rounded-md px-3 py-2 text-sm text-muted transition-colors hover:text-ink">
                     {p.back}
                   </button>
                   {step === 1 && (
-                    <button type="button" onClick={() => go(2, cargo.join(".") || "parcels")}
-                      className="inline-flex items-center gap-2 rounded-md bg-ink px-5 py-2.5 font-medium text-white transition-colors hover:bg-ink-3">
+                    <button type="button" onClick={() => go(2, cargo.join(".") || "parcels")} className="inline-flex items-center gap-2 rounded-md bg-ink px-5 py-2.5 font-medium text-white transition-colors hover:bg-ink-3">
                       {p.next} <ArrowIcon />
                     </button>
                   )}
                   {step === 3 && (
-                    <button type="button" onClick={finish}
-                      className="inline-flex items-center gap-2 rounded-md bg-brand px-5 py-2.5 font-medium text-white transition-colors hover:bg-brand-strong">
+                    <button type="button" onClick={finish} className="inline-flex items-center gap-2 rounded-md bg-brand px-5 py-2.5 font-medium text-white transition-colors hover:bg-brand-strong">
                       {p.build} <ArrowIcon />
                     </button>
                   )}
                 </div>
               </div>
-              <LivePreview t={t} input={persona ? { persona, cargo, volume: volume ?? "starting", priorities } : null} />
+              <PlanModules t={t} input={liveInput} />
             </div>
           ) : plan && input ? (
             <motion.div {...anim}>
@@ -273,34 +272,6 @@ function Option({
   );
 }
 
-/** Live configuration preview: modules switch on as the visitor answers. */
-function LivePreview({ t, input }: { t: Dictionary; input: PlanInput | null }) {
-  const plan = input ? buildPlan(input) : null;
-  const byId = new Map(plan?.modules.map((m) => [m.id, m]) ?? []);
-  return (
-    <aside aria-label={t.planner.preview.title} className="hidden border-s border-line bg-paper p-8 lg:block">
-      <p className="text-sm font-semibold text-ink">{t.planner.preview.title}</p>
-      <p className="mt-1 text-sm text-muted">{plan ? t.planner.result.models[plan.model].name : t.planner.preview.empty}</p>
-      <ul className="mt-6 divide-y divide-line border-y border-line">
-        {facts.services.map((id) => {
-          const m = byId.get(id);
-          return (
-            <li key={id} className="flex items-center gap-3 py-3 text-sm">
-              <span className={`inline-flex size-7 items-center justify-center rounded-md transition-colors duration-300 ${
-                m ? (m.core ? "bg-brand text-white" : "bg-brand-soft text-brand") : "bg-subtle text-faint"
-              }`}>
-                <ServiceIcon id={id} className="size-4" />
-              </span>
-              <span className={`flex-1 transition-colors duration-300 ${m ? "font-medium text-ink" : "text-muted"}`}>{t.planner.services[id].name}</span>
-              {m ? <CheckIcon className="size-4 text-brand" /> : null}
-            </li>
-          );
-        })}
-      </ul>
-    </aside>
-  );
-}
-
 function Result({
   t, input, plan, headingRef, onRestart, onSend, onCopy, copied,
 }: {
@@ -324,7 +295,6 @@ function Result({
           {model.name}
         </h3>
         <p className="mt-3 max-w-lg text-muted">{model.desc}</p>
-
         <ol className="mt-8 divide-y divide-line border-y border-line">
           {plan.modules.map((m) => {
             const s = t.planner.services[m.id];
@@ -342,9 +312,7 @@ function Result({
                     </span>
                   </div>
                   <p className="mt-1 text-sm text-muted">{s.desc}</p>
-                  {reasons.length ? (
-                    <p className="mt-2 text-sm text-brand">{reasons.join(" · ")}</p>
-                  ) : null}
+                  {reasons.length ? <p className="mt-2 text-sm text-brand">{reasons.join(" · ")}</p> : null}
                 </div>
               </li>
             );
@@ -352,7 +320,6 @@ function Result({
         </ol>
         <p className="mt-6 border-s-2 border-brand ps-4 text-sm text-muted">{r.noPricing}</p>
       </div>
-
       <aside className="border-t border-line bg-paper p-6 sm:p-10 lg:border-s lg:border-t-0">
         <h4 className="font-display text-xl font-semibold text-ink">{r.nextTitle}</h4>
         <ol className="mt-5 space-y-5">
@@ -367,8 +334,7 @@ function Result({
           ))}
         </ol>
         <div className="mt-8 grid gap-2.5">
-          <button type="button" onClick={onSend}
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-ink px-5 py-3 font-medium text-white transition-colors hover:bg-ink-3">
+          <button type="button" onClick={onSend} className="inline-flex items-center justify-center gap-2 rounded-md bg-ink px-5 py-3 font-medium text-white transition-colors hover:bg-ink-3">
             {r.send} <ArrowIcon />
           </button>
           <a
