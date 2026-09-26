@@ -3,15 +3,17 @@ import HeroLift from "./HeroLift";
 import TrackedLink from "../ui/TrackedLink";
 import { WhatsAppIcon } from "../ui/icons";
 import { facts, whatsappLink } from "@/content/facts";
-import type { Dictionary } from "@/content/i18n";
+import { openingCopy } from "@/content/opening";
+import type { Dictionary, Locale } from "@/content/i18n";
 
 /**
  * First 15–20 seconds: horizon presence, problem, proof, then a decision.
  * The visitor should leave this fold knowing MSG already runs the door —
  * and which door is theirs.
  */
-export default function Hero({ t }: { t: Dictionary }) {
+export default function Hero({ t, lang }: { t: Dictionary; lang: Locale }) {
   const h = t.hero;
+  const o = openingCopy[lang];
   return (
     <section aria-labelledby="hero-title" className="relative min-h-[100svh] pt-[22svh] sm:pt-[26svh] lg:pt-[28svh]">
       <div
@@ -28,7 +30,7 @@ export default function Hero({ t }: { t: Dictionary }) {
           </h1>
 
           <p className="animate-rise mt-5 max-w-2xl text-lg font-medium text-ink [animation-delay:320ms] sm:text-xl">
-            {h.certainty}
+            {o.certainty}
           </p>
           <p className="animate-rise mt-2 max-w-2xl text-base text-ink-3 [animation-delay:400ms]">{h.forWhom}</p>
 
@@ -47,8 +49,8 @@ export default function Hero({ t }: { t: Dictionary }) {
           </ul>
 
           <div className="animate-rise mt-10 max-w-4xl [animation-delay:700ms]">
-            <p className="text-sm font-semibold text-ink">{h.whoPrompt}</p>
-            <PersonaGate options={t.planner.steps.persona.options} promises={h.personas} />
+            <p className="text-sm font-semibold text-ink">{o.whoPrompt}</p>
+            <PersonaGate options={t.planner.steps.persona.options} promises={o.personas} />
           </div>
 
           <div className="animate-rise mt-7 flex flex-wrap items-center gap-x-6 gap-y-3 [animation-delay:1100ms]">

@@ -30,7 +30,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       <HorizonBackdrop />
       <SiteHeader t={t} lang={lang} />
       <main id="main">
-        <Hero t={t} />
+        <Hero t={t} lang={lang} />
         <NetworkPanel t={t} />
         <TrustBar t={t} />
         <Planner t={t} />
