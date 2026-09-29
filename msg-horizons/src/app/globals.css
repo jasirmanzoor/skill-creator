@@ -110,6 +110,67 @@ html[data-interlude] .msg-landmark { opacity: 0; }
   [class^="svc-"], [class*=" svc-"] { animation: none !important; opacity: 1; stroke-dashoffset: 0; offset-distance: 60%; }
 }
 
+/* Seller needs grid (components/sections/Needs.tsx) */
+.need-card {
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform-style: preserve-3d;
+  transition: transform 0.35s var(--ease-out-expo), box-shadow 0.35s var(--ease-out-expo), border-color 0.35s;
+  opacity: 0;
+  translate: 0 18px;
+}
+.need-card:hover { border-color: var(--color-line-strong); box-shadow: 0 30px 60px -30px rgba(12, 14, 17, 0.35); }
+.needs-grid[data-inview] .need-card { animation: need-in 0.8s var(--ease-out-expo) var(--d, 0ms) forwards; }
+@keyframes need-in { to { opacity: 1; translate: 0 0; } }
+.needs-grid [class^="nd-"], .needs-grid [class*=" nd-"] { animation-play-state: paused; }
+.needs-grid[data-inview] [class^="nd-"], .needs-grid[data-inview] [class*=" nd-"] { animation-play-state: running; }
+.nd-drop { animation: nd-drop 2.4s var(--ease-out-expo) infinite; }
+@keyframes nd-drop { 0% { transform: translateY(-6px); opacity: 0; } 20% { opacity: 1; } 55%, 100% { transform: translateY(12px); opacity: 0; } }
+.nd-slide { animation: nd-slide 2.2s ease-in-out infinite; }
+@keyframes nd-slide { 0%, 10% { transform: translateX(0); } 60%, 100% { transform: translateX(10px); opacity: 0.2; } }
+.nd-tape, .nd-tick, .nd-arc, .nd-flow { stroke-dasharray: 1; stroke-dashoffset: 1; animation: nd-draw 2.6s var(--ease-out-expo) infinite; }
+@keyframes nd-draw { 0% { stroke-dashoffset: 1; } 55%, 85% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+.nd-pop { transform-box: fill-box; transform-origin: bottom; animation: nd-pop 2.8s var(--ease-out-expo) infinite; }
+@keyframes nd-pop { 0% { transform: scale(0.2); opacity: 0; } 20%, 85% { transform: none; opacity: 1; } 100% { opacity: 0; } }
+.nd-spin { transform-box: view-box; transform-origin: 17px 17px; animation: nd-spin 3.2s var(--ease-out-expo) infinite; }
+@keyframes nd-spin { to { transform: rotate(-360deg); } }
+.nd-pulse { animation: nd-pulse 2.4s ease-in-out infinite; }
+@keyframes nd-pulse { 50% { stroke: #8ea2ff; } }
+
+/* Onboarding journey scenes (components/sections/Journey.tsx): play only on the active stage */
+.journey-card [class^="js-"], .journey-card [class*=" js-"] { animation-play-state: paused; }
+.journey-card[data-active] [class^="js-"], .journey-card[data-active] [class*=" js-"] { animation-play-state: running; }
+.js-bubble { transform-box: fill-box; transform-origin: left center; animation: js-bubble 3.6s var(--ease-out-expo) infinite both; }
+@keyframes js-bubble { 0% { transform: scale(0.4); opacity: 0; } 12%, 88% { transform: none; opacity: 1; } 100% { opacity: 0; } }
+.js-plane { offset-path: path("M150 118 C 200 110 240 80 300 30"); animation: js-plane 3.6s ease-in 1.2s infinite both; }
+@keyframes js-plane { 0% { offset-distance: 0%; opacity: 0; } 10% { opacity: 1; } 60%, 100% { offset-distance: 100%; opacity: 0; } }
+.js-grow, .js-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: js-draw 3.2s var(--ease-out-expo) infinite both; }
+@keyframes js-draw { 0% { stroke-dashoffset: 1; } 45%, 90% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 0; opacity: 0.3; } }
+.js-knob { transform-box: fill-box; transform-origin: center; animation: js-knob 3.2s var(--ease-out-expo) infinite both; }
+@keyframes js-knob { 0%, 30% { transform: scale(0); } 45%, 90% { transform: none; } 100% { transform: none; opacity: 0.3; } }
+.js-stamp { transform-box: fill-box; transform-origin: center; animation: js-stamp 2.8s var(--ease-out-expo) infinite both; }
+@keyframes js-stamp { 0%, 30% { transform: translateY(-40px) scale(1.4); opacity: 0; } 45%, 90% { transform: none; opacity: 1; } 100% { opacity: 0; } }
+.js-dot { transform-box: fill-box; transform-origin: center; animation: js-dot 3.4s var(--ease-out-expo) infinite both; }
+@keyframes js-dot { 0% { transform: scale(0); } 25%, 90% { transform: none; } 100% { transform: none; opacity: 0.3; } }
+.js-seal { transform-box: fill-box; transform-origin: center; animation: js-seal 3.2s var(--ease-out-expo) 1.4s infinite both; }
+@keyframes js-seal { 0% { transform: scale(1.8); opacity: 0; } 25%, 90% { transform: none; opacity: 1; stroke: #8ea2ff; } 100% { opacity: 0; } }
+.js-check { transform-box: fill-box; transform-origin: center; animation: js-check 3.6s var(--ease-out-expo) infinite both; }
+@keyframes js-check { 0% { transform: scale(0); opacity: 0; } 15%, 90% { transform: none; opacity: 1; } 100% { opacity: 0; } }
+.js-van { offset-rotate: auto; animation: js-van 4.2s ease-in-out infinite both; }
+@keyframes js-van { from { offset-distance: 0%; } 80%, to { offset-distance: 100%; } }
+.js-live { animation: js-live 1.4s ease-in-out infinite; }
+@keyframes js-live { 50% { opacity: 0.25; } }
+
+/* Partner constellation links carry light toward the hub */
+.partner-link { animation: partner-flow 1.6s linear infinite; }
+@keyframes partner-flow { to { stroke-dashoffset: -20; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .need-card { opacity: 1; translate: none; }
+  [class^="nd-"], [class*=" nd-"], [class^="js-"], [class*=" js-"] { animation: none !important; opacity: 1; stroke-dashoffset: 0; transform: none; }
+  .js-van { offset-distance: 70%; }
+  .js-plane { display: none; }
+}
+
 /* Numbers always render LTR, even inside Arabic text. */
 .num { direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums; }
 

@@ -166,6 +166,21 @@ await test("service landing pages: indexable, one h1, FAQ + Service schema, in s
   assert.equal((await fetch(`${BASE}/en/services/not-a-service`)).status, 404);
 });
 
+await test("experience: seller questions, 7-step journey, partner logos load", async () => {
+  for (const lang of ["en", "ar"]) {
+    const { page, ctx, errors } = await open(`/${lang}`);
+    assert.equal(await page.locator("#sellers .need-card").count(), 9, `${lang}: nine seller questions`);
+    assert.equal(await page.locator("#journey ol li").count() >= 7, true, `${lang}: journey stages`);
+    await page.locator("#partners").scrollIntoViewIfNeeded();
+    await page.waitForTimeout(600);
+    const logos = await page.locator("#partners img").evaluateAll((els) => els.map((e) => [e.getAttribute("alt"), e.complete && e.naturalWidth > 0]));
+    assert.ok(logos.length >= 3, `${lang}: official partner logos present`);
+    for (const [alt, ok] of logos) assert.ok(ok, `${lang}: ${alt} logo failed to load`);
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  }
+});
+
 await test("shared plan link opens directly on the result", async () => {
   const { page, ctx } = await open("/ar?plan=platform~people~high~peaks#planner");
   await page.getByRole("heading", { name: "شريك الطاقة الاستيعابية" }).waitFor({ timeout: 5000 });

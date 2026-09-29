@@ -8,7 +8,9 @@ import HorizonBackdrop from "@/components/HorizonBackdrop";
 import Planner from "@/components/sections/Planner";
 import TrustBar from "@/components/sections/TrustBar";
 import Interlude from "@/components/Interlude";
-import Sellers from "@/components/sections/Sellers";
+import Needs from "@/components/sections/Needs";
+import Journey from "@/components/sections/Journey";
+import Partners from "@/components/sections/Partners";
 import Services from "@/components/sections/Services";
 import Fleet from "@/components/sections/Fleet";
 import Enterprise from "@/components/sections/Enterprise";
@@ -32,12 +34,14 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       <main id="main">
         <Hero t={t} lang={lang} />
         <NetworkPanel t={t} />
-        <TrustBar t={t} />
+        <TrustBar t={t} lang={lang} />
+        <Needs lang={lang} />
         <Planner t={t} lang={lang} />
         <Interlude lines={t.interludes.scale} label={t.interludes.scaleLabel} scene="scale" />
-        <Sellers t={t} />
+        <Journey lang={lang} />
         <Services t={t} lang={lang} />
         <Fleet t={t} lang={lang} />
+        <Partners lang={lang} />
         <Proof t={t} />
         <Gallery t={t} lang={lang} />
         <Interlude lines={t.interludes.growth} label={t.interludes.growthLabel} scene="growth" />

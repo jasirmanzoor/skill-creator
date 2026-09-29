@@ -15,6 +15,16 @@ and what needs **confirmation** before it can be used.
 - **Enquiry and WhatsApp number: 057 806 1556** (`+966578061556`, `wa.me/966578061556`). It replaces the profile's
   +966 55 895 1422 on every call, WhatsApp and structured-data touchpoint.
 
+- **Seller capabilities (29 Sept 2026):** cash on delivery collection, remittance with statements, packaging and
+  labelling guidance, returns handling, proof of delivery, serving sellers based outside the Kingdom (once stock is in
+  KSA; customs is still not promoted), multiple collection points and damage claims. Copy states the capability only;
+  cycles, fees and liability are "as agreed in your contract".
+- **Onboarding path:** enquiry → requirements → standard guide → curated recommendations → project agreement →
+  testing → go live.
+- **Partner logos:** shown as a highlight at MSG's request. Official files in `public/partners/`: J&T Express (Wikimedia
+  Commons, public domain), iMile (EN + AR, from imile.com), Keeta (app icon, from keeta-global.com). AJEX and Logistiqa
+  appear as name tiles until MSG supplies their files. MSG should hold each partner's permission to display its mark.
+
 ## Conflicts (not silently reconciled)
 - **Establishment date.** The source gives "11-04-1446 AH (01/12/2025)". 11 Rabiʿ II 1446 AH falls in
   mid-October 2024, not 1 December 2025. The 2026 growth trajectory also starts at "2024 Q1 Foundation".
