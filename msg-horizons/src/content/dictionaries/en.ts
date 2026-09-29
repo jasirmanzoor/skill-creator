@@ -57,7 +57,7 @@ export const en = {
     quickStart: "Start your logistics plan. Who are you?",
     panelTitle: "MSG network · Saudi Arabia",
     panelLive: "Operating 24/7",
-    partnersLead: "Valued partners",
+    partnersLead: "Partners and clients we work with",
     eyebrow: "Your order left the store. Who owns the door?",
     title: "Last-mile delivery across Saudi Arabia, run by 1,000+ couriers.",
     caption: "Each grey dot is one MSG courier. Blue markers are vehicles on their routes.",

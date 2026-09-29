@@ -5,6 +5,7 @@ import { experience, PARTNERS } from "@/content/experience";
 import type { Locale } from "@/content/i18n";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import PartnerLogo from "../partners/PartnerLogo";
+import Logo from "../ui/Logo";
 
 /**
  * Partner constellation: MSG at the centre, partners orbiting on a tilted ring in depth.
@@ -45,8 +46,8 @@ export default function Partners({ lang }: { lang: Locale }) {
           const s = 0.72 + depth * 0.38;
           tile.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%) scale(${s.toFixed(3)})`;
           tile.style.zIndex = String(Math.round(depth * 100));
-          tile.style.opacity = (0.55 + depth * 0.45).toFixed(3);
-          tile.style.filter = depth < 0.35 ? `blur(${((0.35 - depth) * 3).toFixed(2)}px)` : "none";
+          tile.style.opacity = (0.82 + depth * 0.18).toFixed(3);
+          tile.style.filter = depth < 0.25 ? `blur(${((0.25 - depth) * 2).toFixed(2)}px)` : "none";
         }
         const line = links.current[i];
         if (line) {
@@ -94,15 +95,14 @@ export default function Partners({ lang }: { lang: Locale }) {
         <div aria-hidden="true" className="absolute left-1/2 top-1/2 h-[60%] w-[80%] max-w-[920px] -translate-x-1/2 -translate-y-1/2 rounded-[50%] border border-dashed border-line-strong" />
         <svg aria-hidden="true" className="absolute inset-0 h-full w-full">
           {PARTNERS.map((p, i) => (
-            <line key={p.id} ref={(el) => { links.current[i] = el; }} stroke="#1f43e0" strokeWidth="1.2" strokeDasharray="3 7" className="partner-link" />
+            <line key={p.id} ref={(el) => { links.current[i] = el; }} stroke="#0f9641" strokeWidth="1.4" strokeDasharray="3 7" className="partner-link" />
           ))}
         </svg>
         {/* hub */}
         <div className="absolute left-1/2 top-1/2 z-[60] -translate-x-1/2 -translate-y-1/2">
           <span aria-hidden="true" className="absolute inset-0 -m-6 animate-ping rounded-full bg-brand/10 motion-reduce:hidden [animation-duration:2.6s]" />
-          <div className="relative flex size-24 flex-col items-center justify-center rounded-full bg-ink text-white shadow-[0_24px_60px_-20px_rgba(12,14,17,0.6)] sm:size-32">
-            <span className="font-display text-2xl font-semibold tracking-[-0.02em]">MSG</span>
-            <span className="text-[11px] text-white/60">Horizons</span>
+          <div className="relative flex size-28 items-center justify-center rounded-full bg-[#0c2a1a] shadow-[0_24px_60px_-20px_rgba(12,14,17,0.6)] ring-4 ring-white sm:size-36">
+            <Logo inverted className="scale-110" />
           </div>
         </div>
         {/* partner tiles */}
@@ -111,9 +111,9 @@ export default function Partners({ lang }: { lang: Locale }) {
             <li
               key={p.id}
               ref={(el) => { tiles.current[i] = el; }}
-              className="absolute left-0 top-0 flex h-14 w-28 items-center justify-center rounded-xl border border-line bg-white px-3 sm:h-24 sm:w-52 sm:rounded-2xl sm:px-5 shadow-[0_20px_50px_-24px_rgba(12,14,17,0.45)] will-change-transform sm:h-24 sm:w-52"
+              className="absolute left-0 top-0 size-20 overflow-hidden rounded-[22px] shadow-[0_24px_50px_-20px_rgba(12,14,17,0.55)] ring-1 ring-black/5 will-change-transform sm:size-28 sm:rounded-[28px]"
             >
-              <PartnerLogo id={p.id} lang={lang} className={p.id === "keeta" ? "h-9 sm:h-12" : "h-6 sm:h-10"} />
+              <PartnerLogo id={p.id} />
             </li>
           ))}
         </ul>

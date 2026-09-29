@@ -17,7 +17,7 @@ export default function WorkforcePipeline({ stages, site }: { stages: Stage[]; s
         <div className="absolute inset-x-[10%] top-1/2 h-px bg-white/15" />
         {!reduce ? (
           <motion.span
-            className="absolute top-1/2 size-2 -translate-y-1/2 rounded-full bg-brand-bright shadow-[0_0_12px_rgba(142,162,255,0.8)]"
+            className="absolute top-1/2 size-2 -translate-y-1/2 rounded-full bg-brand-bright shadow-[0_0_12px_rgba(76,201,122,0.8)]"
             animate={{ left: ["10%", "90%"] }}
             transition={{ duration: 6, ease: "linear", repeat: Infinity }}
           />

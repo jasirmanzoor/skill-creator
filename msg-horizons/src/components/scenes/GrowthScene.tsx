@@ -44,17 +44,17 @@ export default function GrowthScene({ progress, reduce }: { progress: MotionValu
           <linearGradient id="growth-stroke" x1="0" x2="1" y1="0" y2="0">
             <stop offset="0" stopColor="#ffffff" stopOpacity="0.5" />
             <stop offset="0.55" stopColor="#ffffff" stopOpacity="1" />
-            <stop offset="1" stopColor="#8ea2ff" stopOpacity="0.9" />
+            <stop offset="1" stopColor="#4cc97a" stopOpacity="0.9" />
           </linearGradient>
         </defs>
         {/* soft glow pass */}
-        <motion.path d={PATH} fill="none" stroke="rgba(142,162,255,0.35)" strokeWidth="10" strokeLinecap="round" style={{ pathLength: draw }} />
+        <motion.path d={PATH} fill="none" stroke="rgba(76,201,122,0.35)" strokeWidth="10" strokeLinecap="round" style={{ pathLength: draw }} />
         <motion.path ref={pathRef} d={PATH} fill="none" stroke="url(#growth-stroke)" strokeWidth="2.25" strokeLinecap="round" style={{ pathLength: draw }} />
       </svg>
       {/* first order: the origin point */}
       <span className="absolute size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_0_5px_rgba(255,255,255,0.18)]" style={{ left: "6%", top: `${(272 / 300) * 100}%` }} />
       {/* the moving tip */}
-      <span ref={tipRef} className="absolute size-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#8ea2ff] shadow-[0_0_18px_4px_rgba(142,162,255,0.7)]" style={{ left: "6%", top: "90.7%" }} />
+      <span ref={tipRef} className="absolute size-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#4cc97a] shadow-[0_0_18px_4px_rgba(76,201,122,0.7)]" style={{ left: "6%", top: "90.7%" }} />
     </motion.div>
   );
 }

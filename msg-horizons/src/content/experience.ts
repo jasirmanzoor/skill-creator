@@ -15,20 +15,36 @@ export type NeedId = (typeof NEED_IDS)[number];
 export const STAGE_IDS = ["enquiry", "requirements", "guide", "recommendations", "agreement", "testing", "live"] as const;
 export type StageId = (typeof STAGE_IDS)[number];
 
-export type PartnerId = "ajex" | "keeta" | "imile" | "logistiqa" | "jt";
+export type PartnerId = "ajex" | "keeta" | "imile" | "logistiqa" | "jt" | "naqel" | "gold";
 
-/** Official artwork where we have it; the rest render as name tiles until MSG supplies files. */
-export const PARTNERS: { id: PartnerId; name: string; logo?: { en: string; ar?: string; w: number; h: number } }[] = [
-  { id: "imile", name: "iMile", logo: { en: "/partners/imile.svg", ar: "/partners/imile-ar.svg", w: 859, h: 463 } },
-  { id: "jt", name: "J&T Express", logo: { en: "/partners/jt-express.svg", w: 1006, h: 217 } },
-  { id: "keeta", name: "Keeta", logo: { en: "/partners/keeta.png", w: 144, h: 144 } },
-  { id: "ajex", name: "AJEX" },
-  { id: "logistiqa", name: "Logistiqa" },
+/**
+ * Logos exactly as they appear on the "Professional customers / partners" slide of MSG's 2026 profile
+ * (square brand tiles). `name: null` = name still to be confirmed by MSG; the tile shows, the text does not.
+ */
+export const PARTNERS: { id: PartnerId; name: string | null; src: string; wide?: boolean }[] = [
+  { id: "ajex", name: "AJEX", src: "/partners/ajex.png" },
+  { id: "gold", name: null, src: "/partners/partner-gold.png" },
+  { id: "keeta", name: "Keeta", src: "/partners/keeta.png" },
+  { id: "imile", name: "iMile", src: "/partners/imile.png" },
+  { id: "naqel", name: "Naqel Express", src: "/partners/naqel.png" },
+  { id: "logistiqa", name: "Logistiqa", src: "/partners/logistiq.png" },
+  { id: "jt", name: "J&T Express", src: "/partners/jt-express.png" },
 ];
+
+/** Short strings for the app-style cards that sit on each journey photo. */
+type JourneyUI = {
+  chatName: string; chatMsg: string; chatReply: string;
+  reqTitle: string; reqChips: string[];
+  guideTitle: string; guideItems: string[];
+  planTag: string; planName: string; planStats: [string, string][];
+  signTitle: string; signed: string;
+  testTitle: string; testDone: string;
+  liveTitle: string; liveBody: string;
+};
 
 type Copy = {
   needs: { eyebrow: string; title: string; lead: string; items: Record<NeedId, { q: string; a: string }>; cta: string; note: string };
-  journey: { eyebrow: string; title: string; lead: string; stages: Record<StageId, { t: string; d: string; tag: string }>; cta: string };
+  journey: { eyebrow: string; title: string; lead: string; stages: Record<StageId, { t: string; d: string; tag: string }>; cta: string; ui: JourneyUI };
   partners: { eyebrow: string; title: string; lead: string; hub: string; note: string };
 };
 
@@ -66,11 +82,20 @@ export const experience: Record<Locale, Copy> = {
         live: { tag: "Go", t: "Go live", d: "Deliveries start. Tracked 24/7, one team accountable." },
       },
       cta: "Start with step one",
+      ui: {
+        chatName: "MSG Horizons", chatMsg: "Hi, we ship about 300 orders a day across Riyadh.", chatReply: "Great, let's size your setup.",
+        reqTitle: "Your requirements", reqChips: ["300 orders/day", "Peak 2.5×", "Cash on delivery", "Returns"],
+        guideTitle: "Standard guide", guideItems: ["Packaging", "Labelling", "Pickup windows", "Handover"],
+        planTag: "Example plan", planName: "Growth Engine", planStats: [["Routes", "12"], ["Couriers", "14"], ["Peak", "+22"]],
+        signTitle: "Project agreement", signed: "Signed",
+        testTitle: "Pilot shipments", testDone: "3 of 3 delivered",
+        liveTitle: "Delivered", liveBody: "Proof of delivery received",
+      },
     },
     partners: {
-      eyebrow: "Valued partners",
-      title: "Moving the Kingdom alongside the names you know.",
-      lead: "Strategic alliances with industry leaders, so your shipments reach further with one accountable partner.",
+      eyebrow: "Partners & clients",
+      title: "Trusted by the names that move the Kingdom.",
+      lead: "Leading delivery platforms and logistics brands already work with MSG Horizons. Your shipments join the same network.",
       hub: "MSG Horizons",
       note: "Partner names and marks belong to their respective owners.",
     },
@@ -108,11 +133,20 @@ export const experience: Record<Locale, Copy> = {
         live: { tag: "انطلق", t: "الإطلاق", d: "يبدأ التوصيل. تتبع على مدار الساعة وفريق واحد مسؤول." },
       },
       cta: "ابدأ بالخطوة الأولى",
+      ui: {
+        chatName: "MSG Horizons", chatMsg: "مرحباً، نشحن نحو 300 طلب يومياً في الرياض.", chatReply: "ممتاز، لنحدد إعدادك.",
+        reqTitle: "متطلباتك", reqChips: ["300 طلب/يوم", "ذروة 2.5×", "الدفع عند الاستلام", "مرتجعات"],
+        guideTitle: "الدليل المعياري", guideItems: ["التغليف", "الملصقات", "مواعيد الاستلام", "التسليم"],
+        planTag: "خطة مثال", planName: "محرك النمو", planStats: [["مسارات", "12"], ["مناديب", "14"], ["ذروة", "+22"]],
+        signTitle: "اتفاقية المشروع", signed: "موقّعة",
+        testTitle: "شحنات تجريبية", testDone: "3 من 3 سُلّمت",
+        liveTitle: "تم التسليم", liveBody: "تم استلام إثبات التسليم",
+      },
     },
     partners: {
-      eyebrow: "شركاؤنا",
-      title: "نحرّك المملكة إلى جانب أسماء تعرفها.",
-      lead: "تحالفات استراتيجية مع رواد القطاع، لتصل شحناتك أبعد مع شريك واحد مسؤول.",
+      eyebrow: "شركاؤنا وعملاؤنا",
+      title: "موثوقون من الأسماء التي تحرّك المملكة.",
+      lead: "منصات توصيل وعلامات لوجستية رائدة تعمل بالفعل مع MSG Horizons، وشحناتك تنضم إلى الشبكة نفسها.",
       hub: "MSG Horizons",
       note: "أسماء الشركاء وعلاماتهم ملك لأصحابها.",
     },

@@ -28,7 +28,7 @@ export default function OpsClock({ now, running, sub, lang }: { now: string; run
   return (
     <div className="flex flex-col items-start gap-8 sm:flex-row sm:items-center">
       <svg viewBox="0 0 200 200" className="size-44 shrink-0" aria-hidden="true">
-        <circle cx="100" cy="100" r="86" fill="none" stroke="#1f43e0" strokeWidth="3" />
+        <circle cx="100" cy="100" r="86" fill="none" stroke="#0b7d36" strokeWidth="3" />
         {Array.from({ length: 24 }, (_, i) => {
           const a = ((i / 24) * 360 - 90) * (Math.PI / 180);
           const r1 = i % 6 === 0 ? 72 : 77;
@@ -40,7 +40,7 @@ export default function OpsClock({ now, running, sub, lang }: { now: string; run
         })}
         <g style={{ transform: `rotate(${angle}deg)`, transformOrigin: "100px 100px", transition: "transform 1s ease" }} opacity={time ? 1 : 0}>
           <line x1="100" y1="100" x2="100" y2="24" stroke="#0c0e11" strokeWidth="2" strokeLinecap="round" />
-          <circle cx="100" cy="24" r="4" fill="#1f43e0" />
+          <circle cx="100" cy="24" r="4" fill="#0b7d36" />
         </g>
         <circle cx="100" cy="100" r="3.5" fill="#0c0e11" />
       </svg>

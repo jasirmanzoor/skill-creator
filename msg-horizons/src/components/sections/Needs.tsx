@@ -87,9 +87,9 @@ function NeedCard({ id, q, a, i }: { id: NeedId; q: string; a: string; i: number
       style={{ ["--d" as string]: `${i * 70}ms` }}
     >
       {/* light that follows the pointer */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[radial-gradient(420px_circle_at_var(--gx,50%)_var(--gy,50%),rgba(31,67,224,0.08),transparent_60%)]" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[radial-gradient(420px_circle_at_var(--gx,50%)_var(--gy,50%),rgba(11,125,54,0.08),transparent_60%)]" />
       <div className="relative flex items-start gap-5 [transform:translateZ(30px)]">
-        <span className="need-icon inline-flex size-14 shrink-0 items-center justify-center rounded-xl bg-[#0b0d12] text-white">
+        <span className="need-icon inline-flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#16a34a] to-[#0b6b2f] text-white shadow-[0_10px_24px_-10px_rgba(11,125,54,0.7)]">
           <NeedIcon id={id} />
         </span>
         <div className="min-w-0">
@@ -101,7 +101,7 @@ function NeedCard({ id, q, a, i }: { id: NeedId; q: string; a: string; i: number
   );
 }
 
-const B = "#8ea2ff";
+const B = "#d9f99d";
 function NeedIcon({ id }: { id: NeedId }) {
   const common = { width: 34, height: 34, viewBox: "0 0 34 34", fill: "none", "aria-hidden": true } as const;
   switch (id) {

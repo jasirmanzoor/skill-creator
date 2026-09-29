@@ -90,8 +90,8 @@ export default function Journey({ lang }: { lang: Locale }) {
         {/* progress rail with a travelling parcel */}
         <div className="relative mx-auto w-full max-w-7xl px-8 pb-10">
           <div className="relative h-px bg-white/15">
-            <motion.div style={{ width: rail }} className="absolute inset-y-0 start-0 bg-[#8ea2ff]" />
-            <motion.span style={{ insetInlineStart: rail }} className="absolute top-1/2 size-3 -translate-y-1/2 rounded-[3px] bg-white shadow-[0_0_16px_4px_rgba(142,162,255,0.6)] ltr:-translate-x-1/2 rtl:translate-x-1/2" />
+            <motion.div style={{ width: rail }} className="absolute inset-y-0 start-0 bg-[#4cc97a]" />
+            <motion.span style={{ insetInlineStart: rail }} className="absolute top-1/2 size-3 -translate-y-1/2 rounded-[3px] bg-white shadow-[0_0_16px_4px_rgba(76,201,122,0.6)] ltr:-translate-x-1/2 rtl:translate-x-1/2" />
           </div>
           <ol className="mt-4 grid grid-cols-7 gap-2 text-xs">
             {STAGE_IDS.map((id, i) => (
@@ -131,12 +131,12 @@ function StageCard({ id, i, lang, active, passed }: { id: StageId; i: number; la
     <article
       data-active={active || undefined}
       className={`journey-card relative w-[min(30rem,36vw)] shrink-0 overflow-hidden rounded-2xl border transition-all duration-500 ${
-        active ? "border-[#8ea2ff]/50 bg-white/[0.07] shadow-[0_30px_80px_-30px_rgba(142,162,255,0.45)]" : "border-white/10 bg-white/[0.03]"
+        active ? "border-[#4cc97a]/50 bg-white/[0.07] shadow-[0_30px_80px_-30px_rgba(76,201,122,0.45)]" : "border-white/10 bg-white/[0.03]"
       } ${active ? "scale-100 opacity-100" : passed ? "scale-[0.97] opacity-60" : "scale-[0.97] opacity-45"}`}
     >
-      <StageScene id={id} />
+      <StageScene id={id} lang={lang} />
       <div className="p-6">
-        <p className="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.14em] text-[#8ea2ff] rtl:tracking-normal">
+        <p className="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.14em] text-[#4cc97a] rtl:tracking-normal">
           <span className="num text-white/50">{String(i + 1).padStart(2, "0")}</span>
           {s.tag}
         </p>
@@ -160,10 +160,10 @@ function InViewStage({ id, i, lang }: { id: StageId; i: number; lang: Locale }) 
   }, []);
   return (
     <li ref={ref} data-active={on || undefined} className="journey-card relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
-      <span aria-hidden="true" className={`absolute -start-[1.95rem] top-6 size-3 rounded-full border-2 border-[#07090f] transition-colors ${on ? "bg-[#8ea2ff]" : "bg-white/30"}`} />
-      <StageScene id={id} />
+      <span aria-hidden="true" className={`absolute -start-[1.95rem] top-6 size-3 rounded-full border-2 border-[#07090f] transition-colors ${on ? "bg-[#4cc97a]" : "bg-white/30"}`} />
+      <StageScene id={id} lang={lang} />
       <div className="p-5">
-        <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#8ea2ff] rtl:tracking-normal">
+        <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#4cc97a] rtl:tracking-normal">
           <span className="num me-2 text-white/50">{String(i + 1).padStart(2, "0")}</span>
           {s.tag}
         </p>
@@ -174,89 +174,110 @@ function InViewStage({ id, i, lang }: { id: StageId; i: number; lang: Locale }) 
   );
 }
 
-const B = "#8ea2ff";
-const W = "rgba(255,255,255,0.85)";
-const DIM = "rgba(255,255,255,0.18)";
+const PHOTO: Record<StageId, string> = {
+  enquiry: "/photos/business.webp",
+  requirements: "/photos/office.webp",
+  guide: "/photos/team.webp",
+  recommendations: "/photos/warehouse.webp",
+  agreement: "/photos/riyadh-night.webp",
+  testing: "/photos/fleet-car.webp",
+  live: "/photos/doorstep.webp",
+};
 
-/** One living diagram per stage; animations run only while the card is active (see "js-" in globals.css). */
-function StageScene({ id }: { id: StageId }) {
+/** MSG's own photography with a small, familiar app card that slides in when the stage is active. */
+function StageScene({ id, lang }: { id: StageId; lang: Locale }) {
+  const u = experience[lang].journey.ui;
   return (
-    <svg viewBox="0 0 320 170" className="block h-auto w-full border-b border-white/10 bg-[#0b0d12]" aria-hidden="true" direction="ltr">
-      <g stroke="rgba(255,255,255,0.04)">
-        {Array.from({ length: 9 }, (_, i) => <line key={i} x1={i * 40} y1="0" x2={i * 40} y2="170" />)}
-      </g>
-      {scenes[id]}
-    </svg>
+    <div className="relative aspect-[16/10] overflow-hidden border-b border-white/10 bg-[#0b0d12]">
+      {/* eslint-disable-next-line @next/next/no-img-element -- local, pre-optimised webp */}
+      <img src={PHOTO[id]} alt="" loading="lazy" decoding="async" className="js-photo absolute inset-0 h-full w-full object-cover" />
+      <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent" />
+      <div aria-hidden="true" className="js-ui absolute bottom-4 start-4 end-4 max-w-[17rem] rounded-xl bg-white/95 p-3 text-[13px] text-ink shadow-[0_18px_40px_-16px_rgba(0,0,0,0.6)] backdrop-blur">
+        <UICard id={id} u={u} />
+      </div>
+    </div>
   );
 }
 
-const scenes: Record<StageId, React.ReactNode> = {
-  enquiry: (
-    <g>
-      <rect x="112" y="18" width="96" height="140" rx="14" fill="none" stroke={W} strokeWidth="1.6" />
-      <rect className="js-bubble" x="124" y="44" width="58" height="16" rx="8" fill={DIM} style={{ animationDelay: "0s" }} />
-      <rect className="js-bubble" x="138" y="68" width="58" height="16" rx="8" fill={B} style={{ animationDelay: ".45s" }} />
-      <rect className="js-bubble" x="124" y="92" width="44" height="16" rx="8" fill={DIM} style={{ animationDelay: ".9s" }} />
-      <path className="js-plane" d="M0 0l16 6-16 6 4-6z" fill="#fff" />
-    </g>
-  ),
-  requirements: (
-    <g>
-      {[0, 1, 2, 3].map((r) => (
-        <g key={r} transform={`translate(60 ${34 + r * 30})`}>
-          <line x1="0" y1="0" x2="200" y2="0" stroke={DIM} strokeWidth="3" strokeLinecap="round" />
-          <line className="js-grow" x1="0" y1="0" x2={[150, 90, 170, 60][r]} y2="0" stroke={B} strokeWidth="3" strokeLinecap="round" pathLength={1} style={{ animationDelay: `${r * 0.25}s` }} />
-          <circle className="js-knob" cx={[150, 90, 170, 60][r]} cy="0" r="6" fill="#fff" style={{ animationDelay: `${r * 0.25}s` }} />
-        </g>
-      ))}
-    </g>
-  ),
-  guide: (
-    <g>
-      <rect x="54" y="22" width="92" height="126" rx="6" fill="none" stroke={W} strokeWidth="1.6" />
-      {[46, 62, 78, 94, 110].map((y, i) => <rect key={y} x="68" y={y} width={[64, 50, 58, 40, 54][i]} height="5" rx="2.5" fill={DIM} />)}
-      <path d="M180 70l44-18 44 18v52l-44 18-44-18z" fill="none" stroke={W} strokeWidth="1.6" strokeLinejoin="round" />
-      <path d="M180 70l44 18 44-18M224 88v52" fill="none" stroke={W} strokeWidth="1.6" strokeLinejoin="round" />
-      <rect className="js-stamp" x="236" y="96" width="24" height="16" rx="2" fill={B} />
-    </g>
-  ),
-  recommendations: (
-    <g>
-      {Array.from({ length: 48 }, (_, i) => (
-        <circle key={i} className="js-dot" cx={52 + (i % 12) * 20} cy={46 + Math.floor(i / 12) * 22} r="4" fill={i % 12 > 7 ? B : "#fff"} style={{ animationDelay: `${(i % 12) * 0.05 + Math.floor(i / 12) * 0.08}s` }} />
-      ))}
-      <path className="js-draw" d="M52 150 C 120 150 150 120 290 120" fill="none" stroke={B} strokeWidth="2" pathLength={1} />
-    </g>
-  ),
-  agreement: (
-    <g>
-      <rect x="84" y="16" width="152" height="140" rx="6" fill="none" stroke={W} strokeWidth="1.6" />
-      {[36, 50, 64, 78].map((y, i) => <rect key={y} x="100" y={y} width={[110, 96, 118, 80][i]} height="5" rx="2.5" fill={DIM} />)}
-      <path className="js-draw" d="M104 126c10-18 18 8 26-6s12 10 22 0 10-8 18 2" fill="none" stroke={B} strokeWidth="2.4" strokeLinecap="round" pathLength={1} />
-      <circle className="js-seal" cx="206" cy="124" r="14" fill="none" stroke="#fff" strokeWidth="2" />
-    </g>
-  ),
-  testing: (
-    <g>
-      <line x1="40" y1="100" x2="280" y2="100" stroke={DIM} strokeWidth="2" strokeDasharray="4 6" />
-      {[80, 160, 240].map((cx, i) => (
-        <g key={cx}>
-          <rect x={cx - 18} y="64" width="36" height="36" rx="4" fill="none" stroke={W} strokeWidth="1.6" />
-          <circle className="js-check" cx={cx} cy="128" r="11" fill={B} style={{ animationDelay: `${0.3 + i * 0.6}s` }} />
-          <path className="js-check" d={`M${cx - 5} 128l3.5 3.5 6.5-7`} stroke="#0b0d12" strokeWidth="2.2" fill="none" strokeLinecap="round" style={{ animationDelay: `${0.3 + i * 0.6}s` }} />
-        </g>
-      ))}
-    </g>
-  ),
-  live: (
-    <g>
-      <path d="M30 130 C 90 130 100 60 160 60 S 240 110 290 40" fill="none" stroke={DIM} strokeWidth="8" strokeLinecap="round" />
-      <path className="js-draw" d="M30 130 C 90 130 100 60 160 60 S 240 110 290 40" fill="none" stroke={B} strokeWidth="2" pathLength={1} />
-      <rect className="js-van" x="-8" y="-5" width="16" height="10" rx="2" fill="#fff" style={{ offsetPath: "path('M30 130 C 90 130 100 60 160 60 S 240 110 290 40')" }} />
-      <g transform="translate(236 128)">
-        <circle className="js-live" r="5" fill="#34d399" />
-        <text x="12" y="4" fill="#fff" fontSize="12" fontWeight="600" fontFamily="inherit">LIVE</text>
-      </g>
-    </g>
-  ),
-};
+const Tick = () => (
+  <span className="inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-[#0f9641] text-white">
+    <svg viewBox="0 0 12 12" className="size-2.5"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+  </span>
+);
+
+function UICard({ id, u }: { id: StageId; u: (typeof experience)["en"]["journey"]["ui"] }) {
+  switch (id) {
+    case "enquiry":
+      return (
+        <div className="space-y-1.5">
+          <p className="flex items-center gap-1.5 text-[11px] font-semibold text-[#128c4a]"><span className="size-2 rounded-full bg-[#25d366]" />WhatsApp · {u.chatName}</p>
+          <p className="ms-auto w-fit max-w-[90%] rounded-lg rounded-se-sm bg-[#dcf8c6] px-2.5 py-1.5">{u.chatMsg}</p>
+          <p className="w-fit max-w-[90%] rounded-lg rounded-ss-sm bg-subtle px-2.5 py-1.5">{u.chatReply}</p>
+        </div>
+      );
+    case "requirements":
+      return (
+        <div>
+          <p className="text-[11px] font-semibold text-muted">{u.reqTitle}</p>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {u.reqChips.map((c) => <span key={c} className="num rounded-full bg-brand-soft px-2 py-0.5 text-[12px] font-medium text-brand-strong">{c}</span>)}
+          </div>
+        </div>
+      );
+    case "guide":
+      return (
+        <div>
+          <p className="text-[11px] font-semibold text-muted">{u.guideTitle}</p>
+          <ul className="mt-1.5 grid grid-cols-2 gap-x-3 gap-y-1">
+            {u.guideItems.map((g) => <li key={g} className="flex items-center gap-1.5"><Tick />{g}</li>)}
+          </ul>
+        </div>
+      );
+    case "recommendations":
+      return (
+        <div>
+          <p className="flex items-center justify-between text-[11px]"><span className="font-semibold text-muted">{u.planTag}</span><span className="font-semibold text-brand">{u.planName}</span></p>
+          <dl className="mt-1.5 grid grid-cols-3 gap-2">
+            {u.planStats.map(([k, v]) => (
+              <div key={k} className="rounded-lg bg-subtle px-2 py-1.5">
+                <dt className="text-[10px] text-muted">{k}</dt>
+                <dd className="num font-display text-lg font-semibold leading-tight">{v}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      );
+    case "agreement":
+      return (
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-[11px] font-semibold text-muted">{u.signTitle}</p>
+            <svg viewBox="0 0 120 30" className="mt-0.5 h-7 w-28"><path className="js-sign" d="M4 22c8-14 14 8 22-4s10 10 18 0 9-8 16 2 12-12 20-4 10 6 18-2" fill="none" stroke="#0c2a8a" strokeWidth="2" strokeLinecap="round" pathLength={1} /></svg>
+          </div>
+          <span className="inline-flex items-center gap-1 rounded-full bg-brand-soft px-2 py-1 text-[12px] font-semibold text-brand-strong"><Tick />{u.signed}</span>
+        </div>
+      );
+    case "testing":
+      return (
+        <div>
+          <p className="flex items-center justify-between text-[11px]"><span className="font-semibold text-muted">{u.testTitle}</span><span className="num font-semibold text-brand">{u.testDone}</span></p>
+          <div className="mt-2 grid grid-cols-3 gap-1.5">
+            {[0, 1, 2].map((k) => <span key={k} className="js-bar h-1.5 rounded-full bg-[#0f9641]" style={{ animationDelay: `${0.2 + k * 0.35}s` }} />)}
+          </div>
+        </div>
+      );
+    case "live":
+      return (
+        <div className="flex items-center gap-3">
+          <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-[#0f9641] text-white">
+            <svg viewBox="0 0 20 20" className="size-5"><path d="M4.5 10.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          </span>
+          <div>
+            <p className="font-semibold">{u.liveTitle}</p>
+            <p className="text-[12px] text-muted">{u.liveBody}</p>
+          </div>
+          <span className="ms-auto inline-flex items-center gap-1 text-[11px] font-semibold text-[#0f9641]"><span className="js-live size-2 rounded-full bg-[#0f9641]" />LIVE</span>
+        </div>
+      );
+  }
+}

@@ -86,7 +86,7 @@ export default function PeakFlow({ stages, labels }: { stages: Stage[]; labels: 
                   y={y(v)}
                   height={H - PAD - y(v)}
                   rx={3}
-                  fill={released ? "rgba(142,162,255,0.4)" : "#8ea2ff"}
+                  fill={released ? "rgba(76,201,122,0.4)" : "#4cc97a"}
                   opacity={0.85}
                   style={{ transition: `y .8s cubic-bezier(.16,1,.3,1) ${i * 30}ms, height .8s cubic-bezier(.16,1,.3,1) ${i * 30}ms, fill .6s` }}
                 />

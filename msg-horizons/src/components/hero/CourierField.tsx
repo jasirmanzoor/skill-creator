@@ -18,7 +18,7 @@ const T_GATHER = 0.2;
 const T_VEHICLES = 2.2;
 
 const INK_DOT = "rgba(28,31,36,0.34)";
-const BRAND = [31, 67, 224] as const; // --color-brand
+const BRAND = [11,125,54] as const; // --color-brand
 
 type Dot = {
   sx: number; sy: number; tx: number; ty: number; nx: number; ny: number;

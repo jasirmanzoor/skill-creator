@@ -92,7 +92,7 @@ export default function HorizonBackdrop() {
           ))}
         </svg>
         {/* faint glow of the horizon: operations still running */}
-        <div className="absolute inset-x-0" style={{ top: `${HORIZON - 6}%`, height: "12%", background: "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(142,162,255,0.18), transparent 70%)" }} />
+        <div className="absolute inset-x-0" style={{ top: `${HORIZON - 6}%`, height: "12%", background: "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(76,201,122,0.18), transparent 70%)" }} />
       </motion.div>
       {/* the landmark, softly lit at night */}
       <motion.div className="absolute inset-0" style={{ scale: dolly, transformOrigin: ORIGIN, opacity: litLetters }}>

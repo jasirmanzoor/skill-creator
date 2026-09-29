@@ -16,10 +16,10 @@
   --color-ink-3: #2a2e35;
   --color-muted: #585e67;
   --color-faint: #8b9098;
-  --color-brand: #1f43e0;
-  --color-brand-strong: #1633b5;
-  --color-brand-soft: #eceffd;
-  --color-brand-bright: #8ea2ff; /* on dark backgrounds only */
+  --color-brand: #0b7d36;
+  --color-brand-strong: #086a2d;
+  --color-brand-soft: #e8f5ec;
+  --color-brand-bright: #4cc97a; /* on dark backgrounds only */
   --color-whatsapp: #128c4a;
   --color-danger: #b42318;
 
@@ -80,36 +80,6 @@ body {
 .msg-landmark { transition: opacity 0.7s var(--ease-out-expo); }
 html[data-interlude] .msg-landmark { opacity: 0; }
 
-/* Service scenes (components/scenes/ServiceScene.tsx). Loops are slow and quiet by design. */
-.svc-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: svc-draw 3.4s var(--ease-out-expo) infinite; }
-@keyframes svc-draw { 0% { stroke-dashoffset: 1; } 70%, 100% { stroke-dashoffset: 0; } }
-.svc-ride, .svc-truck, .svc-flow { offset-rotate: 0deg; animation: svc-ride 3.4s cubic-bezier(0.45, 0, 0.2, 1) infinite; }
-.svc-truck { offset-rotate: auto; animation: svc-truck 5s ease-in-out infinite; }
-.svc-flow { animation: svc-ride 3.5s linear infinite; opacity: 0.9; }
-@keyframes svc-ride { from { offset-distance: 0%; } 70%, to { offset-distance: 100%; } }
-@keyframes svc-truck { 0%, 8% { offset-distance: 0%; } 46%, 54% { offset-distance: 100%; } 92%, 100% { offset-distance: 0%; } }
-.svc-door { opacity: 0.25; animation: svc-door 3.4s ease-out infinite; }
-@keyframes svc-door { 0% { opacity: 0.25; } 8%, 80% { opacity: 1; } 100% { opacity: 0.25; } }
-.svc-fill { opacity: 0; transform-box: fill-box; transform-origin: bottom; animation: svc-fill 4.8s var(--ease-out-expo) infinite; }
-@keyframes svc-fill { 0% { opacity: 0; transform: scaleY(0.3); } 12%, 85% { opacity: 0.85; transform: none; } 100% { opacity: 0; } }
-.svc-scan { animation: svc-scan 3.2s ease-in-out infinite alternate; opacity: 0.7; }
-@keyframes svc-scan { to { transform: translateY(128px); } }
-.svc-road { animation: svc-road 1.2s linear infinite; }
-@keyframes svc-road { to { stroke-dashoffset: -14; } }
-.svc-ping { transform-box: fill-box; transform-origin: center; animation: svc-ping 2.7s ease-out infinite; }
-@keyframes svc-ping { 0% { transform: scale(1); opacity: 0.9; } 60%, 100% { transform: scale(4.5); opacity: 0; } }
-.svc-tick { opacity: 0.2; animation: svc-tick 2.4s var(--ease-out-expo) both; }
-@keyframes svc-tick { to { opacity: 1; } }
-.svc-hand { transform-origin: 262px 52px; animation: svc-hand 6s linear infinite; }
-@keyframes svc-hand { to { transform: rotate(360deg); } }
-.svc-link { stroke-dasharray: 1; stroke-dashoffset: 1; animation: svc-link 3.6s var(--ease-out-expo) infinite; }
-@keyframes svc-link { 0% { stroke-dashoffset: 1; } 40%, 100% { stroke-dashoffset: 0; } }
-.svc-pulse { transform-box: fill-box; transform-origin: center; animation: svc-pulse 2.4s ease-in-out infinite; }
-@keyframes svc-pulse { 50% { transform: scale(1.35); opacity: 0.05; } }
-@media (prefers-reduced-motion: reduce) {
-  [class^="svc-"], [class*=" svc-"] { animation: none !important; opacity: 1; stroke-dashoffset: 0; offset-distance: 60%; }
-}
-
 /* Seller needs grid (components/sections/Needs.tsx) */
 .need-card {
   transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
@@ -134,29 +104,20 @@ html[data-interlude] .msg-landmark { opacity: 0; }
 .nd-spin { transform-box: view-box; transform-origin: 17px 17px; animation: nd-spin 3.2s var(--ease-out-expo) infinite; }
 @keyframes nd-spin { to { transform: rotate(-360deg); } }
 .nd-pulse { animation: nd-pulse 2.4s ease-in-out infinite; }
-@keyframes nd-pulse { 50% { stroke: #8ea2ff; } }
+@keyframes nd-pulse { 50% { stroke: #4cc97a; } }
 
 /* Onboarding journey scenes (components/sections/Journey.tsx): play only on the active stage */
 .journey-card [class^="js-"], .journey-card [class*=" js-"] { animation-play-state: paused; }
 .journey-card[data-active] [class^="js-"], .journey-card[data-active] [class*=" js-"] { animation-play-state: running; }
-.js-bubble { transform-box: fill-box; transform-origin: left center; animation: js-bubble 3.6s var(--ease-out-expo) infinite both; }
-@keyframes js-bubble { 0% { transform: scale(0.4); opacity: 0; } 12%, 88% { transform: none; opacity: 1; } 100% { opacity: 0; } }
-.js-plane { offset-path: path("M150 118 C 200 110 240 80 300 30"); animation: js-plane 3.6s ease-in 1.2s infinite both; }
-@keyframes js-plane { 0% { offset-distance: 0%; opacity: 0; } 10% { opacity: 1; } 60%, 100% { offset-distance: 100%; opacity: 0; } }
-.js-grow, .js-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: js-draw 3.2s var(--ease-out-expo) infinite both; }
-@keyframes js-draw { 0% { stroke-dashoffset: 1; } 45%, 90% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 0; opacity: 0.3; } }
-.js-knob { transform-box: fill-box; transform-origin: center; animation: js-knob 3.2s var(--ease-out-expo) infinite both; }
-@keyframes js-knob { 0%, 30% { transform: scale(0); } 45%, 90% { transform: none; } 100% { transform: none; opacity: 0.3; } }
-.js-stamp { transform-box: fill-box; transform-origin: center; animation: js-stamp 2.8s var(--ease-out-expo) infinite both; }
-@keyframes js-stamp { 0%, 30% { transform: translateY(-40px) scale(1.4); opacity: 0; } 45%, 90% { transform: none; opacity: 1; } 100% { opacity: 0; } }
-.js-dot { transform-box: fill-box; transform-origin: center; animation: js-dot 3.4s var(--ease-out-expo) infinite both; }
-@keyframes js-dot { 0% { transform: scale(0); } 25%, 90% { transform: none; } 100% { transform: none; opacity: 0.3; } }
-.js-seal { transform-box: fill-box; transform-origin: center; animation: js-seal 3.2s var(--ease-out-expo) 1.4s infinite both; }
-@keyframes js-seal { 0% { transform: scale(1.8); opacity: 0; } 25%, 90% { transform: none; opacity: 1; stroke: #8ea2ff; } 100% { opacity: 0; } }
-.js-check { transform-box: fill-box; transform-origin: center; animation: js-check 3.6s var(--ease-out-expo) infinite both; }
-@keyframes js-check { 0% { transform: scale(0); opacity: 0; } 15%, 90% { transform: none; opacity: 1; } 100% { opacity: 0; } }
-.js-van { offset-rotate: auto; animation: js-van 4.2s ease-in-out infinite both; }
-@keyframes js-van { from { offset-distance: 0%; } 80%, to { offset-distance: 100%; } }
+.js-photo { transform: scale(1.06); transition: transform 1.6s var(--ease-out-expo); }
+.journey-card[data-active] .js-photo { transform: scale(1); }
+.js-ui { opacity: 0; translate: 0 14px; transition: opacity 0.6s var(--ease-out-expo) 0.15s, translate 0.6s var(--ease-out-expo) 0.15s; }
+.journey-card[data-active] .js-ui { opacity: 1; translate: 0 0; }
+.js-sign { stroke-dasharray: 1; stroke-dashoffset: 1; animation: js-draw 2.6s var(--ease-out-expo) 0.4s infinite both; }
+@keyframes js-draw { 0% { stroke-dashoffset: 1; } 45%, 100% { stroke-dashoffset: 0; } }
+.js-bar { transform-origin: left; animation: js-bar 3s var(--ease-out-expo) infinite both; }
+[dir="rtl"] .js-bar { transform-origin: right; }
+@keyframes js-bar { 0% { transform: scaleX(0); } 30%, 100% { transform: none; } }
 .js-live { animation: js-live 1.4s ease-in-out infinite; }
 @keyframes js-live { 50% { opacity: 0.25; } }
 
@@ -167,8 +128,7 @@ html[data-interlude] .msg-landmark { opacity: 0; }
 @media (prefers-reduced-motion: reduce) {
   .need-card { opacity: 1; translate: none; }
   [class^="nd-"], [class*=" nd-"], [class^="js-"], [class*=" js-"] { animation: none !important; opacity: 1; stroke-dashoffset: 0; transform: none; }
-  .js-van { offset-distance: 70%; }
-  .js-plane { display: none; }
+  .js-ui { opacity: 1; translate: none; }
 }
 
 /* Numbers always render LTR, even inside Arabic text. */
@@ -235,4 +195,4 @@ html[data-interlude] .msg-landmark { opacity: 0; }
 }
 .sizer-range:active::-webkit-slider-thumb { transform: scale(1.15); }
 .sizer-range:focus-visible { outline: none; }
-.sizer-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(31, 67, 224, 0.25); }
+.sizer-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(11,125,54, 0.25); }
