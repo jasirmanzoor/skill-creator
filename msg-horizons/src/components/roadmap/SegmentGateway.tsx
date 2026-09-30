@@ -5,7 +5,6 @@ import { useRef } from "react";
 import { roadmapCopy, SEGMENT_ORDERS, type Segment } from "@/content/roadmap";
 import type { Locale } from "@/content/i18n";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
-import EmbeddedPhoto from "../ui/EmbeddedPhoto";
 
 const ORDER: { id: Segment; group: "individual" | "business" }[] = [
   { id: "offline", group: "individual" },
@@ -40,9 +39,19 @@ export default function SegmentGateway({
         <p className="font-display text-xl font-semibold text-white sm:text-2xl">{g.hook}</p>
         <p className="text-sm text-white/65">{g.pick}</p>
       </div>
-      <div role="radiogroup" aria-label={g.pick} className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-3">
-        {ORDER.map(({ id, group }) => (
-          <Tile key={id} id={id} group={g[group]} t={g.segments[id].t} d={g.segments[id].d} on={value === id} dim={value !== null && value !== id} onPick={() => onChange(id)} reduce={reduce} />
+      <div role="radiogroup" aria-label={g.pick} className="mt-6 space-y-5">
+        {(["individual", "business"] as const).map((grp) => (
+          <div key={grp}>
+            <p className="mb-2.5 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#8ee3ad] rtl:tracking-normal">
+              {g[grp]}
+              <span aria-hidden="true" className="h-px flex-1 bg-gradient-to-r from-[#4cc97a]/40 to-transparent rtl:bg-gradient-to-l" />
+            </p>
+            <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-5 px-5 pb-1 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0">
+              {ORDER.filter((o) => o.group === grp).map(({ id }) => (
+                <Tile key={id} id={id} t={g.segments[id].t} d={g.segments[id].d} on={value === id} dim={value !== null && value !== id} onPick={() => onChange(id)} reduce={reduce} />
+              ))}
+            </div>
+          </div>
         ))}
       </div>
 
@@ -78,7 +87,7 @@ export default function SegmentGateway({
   );
 }
 
-function Tile({ id, group, t, d, on, dim, onPick, reduce }: { id: Segment; group: string; t: string; d: string; on: boolean; dim: boolean; onPick: () => void; reduce: boolean }) {
+function Tile({ id, t, d, on, dim, onPick, reduce }: { id: Segment; t: string; d: string; on: boolean; dim: boolean; onPick: () => void; reduce: boolean }) {
   const ref = useRef<HTMLButtonElement>(null);
   const move = (e: React.PointerEvent) => {
     if (reduce || e.pointerType !== "mouse") return;
@@ -105,22 +114,18 @@ function Tile({ id, group, t, d, on, dim, onPick, reduce }: { id: Segment; group
       onClick={onPick}
       onPointerMove={move}
       onPointerLeave={leave}
-      className={`seg-tile group relative min-h-[150px] overflow-hidden rounded-2xl text-start ring-1 transition-[box-shadow,opacity,transform] duration-500 sm:min-h-[180px] ${on ? "ring-2 ring-[#4cc97a] shadow-[0_0_40px_-6px_rgba(76,201,122,0.7)]" : "ring-white/10 hover:ring-white/25"} ${dim ? "opacity-60 hover:opacity-100" : ""}`}
+      className={`seg-tile group relative aspect-[4/3] w-[68%] shrink-0 snap-start overflow-hidden sm:w-auto rounded-2xl text-start shadow-[0_18px_40px_-24px_rgba(0,0,0,0.9)] transition-[box-shadow,filter] duration-500 sm:aspect-[16/10] ${on ? "ring-[3px] ring-[#4cc97a] shadow-[0_0_0_6px_rgba(76,201,122,0.18),0_24px_50px_-20px_rgba(76,201,122,0.55)]" : "ring-1 ring-white/15 hover:ring-white/40"} ${dim ? "saturate-[0.55] brightness-90 hover:saturate-100 hover:brightness-100" : ""}`}
     >
-      <EmbeddedPhoto src={src} position={pos} tone="forest" fade="none" strength={on ? 0.9 : 0.55} className="absolute inset-0 transition-transform duration-700 group-hover:scale-105" />
-      <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#04110a] via-[#04110a]/45 to-transparent" />
-      <span aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[radial-gradient(260px_circle_at_var(--gx,50%)_var(--gy,50%),rgba(181,245,204,0.18),transparent_60%)]" />
-      <span className="relative flex h-full flex-col justify-between p-4 [transform:translateZ(24px)]">
-        <span className="flex items-start justify-between gap-2">
-          <span className="rounded-full bg-black/35 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8ee3ad] backdrop-blur rtl:tracking-normal">{group}</span>
-          <span aria-hidden="true" className={`inline-flex size-6 items-center justify-center rounded-full border transition-colors ${on ? "border-[#4cc97a] bg-[#4cc97a] text-[#04110a]" : "border-white/40 bg-black/20"}`}>
-            {on ? <svg viewBox="0 0 12 12" className="size-3"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg> : null}
-          </span>
-        </span>
-        <span className="mt-6 block">
-          <span className="block font-display text-base font-semibold leading-snug text-white sm:text-lg">{t}</span>
-          <span className="mt-0.5 block text-xs text-white/75 sm:text-sm">{d}</span>
-        </span>
+      {/* eslint-disable-next-line @next/next/no-img-element -- MSG's own photography */}
+      <img src={src} alt="" loading="lazy" decoding="async" style={{ objectPosition: pos }} className="absolute inset-0 size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]" />
+      <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
+      <span aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[radial-gradient(240px_circle_at_var(--gx,50%)_var(--gy,50%),rgba(255,255,255,0.18),transparent_60%)]" />
+      <span aria-hidden="true" className={`absolute end-3 top-3 inline-flex size-7 items-center justify-center rounded-full transition-all duration-300 ${on ? "scale-100 bg-[#4cc97a] text-[#04110a] shadow-[0_0_20px_rgba(76,201,122,0.8)]" : "scale-90 border-2 border-white/80 bg-black/25 backdrop-blur"}`}>
+        {on ? <svg viewBox="0 0 12 12" className="size-3.5"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg> : null}
+      </span>
+      <span className="absolute inset-x-0 bottom-0 block p-3 sm:p-4 [transform:translateZ(24px)]">
+        <span className="block font-display text-[15px] font-semibold leading-snug text-white [text-shadow:0_1px_12px_rgba(0,0,0,0.6)] sm:text-lg">{t}</span>
+        <span className="mt-0.5 block text-xs text-white/85 sm:text-sm">{d}</span>
       </span>
     </button>
   );

@@ -97,12 +97,6 @@ export default function RoadmapSection({ t, lang }: { t: Dictionary; lang: Local
 
         {/* the roadmap */}
         <div className="glass mt-6 rounded-3xl p-5 sm:p-8">
-          {segment ? (
-            <p className="mb-6 flex flex-wrap items-center gap-2 text-sm text-white/70 md:mb-10">
-              <span className="size-1.5 rounded-full bg-[#4cc97a] plan-ping" />
-              {c.gate.selected} <span className="font-semibold text-white">{c.gate.segments[segment].t}</span>
-            </p>
-          ) : null}
           <RoadmapPath labels={c.steps.map((s) => s.t)} active={step} onSelect={go} stepLabel={c.stepLabel} rtl={lang === "ar"} />
           {/* mobile step rail */}
           <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 md:hidden" role="tablist" aria-label={c.stepLabel}>
