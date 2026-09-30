@@ -77,3 +77,7 @@ Open questions for MSG:
 - The Sabya brief earlier also gave a 500+ a month tier (13 / 22). This lock lists only walk-in and 299, so only those are shown.
 
 Update, 30 Sept 2026 (MSG): walk-in prices are no longer shown separately. The network band's rate table was replaced by a panel that points to the roadmap. The roadmap plan card, the price band and the Sabya card each show one approximate cost per order, read from the rate card at the visitor's volume (`approxCost` in `src/lib/estimate.ts`). The Sabya card shows the 299 a month rates (17 / 28) as its approximate per-order figures.
+
+Update, 30 Sept 2026 (MSG): Naqel, Landmark and Logistiq are confirmed partners. "Logistiq" follows the logo and MSG's spelling; the profile's "Logistiqa" is retired. Text lists now read: iMile · J&T · Keeta · Landmark · AJEX · Naqel · Logistiq.
+
+Domain: the website goes on www.msg-horizons.com only. msg-horizons.com (apex) stays on MSG's Odoo server (5.189.157.17); Google Workspace MX and SPF are unchanged. Once www resolves to Vercel, set NEXT_PUBLIC_SITE_URL=https://www.msg-horizons.com and redeploy. Canonicals, sitemap and hreflang then switch, and msg-horizons.vercel.app 308-redirects to www (next.config.ts).

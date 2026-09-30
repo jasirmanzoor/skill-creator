@@ -64,7 +64,7 @@ export const ar: Dictionary = {
     forWhom: "للبائعين أونلاين والمتاجر النامية والشركات في أنحاء المملكة.",
     nextStep: "أدخل أرقامك، واحصل على المسارات والمناديب والهيكل محسوبة مباشرة.",
     ctaMicro: "دون تسجيل. تؤكد مسج النطاق والسعر بعد الاطلاع على أحجامك.",
-    proofBeside: "+1,000 مندوب · +100 مركبة · 24/7 · AJEX · Keeta · iMile · Logistiqa · J&T Express",
+    proofBeside: "+1,000 مندوب · +100 مركبة · 24/7 · AJEX · Keeta · iMile · Logistiq · J&T Express · Naqel · Landmark",
     ctaPlan: "ابنِ خطتك اللوجستية",
     ctaTalk: "تحدث مع مسج عبر واتساب",
     legend: { courier: "نقطة واحدة = مندوب واحد", vehicle: "مركبات في طريقها", sweep: "عمليات على مدار الساعة" },

@@ -27,7 +27,7 @@ export const PARTNERS: { id: PartnerId; name: string | null; src: string; wide?:
   { id: "keeta", name: "Keeta", src: "/partners/keeta.png" },
   { id: "imile", name: "iMile", src: "/partners/imile.png" },
   { id: "naqel", name: "Naqel Express", src: "/partners/naqel.png" },
-  { id: "logistiqa", name: "Logistiqa", src: "/partners/logistiq.png" },
+  { id: "logistiqa", name: "Logistiq", src: "/partners/logistiq.png" },
   { id: "jt", name: "J&T Express", src: "/partners/jt-express.png" },
 ];
 

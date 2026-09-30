@@ -65,7 +65,7 @@ export const en = {
     forWhom: "For online sellers, growing stores and enterprises across the Kingdom.",
     nextStep: "Enter your numbers. Get routes, couriers and a structure, calculated live.",
     ctaMicro: "No sign-up. MSG confirms scope and pricing once they see your volumes.",
-    proofBeside: "1,000+ couriers · 100+ vehicles · 24/7 · AJEX · Keeta · iMile · Logistiqa · J&T Express",
+    proofBeside: "1,000+ couriers · 100+ vehicles · 24/7 · AJEX · Keeta · iMile · Logistiq · J&T Express · Naqel · Landmark",
     ctaPlan: "Build my logistics plan",
     ctaTalk: "Talk to MSG on WhatsApp",
     legend: { courier: "1 dot = 1 courier", vehicle: "Vehicles on route", sweep: "Operating 24/7" },

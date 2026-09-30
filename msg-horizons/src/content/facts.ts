@@ -45,7 +45,7 @@ export const facts = {
   },
 
   /** "Our Valued Partners" — 2026 profile. Text only; no third-party logos without permission. */
-  partners: ["AJEX", "Keeta", "iMile", "Logistiqa", "J&T Express"],
+  partners: ["AJEX", "Keeta", "iMile", "Logistiq", "J&T Express", "Naqel", "Landmark"],
 
   /** Services promoted on the website. Customs Clearance is excluded by project instruction. */
   services: [

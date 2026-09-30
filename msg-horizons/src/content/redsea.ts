@@ -21,7 +21,7 @@ export const TIER_FROM = 299;
 export const rateFor = (lane: Lane, monthly: number) => (monthly >= TIER_FROM ? RATE_CARD[lane].t299 : RATE_CARD[lane].walkin);
 
 /** Partners exactly as MSG listed them for this band (text, no logos). */
-export const PARTNER_TEXT = ["iMile", "J&T", "Keeta", "Landmark", "AJEX"];
+export const PARTNER_TEXT = ["iMile", "J&T", "Keeta", "Landmark", "AJEX", "Naqel", "Logistiq"];
 
 type Copy = {
   network: {
