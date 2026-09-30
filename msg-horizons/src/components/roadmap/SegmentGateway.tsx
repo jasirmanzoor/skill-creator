@@ -34,15 +34,15 @@ export default function SegmentGateway({
   const g = roadmapCopy[lang].gate;
   const reduce = useReducedMotion();
   return (
-    <div className="glass rounded-3xl p-5 sm:p-7">
+    <div className="sea-glass rounded-3xl p-5 sm:p-7">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <p className="font-display text-xl font-semibold text-white sm:text-2xl">{g.hook}</p>
-        <p className="text-sm text-white/65">{g.pick}</p>
+        <p className="font-display text-xl font-semibold text-teal-deep sm:text-2xl">{g.hook}</p>
+        <p className="text-sm text-teal-deep/75">{g.pick}</p>
       </div>
       <div role="radiogroup" aria-label={g.pick} className="mt-6 space-y-5">
         {(["individual", "business"] as const).map((grp) => (
           <div key={grp}>
-            <p className="mb-2.5 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#8ee3ad] rtl:tracking-normal">
+            <p className="mb-2.5 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-teal rtl:tracking-normal">
               {g[grp]}
               <span aria-hidden="true" className="h-px flex-1 bg-gradient-to-r from-[#4cc97a]/40 to-transparent rtl:bg-gradient-to-l" />
             </p>
@@ -67,9 +67,9 @@ export default function SegmentGateway({
           >
             <div className="mt-4 flex flex-col gap-4 rounded-2xl border border-[#4cc97a]/30 bg-[#0b7d36]/20 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
               <div>
-                <p className="text-sm text-white/70">{g.selected}</p>
-                <p className="mt-0.5 font-display text-xl font-semibold text-white">{g.segments[value].t}</p>
-                <p className="mt-1 text-sm text-white/70">
+                <p className="text-sm text-teal-deep/80">{g.selected}</p>
+                <p className="mt-0.5 font-display text-xl font-semibold text-teal-deep">{g.segments[value].t}</p>
+                <p className="mt-1 text-sm text-teal-deep/80">
                   {g.typical.replace("{n}", SEGMENT_ORDERS[value].toLocaleString("en-US"))} {g.change}
                 </p>
               </div>

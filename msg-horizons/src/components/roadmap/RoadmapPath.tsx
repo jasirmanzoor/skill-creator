@@ -108,12 +108,12 @@ export default function RoadmapPath({
         <motion.div
           aria-hidden="true"
           style={{ x: sx, y: sy, scale }}
-          className="pointer-events-none absolute left-0 top-0 -ml-24 -mt-24 size-48 rounded-full bg-[radial-gradient(circle,rgba(76,201,122,0.45),rgba(15,150,65,0.12)_45%,transparent_70%)] blur-xl"
+          className="pointer-events-none absolute left-0 top-0 -ml-24 -mt-24 size-48 rounded-full bg-[radial-gradient(circle,rgba(108,195,195,0.5),rgba(19,113,121,0.12)_45%,transparent_70%)] blur-xl"
         />
       ) : null}
 
       <svg viewBox="0 0 1000 220" className="absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
-        <path d={PATH} fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth="2" strokeDasharray="2 8" strokeLinecap="round" />
+        <path d={PATH} fill="none" stroke="rgba(19,113,121,0.25)" strokeWidth="2" strokeDasharray="2 8" strokeLinecap="round" />
         <motion.path
           d={PATH}
           fill="none"
@@ -126,8 +126,8 @@ export default function RoadmapPath({
         />
         <defs>
           <linearGradient id="roadmap-fill" x1={rtl ? "1" : "0"} x2={rtl ? "0" : "1"}>
-            <stop offset="0" stopColor="#0f9641" />
-            <stop offset="1" stopColor="#4cc97a" />
+            <stop offset="0" stopColor="#137179" />
+            <stop offset="1" stopColor="#6cc3c3" />
           </linearGradient>
         </defs>
       </svg>
@@ -155,17 +155,17 @@ export default function RoadmapPath({
                 transition={{ type: "spring", stiffness: 400, damping: 24 }}
                 className={`relative flex size-14 items-center justify-center rounded-2xl border font-display text-lg font-semibold backdrop-blur-md transition-colors duration-300 group-focus-visible:ring-2 group-focus-visible:ring-[#4cc97a] ${
                   on
-                    ? "border-[#4cc97a]/70 bg-[#0b7d36] text-white shadow-[0_0_40px_-4px_rgba(76,201,122,0.8)]"
+                    ? "border-teal bg-teal text-white shadow-[0_10px_30px_-8px_rgba(19,113,121,0.8)]"
                     : done
-                      ? "border-[#4cc97a]/40 bg-[#0f9641]/25 text-white"
-                      : "border-white/15 bg-white/[0.06] text-white/70"
+                      ? "border-teal/40 bg-sea-100 text-teal-deep"
+                      : "border-teal/25 bg-white/75 text-teal-deep/80"
                 }`}
               >
                 <span className="num">{String(i + 1).padStart(2, "0")}</span>
-                {on ? <span aria-hidden="true" className="absolute -inset-2 animate-ping rounded-2xl border border-[#4cc97a]/40 [animation-duration:2.4s] motion-reduce:hidden" /> : null}
+                {on ? <span aria-hidden="true" className="absolute -inset-2 animate-ping rounded-2xl border border-teal/40 [animation-duration:2.4s] motion-reduce:hidden" /> : null}
               </motion.span>
               <span
-                className={`absolute left-1/2 top-full mt-3 w-36 -translate-x-1/2 text-center text-[13px] leading-tight transition-colors ${lit ? "text-white" : "text-white/55"}`}
+                className={`absolute left-1/2 top-full mt-3 w-36 -translate-x-1/2 text-center text-[13px] leading-tight transition-colors ${lit ? "text-teal-deep" : "text-teal-deep/70"}`}
                 dir="auto"
               >
                 {labels[i]}

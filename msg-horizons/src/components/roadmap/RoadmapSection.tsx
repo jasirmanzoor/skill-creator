@@ -1,6 +1,6 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element -- local, pre-optimised webp backdrop */
+ 
 import { motion, useScroll, useTransform } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { roadmapCopy, SEGMENT_ORDERS, SEGMENT_PERSONA, type Segment } from "@/content/roadmap";
@@ -9,6 +9,7 @@ import { DEFAULT_SIZER, type SizerInput } from "@/lib/sizer";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { track } from "@/lib/analytics";
 import HookRoll from "./HookRoll";
+import EmbeddedPhoto from "../ui/EmbeddedPhoto";
 import SegmentGateway from "./SegmentGateway";
 import RoadmapPath from "./RoadmapPath";
 import StepStage, { TOUR_MS } from "./StepStage";
@@ -67,20 +68,20 @@ export default function RoadmapSection({ t, lang }: { t: Dictionary; lang: Local
   };
 
   return (
-    <section id="journey" ref={ref} aria-labelledby="roadmap-title" data-theme="dark" className="on-dark relative scroll-mt-16 overflow-hidden bg-[#04110a] py-24 text-white lg:py-32">
-      {/* backdrop: MSG warehouse, blurred, with slow parallax and brand light */}
+    <section id="journey" ref={ref} aria-labelledby="roadmap-title" className="sea-band relative scroll-mt-16 overflow-hidden py-24 text-teal-deep lg:py-32">
+      {/* backdrop: MSG's warehouse dissolved into the sea-glass light, with a slow parallax */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden [contain:paint]">
-        <motion.div style={reduce ? undefined : { y: bgY }} className="absolute -inset-y-[8%] inset-x-0">
-          <img src="/photos/clean/warehouse.webp" alt="" className="h-full w-full scale-110 object-cover opacity-30 blur-2xl" />
+        <motion.div style={reduce ? undefined : { y: bgY }} className="absolute inset-x-0 -top-[8%] h-[70%]">
+          <EmbeddedPhoto src="/photos/clean/warehouse.webp" tone="teal" fade="bottom" strength={0.35} className="size-full opacity-25" />
         </motion.div>
       </div>
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_15%_0%,rgba(15,150,65,0.35),transparent_70%),radial-gradient(50%_40%_at_90%_40%,rgba(76,201,122,0.18),transparent_70%),linear-gradient(to_bottom,rgba(4,17,10,0.55),#04110a_85%)]" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_40%_at_85%_0%,rgba(196,233,231,0.7),transparent_70%),linear-gradient(to_bottom,rgba(243,251,251,0.2),#f3fbfb_55%)]" />
 
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         {/* entry gate */}
         <div className="max-w-4xl">
-          <p className="text-sm font-semibold text-[#4cc97a]">{c.eyebrow}</p>
-          <HookRoll phrases={c.rolls} className="mt-3 text-lg font-medium text-white/85 sm:text-xl" />
+          <p className="text-sm font-semibold text-teal">{c.eyebrow}</p>
+          <HookRoll phrases={c.rolls} className="mt-3 text-lg font-medium text-teal-deep/90 sm:text-xl" />
           <h2 id="roadmap-title" className="mt-2 font-display text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-balance sm:text-6xl rtl:leading-[1.3] rtl:tracking-normal">
             {c.title}
           </h2>
@@ -96,13 +97,13 @@ export default function RoadmapSection({ t, lang }: { t: Dictionary; lang: Local
         </div>
 
         {/* the roadmap */}
-        <div className="glass mt-6 rounded-3xl p-5 sm:p-8">
+        <div className="sea-glass mt-6 rounded-3xl p-5 sm:p-8">
           <RoadmapPath labels={c.steps.map((s) => s.t)} active={step} onSelect={go} stepLabel={c.stepLabel} rtl={lang === "ar"} />
           {/* mobile step rail */}
           <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 md:hidden" role="tablist" aria-label={c.stepLabel}>
             {c.steps.map((s, i) => (
               <button key={s.t} type="button" role="tab" aria-selected={i === step} aria-controls="roadmap-stage" onClick={() => go(i)}
-                className={`num shrink-0 rounded-xl border px-3.5 py-2 text-sm font-semibold transition-colors ${i === step ? "border-[#4cc97a]/60 bg-[#0b7d36] text-white" : i < step ? "border-[#4cc97a]/30 bg-[#0f9641]/20 text-white" : "border-white/15 text-white/60"}`}>
+                className={`num shrink-0 rounded-xl border px-3.5 py-2 text-sm font-semibold transition-colors ${i === step ? "border-teal bg-teal text-white" : i < step ? "border-teal/30 bg-sea-100 text-teal-deep" : "border-teal/23 text-teal-deep/75"}`}>
                 {String(i + 1).padStart(2, "0")}
               </button>
             ))}
@@ -111,9 +112,9 @@ export default function RoadmapSection({ t, lang }: { t: Dictionary; lang: Local
             <StepStage lang={lang} step={step} dir={dir} segment={segment} net={net} touring={touring} onTour={() => { setTouring((t) => !t); track("cta_click", { cta: "tour", location: "roadmap" }); }} />
           </div>
           <div className="mt-5 flex items-center justify-between gap-3">
-            <button type="button" onClick={() => go(Math.max(0, step - 1))} disabled={step === 0} className="rounded-full px-4 py-2 text-sm text-white/70 transition-opacity hover:text-white disabled:opacity-30">{c.prev}</button>
+            <button type="button" onClick={() => go(Math.max(0, step - 1))} disabled={step === 0} className="rounded-full px-4 py-2 text-sm text-teal-deep/80 transition-opacity hover:text-teal-deep disabled:opacity-30">{c.prev}</button>
             {step < 5 ? (
-              <button type="button" onClick={() => go(step + 1)} className="rounded-full bg-white/10 px-5 py-2.5 text-sm font-semibold text-white ring-1 ring-white/20 backdrop-blur hover:bg-white/15">{c.next}</button>
+              <button type="button" onClick={() => go(step + 1)} className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-teal-deep ring-1 ring-teal/28 backdrop-blur hover:bg-white">{c.next}</button>
             ) : (
               <button type="button" onClick={toEstimator} className="rounded-full bg-[#0b7d36] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_0_30px_-6px_rgba(76,201,122,0.9)] hover:bg-[#12a84b]">{c.toEstimator}</button>
             )}

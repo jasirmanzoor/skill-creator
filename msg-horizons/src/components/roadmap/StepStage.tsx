@@ -33,16 +33,16 @@ export default function StepStage({
   return (
     <div id="roadmap-stage" role="tabpanel" aria-live="polite" className="relative mt-4 overflow-hidden rounded-3xl">
       <AnimatePresence mode="wait" initial={false} custom={dir}>
-        <motion.div key={step} {...pop} className="journey-card relative grid overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] md:grid-cols-[1.15fr_1fr]" data-active>
+        <motion.div key={step} {...pop} className="journey-card relative grid overflow-hidden rounded-3xl border border-teal/18 bg-white/75 md:grid-cols-[1.15fr_1fr]" data-active>
           <div className="relative">
             <GuideDevice lang={lang} step={step} segment={segment} net={net} />
           </div>
           <div className="flex flex-col justify-center p-6 sm:p-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#4cc97a] rtl:tracking-normal">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal rtl:tracking-normal">
               {c.stepLabel} <span className="num">{String(step + 1).padStart(2, "0")}</span> / <span className="num">06</span>
             </p>
-            <h3 className="mt-3 font-display text-3xl font-semibold tracking-[-0.02em] text-white rtl:tracking-normal">{s.t}</h3>
-            <p className="mt-3 text-lg text-white/70">{s.d}</p>
+            <h3 className="mt-3 font-display text-3xl font-semibold tracking-[-0.02em] text-teal-deep rtl:tracking-normal">{s.t}</h3>
+            <p className="mt-3 text-lg text-teal-deep/80">{s.d}</p>
             <dl className="mt-6 grid gap-3">
               {([[gc.you, role.you, "you"], [gc.msg, role.msg, "msg"]] as const).map(([k, v, who], i) => (
                 <motion.div
@@ -50,23 +50,23 @@ export default function StepStage({
                   initial={reduce ? false : { opacity: 0, x: 12 * dir }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.15 + i * 0.1, duration: 0.4 }}
-                  className={`rounded-2xl p-4 ring-1 ${who === "you" ? "bg-white/[0.06] ring-white/10" : "bg-[#0b7d36]/25 ring-[#4cc97a]/30"}`}
+                  className={`rounded-2xl p-4 ring-1 ${who === "you" ? "bg-white/75 ring-teal/18" : "bg-sea-100 ring-teal/30"}`}
                 >
-                  <dt className={`text-xs font-semibold ${who === "you" ? "text-white/60" : "text-[#4cc97a]"}`}>{k}</dt>
-                  <dd className="mt-1 text-white/90">{v}</dd>
+                  <dt className={`text-xs font-semibold ${who === "you" ? "text-teal-deep/75" : "text-teal"}`}>{k}</dt>
+                  <dd className="mt-1 text-teal-deep/95">{v}</dd>
                 </motion.div>
               ))}
             </dl>
             <ul className="mt-4 flex flex-wrap gap-1.5">
               {s.points.map((pt) => (
-                <li key={pt} className="rounded-full bg-white/[0.06] px-3 py-1 text-xs text-white/75 ring-1 ring-white/10">{pt}</li>
+                <li key={pt} className="rounded-full bg-white/75 px-3 py-1 text-xs text-teal-deep/80 ring-1 ring-teal/18">{pt}</li>
               ))}
             </ul>
-            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4">
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-teal/18 pt-4">
               {step < 5 ? (
-                <p className="text-sm text-white/60">{gc.nextUp}: <span className="font-medium text-white">{c.steps[step + 1].t}</span></p>
+                <p className="text-sm text-teal-deep/75">{gc.nextUp}: <span className="font-medium text-teal-deep">{c.steps[step + 1].t}</span></p>
               ) : <span />}
-              <button type="button" onClick={onTour} aria-pressed={touring} className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20 hover:bg-white/15">
+              <button type="button" onClick={onTour} aria-pressed={touring} className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-teal-deep ring-1 ring-teal/28 hover:bg-white">
                 {touring ? (
                   <svg viewBox="0 0 12 12" className="size-3" aria-hidden="true"><path d="M3 2h2v8H3zM7 2h2v8H7z" fill="currentColor" /></svg>
                 ) : (
@@ -78,7 +78,7 @@ export default function StepStage({
           </div>
           {/* guided tour progress */}
           {touring && !reduce ? (
-            <motion.span key={`tour-${step}`} aria-hidden="true" className="absolute inset-x-0 top-0 h-0.5 origin-left bg-[#4cc97a] rtl:origin-right" initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: TOUR_MS / 1000, ease: "linear" }} />
+            <motion.span key={`tour-${step}`} aria-hidden="true" className="absolute inset-x-0 top-0 h-0.5 origin-left bg-teal rtl:origin-right" initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: TOUR_MS / 1000, ease: "linear" }} />
           ) : null}
           {/* holographic flash-up */}
           {!reduce ? (

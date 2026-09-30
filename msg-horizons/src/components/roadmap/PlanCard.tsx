@@ -67,50 +67,50 @@ export default function PlanCard({
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#4cc97a] rtl:tracking-normal">{c.eyebrow}</p>
-          <h3 className="mt-2 font-display text-4xl font-semibold tracking-[-0.03em] text-white rtl:tracking-normal">{t.planner.result.models[plan.model].name}</h3>
-          <p className="mt-2 max-w-2xl text-white/70">{sc.headline(s, net)}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal rtl:tracking-normal">{c.eyebrow}</p>
+          <h3 className="mt-2 font-display text-4xl font-semibold tracking-[-0.03em] text-teal-deep rtl:tracking-normal">{t.planner.result.models[plan.model].name}</h3>
+          <p className="mt-2 max-w-2xl text-teal-deep/80">{sc.headline(s, net)}</p>
         </div>
-        <button type="button" onClick={onEdit} className="rounded-full border border-white/20 px-4 py-2 text-sm text-white/80 hover:border-white/50 hover:text-white">{c.edit}</button>
+        <button type="button" onClick={onEdit} className="rounded-full border border-teal/28 px-4 py-2 text-sm text-teal-deep/85 hover:border-teal/40 hover:text-teal-deep">{c.edit}</button>
       </div>
 
       <div className="mt-8 grid gap-4 lg:grid-cols-3">
-        <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-md">
-          <h4 className="text-sm font-semibold text-white/80">{c.config}</h4>
+        <section className="rounded-2xl border border-teal/18 bg-white/75 p-5 backdrop-blur-md">
+          <h4 className="text-sm font-semibold text-teal-deep/85">{c.config}</h4>
           <ul className="mt-4 space-y-3">
             {plan.modules.map((m, k) => (
               <motion.li key={m.id} {...stagger(k)} className="flex items-center gap-3">
-                <span className={`inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${m.core ? "bg-[#0b7d36] text-white" : "bg-white/10 text-[#4cc97a]"}`}><ServiceIcon id={m.id} className="size-4" /></span>
-                <span className="text-sm text-white/90">{t.planner.services[m.id].name}</span>
+                <span className={`inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${m.core ? "bg-[#0b7d36] text-white" : "bg-white text-teal"}`}><ServiceIcon id={m.id} className="size-4" /></span>
+                <span className="text-sm text-teal-deep/95">{t.planner.services[m.id].name}</span>
               </motion.li>
             ))}
           </ul>
         </section>
 
-        <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-md">
-          <h4 className="text-sm font-semibold text-white/80">{c.assets}</h4>
+        <section className="rounded-2xl border border-teal/18 bg-white/75 p-5 backdrop-blur-md">
+          <h4 className="text-sm font-semibold text-teal-deep/85">{c.assets}</h4>
           <dl className="mt-4 divide-y divide-white/10">
             {assets.map(([k, v], i) => (
               <motion.div key={k} {...stagger(i)} className="flex items-baseline justify-between gap-3 py-2.5">
-                <dt className="text-sm text-white/55">{k}</dt>
-                <dd className={`text-end ${typeof v === "number" ? "num font-display text-2xl font-semibold text-white" : "text-sm font-medium text-white"}`}>{typeof v === "number" ? v.toLocaleString("en-US") : v}</dd>
+                <dt className="text-sm text-teal-deep/70">{k}</dt>
+                <dd className={`text-end ${typeof v === "number" ? "num font-display text-2xl font-semibold text-teal-deep" : "text-sm font-medium text-teal-deep"}`}>{typeof v === "number" ? v.toLocaleString("en-US") : v}</dd>
               </motion.div>
             ))}
           </dl>
         </section>
 
-        <section className="flex flex-col rounded-2xl border border-[#4cc97a]/30 bg-gradient-to-b from-[#0f9641]/25 to-white/[0.03] p-5 backdrop-blur-md">
-          <h4 className="text-sm font-semibold text-white/80">{c.cost}</h4>
+        <section className="flex flex-col rounded-2xl border border-teal/30 bg-gradient-to-b from-sea-100 to-white/80 p-5 backdrop-blur-md">
+          <h4 className="text-sm font-semibold text-teal-deep/85">{c.cost}</h4>
           <p className="mt-4" data-rate-card>
-            <span className="num block font-display text-4xl font-semibold text-white" dir={lang === "ar" ? "rtl" : "ltr"}>
-              <span className="text-xl text-white/70">≈ </span>
-              {lang === "ar" ? <>{cur(cost.perOrder)} <span className="text-xl text-white/70">ريال</span></> : <><span className="text-xl text-white/70">SAR</span> {cur(cost.perOrder)}</>}
+            <span className="num block font-display text-4xl font-semibold text-teal-deep" dir={lang === "ar" ? "rtl" : "ltr"}>
+              <span className="text-xl text-teal-deep/80">≈ </span>
+              {lang === "ar" ? <>{cur(cost.perOrder)} <span className="text-xl text-teal-deep/80">ريال</span></> : <><span className="text-xl text-teal-deep/80">SAR</span> {cur(cost.perOrder)}</>}
             </span>
-            <span className="mt-2 block text-sm text-white/70">
+            <span className="mt-2 block text-sm text-teal-deep/80">
               {c.costMonthly.replace("{total}", cost.monthly.toLocaleString("en-US")).replace("{n}", cost.orders.toLocaleString("en-US"))}
             </span>
           </p>
-          <p className="mt-3 text-sm text-white/65">{c.costNote}</p>
+          <p className="mt-3 text-sm text-teal-deep/75">{c.costNote}</p>
           <div className="mt-auto grid gap-2 pt-5">
             <a
               href={whatsappLink(`${t.wa.planIntro}\n\n${summary}`)}
@@ -129,14 +129,14 @@ export default function PlanCard({
                 document.getElementById("contact")?.scrollIntoView({ behavior: "smooth", block: "start" });
                 window.setTimeout(() => document.getElementById("lead-name")?.focus({ preventScroll: true }), 700);
               }}
-              className="inline-flex items-center justify-center rounded-xl border border-white/25 px-4 py-3 font-medium text-white hover:border-white/60"
+              className="inline-flex items-center justify-center rounded-xl border border-teal/33 px-4 py-3 font-medium text-teal-deep hover:border-teal/40"
             >
               {c.send}
             </button>
           </div>
         </section>
       </div>
-      <p className="mt-4 text-xs text-white/50">{c.example}</p>
+      <p className="mt-4 text-xs text-teal-deep/65">{c.example}</p>
     </motion.div>
   );
 }

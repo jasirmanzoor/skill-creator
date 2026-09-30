@@ -149,19 +149,19 @@ body {
     0 60px 120px -60px rgba(15, 150, 65, 0.35);
 }
 .theme-shine {
-  background-image: linear-gradient(100deg, rgba(255, 255, 255, 0.6) 20%, #b5f5cc 45%, rgba(255, 255, 255, 0.6) 70%);
+  background-image: linear-gradient(100deg, #137179 20%, #6cc3c3 45%, #137179 70%);
   background-size: 250% 100%;
   animation: theme-shine 4.5s ease-in-out infinite;
 }
 @keyframes theme-shine { 0% { background-position: 100% 0; } 60%, 100% { background-position: 0 0; } }
 .est-range { -webkit-appearance: none; appearance: none; height: 24px; background: transparent; cursor: pointer; }
-.est-range::-webkit-slider-runnable-track { height: 4px; border-radius: 99px; background: rgba(255, 255, 255, 0.18); }
-.est-range::-moz-range-track { height: 4px; border-radius: 99px; background: rgba(255, 255, 255, 0.18); }
-.est-range::-moz-range-progress { height: 4px; border-radius: 99px; background: #4cc97a; }
-.est-range::-webkit-slider-thumb { -webkit-appearance: none; margin-top: -9px; width: 22px; height: 22px; border-radius: 99px; background: #fff; box-shadow: 0 0 0 5px rgba(76, 201, 122, 0.35), 0 4px 12px rgba(0, 0, 0, 0.4); }
-.est-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 99px; background: #fff; border: 0; box-shadow: 0 0 0 5px rgba(76, 201, 122, 0.35); }
+.est-range::-webkit-slider-runnable-track { height: 4px; border-radius: 99px; background: rgba(19, 113, 121, 0.2); }
+.est-range::-moz-range-track { height: 4px; border-radius: 99px; background: rgba(19, 113, 121, 0.2); }
+.est-range::-moz-range-progress { height: 4px; border-radius: 99px; background: #137179; }
+.est-range::-webkit-slider-thumb { -webkit-appearance: none; margin-top: -9px; width: 22px; height: 22px; border-radius: 99px; background: #fff; box-shadow: 0 0 0 5px rgba(19, 113, 121, 0.3), 0 4px 12px rgba(11, 58, 64, 0.3); }
+.est-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 99px; background: #fff; border: 0; box-shadow: 0 0 0 5px rgba(19, 113, 121, 0.3); }
 .est-range:focus-visible { outline: none; }
-.est-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 6px rgba(76, 201, 122, 0.7); }
+.est-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 6px rgba(19, 113, 121, 0.6); }
 @media (prefers-reduced-motion: reduce) { .theme-shine { animation: none; background-position: 50% 0; } }
 
 /* Numbers always render LTR, even inside Arabic text. */
