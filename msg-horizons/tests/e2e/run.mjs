@@ -77,7 +77,8 @@ await test("SEO: metadata, hreflang, JSON-LD, sitemap, robots, OG image", async 
 await test("no forbidden claims in rendered copy", async () => {
   for (const lang of ["en", "ar"]) {
     const html = await (await fetch(`${BASE}/${lang}`)).text();
-    const text = html.replace(/<(script|style)[\s\S]*?<\/\1>/g, "").replace(/<[^>]+>/g, " ");
+    // <output> holds the visitor's own slider values (e.g. "30%" cash share), not site claims
+    const text = html.replace(/<(script|style|output)[\s\S]*?<\/\1>/g, "").replace(/<[^>]+>/g, " ");
     assert.ok(!/customs|تخليص جمركي/i.test(text), `${lang}: customs clearance must not be promoted`);
     assert.ok(!/amazon/i.test(text), `${lang}: no Amazon comparison`);
     assert.ok(!/\bSAR\s?\d+(?![\d,.]*M\+)/.test(text), `${lang}: no pricing in SAR`);
@@ -140,7 +141,7 @@ await test("network sizer recalculates live as inputs change", async () => {
   await page.locator("#planner input[type=range]").first().fill("900");
   await page.waitForTimeout(900);
   assert.notEqual(await peak(), before, "peak couriers should change with orders");
-  await page.getByRole("radio", { name: "Across the Kingdom" }).click();
+  await page.locator("#planner").getByRole("radio", { name: "Across the Kingdom" }).click();
   await page.getByRole("button", { name: /Continue/ }).click();
   await page.getByRole("button", { name: /Build my plan/ }).last().click();
   await page.getByText("Scheduled land freight between cities").waitFor();
@@ -166,11 +167,11 @@ await test("service landing pages: indexable, one h1, FAQ + Service schema, in s
   assert.equal((await fetch(`${BASE}/en/services/not-a-service`)).status, 404);
 });
 
-await test("experience: seller questions, 7-step journey, partner logos load", async () => {
+await test("experience: seller questions, 6-step roadmap, partner logos load", async () => {
   for (const lang of ["en", "ar"]) {
     const { page, ctx, errors } = await open(`/${lang}`);
     assert.equal(await page.locator("#sellers .need-card").count(), 9, `${lang}: nine seller questions`);
-    assert.equal(await page.locator("#journey ol li").count() >= 7, true, `${lang}: journey stages`);
+    assert.ok(await page.locator("#journey [role=tab]").count() >= 6, `${lang}: roadmap steps`);
     await page.locator("#partners").scrollIntoViewIfNeeded();
     await page.waitForTimeout(600);
     const logos = await page.locator("#partners img").evaluateAll((els) => els.map((e) => [e.getAttribute("alt"), e.complete && e.naturalWidth > 0]));
@@ -179,6 +180,31 @@ await test("experience: seller questions, 7-step journey, partner logos load", a
     assert.deepEqual(errors, []);
     await ctx.close();
   }
+});
+
+await test("roadmap: segment → steps → estimator → curated plan (no invented price)", async () => {
+  const { page, ctx, errors } = await open("/en");
+  const sec = page.locator("#journey");
+  await sec.scrollIntoViewIfNeeded();
+  await sec.getByRole("radio", { name: /Scaling SMEs/ }).first().click();
+  const stage = page.locator("#roadmap-stage");
+  await page.locator("#journey").getByRole("button", { name: "Next step" }).click();
+  await stage.getByText("We map your requirements").waitFor();
+  for (let k = 0; k < 4; k++) await page.locator("#journey").getByRole("button", { name: "Next step" }).click();
+  await stage.getByText("Testing & go-live").waitFor();
+  const est = page.locator("#estimator");
+  await est.locator("input[type=range]").nth(1).fill("40");
+  await est.getByRole("button", { name: "Generate my plan" }).click();
+  await est.getByText("Curated recommendation plan").waitFor();
+  const txt = await est.innerText();
+  assert.ok(/Priced by MSG for your volumes/.test(txt), "cost stays with MSG until a rate card exists");
+  assert.ok(!/SAR\s?\d/.test(txt), "no invented SAR figure");
+  const wa = await est.getByRole("link", { name: /Get my quote on WhatsApp/ }).getAttribute("href");
+  assert.match(wa, /^https:\/\/wa\.me\/966578061556\?text=/);
+  await est.getByRole("button", { name: "Send plan to MSG" }).click();
+  await page.getByText("Your logistics plan is attached").waitFor();
+  assert.deepEqual(errors, []);
+  await ctx.close();
 });
 
 await test("shared plan link opens directly on the result", async () => {

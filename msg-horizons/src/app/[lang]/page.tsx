@@ -9,7 +9,7 @@ import Planner from "@/components/sections/Planner";
 import TrustBar from "@/components/sections/TrustBar";
 import Interlude from "@/components/Interlude";
 import Needs from "@/components/sections/Needs";
-import Journey from "@/components/sections/Journey";
+import RoadmapSection from "@/components/roadmap/RoadmapSection";
 import Partners from "@/components/sections/Partners";
 import Services from "@/components/sections/Services";
 import Fleet from "@/components/sections/Fleet";
@@ -38,7 +38,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         <Needs lang={lang} />
         <Planner t={t} lang={lang} />
         <Interlude lines={t.interludes.scale} label={t.interludes.scaleLabel} scene="scale" />
-        <Journey lang={lang} />
+        <RoadmapSection t={t} lang={lang} />
         <Services t={t} lang={lang} />
         <Fleet t={t} lang={lang} />
         <Partners lang={lang} />
