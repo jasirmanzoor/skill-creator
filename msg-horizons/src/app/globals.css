@@ -21,6 +21,14 @@
   --color-brand-soft: #e8f5ec;
   --color-brand-bright: #4cc97a; /* on dark backgrounds only */
   --color-whatsapp: #128c4a;
+  /* Red Sea glass: daylight Jeddah water */
+  --color-sea-50: #f3fbfb;
+  --color-sea-100: #e2f4f3;
+  --color-sea-200: #c4e9e7;
+  --color-sea-400: #6cc3c3;
+  --color-teal: #137179;
+  --color-teal-deep: #0b3a40;
+  --color-silver: #c3cdd2;
   --color-danger: #b42318;
 
   --font-display: var(--font-display-latin), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
@@ -76,9 +84,6 @@ body {
 }
 .on-dark .label { color: var(--color-brand-bright); }
 
-/* Cinematic cut: the MSG landmark steps out of frame while an interlude statement is pinned. */
-.msg-landmark { transition: opacity 0.7s var(--ease-out-expo); }
-html[data-interlude] .msg-landmark { opacity: 0; }
 
 /* Seller needs grid (components/sections/Needs.tsx) */
 .need-card {
@@ -224,3 +229,53 @@ html[data-interlude] .msg-landmark { opacity: 0; }
 .sizer-range:active::-webkit-slider-thumb { transform: scale(1.15); }
 .sizer-range:focus-visible { outline: none; }
 .sizer-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(11,125,54, 0.25); }
+
+/* ---------- Red Sea glass (network band, price band, peak flow) ---------- */
+.sea-band {
+  background:
+    radial-gradient(90% 60% at 85% 0%, rgba(196, 233, 231, 0.9), transparent 70%),
+    radial-gradient(70% 50% at 0% 100%, rgba(226, 244, 243, 0.95), transparent 70%),
+    linear-gradient(180deg, #f3fbfb 0%, #ffffff 100%);
+  color: var(--color-teal-deep);
+}
+.sea-band .label { color: var(--color-teal); }
+.sea-glass {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.78), rgba(226, 244, 243, 0.55));
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 2px rgba(11, 58, 64, 0.06),
+    0 24px 48px -28px rgba(19, 113, 121, 0.45);
+}
+/* Corniche scene */
+.corniche-sky { background: linear-gradient(180deg, #bfe6ee 0%, #dff3f4 55%, #f4fbfb 100%); }
+.corniche-sea {
+  background: linear-gradient(180deg, #7cc8cc 0%, #3ea3ad 45%, #1f7f8c 100%);
+}
+.corniche-sparkle {
+  background-image:
+    radial-gradient(2px 1px at 12% 30%, #fff 60%, transparent 100%),
+    radial-gradient(3px 1px at 27% 62%, #fff 60%, transparent 100%),
+    radial-gradient(2px 1px at 44% 22%, #fff 60%, transparent 100%),
+    radial-gradient(4px 1px at 58% 70%, #fff 60%, transparent 100%),
+    radial-gradient(2px 1px at 71% 40%, #fff 60%, transparent 100%),
+    radial-gradient(3px 1px at 86% 58%, #fff 60%, transparent 100%),
+    radial-gradient(2px 1px at 93% 26%, #fff 60%, transparent 100%);
+  background-size: 260px 60px;
+  animation: sparkle-drift 9s linear infinite, sparkle-twinkle 2.6s ease-in-out infinite;
+}
+@keyframes sparkle-drift { to { background-position: -260px 0; } }
+@keyframes sparkle-twinkle { 50% { opacity: 0.45; } }
+.corniche-road { background: linear-gradient(180deg, #d9e1e4 0%, #aab6bc 18%, #8e9ca3 60%, #7b8a92 100%); }
+.corniche-lane {
+  background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.85) 0 46px, transparent 46px 110px);
+  background-size: 110px 100%;
+  animation: lane-run 1.4s linear infinite;
+}
+@keyframes lane-run { to { background-position: 110px 0; } }
+.sea-range { accent-color: var(--color-teal); }
+@media (prefers-reduced-motion: reduce) {
+  .corniche-sparkle, .corniche-lane { animation: none; }
+}

@@ -7,7 +7,9 @@ import NetworkPanel from "@/components/hero/NetworkPanel";
 import HorizonBackdrop from "@/components/HorizonBackdrop";
 import Planner from "@/components/sections/Planner";
 import TrustBar from "@/components/sections/TrustBar";
-import Interlude from "@/components/Interlude";
+import NetworkBand from "@/components/sections/NetworkBand";
+import GrowthBand from "@/components/sections/GrowthBand";
+import { hasPublicFile } from "@/lib/photo-slot";
 import Needs from "@/components/sections/Needs";
 import RoadmapSection from "@/components/roadmap/RoadmapSection";
 import Partners from "@/components/sections/Partners";
@@ -37,14 +39,14 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         <TrustBar t={t} lang={lang} />
         <Needs lang={lang} />
         <Planner t={t} lang={lang} />
-        <Interlude lines={t.interludes.scale} label={t.interludes.scaleLabel} scene="scale" />
+        <NetworkBand lang={lang} coastPhoto={hasPublicFile("coast.jpg")} />
         <RoadmapSection t={t} lang={lang} />
         <Services t={t} lang={lang} />
         <Fleet t={t} lang={lang} />
         <Partners lang={lang} />
         <Proof t={t} />
         <Gallery t={t} lang={lang} />
-        <Interlude lines={t.interludes.growth} label={t.interludes.growthLabel} scene="growth" />
+        <GrowthBand lang={lang} warehousePhoto={hasPublicFile("warehouse.jpg")} />
         <Enterprise t={t} />
         <Contact t={t} lang={lang} />
       </main>

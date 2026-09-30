@@ -14,10 +14,10 @@ export default function WorkforcePipeline({ stages, site }: { stages: Stage[]; s
   return (
     <div>
       <div className="relative hidden h-10 sm:block" aria-hidden="true">
-        <div className="absolute inset-x-[10%] top-1/2 h-px bg-white/15" />
+        <div className="absolute inset-x-[10%] top-1/2 h-px bg-teal/25" />
         {!reduce ? (
           <motion.span
-            className="absolute top-1/2 size-2 -translate-y-1/2 rounded-full bg-brand-bright shadow-[0_0_12px_rgba(76,201,122,0.8)]"
+            className="absolute top-1/2 size-2 -translate-y-1/2 rounded-full bg-teal shadow-[0_0_12px_rgba(19,113,121,0.6)]"
             animate={{ left: ["10%", "90%"] }}
             transition={{ duration: 6, ease: "linear", repeat: Infinity }}
           />
@@ -26,24 +26,24 @@ export default function WorkforcePipeline({ stages, site }: { stages: Stage[]; s
           <span
             key={i}
             className={`absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 transition-colors rtl:translate-x-1/2 ${
-              i === active ? "border-brand-bright bg-brand-bright" : "border-white/40 bg-ink"
+              i === active ? "border-teal bg-teal" : "border-teal/40 bg-white"
             }`}
             style={{ insetInlineStart: `${10 + i * 20}%` }}
           />
         ))}
       </div>
-      <ol className="grid gap-px overflow-hidden rounded-lg border border-white/10 bg-white/10 sm:grid-cols-5">
+      <ol className="grid gap-px overflow-hidden rounded-lg border border-teal/15 bg-teal/10 sm:grid-cols-5">
         {all.map((s, i) => (
           <li key={s.t}>
             <button
               type="button"
               onMouseEnter={() => setActive(i)}
               onFocus={() => setActive(i)}
-              className={`h-full w-full p-5 text-start transition-colors ${i === active ? "bg-white/[0.08]" : "bg-ink-2/90 hover:bg-white/[0.05]"}`}
+              className={`h-full w-full p-5 text-start transition-colors ${i === active ? "bg-sea-100" : "bg-white/80 hover:bg-sea-50"}`}
             >
-              <span className={`num text-sm ${i === active ? "text-white" : "text-brand-bright"}`}>{i < 4 ? `0${i + 1}` : "→"}</span>
-              <span className="mt-2 block font-semibold text-white">{s.t}</span>
-              <span className="mt-1 block text-sm text-white/65">{s.d}</span>
+              <span className={`num text-sm ${i === active ? "text-teal-deep" : "text-teal"}`}>{i < 4 ? `0${i + 1}` : "→"}</span>
+              <span className="mt-2 block font-semibold text-teal-deep">{s.t}</span>
+              <span className="mt-1 block text-sm text-teal-deep/75">{s.d}</span>
             </button>
           </li>
         ))}

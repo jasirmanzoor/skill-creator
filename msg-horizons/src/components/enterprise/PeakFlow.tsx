@@ -13,6 +13,9 @@ const forecast = demand.map((d, i) => d * (1 + 0.05 * Math.sin(i * 1.7)));
 const BASE = 0.34;
 const planned = forecast.map((f) => Math.max(BASE, Math.min(1, f * 1.08)));
 
+// MSG operations photography, one per stage: forecast, ready, mobilise, control, demobilise
+const PHOTOS = ["/photos/office.webp", "/photos/team.webp", "/photos/courier-mall.webp", "/photos/fleet-car.webp", "/photos/warehouse.webp"];
+
 const W = 560, H = 300, PAD = 28;
 const x = (i: number) => PAD + (i / (N - 1)) * (W - PAD * 2);
 const y = (v: number) => H - PAD - v * (H - PAD * 2.4);
@@ -30,7 +33,7 @@ export default function PeakFlow({ stages, labels }: { stages: Stage[]; labels: 
           if (e.isIntersecting) setStep(Number((e.target as HTMLElement).dataset.step));
         });
       },
-      { rootMargin: "-45% 0px -45% 0px" },
+      { rootMargin: "-70% 0px -25% 0px" },
     );
     refs.current.forEach((el) => el && io.observe(el));
     return () => io.disconnect();
@@ -44,37 +47,19 @@ export default function PeakFlow({ stages, labels }: { stages: Stage[]; labels: 
   };
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
-      <ol className="order-2 lg:order-1">
-        {stages.map((s, i) => (
-          <li
-            key={s.t}
-            ref={(el) => { refs.current[i] = el; }}
-            data-step={i}
-            className="flex min-h-[40vh] items-center lg:min-h-[50vh]"
-          >
-            <div className="transition-colors duration-500">
-              <span className={`num text-sm transition-colors ${step === i ? "text-brand-bright" : "text-white/55"}`}>0{i + 1} / 05</span>
-              <h4 className={`mt-2 font-display text-3xl font-semibold transition-colors sm:text-4xl ${step === i ? "text-white" : "text-white/55"}`}>{s.t}</h4>
-              <p className={`mt-3 max-w-sm text-lg transition-colors ${step === i ? "text-white/80" : "text-white/55"}`}>{s.d}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
-
-      <div className="order-1 lg:order-2">
-        <div className="sticky top-20 z-10 rounded-xl border border-white/10 bg-ink-2/90 p-4 backdrop-blur sm:p-6 lg:top-28">
-          <div className="mb-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-white/65">
-            <span className="flex items-center gap-2"><span className="h-0.5 w-5 bg-white" />{labels.demand}</span>
-            <span className="flex items-center gap-2"><span className="h-3 w-2.5 rounded-sm bg-brand-bright" />{labels.capacity}</span>
-            <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-white" />{labels.standby}</span>
+    <div className="grid gap-6 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
+      {/* the chart: pinned while the stages scroll past (on phones too, so there is never an empty screen) */}
+      <div className="sticky top-[68px] z-10 self-start lg:order-2 lg:top-28">
+        <div className="rounded-2xl border border-white bg-white p-4 shadow-[0_24px_48px_-28px_rgba(19,113,121,0.5)] sm:p-6">
+          <div className="mb-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-teal-deep/75">
+            <span className="flex items-center gap-2"><span className="h-0.5 w-5 bg-teal-deep" />{labels.demand}</span>
+            <span className="flex items-center gap-2"><span className="h-3 w-2.5 rounded-sm bg-teal" />{labels.capacity}</span>
+            <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-sea-400" />{labels.standby}</span>
           </div>
           <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label={`${stages[step].t}: ${stages[step].d}. ${labels.illustrative}`}>
-            {/* grid */}
             {[0.25, 0.5, 0.75, 1].map((g) => (
-              <line key={g} x1={PAD} x2={W - PAD} y1={y(g)} y2={y(g)} stroke="rgba(255,255,255,0.06)" />
+              <line key={g} x1={PAD} x2={W - PAD} y1={y(g)} y2={y(g)} stroke="rgba(19,113,121,0.1)" />
             ))}
-            {/* capacity bars */}
             {Array.from({ length: N }, (_, i) => {
               const v = capacity(i);
               const released = step >= 4 && i > PEAK;
@@ -86,31 +71,26 @@ export default function PeakFlow({ stages, labels }: { stages: Stage[]; labels: 
                   y={y(v)}
                   height={H - PAD - y(v)}
                   rx={3}
-                  fill={released ? "rgba(76,201,122,0.4)" : "#4cc97a"}
-                  opacity={0.85}
+                  fill={released ? "rgba(108,195,195,0.45)" : "#137179"}
+                  opacity={0.9}
                   style={{ transition: `y .8s cubic-bezier(.16,1,.3,1) ${i * 30}ms, height .8s cubic-bezier(.16,1,.3,1) ${i * 30}ms, fill .6s` }}
                 />
               );
             })}
-            {/* control ticks (attendance & performance checks) */}
             {Array.from({ length: N }, (_, i) => (
               <path
                 key={`c${i}`}
                 d={`M${x(i) - 4} ${y(capacity(i)) - 10} l3 3 l6 -6`}
-                stroke="#ffffff"
+                stroke="#0b7d36"
                 strokeWidth="1.8"
                 fill="none"
                 strokeLinecap="round"
                 style={{ opacity: step >= 3 ? 1 : 0, transition: `opacity .4s ${i * 40}ms` }}
               />
             ))}
-            {/* forecast (dashed) */}
-            <path d={linePath(forecast)} fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="2" strokeDasharray="5 6"
-              style={{ opacity: step >= 0 ? 1 : 0, transition: "opacity .6s" }} />
-            {/* actual demand */}
-            <path d={linePath(demand)} fill="none" stroke="#fff" strokeWidth="2.5" pathLength={1} strokeDasharray="1"
+            <path d={linePath(forecast)} fill="none" stroke="rgba(11,58,64,0.45)" strokeWidth="2" strokeDasharray="5 6" />
+            <path d={linePath(demand)} fill="none" stroke="#0b3a40" strokeWidth="2.5" pathLength={1} strokeDasharray="1"
               style={{ strokeDashoffset: step >= 3 ? 0 : 1, transition: "stroke-dashoffset 1.4s ease" }} />
-            {/* standby pool */}
             <g style={{ opacity: step >= 1 && step < 4 ? 1 : 0, transition: "opacity .6s" }}>
               {Array.from({ length: 18 }, (_, k) => (
                 <circle
@@ -118,28 +98,45 @@ export default function PeakFlow({ stages, labels }: { stages: Stage[]; labels: 
                   cx={W - PAD - 8 - (k % 6) * 11}
                   cy={PAD + 6 + Math.floor(k / 6) * 11}
                   r="3.2"
-                  fill="#ffffff"
-                  style={{
-                    opacity: step === 2 && k % 3 === 0 ? 0.25 : 1,
-                    transition: "opacity .6s",
-                  }}
+                  fill="#6cc3c3"
+                  style={{ opacity: step === 2 && k % 3 === 0 ? 0.25 : 1, transition: "opacity .6s" }}
                 />
               ))}
             </g>
-            {/* review badge */}
             <g style={{ opacity: step >= 4 ? 1 : 0, transition: "opacity .6s .6s" }}>
-              <rect x={W - PAD - 92} y={PAD - 4} width="92" height="26" rx="13" fill="rgba(79,227,193,0.12)" stroke="#ffffff" />
-              <text x={W - PAD - 46} y={PAD + 13} textAnchor="middle" className="fill-white text-[12px] font-semibold">✓ {stages[4].t}</text>
+              <rect x={W - PAD - 92} y={PAD - 4} width="92" height="26" rx="13" fill="#e2f4f3" stroke="#137179" />
+              <text x={W - PAD - 46} y={PAD + 13} textAnchor="middle" className="fill-[#0b3a40] text-[12px] font-semibold">✓ {stages[4].t}</text>
             </g>
           </svg>
-          <p className="mt-3 text-xs text-white/65">{labels.illustrative}</p>
+          <p className="mt-3 text-xs text-teal-deep/70">{labels.illustrative}</p>
           <div className="mt-4 flex gap-1.5" aria-hidden="true">
             {stages.map((s, i) => (
-              <span key={s.t} className={`h-1 flex-1 rounded-full transition-colors duration-500 ${i <= step ? "bg-brand-bright" : "bg-white/10"}`} />
+              <span key={s.t} className={`h-1 flex-1 rounded-full transition-colors duration-500 ${i <= step ? "bg-teal" : "bg-teal/15"}`} />
             ))}
           </div>
         </div>
       </div>
+
+      <ol className="lg:order-1">
+        {stages.map((s, i) => (
+          <li
+            key={s.t}
+            ref={(el) => { refs.current[i] = el; }}
+            data-step={i}
+            className="flex py-3 lg:min-h-[46vh] lg:items-center lg:py-0"
+          >
+            <div className={`w-full max-w-md overflow-hidden rounded-2xl border bg-white/80 transition-all duration-500 ${step === i ? "border-teal/40 opacity-100 shadow-[0_24px_48px_-28px_rgba(19,113,121,0.55)]" : "border-teal/10 opacity-60"}`}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- MSG's own operations photography */}
+              <img src={PHOTOS[i]} alt="" loading="lazy" className="aspect-[16/7] w-full object-cover" />
+              <div className="p-5">
+                <span className="num text-sm text-teal">0{i + 1} / 05</span>
+                <h4 className="mt-1 font-display text-2xl font-semibold text-teal-deep sm:text-3xl">{s.t}</h4>
+                <p className="mt-2 text-teal-deep/75">{s.d}</p>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }

@@ -78,7 +78,10 @@ await test("no forbidden claims in rendered copy", async () => {
   for (const lang of ["en", "ar"]) {
     const html = await (await fetch(`${BASE}/${lang}`)).text();
     // <output> holds the visitor's own slider values (e.g. "30%" cash share), not site claims
-    const text = html.replace(/<(script|style|output)[\s\S]*?<\/\1>/g, "").replace(/<[^>]+>/g, " ");
+    // <aside data-rate-card> blocks hold MSG's own supplied rate card, the only places prices are stated
+    const text = html
+      .replace(/<aside[^>]*data-rate-card[\s\S]*?<\/aside>/g, "")
+      .replace(/<(script|style|output)[\s\S]*?<\/\1>/g, "").replace(/<[^>]+>/g, " ");
     assert.ok(!/customs|تخليص جمركي/i.test(text), `${lang}: customs clearance must not be promoted`);
     assert.ok(!/amazon/i.test(text), `${lang}: no Amazon comparison`);
     assert.ok(!/\bSAR\s?\d+(?![\d,.]*M\+)/.test(text), `${lang}: no pricing in SAR`);
@@ -165,6 +168,30 @@ await test("service landing pages: indexable, one h1, FAQ + Service schema, in s
     assert.match(sm, new RegExp(`/${lang}/services/${slug}</loc>`));
   }
   assert.equal((await fetch(`${BASE}/en/services/not-a-service`)).status, 404);
+});
+
+await test("red sea bands: rate card as supplied, live price band, Sabya slot", async () => {
+  for (const lang of ["en", "ar"]) {
+    const { page, ctx, errors } = await open(`/${lang}`, { viewport: { width: 440, height: 900 } });
+    const rows = (sel) => page.locator(`${sel} [data-rate-card] tbody tr`).evaluateAll((trs) => trs.map((tr) => [...tr.querySelectorAll("td")].map((td) => td.textContent.trim())));
+    assert.deepEqual(await rows("#network"), [["33", "52"], ["21", "30"]], `${lang}: 1 kg next-day card`);
+    const sabya = await page.locator("#growth aside[data-rate-card]").last().locator("tbody tr").evaluateAll((trs) => trs.map((tr) => [...tr.querySelectorAll("td")].map((td) => td.textContent.trim())));
+    assert.deepEqual(sabya, [["29", "48"], ["17", "28"]], `${lang}: Sabya card`);
+    assert.match(await page.locator("#growth h3").innerText(), /800/);
+    // price band: 120 intra-city = walk-in 33 → 3,960; 300 = 299 band 21 → 6,300
+    const panel = page.locator("#growth aside[data-rate-card]").first();
+    const slider = page.locator("#growth input[type=range]");
+    await slider.fill("120");
+    await page.waitForTimeout(900);
+    assert.equal(await panel.locator("[data-monthly]").getAttribute("data-monthly"), "3960", `${lang}: 120 × 33`);
+    await slider.fill("300");
+    await page.waitForTimeout(900);
+    assert.equal(await panel.locator("[data-monthly]").getAttribute("data-monthly"), "6300", `${lang}: 300 × 21`);
+    assert.match(await panel.getByRole("link").getAttribute("href"), /wa\.me\/966578061556/);
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${lang}: no horizontal page scroll`);
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  }
 });
 
 await test("experience: seller questions, 6-step roadmap, partner logos load", async () => {

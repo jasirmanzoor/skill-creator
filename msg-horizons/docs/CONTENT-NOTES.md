@@ -57,3 +57,21 @@ and what needs **confirmation** before it can be used.
   no attribution required). It is used purely as an atmospheric landscape and is **not** presented as an MSG
   location, vehicle or operation. It can be swapped for MSG's own horizon or desert photography at any time
   (keep the horizon near 50.8% of the image height, or update `HORIZON` in `HorizonBackdrop.tsx`).
+
+## Red Sea glass bands (supplied by MSG, 30 Sept 2026)
+
+The skin is "Red Sea glass": daylight aqua, sea-foam, white, silver and deep teal type. It applies to the network band, the price band and the Enterprise section. The copy and rates live in `src/content/redsea.ts`.
+
+- Hero: "You have something to sell. We already have the drivers." The earlier SEO line, "Last-mile delivery across Saudi Arabia", now sits in the h1 eyebrow.
+- 1 kg next-day rates, SAR per shipment: walk-in 33 intra-city / 52 inter-city; 299 a month 21 / 30.
+- Sabya: 800 m² logistics centre; walk-in 29 local / 48 to major cities; 299 a month 17 / 28.
+- The price band multiplies monthly shipments by the listed rate. Walk-in applies below 299 a month; the 299 band applies from 299. It makes no other assumption.
+- Rates appear only inside `<aside data-rate-card>`. The e2e claims test exempts only those blocks.
+
+Photo slots. MSG supplies these files; no generated stand-ins:
+- `public/warehouse.jpg`: the real Sabya warehouse, used behind "800 m² equipped with all necessary components". Until it exists, the card shows a plain sun-toned panel.
+- `public/coast.jpg` (optional): a coastal highway or Corniche shot with a white truck. Until it exists, the network band paints a daylight Red Sea scene around MSG's own car photo.
+
+Open questions for MSG:
+- The text partner list is "iMile · J&T · Keeta · Landmark · AJEX". Landmark is new, and it is not among the logo tiles (AJEX, gold tile, Keeta, iMile, Naqel, Logistiqa, J&T). Please confirm Landmark, and whether Naqel and Logistiqa should also be listed.
+- The Sabya brief earlier also gave a 500+ a month tier (13 / 22). This lock lists only walk-in and 299, so only those are shown.

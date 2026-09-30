@@ -58,8 +58,8 @@ export const en = {
     panelTitle: "MSG network · Saudi Arabia",
     panelLive: "Operating 24/7",
     partnersLead: "Partners and clients we work with",
-    eyebrow: "Your order left the store. Who owns the door?",
-    title: "Last-mile delivery across Saudi Arabia, run by 1,000+ couriers.",
+    eyebrow: "Last-mile delivery across Saudi Arabia · 1,000+ couriers · 100+ vehicles",
+    title: "You have something to sell. We already have the drivers.",
     caption: "Each grey dot is one MSG courier. Blue markers are vehicles on their routes.",
     lead: "MSG Horizons runs last-mile delivery, warehousing, land freight and people as one accountable operation, for online sellers, growing e-commerce brands and enterprises. From a first order to peak season. Based in Riyadh, operating 24/7.",
     forWhom: "For online sellers, growing stores and enterprises across the Kingdom.",
@@ -79,12 +79,6 @@ export const en = {
       "Animated map of Saudi Arabia built from 1,000 dots, one for each MSG Horizons courier, with 100 moving vehicle trails radiating from the Riyadh headquarters.",
     scroll: "Scroll to explore",
     replay: "Replay",
-  },
-  interludes: {
-    scale: ["1,000+ couriers.", "100+ vehicles.", "One network, operating around the clock."],
-    scaleLabel: "MSG Horizons at a glance",
-    growth: ["From your first order", "to your biggest peak season,", "MSG moves with you."],
-    growthLabel: "Growing with MSG Horizons",
   },
   planner: {
     eyebrow: "Build your logistics",
