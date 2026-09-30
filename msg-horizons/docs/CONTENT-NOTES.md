@@ -57,19 +57,3 @@ and what needs **confirmation** before it can be used.
   no attribution required). It is used purely as an atmospheric landscape and is **not** presented as an MSG
   location, vehicle or operation. It can be swapped for MSG's own horizon or desert photography at any time
   (keep the horizon near 50.8% of the image height, or update `HORIZON` in `HorizonBackdrop.tsx`).
-
-## Sabya Hub (supplied by MSG, 30 Sept 2026)
-
-Locked facts, used verbatim in `src/content/sabya.ts`:
-- 800 m² warehouse in the Sabya logistics centre, Jazan region (owned floor): last mile, short-hold storage, northbound line-haul.
-- Channel partners on the northbound lane: iMile, J&T, Naqel.
-- 1 kg standard rates, SAR per shipment. Sabya local doorstep: 29 walk-in / 17 from 299 a month / 13 from 500+. Sabya ↔ Riyadh, Jeddah, Dammam (line-haul + last mile): 48 / 28 / 22. Same-day or evening: +16 local, +20 northbound.
-- COD: 4% (min SAR 8) at low volume; 3% (min SAR 5) from 200+ a month. Returns: SAR 18 flat from 150 shipments a month; otherwise 50% of the delivery rate or SAR 20.
-
-This is the only place on the site that states prices. The e2e "no forbidden claims" test exempts only the `<aside data-rate-card>` block.
-
-Open questions for MSG:
-- Returns below 150 a month: "50% or SAR 20". Is that whichever is higher, or whichever is lower? The site shows the wording as given.
-- COD "low volume": the site reads this as under 200 shipments a month.
-- The market note "mainstream networks add SAR 8–20 surcharges" is a claim about competitors. It is not on the site.
-- Does the general estimator keep "Priced by MSG" for now? Its rate card (`src/content/rates.ts`) is still empty. The Sabya rates cover only this lane.
