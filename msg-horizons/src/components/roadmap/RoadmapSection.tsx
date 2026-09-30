@@ -52,7 +52,7 @@ export default function RoadmapSection({ t, lang }: { t: Dictionary; lang: Local
       {/* backdrop: MSG warehouse, blurred, with slow parallax and brand light */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden [contain:paint]">
         <motion.div style={reduce ? undefined : { y: bgY }} className="absolute -inset-y-[8%] inset-x-0">
-          <img src="/photos/warehouse.webp" alt="" className="h-full w-full scale-110 object-cover opacity-30 blur-2xl" />
+          <img src="/photos/clean/warehouse.webp" alt="" className="h-full w-full scale-110 object-cover opacity-30 blur-2xl" />
         </motion.div>
       </div>
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_15%_0%,rgba(15,150,65,0.35),transparent_70%),radial-gradient(50%_40%_at_90%_40%,rgba(76,201,122,0.18),transparent_70%),linear-gradient(to_bottom,rgba(4,17,10,0.55),#04110a_85%)]" />

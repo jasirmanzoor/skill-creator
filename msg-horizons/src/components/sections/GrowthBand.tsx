@@ -125,16 +125,14 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
             <div className="mt-4 grid grid-cols-2 gap-4 border-t border-teal/15 pt-6">
               <div>
                 <p className="text-sm text-teal-deep/70">{c.perShipment}</p>
-                <p className="num mt-1 font-display text-4xl font-semibold text-teal-deep" dir="ltr">
-                  <span className="me-1 text-lg">≈ {c.cur}</span>
-                  <NumberFlow value={rate} locales="en-US" format={fmt} animated={!reduce} />
+                <p className="num mt-1 font-display text-4xl font-semibold text-teal-deep">
+                  <Money cur={c.cur} approx ar={lang === "ar"}><NumberFlow value={rate} locales="en-US" format={fmt} animated={!reduce} /></Money>
                 </p>
               </div>
               <div>
                 <p className="text-sm text-teal-deep/70">{c.monthly}</p>
-                <p data-monthly={monthly} className="num mt-1 font-display text-4xl font-semibold text-teal" dir="ltr">
-                  <span className="me-1 text-lg">{c.cur}</span>
-                  <NumberFlow value={monthly} locales="en-US" format={fmt} animated={!reduce} />
+                <p data-monthly={monthly} className="num mt-1 font-display text-4xl font-semibold text-teal">
+                  <Money cur={c.cur} ar={lang === "ar"}><NumberFlow value={monthly} locales="en-US" format={fmt} animated={!reduce} /></Money>
                 </p>
               </div>
             </div>
@@ -176,8 +174,8 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
               {([["sabyaLocal", s.local], ["sabyaMajor", s.major]] as const).map(([k, label]) => (
                 <div key={k} className="rounded-2xl bg-white/70 p-4">
                   <dt className="text-sm text-[#6b4210]">{label}</dt>
-                  <dd className="num mt-1 font-display text-4xl font-semibold" dir="ltr">
-                    <span className="me-1 text-lg">≈ {c.cur}</span>{RATE_CARD[k].t299}
+                  <dd className="num mt-1 font-display text-4xl font-semibold">
+                    <Money cur={c.cur} approx ar={lang === "ar"}>{RATE_CARD[k].t299}</Money>
                   </dd>
                 </div>
               ))}
@@ -206,6 +204,16 @@ function Milestone({ at, label, below = false }: { at: { x: number; y: number };
       <span className={`absolute left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-medium sm:text-xs ${below ? "top-3" : "-top-9"} bg-white/85 text-teal-deep`}>
         {label}
       </span>
+    </span>
+  );
+}
+
+/** "≈ SAR 33" in English; "≈ 33 ريال" in Arabic (currency after the amount, read right to left). */
+export function Money({ cur, approx = false, ar, children }: { cur: string; approx?: boolean; ar: boolean; children: React.ReactNode }) {
+  return (
+    <span dir={ar ? "rtl" : "ltr"} className="inline-flex items-baseline gap-1.5">
+      {approx ? <span className="text-lg">≈</span> : null}
+      {ar ? <>{children}<span className="text-lg">{cur}</span></> : <><span className="text-lg">{cur}</span>{children}</>}
     </span>
   );
 }

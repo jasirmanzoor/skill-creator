@@ -86,7 +86,7 @@ export default function Enterprise({ t }: { t: Dictionary }) {
         <div className="mt-16 flex flex-col gap-3 sm:flex-row">
           <TrackedLink href="#contact" event="cta_click" props={{ cta: "enterprise", location: "enterprise" }} data-interest="enterprise"
             className="inline-flex items-center justify-center gap-2 rounded-md bg-teal px-5 py-3 font-medium text-white transition-colors hover:bg-teal-deep">
-            {e.cta} <ArrowIcon className="rtl:rotate-180" />
+            {e.cta} <ArrowIcon className="size-4 rtl:rotate-180" />
           </TrackedLink>
           <TrackedLink href="#contact" event="cta_click" props={{ cta: "manpower", location: "enterprise" }} data-interest="manpower"
             className="inline-flex items-center justify-center rounded-md border border-teal/30 px-5 py-3 font-medium text-teal-deep transition-colors hover:border-teal">

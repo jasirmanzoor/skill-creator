@@ -36,6 +36,7 @@ export default function PlanCard({
   };
   const plan = buildPlan(input);
   const cost = approxCost(net);
+  const cur = (n: number) => n.toLocaleString("en-US");
   const summary = planSummary(t, input, lang);
   const find = (id: string) => s.decisions.find((d) => d.id === id);
   const assets: [string, string | number][] = [
@@ -101,8 +102,9 @@ export default function PlanCard({
         <section className="flex flex-col rounded-2xl border border-[#4cc97a]/30 bg-gradient-to-b from-[#0f9641]/25 to-white/[0.03] p-5 backdrop-blur-md">
           <h4 className="text-sm font-semibold text-white/80">{c.cost}</h4>
           <p className="mt-4" data-rate-card>
-            <span className="num font-display text-4xl font-semibold text-white" dir="ltr">
-              <span className="text-xl text-white/70">≈ {lang === "ar" ? "ريال" : "SAR"}</span> {cost.perOrder}
+            <span className="num block font-display text-4xl font-semibold text-white" dir={lang === "ar" ? "rtl" : "ltr"}>
+              <span className="text-xl text-white/70">≈ </span>
+              {lang === "ar" ? <>{cur(cost.perOrder)} <span className="text-xl text-white/70">ريال</span></> : <><span className="text-xl text-white/70">SAR</span> {cur(cost.perOrder)}</>}
             </span>
             <span className="mt-2 block text-sm text-white/70">
               {c.costMonthly.replace("{total}", cost.monthly.toLocaleString("en-US")).replace("{n}", cost.orders.toLocaleString("en-US"))}

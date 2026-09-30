@@ -3,13 +3,13 @@ import { experience, type StageId } from "@/content/experience";
 import type { Locale } from "@/content/i18n";
 
 export const PHOTO: Record<StageId, string> = {
-  enquiry: "/photos/business.webp",
-  requirements: "/photos/office.webp",
-  guide: "/photos/team.webp",
-  recommendations: "/photos/warehouse.webp",
-  agreement: "/photos/riyadh-night.webp",
-  testing: "/photos/fleet-car.webp",
-  live: "/photos/doorstep.webp",
+  enquiry: "/photos/clean/business.webp",
+  requirements: "/photos/clean/courier-mall.webp",
+  guide: "/photos/clean/team.webp",
+  recommendations: "/photos/clean/warehouse.webp",
+  agreement: "/photos/clean/riyadh-night.webp",
+  testing: "/photos/clean/fleet-car.webp",
+  live: "/photos/clean/doorstep.webp",
 };
 
 /** MSG's own photography with a small, familiar app card that slides in when the stage is active. */

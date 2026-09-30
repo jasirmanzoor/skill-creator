@@ -13,8 +13,8 @@ const forecast = demand.map((d, i) => d * (1 + 0.05 * Math.sin(i * 1.7)));
 const BASE = 0.34;
 const planned = forecast.map((f) => Math.max(BASE, Math.min(1, f * 1.08)));
 
-// MSG operations photography, one per stage: forecast, ready, mobilise, control, demobilise
-const PHOTOS = ["/photos/office.webp", "/photos/team.webp", "/photos/courier-mall.webp", "/photos/fleet-car.webp", "/photos/warehouse.webp"];
+// MSG operations photography, one per stage: forecast, ready, mobilise, control, demobilise (office.webp is retired: its logo renders twice)
+const PHOTOS = ["/photos/clean/business.webp", "/photos/clean/team.webp", "/photos/clean/courier-mall.webp", "/photos/clean/fleet-car.webp", "/photos/clean/warehouse.webp"];
 
 const W = 560, H = 300, PAD = 28;
 const x = (i: number) => PAD + (i / (N - 1)) * (W - PAD * 2);
@@ -127,7 +127,7 @@ export default function PeakFlow({ stages, labels }: { stages: Stage[]; labels: 
           >
             <div className={`w-full max-w-md overflow-hidden rounded-2xl border bg-white/80 transition-all duration-500 ${step === i ? "border-teal/40 opacity-100 shadow-[0_24px_48px_-28px_rgba(19,113,121,0.55)]" : "border-teal/10 opacity-60"}`}>
               {/* eslint-disable-next-line @next/next/no-img-element -- MSG's own operations photography */}
-              <img src={PHOTOS[i]} alt="" loading="lazy" className="aspect-[16/7] w-full object-cover" />
+              <img src={PHOTOS[i]} alt="" loading="lazy" className="aspect-[16/7] w-full object-cover" style={{ objectPosition: i === 1 ? "50% 100%" : "50% 50%" }} />
               <div className="p-5">
                 <span className="num text-sm text-teal">0{i + 1} / 05</span>
                 <h4 className="mt-1 font-display text-2xl font-semibold text-teal-deep sm:text-3xl">{s.t}</h4>
