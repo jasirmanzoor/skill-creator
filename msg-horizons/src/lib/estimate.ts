@@ -1,5 +1,6 @@
 import type { RateCard } from "../content/rates.ts";
 import type { SizerInput } from "./sizer.ts";
+import { rateFor } from "../content/redsea.ts";
 
 const DAYS_PER_MONTH = 30;
 
@@ -25,4 +26,19 @@ export function estimateMonthly(i: SizerInput, r: RateCard): number | null {
     total += monthly * 0.5 * r.outsideRiyadhPerOrder;
   }
   return Math.round(total);
+}
+
+/**
+ * Approximate cost per order from MSG's 1 kg next-day rate card (see content/redsea.ts).
+ * The tier follows the visitor's own monthly volume. Riyadh-only uses the intra-city rate and
+ * Kingdom-wide uses the inter-city rate. "Riyadh + other cities" assumes half the orders leave
+ * the city, the same planning midpoint used above. Cash on delivery, storage and returns are
+ * quoted separately.
+ */
+export function approxCost(i: Pick<SizerInput, "orders" | "area">): { perOrder: number; monthly: number; orders: number } {
+  const orders = i.orders * DAYS_PER_MONTH;
+  const intra = rateFor("intra", orders);
+  const inter = rateFor("inter", orders);
+  const perOrder = i.area === "riyadh" ? intra : i.area === "kingdom" ? inter : Math.round((intra + inter) / 2);
+  return { perOrder, monthly: perOrder * orders, orders };
 }

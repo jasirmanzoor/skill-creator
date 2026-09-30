@@ -170,13 +170,12 @@ await test("service landing pages: indexable, one h1, FAQ + Service schema, in s
   assert.equal((await fetch(`${BASE}/en/services/not-a-service`)).status, 404);
 });
 
-await test("red sea bands: rate card as supplied, live price band, Sabya slot", async () => {
+await test("red sea bands: no walk-in table, live approx cost per order, Sabya slot", async () => {
   for (const lang of ["en", "ar"]) {
     const { page, ctx, errors } = await open(`/${lang}`, { viewport: { width: 440, height: 900 } });
-    const rows = (sel) => page.locator(`${sel} [data-rate-card] tbody tr`).evaluateAll((trs) => trs.map((tr) => [...tr.querySelectorAll("td")].map((td) => td.textContent.trim())));
-    assert.deepEqual(await rows("#network"), [["33", "52"], ["21", "30"]], `${lang}: 1 kg next-day card`);
-    const sabya = await page.locator("#growth aside[data-rate-card]").last().locator("tbody tr").evaluateAll((trs) => trs.map((tr) => [...tr.querySelectorAll("td")].map((td) => td.textContent.trim())));
-    assert.deepEqual(sabya, [["29", "48"], ["17", "28"]], `${lang}: Sabya card`);
+    assert.equal(await page.locator("#network [data-rate-card]").count(), 0, `${lang}: no rate table in the network band`);
+    const sabya = await page.locator("#growth aside[data-rate-card]").last().locator("dd").allTextContents();
+    assert.deepEqual(sabya.map((t) => t.replace(/\D/g, "")), ["17", "28"], `${lang}: Sabya approx per order`);
     assert.match(await page.locator("#growth h3").innerText(), /800/);
     // price band: 120 intra-city = walk-in 33 → 3,960; 300 = 299 band 21 → 6,300
     const panel = page.locator("#growth aside[data-rate-card]").first();
@@ -209,7 +208,7 @@ await test("experience: seller questions, 6-step roadmap, partner logos load", a
   }
 });
 
-await test("roadmap: segment → steps → estimator → curated plan (no invented price)", async () => {
+await test("roadmap: segment → steps → estimator → curated plan with approx cost per order", async () => {
   const { page, ctx, errors } = await open("/en");
   const sec = page.locator("#journey");
   await sec.scrollIntoViewIfNeeded();
@@ -224,8 +223,9 @@ await test("roadmap: segment → steps → estimator → curated plan (no invent
   await est.getByRole("button", { name: "Generate my plan" }).click();
   await est.getByText("Curated recommendation plan").waitFor();
   const txt = await est.innerText();
-  assert.ok(/Priced by MSG for your volumes/.test(txt), "cost stays with MSG until a rate card exists");
-  assert.ok(!/SAR\s?\d/.test(txt), "no invented SAR figure");
+  // SME opens at 400 a day in Riyadh = 12,000 a month → intra-city card rate 21
+  assert.match(txt, /≈\s*SAR\s*21\b/, "approx cost per order from MSG's rate card");
+  assert.match(txt, /252,000 a month for 12,000 orders/);
   const wa = await est.getByRole("link", { name: /Get my quote on WhatsApp/ }).getAttribute("href");
   assert.match(wa, /^https:\/\/wa\.me\/966578061556\?text=/);
   await est.getByRole("button", { name: "Send plan to MSG" }).click();

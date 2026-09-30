@@ -78,9 +78,8 @@ type Copy = {
     pickup: string;
     dispatch: string;
     cost: string;
-    costPending: string;
+    costMonthly: string;
     costNote: string;
-    perMonth: string;
     whatsapp: string;
     send: string;
     edit: string;
@@ -144,10 +143,9 @@ export const roadmapCopy: Record<Locale, Copy> = {
       vehicles: "Vehicle mix",
       pickup: "Pickup",
       dispatch: "Dispatch",
-      cost: "Cost estimate",
-      costPending: "Priced by MSG for your volumes",
-      costNote: "MSG prices every plan from its rate card after reviewing your volumes. Send this plan and get your quote directly.",
-      perMonth: "per month, estimated",
+      cost: "Approx. cost per order",
+      costMonthly: "≈ SAR {total} a month for {n} orders",
+      costNote: "1 kg next-day, from MSG's rate card at your volume. Cash on delivery, storage and returns are confirmed in your quote.",
       whatsapp: "Get my quote on WhatsApp",
       send: "Send plan to MSG",
       edit: "Adjust numbers",
@@ -209,10 +207,9 @@ export const roadmapCopy: Record<Locale, Copy> = {
       vehicles: "المركبات",
       pickup: "الاستلام",
       dispatch: "الانطلاق",
-      cost: "تقدير التكلفة",
-      costPending: "تسعّرها MSG حسب أحجامك",
-      costNote: "تسعّر MSG كل خطة من جدول أسعارها بعد مراجعة أحجامك. أرسل الخطة واحصل على عرضك مباشرة.",
-      perMonth: "شهرياً، تقديرياً",
+      cost: "التكلفة التقريبية للطلب",
+      costMonthly: "≈ {total} ريال شهرياً مقابل {n} طلب",
+      costNote: "شحنة 1 كجم في اليوم التالي، من جدول أسعار MSG حسب حجمك. الدفع عند الاستلام والتخزين والمرتجعات تُؤكد في عرض السعر.",
       whatsapp: "احصل على عرض السعر عبر واتساب",
       send: "أرسل الخطة إلى MSG",
       edit: "عدّل الأرقام",

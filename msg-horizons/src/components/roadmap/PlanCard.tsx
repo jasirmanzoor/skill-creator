@@ -3,12 +3,11 @@
 import { motion } from "motion/react";
 import { roadmapCopy, SEGMENT_PERSONA, type Segment } from "@/content/roadmap";
 import { sizerCopy } from "@/content/sizerCopy";
-import { RATES } from "@/content/rates";
 import { whatsappLink } from "@/content/facts";
 import type { Dictionary, Locale } from "@/content/i18n";
 import { buildPlan, type PlanInput } from "@/lib/planner";
 import { volumeBand, type SizerInput, type Structure } from "@/lib/sizer";
-import { estimateMonthly } from "@/lib/estimate";
+import { approxCost } from "@/lib/estimate";
 import { planSummary } from "@/lib/plan-summary";
 import { track } from "@/lib/analytics";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
@@ -36,7 +35,7 @@ export default function PlanCard({
     net,
   };
   const plan = buildPlan(input);
-  const cost = estimateMonthly(net, RATES);
+  const cost = approxCost(net);
   const summary = planSummary(t, input, lang);
   const find = (id: string) => s.decisions.find((d) => d.id === id);
   const assets: [string, string | number][] = [
@@ -101,14 +100,14 @@ export default function PlanCard({
 
         <section className="flex flex-col rounded-2xl border border-[#4cc97a]/30 bg-gradient-to-b from-[#0f9641]/25 to-white/[0.03] p-5 backdrop-blur-md">
           <h4 className="text-sm font-semibold text-white/80">{c.cost}</h4>
-          {cost != null ? (
-            <p className="mt-4">
-              <span className="num font-display text-4xl font-semibold text-white">{RATES.currency} {cost.toLocaleString("en-US")}</span>
-              <span className="mt-1 block text-sm text-white/60">{c.perMonth}</span>
-            </p>
-          ) : (
-            <p className="mt-4 font-display text-2xl font-semibold text-white">{c.costPending}</p>
-          )}
+          <p className="mt-4" data-rate-card>
+            <span className="num font-display text-4xl font-semibold text-white" dir="ltr">
+              <span className="text-xl text-white/70">≈ {lang === "ar" ? "ريال" : "SAR"}</span> {cost.perOrder}
+            </span>
+            <span className="mt-2 block text-sm text-white/70">
+              {c.costMonthly.replace("{total}", cost.monthly.toLocaleString("en-US")).replace("{n}", cost.orders.toLocaleString("en-US"))}
+            </span>
+          </p>
           <p className="mt-3 text-sm text-white/65">{c.costNote}</p>
           <div className="mt-auto grid gap-2 pt-5">
             <a

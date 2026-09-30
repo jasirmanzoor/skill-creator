@@ -16,3 +16,14 @@ test("with a rate card the estimate is orders × days × rate (+ COD, storage)",
   assert.equal(estimateMonthly({ ...i, cod: 0, stock: false }, card), 30000);
   assert.equal(estimateMonthly(i, { ...card, codPerOrder: null }), null);
 });
+
+test("approx cost per order reads MSG's 1 kg next-day card at the visitor's monthly volume", async () => {
+  const { approxCost } = await import("../../src/lib/estimate.ts");
+  // 5 a day = 150 a month: below 299, so the entry rate applies
+  assert.deepEqual(approxCost({ orders: 5, area: "riyadh" }), { perOrder: 33, monthly: 4950, orders: 150 });
+  assert.equal(approxCost({ orders: 5, area: "kingdom" }).perOrder, 52);
+  // 10 a day = 300 a month: the 299 rate applies
+  assert.equal(approxCost({ orders: 10, area: "riyadh" }).perOrder, 21);
+  assert.equal(approxCost({ orders: 10, area: "kingdom" }).perOrder, 30);
+  assert.equal(approxCost({ orders: 10, area: "multi" }).perOrder, 26); // midpoint of 21 and 30 (rounded 25.5 → 26)
+});

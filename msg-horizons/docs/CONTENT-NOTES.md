@@ -75,3 +75,5 @@ Photo slots. MSG supplies these files; no generated stand-ins:
 Open questions for MSG:
 - The text partner list is "iMile · J&T · Keeta · Landmark · AJEX". Landmark is new, and it is not among the logo tiles (AJEX, gold tile, Keeta, iMile, Naqel, Logistiqa, J&T). Please confirm Landmark, and whether Naqel and Logistiqa should also be listed.
 - The Sabya brief earlier also gave a 500+ a month tier (13 / 22). This lock lists only walk-in and 299, so only those are shown.
+
+Update, 30 Sept 2026 (MSG): walk-in prices are no longer shown separately. The network band's rate table was replaced by a panel that points to the roadmap. The roadmap plan card, the price band and the Sabya card each show one approximate cost per order, read from the rate card at the visitor's volume (`approxCost` in `src/lib/estimate.ts`). The Sabya card shows the 299 a month rates (17 / 28) as its approximate per-order figures.

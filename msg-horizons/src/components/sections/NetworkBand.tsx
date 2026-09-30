@@ -3,7 +3,9 @@
 /* eslint-disable @next/next/no-img-element -- MSG's branded car cut-out and optional coast photo, local files */
 import { motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
-import { redSea, PARTNER_TEXT, RATE_CARD } from "@/content/redsea";
+import { redSea, PARTNER_TEXT } from "@/content/redsea";
+import TrackedLink from "../ui/TrackedLink";
+import { ArrowIcon } from "../ui/icons";
 import type { Locale } from "@/content/i18n";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
@@ -11,7 +13,7 @@ import { useReducedMotion } from "@/lib/use-reduced-motion";
  * "1,000+ couriers. 100+ vehicles." in Red Sea daylight.
  * A Corniche scene (painted sky, sparkling water and a wet silver road, or MSG's own coast photo
  * once `/public/coast.jpg` exists) with MSG's branded car driving through it as the visitor scrolls.
- * Glass panels carry the network facts, the partners and the 1 kg next-day rate card.
+ * Glass panels carry the network facts and the partners, and point to the roadmap for a cost per order.
  */
 export default function NetworkBand({ lang, coastPhoto }: { lang: Locale; coastPhoto: boolean }) {
   const c = redSea[lang].network;
@@ -78,31 +80,20 @@ export default function NetworkBand({ lang, coastPhoto }: { lang: Locale; coastP
           <Partners label={c.partners} />
         </div>
 
-        <div className="mt-5">
-          <aside data-rate-card aria-labelledby="network-rates" className="sea-glass rounded-3xl p-6 sm:p-8">
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <h3 id="network-rates" className="font-display text-xl font-semibold text-teal-deep">{c.rateTitle}</h3>
-              <p className="text-sm text-teal-deep/65">{c.rateUnit}</p>
-            </div>
-            <table className="mt-4 w-full border-collapse">
-              <thead>
-                <tr className="text-sm text-teal-deep/65">
-                  <th scope="col" className="pb-2 text-start font-medium"><span className="sr-only">{c.rateTitle}</span></th>
-                  <th scope="col" className="pb-2 text-end font-medium">{c.intra}</th>
-                  <th scope="col" className="pb-2 text-end font-medium">{c.inter}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(["walkin", "t299"] as const).map((k) => (
-                  <tr key={k} className="border-t border-teal/15">
-                    <th scope="row" className="py-3 text-start font-medium text-teal-deep">{k === "walkin" ? c.walkin : c.t299}</th>
-                    <td className="py-3 text-end"><span className="num font-display text-3xl font-semibold text-teal-deep">{RATE_CARD.intra[k]}</span></td>
-                    <td className="py-3 text-end"><span className="num font-display text-3xl font-semibold text-teal">{RATE_CARD.inter[k]}</span></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </aside>
+        {/* the way in: the roadmap turns a visitor's numbers into a plan and an approximate cost per order */}
+        <div className="sea-glass mt-5 flex flex-col gap-5 rounded-3xl p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+          <div>
+            <p className="font-display text-2xl font-semibold text-teal-deep text-balance">{c.ctaTitle}</p>
+            <p className="mt-2 max-w-2xl text-teal-deep/75">{c.ctaBody}</p>
+          </div>
+          <TrackedLink
+            href="#journey"
+            event="cta_click"
+            props={{ cta: "journey", location: "network" }}
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-teal px-5 py-3 font-medium text-white transition-colors hover:bg-teal-deep"
+          >
+            {c.cta} <ArrowIcon className="size-4 rtl:rotate-180" />
+          </TrackedLink>
         </div>
       </div>
     </section>

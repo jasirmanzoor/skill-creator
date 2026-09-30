@@ -4,7 +4,7 @@
 import NumberFlow from "@number-flow/react";
 import { motion } from "motion/react";
 import { useId, useState } from "react";
-import { redSea, LANES, RATE_CARD, TIER_FROM, rateFor, type Lane } from "@/content/redsea";
+import { redSea, LANES, RATE_CARD, rateFor, type Lane } from "@/content/redsea";
 import { whatsappLink } from "@/content/facts";
 import type { Locale } from "@/content/i18n";
 import { track } from "@/lib/analytics";
@@ -15,8 +15,8 @@ import { ArrowIcon, WhatsAppIcon } from "../ui/icons";
 /**
  * "From your first order to your biggest peak season, MSG moves with you." made usable:
  * the visitor slides to their monthly shipments and the price is read live from MSG's 1 kg
- * next-day rate card (walk-in below 299 a month, the 299 band from 299). The growth line is
- * illustrative; the prices are not. Then the Sabya contrast beat, with MSG's warehouse photo slot.
+ * next-day rate card at their volume, shown as one approximate cost per order. The growth line
+ * is illustrative; the prices are not. Then the Sabya contrast beat, with MSG's warehouse photo slot.
  */
 
 const MAX = 1000;
@@ -30,7 +30,6 @@ const CURVE = Array.from({ length: 241 }, (_, i) => {
   return `${i ? "L" : "M"}${x.toFixed(1)} ${curveY(x).toFixed(1)}`;
 }).join(" ");
 const xFor = (n: number) => X0 + (X1 - X0) * (0.02 + 0.96 * Math.sqrt(n / MAX));
-const TIER_X = xFor(TIER_FROM);
 const fmt = { useGrouping: true } as const;
 
 export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; warehousePhoto: boolean }) {
@@ -42,13 +41,10 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
   const [n, setN] = useState(120);
 
   const rate = rateFor(lane, n);
-  const tier = n >= TIER_FROM;
   const monthly = n * rate;
-  const saving = n * (RATE_CARD[lane].walkin - RATE_CARD[lane].t299);
   const x = xFor(n);
   const pos = { left: `${(x / 1000) * 100}%`, top: `${(curveY(x) / 300) * 100}%` };
-  const band = tier ? c.tierBand : c.walkinBand;
-  const wa = whatsappLink(c.wa.replace("{n}", String(n)).replace("{lane}", c.lanes[lane]).replace("{band}", band));
+  const wa = whatsappLink(c.wa.replace("{n}", String(n)).replace("{lane}", c.lanes[lane]));
 
   return (
     <section id="growth" aria-labelledby="growth-title" className="sea-band relative scroll-mt-16 overflow-hidden py-20 lg:py-28">
@@ -94,10 +90,8 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
                 <path d={`${CURVE} L${X1} 300 L${X0} 300 Z`} fill={`url(#${id}-fill)`} clipPath={`url(#${id}-clip)`} />
                 <path d={CURVE} fill="none" stroke="#c3cdd2" strokeWidth="2" vectorEffect="non-scaling-stroke" />
                 <path d={CURVE} fill="none" stroke="#137179" strokeWidth="3" strokeLinecap="round" vectorEffect="non-scaling-stroke" clipPath={`url(#${id}-clip)`} />
-                <line x1={TIER_X} x2={TIER_X} y1={curveY(TIER_X)} y2="300" stroke="#137179" strokeOpacity="0.35" strokeDasharray="4 5" vectorEffect="non-scaling-stroke" />
               </svg>
               <Milestone at={{ x: X0 + 14, y: curveY(X0 + 14) }} label={c.milestones.first} below />
-              <Milestone at={{ x: TIER_X, y: curveY(TIER_X) }} label={c.milestones.tier} lit={tier} />
               <Milestone at={{ x: PEAK_X, y: curveY(PEAK_X) }} label={c.milestones.peak} />
               <motion.span
                 className="absolute z-10 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-white bg-teal shadow-[0_0_0_6px_rgba(108,195,195,0.35)]"
@@ -125,14 +119,14 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
           </div>
 
           {/* the price, straight from the rate card */}
-          <aside data-rate-card aria-label={c.band} className="sea-glass flex flex-col rounded-3xl p-6 sm:p-8" aria-live="polite">
-            <p className="text-sm font-medium text-teal-deep/70">{c.band}</p>
-            <p className="mt-1 font-display text-2xl font-semibold text-teal-deep">{band} · {c.lanes[lane]}</p>
+          <aside data-rate-card aria-label={c.perShipment} className="sea-glass flex flex-col rounded-3xl p-6 sm:p-8" aria-live="polite">
+            <p className="text-sm font-medium text-teal-deep/70">{c.lanes[lane]}</p>
 
-            <div className="mt-6 grid grid-cols-2 gap-4 border-t border-teal/15 pt-6">
+            <div className="mt-4 grid grid-cols-2 gap-4 border-t border-teal/15 pt-6">
               <div>
-                <p className="text-sm text-teal-deep/70">{c.cur} {c.perShipment}</p>
+                <p className="text-sm text-teal-deep/70">{c.perShipment}</p>
                 <p className="num mt-1 font-display text-4xl font-semibold text-teal-deep" dir="ltr">
+                  <span className="me-1 text-lg">≈ {c.cur}</span>
                   <NumberFlow value={rate} locales="en-US" format={fmt} animated={!reduce} />
                 </p>
               </div>
@@ -144,14 +138,6 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
                 </p>
               </div>
             </div>
-
-            <p className="mt-5 rounded-2xl bg-white/70 px-4 py-3 text-sm text-teal-deep">
-              {tier ? (
-                <>{c.save} <strong className="num">{c.cur} {saving.toLocaleString("en-US")}</strong> {c.perMonth}.</>
-              ) : (
-                <><strong className="num">{(TIER_FROM - n).toLocaleString("en-US")}</strong> {c.unlock}.</>
-              )}
-            </p>
 
             <TrackedLink
               href={wa}
@@ -184,26 +170,18 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
               <p className={`mt-3 max-w-lg ${warehousePhoto ? "text-white/85" : "text-[#4a2e0b]"}`}>{s.sub}</p>
             </div>
           </div>
-          <aside data-rate-card aria-label={s.eyebrow} className="flex flex-col justify-center bg-[linear-gradient(180deg,#fffaf0,#fbf1dc)] p-6 sm:p-10">
-            <p className="text-sm text-[#6b4210]">{redSea[lang].network.rateTitle} · {redSea[lang].network.rateUnit}</p>
-            <table className="mt-4 w-full border-collapse text-[#3b2408]">
-              <thead>
-                <tr className="text-sm text-[#6b4210]">
-                  <th scope="col" className="pb-2 text-start font-medium"><span className="sr-only">{s.eyebrow}</span></th>
-                  <th scope="col" className="pb-2 text-end font-medium">{s.local}</th>
-                  <th scope="col" className="pb-2 text-end font-medium">{s.major}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(["walkin", "t299"] as const).map((k) => (
-                  <tr key={k} className="border-t border-[#6b4210]/15">
-                    <th scope="row" className="py-3 text-start font-medium">{k === "walkin" ? s.walkin : s.t299}</th>
-                    <td className="py-3 text-end"><span className="num font-display text-3xl font-semibold">{RATE_CARD.sabyaLocal[k]}</span></td>
-                    <td className="py-3 text-end"><span className="num font-display text-3xl font-semibold">{RATE_CARD.sabyaMajor[k]}</span></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <aside data-rate-card aria-label={s.eyebrow} className="flex flex-col justify-center bg-[linear-gradient(180deg,#fffaf0,#fbf1dc)] p-6 text-[#3b2408] sm:p-10">
+            <p className="text-sm text-[#6b4210]">{s.approx}</p>
+            <dl className="mt-4 grid grid-cols-2 gap-4">
+              {([["sabyaLocal", s.local], ["sabyaMajor", s.major]] as const).map(([k, label]) => (
+                <div key={k} className="rounded-2xl bg-white/70 p-4">
+                  <dt className="text-sm text-[#6b4210]">{label}</dt>
+                  <dd className="num mt-1 font-display text-4xl font-semibold" dir="ltr">
+                    <span className="me-1 text-lg">≈ {c.cur}</span>{RATE_CARD[k].t299}
+                  </dd>
+                </div>
+              ))}
+            </dl>
             <TrackedLink
               href={whatsappLink(s.wa)}
               target="_blank"
@@ -221,11 +199,11 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
   );
 }
 
-function Milestone({ at, label, lit = false, below = false }: { at: { x: number; y: number }; label: string; lit?: boolean; below?: boolean }) {
+function Milestone({ at, label, below = false }: { at: { x: number; y: number }; label: string; below?: boolean }) {
   return (
     <span className="absolute -translate-x-1/2" style={{ left: `${(at.x / 1000) * 100}%`, top: `${(at.y / 300) * 100}%` }}>
-      <span className={`absolute left-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white ${lit ? "bg-teal" : "bg-silver"}`} />
-      <span className={`absolute left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-medium sm:text-xs ${below ? "top-3" : "-top-9"} ${lit ? "bg-teal text-white" : "bg-white/85 text-teal-deep"}`}>
+      <span className={`absolute left-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-teal`} />
+      <span className={`absolute left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-medium sm:text-xs ${below ? "top-3" : "-top-9"} bg-white/85 text-teal-deep`}>
         {label}
       </span>
     </span>

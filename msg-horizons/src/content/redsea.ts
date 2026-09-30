@@ -30,12 +30,9 @@ type Copy = {
     sub: string;
     stats: { v: string; l: string }[];
     partners: string;
-    rateTitle: string;
-    rateUnit: string;
-    intra: string;
-    inter: string;
-    walkin: string;
-    t299: string;
+    ctaTitle: string;
+    ctaBody: string;
+    cta: string;
   };
   growth: {
     eyebrow: string;
@@ -45,27 +42,21 @@ type Copy = {
     lanes: Record<Lane, string>;
     orders: string;
     perMonth: string;
-    band: string;
-    walkinBand: string;
-    tierBand: string;
     cur: string;
     perShipment: string;
     monthly: string;
-    save: string;
-    unlock: string;
     note: string;
     cta: string;
     wa: string;
-    milestones: { first: string; tier: string; peak: string };
+    milestones: { first: string; peak: string };
   };
   sabya: {
     eyebrow: string;
     title: string;
     sub: string;
+    approx: string;
     local: string;
     major: string;
-    walkin: string;
-    t299: string;
     cta: string;
     wa: string;
   };
@@ -83,42 +74,33 @@ export const redSea: Record<Locale, Copy> = {
         { v: "24/7", l: "Operations, every day" },
       ],
       partners: "Working alongside",
-      rateTitle: "1 kg, next-day",
-      rateUnit: "SAR per shipment",
-      intra: "Intra-city",
-      inter: "Inter-city",
-      walkin: "Walk-in",
-      t299: "299 a month",
+      ctaTitle: "Your approximate cost per order, in two minutes.",
+      ctaBody: "Tell the MSG roadmap who you are and how many orders you ship. It returns your delivery plan with an approximate cost per order.",
+      cta: "Map my delivery plan",
     },
     growth: {
       eyebrow: "Growing with MSG Horizons",
       title: ["From your first order", "to your biggest peak season,", "MSG moves with you."],
-      lead: "Move the slider to your monthly shipments. The price is read straight from MSG's 1 kg next-day rate card.",
+      lead: "Move the slider to your monthly orders and see the approximate cost per order, straight from MSG's rate card.",
       lane: "Where do they go?",
       lanes: { intra: "Same city", inter: "City to city", sabyaLocal: "Inside Sabya", sabyaMajor: "Sabya → major cities" },
-      orders: "Shipments a month",
+      orders: "Orders a month",
       perMonth: "a month",
-      band: "Your band",
-      walkinBand: "Walk-in",
-      tierBand: "299 a month",
       cur: "SAR",
-      perShipment: "per shipment",
-      monthly: "Shipping, per month",
-      save: "The 299 band saves you",
-      unlock: "more shipments a month unlock the 299 band",
-      note: "1 kg next-day. Cash on delivery, returns and same-day are quoted with your plan.",
-      cta: "Lock this band on WhatsApp",
-      wa: "Hello MSG Horizons, I ship about {n} a month ({lane}). I want the {band} band.",
-      milestones: { first: "First order", tier: "299 a month", peak: "Peak season" },
+      perShipment: "Approx. cost per order",
+      monthly: "Approx. per month",
+      note: "1 kg next-day, from MSG's rate card at your volume. Cash on delivery, returns and same-day are quoted with your plan.",
+      cta: "Get my quote on WhatsApp",
+      wa: "Hello MSG Horizons, I ship about {n} orders a month ({lane}). Please send my quote.",
+      milestones: { first: "First order", peak: "Peak season" },
     },
     sabya: {
       eyebrow: "Sabya · Jazan",
       title: "800 m² equipped with all necessary components",
       sub: "Our logistics centre in Sabya: doorstep delivery across Jazan, and line-haul north to the major cities.",
-      local: "Sabya local",
-      major: "To major cities",
-      walkin: "Walk-in",
-      t299: "299 a month",
+      approx: "Approx. cost per order · 1 kg next-day",
+      local: "Inside Sabya",
+      major: "Sabya to major cities",
       cta: "Ask about Sabya",
       wa: "Hello MSG Horizons, I want to ship from Sabya.",
     },
@@ -134,42 +116,33 @@ export const redSea: Record<Locale, Copy> = {
         { v: "24/7", l: "عمليات كل يوم" },
       ],
       partners: "نعمل جنباً إلى جنب مع",
-      rateTitle: "1 كجم، اليوم التالي",
-      rateUnit: "ريال للشحنة",
-      intra: "داخل المدينة",
-      inter: "بين المدن",
-      walkin: "بدون اشتراك",
-      t299: "299 شهرياً",
+      ctaTitle: "التكلفة التقريبية لطلبك، في دقيقتين.",
+      ctaBody: "أخبر خارطة MSG من أنت وكم طلباً تشحن، وستحصل على خطة التوصيل مع التكلفة التقريبية لكل طلب.",
+      cta: "ارسم خطة التوصيل",
     },
     growth: {
       eyebrow: "النمو مع مسج هورايزونز",
       title: ["من أول طلب لك", "إلى أكبر مواسم الذروة،", "مسج تتحرك معك."],
-      lead: "حرّك المؤشر إلى عدد شحناتك الشهرية. السعر مأخوذ مباشرة من جدول أسعار مسج لشحنة 1 كجم في اليوم التالي.",
+      lead: "حرّك المؤشر إلى عدد طلباتك الشهرية لترى التكلفة التقريبية لكل طلب، مباشرة من جدول أسعار مسج.",
       lane: "إلى أين تذهب؟",
       lanes: { intra: "داخل المدينة", inter: "بين المدن", sabyaLocal: "داخل صبيا", sabyaMajor: "من صبيا إلى المدن الكبرى" },
-      orders: "الشحنات شهرياً",
+      orders: "الطلبات شهرياً",
       perMonth: "شهرياً",
-      band: "شريحتك",
-      walkinBand: "بدون اشتراك",
-      tierBand: "299 شهرياً",
       cur: "ريال",
-      perShipment: "للشحنة",
-      monthly: "الشحن شهرياً",
-      save: "توفّر لك شريحة 299",
-      unlock: "شحنة إضافية شهرياً تفتح لك شريحة 299",
+      perShipment: "التكلفة التقريبية للطلب",
+      monthly: "تقريباً شهرياً",
       note: "1 كجم، اليوم التالي. الدفع عند الاستلام والمرتجعات ونفس اليوم تُسعّر مع خطتك.",
-      cta: "ثبّت هذه الشريحة عبر واتساب",
-      wa: "مرحباً مسج هورايزونز، أشحن نحو {n} شهرياً ({lane}). أريد شريحة {band}.",
-      milestones: { first: "أول طلب", tier: "299 شهرياً", peak: "موسم الذروة" },
+      cta: "احصل على عرض السعر عبر واتساب",
+      wa: "مرحباً مسج هورايزونز، أشحن نحو {n} طلب شهرياً ({lane}). أرسلوا لي عرض السعر.",
+      milestones: { first: "أول طلب", peak: "موسم الذروة" },
     },
     sabya: {
       eyebrow: "صبيا · جازان",
       title: "800 م² مجهزة بكل المكونات اللازمة",
       sub: "مركزنا اللوجستي في صبيا: توصيل حتى الباب في أنحاء جازان، ونقل بري شمالاً إلى المدن الكبرى.",
+      approx: "التكلفة التقريبية للطلب · 1 كجم اليوم التالي",
       local: "داخل صبيا",
-      major: "إلى المدن الكبرى",
-      walkin: "بدون اشتراك",
-      t299: "299 شهرياً",
+      major: "من صبيا إلى المدن الكبرى",
       cta: "اسأل عن صبيا",
       wa: "مرحباً مسج هورايزونز، أريد الشحن من صبيا.",
     },
