@@ -78,7 +78,10 @@ await test("no forbidden claims in rendered copy", async () => {
   for (const lang of ["en", "ar"]) {
     const html = await (await fetch(`${BASE}/${lang}`)).text();
     // <output> holds the visitor's own slider values (e.g. "30%" cash share), not site claims
-    const text = html.replace(/<(script|style|output)[\s\S]*?<\/\1>/g, "").replace(/<[^>]+>/g, " ");
+    // <aside data-rate-card> is the owner-supplied Sabya rate band, the one place prices are stated
+    const text = html
+      .replace(/<aside[^>]*data-rate-card[\s\S]*?<\/aside>/g, "")
+      .replace(/<(script|style|output)[\s\S]*?<\/\1>/g, "").replace(/<[^>]+>/g, " ");
     assert.ok(!/customs|تخليص جمركي/i.test(text), `${lang}: customs clearance must not be promoted`);
     assert.ok(!/amazon/i.test(text), `${lang}: no Amazon comparison`);
     assert.ok(!/\bSAR\s?\d+(?![\d,.]*M\+)/.test(text), `${lang}: no pricing in SAR`);
@@ -165,6 +168,28 @@ await test("service landing pages: indexable, one h1, FAQ + Service schema, in s
     assert.match(sm, new RegExp(`/${lang}/services/${slug}</loc>`));
   }
   assert.equal((await fetch(`${BASE}/en/services/not-a-service`)).status, 404);
+});
+
+await test("sabya hub: locked facts, exact rate band, truck runs north, WhatsApp CTA", async () => {
+  for (const lang of ["en", "ar"]) {
+    const { page, ctx, errors } = await open(`/${lang}`, { viewport: { width: 440, height: 900 } });
+    const s = page.locator("#sabya");
+    assert.match(await s.locator("h2").innerText(), /800/, `${lang}: 800 m² headline`);
+    const rows = await s.locator("[data-rate-card] tbody tr").evaluateAll((trs) => trs.map((tr) => [...tr.querySelectorAll("td")].map((td) => td.textContent.trim())));
+    assert.deepEqual(rows, [["29", "48"], ["17", "28"], ["13", "22"], ["+16", "+20"]], `${lang}: rates exactly as supplied`);
+    // no page-level horizontal scroll at 440px; the rate band scrolls inside itself if it must
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${lang}: no horizontal page scroll`);
+    const truck = s.locator("[data-truck]");
+    const before = await truck.boundingBox();
+    await s.locator("[data-rate-card]").scrollIntoViewIfNeeded();
+    await page.waitForTimeout(3800);
+    const after = await truck.boundingBox();
+    assert.ok(after.y < before.y - 40, `${lang}: truck left Sabya heading north`);
+    const href = await s.getByRole("link", { name: lang === "en" ? /Lock Sabya band/ : /ثبّت شريحة صبيا/ }).getAttribute("href");
+    assert.match(href, /wa\.me\/966578061556/);
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  }
 });
 
 await test("experience: seller questions, 6-step roadmap, partner logos load", async () => {

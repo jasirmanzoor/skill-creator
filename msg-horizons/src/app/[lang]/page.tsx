@@ -9,6 +9,7 @@ import Planner from "@/components/sections/Planner";
 import TrustBar from "@/components/sections/TrustBar";
 import Interlude from "@/components/Interlude";
 import Needs from "@/components/sections/Needs";
+import SabyaHub from "@/components/sections/SabyaHub";
 import RoadmapSection from "@/components/roadmap/RoadmapSection";
 import Partners from "@/components/sections/Partners";
 import Services from "@/components/sections/Services";
@@ -36,6 +37,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         <NetworkPanel t={t} />
         <TrustBar t={t} lang={lang} />
         <Needs lang={lang} />
+        <SabyaHub lang={lang} />
         <Planner t={t} lang={lang} />
         <Interlude lines={t.interludes.scale} label={t.interludes.scaleLabel} scene="scale" />
         <RoadmapSection t={t} lang={lang} />
