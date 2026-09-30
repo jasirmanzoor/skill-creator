@@ -133,3 +133,61 @@ export const planVisual: Record<
     canvasLabel: "لوحة حية لمسار الميل الأخير: طرد يتحرك من الاستلام في الرياض عبر المحطة حتى باب العميل.",
   },
 };
+
+/** Live network console (planner): view modes, legend, counters and the event feed. */
+export const consoleCopy: Record<
+  Locale,
+  {
+    modes: { network: string; follow: string; coverage: string };
+    legend: { van: string; courier: string; truck: string; shuttle: string; hub: string; pickup: string; warehouse: string; shift: string };
+    stats: { moving: string; delivered: string; queued: string };
+    events: Record<"pickup" | "sorted" | "out" | "delivered" | "stock" | "linehaul" | "shift", string>;
+    hub: string;
+    warehouse: string;
+    corridor: string;
+    following: string;
+    note: string;
+    added: string;
+  }
+> = {
+  en: {
+    modes: { network: "Network", follow: "Follow a parcel", coverage: "Coverage" },
+    legend: { van: "Pickup vans", courier: "Couriers", truck: "Line-haul", shuttle: "Warehouse shuttle", hub: "Hub", pickup: "Your pickups", warehouse: "Warehouse", shift: "Shift teams" },
+    stats: { moving: "In motion", delivered: "Delivered", queued: "At the hub" },
+    events: {
+      pickup: "{id} · {n} parcels scanned in at the hub",
+      sorted: "Hub · parcel sorted to route {id}",
+      out: "Courier {id} · out for delivery",
+      delivered: "Delivered · proof of delivery captured",
+      stock: "Warehouse · order picked from the shelf",
+      linehaul: "Line-haul {id} · departed the hub",
+      shift: "Shift team · checked in at the hub",
+    },
+    hub: "Riyadh hub",
+    warehouse: "Warehouse",
+    corridor: "To other cities",
+    following: "Following parcel",
+    note: "Illustrative simulation of MSG's operating model, not live data. Your answers reshape it.",
+    added: "Added to your network",
+  },
+  ar: {
+    modes: { network: "الشبكة", follow: "تتبّع طرداً", coverage: "التغطية" },
+    legend: { van: "مركبات الاستلام", courier: "المناديب", truck: "النقل بين المدن", shuttle: "مكوك المستودع", hub: "المحطة", pickup: "نقاط استلامك", warehouse: "المستودع", shift: "فرق الوردية" },
+    stats: { moving: "في الحركة", delivered: "سُلّمت", queued: "في المحطة" },
+    events: {
+      pickup: "{id} · {n} طرود مُسحت في المحطة",
+      sorted: "المحطة · فُرز طرد إلى المسار {id}",
+      out: "المندوب {id} · خرج للتوصيل",
+      delivered: "تم التسليم · إثبات التسليم مُسجّل",
+      stock: "المستودع · طلب جُهّز من الرف",
+      linehaul: "النقل {id} · غادر المحطة",
+      shift: "فريق الوردية · سجّل حضوره في المحطة",
+    },
+    hub: "محطة الرياض",
+    warehouse: "المستودع",
+    corridor: "إلى المدن الأخرى",
+    following: "تتبّع الطرد",
+    note: "محاكاة توضيحية لنموذج تشغيل مسج، وليست بيانات مباشرة. إجاباتك تعيد تشكيلها.",
+    added: "أُضيف إلى شبكتك",
+  },
+};

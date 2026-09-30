@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- local, pre-optimised webp backdrop */
 import { motion, useScroll, useTransform } from "motion/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { roadmapCopy, SEGMENT_ORDERS, SEGMENT_PERSONA, type Segment } from "@/content/roadmap";
 import type { Dictionary, Locale } from "@/content/i18n";
 import { DEFAULT_SIZER, type SizerInput } from "@/lib/sizer";
@@ -11,7 +11,7 @@ import { track } from "@/lib/analytics";
 import HookRoll from "./HookRoll";
 import SegmentGateway from "./SegmentGateway";
 import RoadmapPath from "./RoadmapPath";
-import StepStage from "./StepStage";
+import StepStage, { TOUR_MS } from "./StepStage";
 import Estimator from "./Estimator";
 
 /**
@@ -36,7 +36,18 @@ export default function RoadmapSection({ t, lang }: { t: Dictionary; lang: Local
     setNet((n) => ({ ...n, orders: SEGMENT_ORDERS[s], window: SEGMENT_PERSONA[s] === "platform" ? "sameday" : n.window }));
     track("planner_step", { step: 0, value: `segment:${s}` });
   };
+  const [touring, setTouring] = useState(false);
+  useEffect(() => {
+    if (!touring || step >= 5) return;
+    const id = window.setTimeout(() => {
+      setDir(1);
+      setStep(step + 1);
+      if (step + 1 >= 5) setTouring(false); // the tour ends on go-live
+    }, TOUR_MS);
+    return () => window.clearTimeout(id);
+  }, [touring, step]);
   const go = (i: number) => {
+    setTouring(false);
     if (i === step) return;
     setDir(i > step ? 1 : -1);
     setStep(i);
@@ -89,7 +100,7 @@ export default function RoadmapSection({ t, lang }: { t: Dictionary; lang: Local
             ))}
           </div>
           <div className="md:mt-16">
-            <StepStage lang={lang} step={step} dir={dir} />
+            <StepStage lang={lang} step={step} dir={dir} segment={segment} net={net} touring={touring} onTour={() => { setTouring((t) => !t); track("cta_click", { cta: "tour", location: "roadmap" }); }} />
           </div>
           <div className="mt-5 flex items-center justify-between gap-3">
             <button type="button" onClick={() => go(Math.max(0, step - 1))} disabled={step === 0} className="rounded-full px-4 py-2 text-sm text-white/70 transition-opacity hover:text-white disabled:opacity-30">{c.prev}</button>

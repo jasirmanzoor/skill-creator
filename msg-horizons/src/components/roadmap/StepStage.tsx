@@ -1,18 +1,26 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { ROADMAP_STEPS, roadmapCopy } from "@/content/roadmap";
+import { guideCopy, roadmapCopy, type Segment } from "@/content/roadmap";
 import type { Locale } from "@/content/i18n";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
-import { StageScene } from "./StageVisual";
+import type { SizerInput } from "@/lib/sizer";
+import GuideDevice from "./GuideDevice";
+
+export const TOUR_MS = 7500;
 
 /**
- * The split sub-screen for the active milestone: MSG photography + app card on one side, the step on the other.
- * Changing step "teleports" the panel (blur-scale pop) and a holographic sheen sweeps across it.
+ * The split sub-screen for the active milestone: a phone performing the step for this visitor on one
+ * side; on the other, the step with exactly what the visitor does and what MSG does, and what comes
+ * next. "Walk me through it" plays the six steps as a guided tour.
  */
-export default function StepStage({ lang, step, dir }: { lang: Locale; step: number; dir: 1 | -1 }) {
+export default function StepStage({
+  lang, step, dir, segment, net, touring, onTour,
+}: { lang: Locale; step: number; dir: 1 | -1; segment: Segment | null; net: SizerInput; touring: boolean; onTour: () => void }) {
   const c = roadmapCopy[lang];
+  const gc = guideCopy[lang];
   const s = c.steps[step];
+  const role = gc.steps[step];
   const reduce = useReducedMotion();
   const pop = reduce
     ? {}
@@ -26,8 +34,8 @@ export default function StepStage({ lang, step, dir }: { lang: Locale; step: num
     <div id="roadmap-stage" role="tabpanel" aria-live="polite" className="relative mt-4 overflow-hidden rounded-3xl">
       <AnimatePresence mode="wait" initial={false} custom={dir}>
         <motion.div key={step} {...pop} className="journey-card relative grid overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] md:grid-cols-[1.15fr_1fr]" data-active>
-          <div className="relative [&>div]:border-b-0 md:[&>div]:h-full md:[&>div]:aspect-auto">
-            <StageScene id={ROADMAP_STEPS[step].visual} lang={lang} />
+          <div className="relative">
+            <GuideDevice lang={lang} step={step} segment={segment} net={net} />
           </div>
           <div className="flex flex-col justify-center p-6 sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#4cc97a] rtl:tracking-normal">
@@ -35,23 +43,43 @@ export default function StepStage({ lang, step, dir }: { lang: Locale; step: num
             </p>
             <h3 className="mt-3 font-display text-3xl font-semibold tracking-[-0.02em] text-white rtl:tracking-normal">{s.t}</h3>
             <p className="mt-3 text-lg text-white/70">{s.d}</p>
-            <ul className="mt-6 grid gap-2.5">
-              {s.points.map((pt, k) => (
-                <motion.li
-                  key={pt}
+            <dl className="mt-6 grid gap-3">
+              {([[gc.you, role.you, "you"], [gc.msg, role.msg, "msg"]] as const).map(([k, v, who], i) => (
+                <motion.div
+                  key={who}
                   initial={reduce ? false : { opacity: 0, x: 12 * dir }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.15 + k * 0.08, duration: 0.4 }}
-                  className="flex items-center gap-3 text-white/85"
+                  transition={{ delay: 0.15 + i * 0.1, duration: 0.4 }}
+                  className={`rounded-2xl p-4 ring-1 ${who === "you" ? "bg-white/[0.06] ring-white/10" : "bg-[#0b7d36]/25 ring-[#4cc97a]/30"}`}
                 >
-                  <span className="inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-[#0b7d36] text-white">
-                    <svg viewBox="0 0 12 12" className="size-3" aria-hidden="true"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                  </span>
-                  {pt}
-                </motion.li>
+                  <dt className={`text-xs font-semibold ${who === "you" ? "text-white/60" : "text-[#4cc97a]"}`}>{k}</dt>
+                  <dd className="mt-1 text-white/90">{v}</dd>
+                </motion.div>
+              ))}
+            </dl>
+            <ul className="mt-4 flex flex-wrap gap-1.5">
+              {s.points.map((pt) => (
+                <li key={pt} className="rounded-full bg-white/[0.06] px-3 py-1 text-xs text-white/75 ring-1 ring-white/10">{pt}</li>
               ))}
             </ul>
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4">
+              {step < 5 ? (
+                <p className="text-sm text-white/60">{gc.nextUp}: <span className="font-medium text-white">{c.steps[step + 1].t}</span></p>
+              ) : <span />}
+              <button type="button" onClick={onTour} aria-pressed={touring} className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20 hover:bg-white/15">
+                {touring ? (
+                  <svg viewBox="0 0 12 12" className="size-3" aria-hidden="true"><path d="M3 2h2v8H3zM7 2h2v8H7z" fill="currentColor" /></svg>
+                ) : (
+                  <svg viewBox="0 0 12 12" className="size-3 rtl:-scale-x-100" aria-hidden="true"><path d="M3 1.8v8.4L10 6z" fill="currentColor" /></svg>
+                )}
+                {touring ? gc.pause : gc.walk}
+              </button>
+            </div>
           </div>
+          {/* guided tour progress */}
+          {touring && !reduce ? (
+            <motion.span key={`tour-${step}`} aria-hidden="true" className="absolute inset-x-0 top-0 h-0.5 origin-left bg-[#4cc97a] rtl:origin-right" initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: TOUR_MS / 1000, ease: "linear" }} />
+          ) : null}
           {/* holographic flash-up */}
           {!reduce ? (
             <motion.span

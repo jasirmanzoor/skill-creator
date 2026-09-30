@@ -217,3 +217,140 @@ export const roadmapCopy: Record<Locale, Copy> = {
     },
   },
 };
+
+/** Hand-holding guide for each roadmap step: who does what, and the device demo's strings. */
+export const guideCopy: Record<
+  Locale,
+  {
+    you: string;
+    msg: string;
+    nextUp: string;
+    walk: string;
+    pause: string;
+    steps: { you: string; msg: string }[];
+    demo: {
+      chatHead: string;
+      hello: (who: string, orders: number, where: string) => string;
+      who: Record<Segment, string>;
+      where: { riyadh: string; multi: string; kingdom: string };
+      reply: string;
+      typing: string;
+      quick: string;
+      formTitle: string;
+      fields: { profile: string; orders: string; cod: string; area: string; stock: string };
+      perDay: string;
+      yes: string;
+      no: string;
+      guideTitle: string;
+      guideItems: string[];
+      label: { to: string; cod: string; handle: string };
+      planTitle: string;
+      routes: string;
+      couriers: string;
+      perOrder: string;
+      peak: string;
+      flex: string;
+      services: { lastMile: string; cod: string; storage: string; tracking: string };
+      docTitle: string;
+      docItems: string[];
+      signed: string;
+      pilotTitle: string;
+      pod: string;
+      live: string;
+      liveBody: string;
+    };
+  }
+> = {
+  en: {
+    you: "You do",
+    msg: "MSG does",
+    nextUp: "Next up",
+    walk: "Walk me through it",
+    pause: "Pause the tour",
+    steps: [
+      { you: "Send one WhatsApp message or the two-minute form.", msg: "Replies in Arabic or English and assigns your contact." },
+      { you: "Share your numbers: orders, areas, cash share and returns.", msg: "Turns them into a delivery profile you can check line by line." },
+      { you: "Prepare parcels with the packaging and label guide.", msg: "Sets your pickup window and handover rules before day one." },
+      { you: "Review the plan and ask anything.", msg: "Sizes routes, couriers and pickup to your volume, with the reason for each." },
+      { you: "Sign scope, remittance, returns and claims.", msg: "Puts every term in writing before the first parcel moves." },
+      { you: "Hand over the pilot parcels.", msg: "Delivers them with proof, reviews them with you, then switches you to live." },
+    ],
+    demo: {
+      chatHead: "MSG Horizons",
+      hello: (who, orders, where) => `Hi MSG, we're ${who} with about ${orders} orders a day ${where}.`,
+      who: { offline: "a local shop", social: "an online seller on social media", neighborhood: "a neighbourhood store", enterprise: "a retailer with several sites", sme: "a growing online brand", aggregator: "a delivery platform" },
+      where: { riyadh: "in Riyadh", multi: "in Riyadh and other cities", kingdom: "across the Kingdom" },
+      reply: "Welcome. Let's map your deliveries together.",
+      typing: "typing…",
+      quick: "Share my numbers",
+      formTitle: "Your delivery profile",
+      fields: { profile: "Profile", orders: "Orders", cod: "Paid in cash", area: "Areas", stock: "Storage" },
+      perDay: "a day",
+      yes: "Yes",
+      no: "No",
+      guideTitle: "Standard guide",
+      guideItems: ["Packaging", "Shipping label", "Pickup window", "Handover rules"],
+      label: { to: "Deliver to", cod: "Cash on delivery", handle: "Handle with care" },
+      planTitle: "Recommended plan",
+      routes: "Routes",
+      couriers: "Couriers",
+      perOrder: "Approx. per order",
+      peak: "Couriers on peak days",
+      flex: "Flex couriers switched on for peaks",
+      services: { lastMile: "Last-mile", cod: "Cash collection", storage: "Storage", tracking: "Live tracking" },
+      docTitle: "Project agreement",
+      docItems: ["Scope", "Remittance", "Returns", "Claims"],
+      signed: "Signed",
+      pilotTitle: "Pilot shipments",
+      pod: "proof of delivery",
+      live: "You're live",
+      liveBody: "Tracked 24/7, one team accountable.",
+    },
+  },
+  ar: {
+    you: "ما تقوم به",
+    msg: "ما تقوم به مسج",
+    nextUp: "التالي",
+    walk: "خذني في جولة",
+    pause: "أوقف الجولة",
+    steps: [
+      { you: "أرسل رسالة واتساب واحدة أو النموذج في دقيقتين.", msg: "ترد بالعربية أو الإنجليزية وتعيّن لك جهة تواصل." },
+      { you: "شارك أرقامك: الطلبات والمناطق ونسبة النقد والمرتجعات.", msg: "تحوّلها إلى ملف توصيل تراجعه سطراً بسطر." },
+      { you: "جهّز الطرود وفق دليل التغليف والملصقات.", msg: "تحدد موعد الاستلام وقواعد التسليم قبل اليوم الأول." },
+      { you: "راجع الخطة واسأل عن أي شيء.", msg: "تحدد المسارات والمناديب والاستلام حسب حجمك، مع سبب كل اختيار." },
+      { you: "وقّع النطاق والتحويلات والمرتجعات والمطالبات.", msg: "تكتب كل الشروط قبل أن يتحرك أول طرد." },
+      { you: "سلّم الطرود التجريبية.", msg: "توصلها مع إثبات التسليم وتراجعها معك، ثم تنقلك إلى التشغيل." },
+    ],
+    demo: {
+      chatHead: "مسج هورايزونز",
+      hello: (who, orders, where) => `مرحباً مسج، نحن ${who} ولدينا نحو ${orders} طلب يومياً ${where}.`,
+      who: { offline: "متجر محلي", social: "بائع عبر منصات التواصل", neighborhood: "متجر حي", enterprise: "متاجر بعدة فروع", sme: "علامة إلكترونية متنامية", aggregator: "منصة توصيل" },
+      where: { riyadh: "في الرياض", multi: "في الرياض ومدن أخرى", kingdom: "في أنحاء المملكة" },
+      reply: "أهلاً بك. لنرسم توصيلاتك معاً.",
+      typing: "يكتب…",
+      quick: "شارك أرقامي",
+      formTitle: "ملف التوصيل الخاص بك",
+      fields: { profile: "الملف", orders: "الطلبات", cod: "الدفع نقداً", area: "المناطق", stock: "التخزين" },
+      perDay: "يومياً",
+      yes: "نعم",
+      no: "لا",
+      guideTitle: "الدليل المعياري",
+      guideItems: ["التغليف", "ملصق الشحن", "موعد الاستلام", "قواعد التسليم"],
+      label: { to: "التسليم إلى", cod: "الدفع عند الاستلام", handle: "يُرجى العناية" },
+      planTitle: "الخطة الموصى بها",
+      routes: "المسارات",
+      couriers: "المناديب",
+      perOrder: "تقريباً للطلب",
+      peak: "مناديب أيام الذروة",
+      flex: "مناديب مرنة تُفعّل للذروة",
+      services: { lastMile: "الميل الأخير", cod: "تحصيل النقد", storage: "التخزين", tracking: "تتبع مباشر" },
+      docTitle: "اتفاقية المشروع",
+      docItems: ["النطاق", "التحويلات", "المرتجعات", "المطالبات"],
+      signed: "موقّعة",
+      pilotTitle: "الشحنات التجريبية",
+      pod: "إثبات تسليم",
+      live: "أنت الآن في التشغيل",
+      liveBody: "تتبع على مدار الساعة وفريق واحد مسؤول.",
+    },
+  },
+};

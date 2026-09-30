@@ -250,3 +250,8 @@ body {
     0 24px 48px -28px rgba(19, 113, 121, 0.45);
 }
 .sea-range { accent-color: var(--color-teal); }
+
+/* Live network console event feed */
+.feed-in { animation: feed-in 0.45s var(--ease-out-expo) both; }
+@keyframes feed-in { from { opacity: 0; transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) { .feed-in { animation: none; } }
