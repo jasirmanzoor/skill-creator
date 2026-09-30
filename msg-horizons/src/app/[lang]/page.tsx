@@ -21,6 +21,8 @@ import Gallery from "@/components/sections/Gallery";
 import Contact from "@/components/sections/Contact";
 import Footer from "@/components/Footer";
 import MobileBar from "@/components/MobileBar";
+import SmoothScroll from "@/components/spatial/SmoothScroll";
+import Depth from "@/components/spatial/Depth";
 
 export default async function Home({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
@@ -31,24 +33,25 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
   // Story sections come after the visitor already has a named setup in motion.
   return (
     <PlanProvider>
+      <SmoothScroll />
       <HorizonBackdrop />
       <SiteHeader t={t} lang={lang} />
-      <main id="main">
+      <main id="main" className="overflow-x-clip">
         <Hero t={t} lang={lang} />
         <NetworkPanel t={t} />
         <TrustBar t={t} lang={lang} />
-        <Needs lang={lang} />
-        <Planner t={t} lang={lang} />
-        <NetworkBand lang={lang} coastPhoto={hasPublicFile("coast.jpg")} />
-        <RoadmapSection t={t} lang={lang} />
-        <Services t={t} lang={lang} />
-        <Fleet t={t} lang={lang} />
-        <Partners lang={lang} />
-        <Proof t={t} />
-        <Gallery t={t} lang={lang} />
-        <GrowthBand lang={lang} warehousePhoto={hasPublicFile("warehouse.jpg")} />
-        <Enterprise t={t} />
-        <Contact t={t} lang={lang} />
+        <Depth><Needs lang={lang} /></Depth>
+        <Depth><Planner t={t} lang={lang} /></Depth>
+        <Depth><NetworkBand lang={lang} coastPhoto={hasPublicFile("coast.jpg")} /></Depth>
+        <Depth><RoadmapSection t={t} lang={lang} /></Depth>
+        <Depth><Services t={t} lang={lang} /></Depth>
+        <Depth><Fleet t={t} lang={lang} /></Depth>
+        <Depth><Partners lang={lang} /></Depth>
+        <Depth><Proof t={t} /></Depth>
+        <Depth><Gallery t={t} lang={lang} /></Depth>
+        <Depth><GrowthBand lang={lang} warehousePhoto={hasPublicFile("warehouse.jpg")} /></Depth>
+        <Depth><Enterprise t={t} /></Depth>
+        <Depth><Contact t={t} lang={lang} /></Depth>
       </main>
       <Footer t={t} lang={lang} />
       <MobileBar t={t} />

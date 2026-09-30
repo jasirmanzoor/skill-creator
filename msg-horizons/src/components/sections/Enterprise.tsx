@@ -1,7 +1,7 @@
 import Reveal from "../ui/Reveal";
 import TrackedLink from "../ui/TrackedLink";
 import WorkforcePipeline from "../enterprise/WorkforcePipeline";
-import PeakFlow from "../enterprise/PeakFlow";
+import PeakControl from "../enterprise/PeakControl";
 import { ArrowIcon } from "../ui/icons";
 import { facts } from "@/content/facts";
 import type { Dictionary } from "@/content/i18n";
@@ -54,7 +54,7 @@ export default function Enterprise({ t }: { t: Dictionary }) {
             <p className="mt-3 text-lg text-teal-deep/75">{e.peak.lead}</p>
           </Reveal>
           <div className="mt-6">
-            <PeakFlow
+            <PeakControl
               stages={facts.peakStages.map((k) => e.peak.stages[k])}
               labels={{ demand: e.peak.demand, capacity: e.peak.capacity, standby: e.peak.standby, illustrative: e.peak.illustrative }}
             />

@@ -47,6 +47,10 @@ type Copy = {
     business: string;
     segments: Record<Segment, { t: string; d: string }>;
     pick: string;
+    selected: string;
+    typical: string;
+    walk: string;
+    change: string;
   };
   steps: { t: string; d: string; points: string[] }[];
   stepLabel: string;
@@ -106,6 +110,10 @@ export const roadmapCopy: Record<Locale, Copy> = {
         aggregator: { t: "Merchants & delivery aggregators", d: "Capacity for your own network" },
       },
       pick: "Who are you?",
+      selected: "Your roadmap is now personalised for",
+      typical: "We'll start your plan at about {n} orders a day. You can change it in the estimator.",
+      walk: "Walk me through my roadmap",
+      change: "Pick another profile any time.",
     },
     steps: [
       { t: "Submit your enquiry", d: "Two minutes on the web, or one WhatsApp message.", points: ["No sign-up", "Arabic or English", "Straight to MSG's team"] },
@@ -170,6 +178,10 @@ export const roadmapCopy: Record<Locale, Copy> = {
         aggregator: { t: "التجار ومجمّعو التوصيل", d: "طاقة لشبكتك الخاصة" },
       },
       pick: "من أنت؟",
+      selected: "خارطتك الآن مخصصة لـ",
+      typical: "سنبدأ خطتك بنحو {n} طلب يومياً، ويمكنك تعديله في المقدّر.",
+      walk: "خذني في جولة على خارطتي",
+      change: "يمكنك اختيار ملف آخر في أي وقت.",
     },
     steps: [
       { t: "أرسل استفسارك", d: "دقيقتان على الموقع، أو رسالة واتساب واحدة.", points: ["دون تسجيل", "بالعربية أو الإنجليزية", "مباشرة إلى فريق MSG"] },

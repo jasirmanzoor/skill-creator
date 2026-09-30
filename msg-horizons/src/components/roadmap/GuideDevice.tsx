@@ -8,6 +8,7 @@ import type { SizerInput } from "@/lib/sizer";
 import { size } from "@/lib/sizer";
 import { approxCost } from "@/lib/estimate";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import EmbeddedPhoto from "../ui/EmbeddedPhoto";
 
 /* eslint-disable @next/next/no-img-element -- MSG's logo, local PNG */
 const Mark = ({ className = "", inverted = false }: { className?: string; inverted?: boolean }) => (
@@ -27,6 +28,8 @@ export default function GuideDevice({ lang, step, segment, net }: { lang: Locale
   const area = rc.est.areas[net.area];
   return (
     <div className="relative flex h-full min-h-[440px] items-center justify-center overflow-hidden bg-[radial-gradient(80%_70%_at_50%_40%,rgba(15,150,65,0.35),transparent_70%),linear-gradient(160deg,#0a1f14,#050b08)] px-6 py-8">
+      {/* MSG's warehouse, dissolved behind the phone */}
+      <EmbeddedPhoto src="/photos/clean/warehouse.webp" tone="forest" fade="all" strength={0.25} className="absolute inset-0 opacity-45" />
       <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:radial-gradient(70%_60%_at_50%_50%,#000,transparent)]" />
       {/* the phone */}
       <div className="relative w-full max-w-[290px] rounded-[34px] bg-[#0f1411] p-2.5 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.9),0_0_0_1px_rgba(255,255,255,0.08),0_0_60px_-10px_rgba(76,201,122,0.35)]">

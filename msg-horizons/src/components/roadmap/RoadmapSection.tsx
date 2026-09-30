@@ -53,6 +53,14 @@ export default function RoadmapSection({ t, lang }: { t: Dictionary; lang: Local
     setStep(i);
     track("planner_step", { step: i + 1, value: "roadmap" });
   };
+  // "Walk me through my roadmap": from step one, the tour plays and the stage comes into view
+  const startTour = () => {
+    setDir(1);
+    setStep(0);
+    setTouring(true);
+    track("cta_click", { cta: "tour", location: "gateway" });
+    document.getElementById("roadmap-stage")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+  };
   const toEstimator = () => {
     if (!segment) chooseSegment("social");
     document.getElementById("estimator")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
@@ -84,11 +92,17 @@ export default function RoadmapSection({ t, lang }: { t: Dictionary; lang: Local
         </div>
 
         <div className="mt-12">
-          <SegmentGateway lang={lang} value={segment} onChange={chooseSegment} />
+          <SegmentGateway lang={lang} value={segment} onChange={chooseSegment} onWalk={startTour} />
         </div>
 
         {/* the roadmap */}
         <div className="glass mt-6 rounded-3xl p-5 sm:p-8">
+          {segment ? (
+            <p className="mb-6 flex flex-wrap items-center gap-2 text-sm text-white/70 md:mb-10">
+              <span className="size-1.5 rounded-full bg-[#4cc97a] plan-ping" />
+              {c.gate.selected} <span className="font-semibold text-white">{c.gate.segments[segment].t}</span>
+            </p>
+          ) : null}
           <RoadmapPath labels={c.steps.map((s) => s.t)} active={step} onSelect={go} stepLabel={c.stepLabel} rtl={lang === "ar"} />
           {/* mobile step rail */}
           <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 md:hidden" role="tablist" aria-label={c.stepLabel}>

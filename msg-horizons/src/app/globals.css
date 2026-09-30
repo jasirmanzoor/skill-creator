@@ -255,3 +255,15 @@ body {
 .feed-in { animation: feed-in 0.45s var(--ease-out-expo) both; }
 @keyframes feed-in { from { opacity: 0; transform: translateY(8px); } }
 @media (prefers-reduced-motion: reduce) { .feed-in { animation: none; } }
+
+/* "Who are you?" tiles lean toward the pointer */
+.seg-tile { transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transform-style: preserve-3d; }
+@media (prefers-reduced-motion: reduce) { .seg-tile { transform: none; } }
+
+/* Lenis momentum scroll */
+html.lenis-on, html.lenis-on body { height: auto; }
+.lenis-smooth { scroll-behavior: auto !important; }
+.lenis-stopped { overflow: hidden; }
+
+/* EmbeddedPhoto fades toward the inline end in both directions */
+[dir="rtl"] { --fade-end: left; }
