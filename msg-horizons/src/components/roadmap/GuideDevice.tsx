@@ -72,7 +72,7 @@ function AppBar({ title, sub }: { title: string; sub?: string }) {
       <span className="flex size-8 items-center justify-center rounded-full bg-[#0b3a26]"><Mark inverted className="h-3.5 w-auto" /></span>
       <div className="min-w-0">
         <p className="truncate text-[13px] font-semibold">{title}</p>
-        {sub ? <p className="text-[10px] text-[#0f9641]">{sub}</p> : null}
+        {sub ? <p className="text-[10px] text-[#0b7d36]">{sub}</p> : null}
       </div>
     </div>
   );

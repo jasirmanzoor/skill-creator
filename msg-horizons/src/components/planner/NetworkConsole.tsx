@@ -367,7 +367,7 @@ export default function NetworkConsole({
           const name = { pickup: c.legend.pickup, courier: c.legend.courier, warehouse: c.legend.warehouse, truck: c.legend.truck, shift: c.legend.shift }[f];
           const dot = { pickup: "bg-white", courier: "bg-[#96ebb9]", warehouse: "bg-[#4cc97a]", truck: "bg-[#e0b95c]", shift: "bg-white" }[f];
           return (
-            <span key={f} className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] ring-1 transition-all duration-500 ${on ? "bg-white/[0.07] text-white/85 ring-white/15" : "text-white/30 ring-white/5"} ${fresh === f ? "ring-[#4cc97a] shadow-[0_0_20px_-4px_rgba(76,201,122,0.9)]" : ""}`}>
+            <span key={f} className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] ring-1 transition-all duration-500 ${on ? "bg-white/[0.07] text-white/85 ring-white/15" : "text-white/55 ring-white/10"} ${fresh === f ? "ring-[#4cc97a] shadow-[0_0_20px_-4px_rgba(76,201,122,0.9)]" : ""}`}>
               <span className={`size-1.5 rounded-full ${on ? dot : "bg-white/20"}`} />
               {name}
               {fresh === f ? <span className="font-semibold text-[#4cc97a]">· {c.added}</span> : null}
@@ -383,8 +383,8 @@ export default function NetworkConsole({
           const now = phaseIx === i + 1;
           return (
             <div key={st.id} className={`relative px-2 py-2.5 text-center sm:px-3 ${on ? "bg-white/10" : ""}`}>
-              <p className={`num text-[10px] font-semibold uppercase tracking-[0.12em] ${on ? "text-[#4cc97a]" : "text-white/35"}`}>0{i + 1}</p>
-              <p className={`mt-0.5 text-xs ${on ? "text-white" : "text-white/45"}`}>{st.label}</p>
+              <p className={`num text-[10px] font-semibold uppercase tracking-[0.12em] ${on ? "text-[#4cc97a]" : "text-white/60"}`}>0{i + 1}</p>
+              <p className={`mt-0.5 text-xs ${on ? "text-white" : "text-white/60"}`}>{st.label}</p>
               {now ? <span className="absolute inset-x-6 bottom-0 h-0.5 rounded-full bg-[#4cc97a]" /> : null}
             </div>
           );
