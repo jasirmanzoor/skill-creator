@@ -62,8 +62,10 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
 
   const other = lang === "en" ? "ar" : "en";
   const solid = (scrolled || open) && !overDark;
+  // ink text on the light hero and light sections; white only over dark sections
+  const ink = !overDark || open;
   const dark = overDark && !open;
-  const linkBase = solid ? "text-muted hover:text-ink" : "text-white/80 hover:text-white";
+  const linkBase = ink ? "text-muted hover:text-ink" : "text-white/80 hover:text-white";
   const crumb = active ? CRUMB_LABEL[active] : null;
 
   return (
@@ -84,7 +86,7 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
       </a>
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-5 lg:px-8">
         <a href={`/${lang}`} className="rounded" aria-label="MSG Horizons">
-          <Logo inverted={!solid} />
+          <Logo inverted={!ink} />
         </a>
 
         <nav aria-label="Primary" className="hidden lg:block">
@@ -98,7 +100,7 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
                     aria-current={isActive ? "location" : undefined}
                     className={`relative inline-flex px-3 py-2 text-[15px] transition-colors ${
                       isActive
-                        ? solid
+                        ? ink
                           ? "font-semibold text-ink"
                           : "font-semibold text-white"
                         : linkBase
@@ -107,7 +109,7 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
                     {t.nav[NAV_LABEL[item.id]]}
                     {isActive && (
                       <span
-                        className={`absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full ${solid ? "bg-brand" : "bg-white"}`}
+                        className={`absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full ${ink ? "bg-brand" : "bg-white"}`}
                         aria-hidden="true"
                       />
                     )}
@@ -119,7 +121,7 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
         </nav>
 
         <div className="flex items-center gap-1.5 sm:gap-3">
-          <SiteSearch t={t} lang={lang} inverted={!solid} />
+          <SiteSearch t={t} lang={lang} inverted={!ink} />
           <a
             href={`/${other}`}
             hrefLang={other}
@@ -134,14 +136,14 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
             href="#planner"
             onClick={() => track("cta_click", { cta: "plan", location: "header" })}
             className={`hidden rounded-md px-4 py-2 text-sm font-medium transition-colors md:inline-flex ${
-              solid ? "bg-ink text-white hover:bg-ink-3" : "bg-white text-ink hover:bg-white/90"
+              ink ? "bg-ink text-white hover:bg-ink-3" : "bg-white text-ink hover:bg-white/90"
             }`}
           >
             {t.nav.ctaShort}
           </a>
           <button
             type="button"
-            className={`inline-flex items-center gap-2 rounded-md px-2 py-2 lg:hidden ${solid ? "text-ink" : "text-white"}`}
+            className={`inline-flex items-center gap-2 rounded-md px-2 py-2 lg:hidden ${ink ? "text-ink" : "text-white"}`}
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? t.nav.close : t.nav.menu}
@@ -156,13 +158,13 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
       </div>
 
       {scrolled && crumb && !open && (
-        <div className={`hidden border-t px-5 text-xs lg:block lg:px-8 ${solid ? "border-line text-muted" : "border-white/10 text-white/70"}`}>
+        <div className={`hidden border-t px-5 text-xs lg:block lg:px-8 ${ink ? "border-line text-muted" : "border-white/10 text-white/70"}`}>
           <nav aria-label="Breadcrumb" className="mx-auto flex h-8 max-w-7xl items-center gap-2">
             <a href={`/${lang}`} className="hover:underline">
               {t.nav.home}
             </a>
             <span aria-hidden="true">/</span>
-            <span className={solid ? "font-medium text-ink" : "font-medium text-white"}>
+            <span className={ink ? "font-medium text-ink" : "font-medium text-white"}>
               {t.nav[crumb]}
             </span>
           </nav>

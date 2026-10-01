@@ -3,7 +3,6 @@ import { getDictionary, isLocale } from "@/content/i18n";
 import { PlanProvider } from "@/components/PlanContext";
 import SiteHeader from "@/components/SiteHeader";
 import Hero from "@/components/hero/Hero";
-import NetworkPanel from "@/components/hero/NetworkPanel";
 import HorizonBackdrop from "@/components/HorizonBackdrop";
 import Planner from "@/components/sections/Planner";
 import TrustBar from "@/components/sections/TrustBar";
@@ -38,7 +37,6 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       <SiteHeader t={t} lang={lang} />
       <main id="main" className="overflow-x-clip">
         <Hero t={t} lang={lang} />
-        <NetworkPanel t={t} />
         <TrustBar t={t} lang={lang} />
         <Depth><Needs lang={lang} /></Depth>
         <Depth><Planner t={t} lang={lang} /></Depth>
