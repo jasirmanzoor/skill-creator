@@ -72,7 +72,7 @@ export default function RoadmapSection({ t, lang }: { t: Dictionary; lang: Local
       {/* backdrop: MSG's warehouse dissolved into the sea-glass light, with a slow parallax */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden [contain:paint]">
         <motion.div style={reduce ? undefined : { y: bgY }} className="absolute inset-x-0 -top-[8%] h-[70%]">
-          <EmbeddedPhoto src="/photos/clean/warehouse.webp" tone="teal" fade="bottom" strength={0.35} className="size-full opacity-25" />
+          <EmbeddedPhoto src="/photos/msg/warehouse-floor.webp" tone="teal" fade="bottom" strength={0.35} className="size-full opacity-25" />
         </motion.div>
       </div>
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_40%_at_85%_0%,rgba(196,233,231,0.7),transparent_70%),linear-gradient(to_bottom,rgba(243,251,251,0.2),#f3fbfb_55%)]" />

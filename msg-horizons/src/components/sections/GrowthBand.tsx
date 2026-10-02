@@ -2,8 +2,8 @@
 
 /* eslint-disable @next/next/no-img-element -- the Sabya warehouse slot is MSG's own photo, served locally */
 import NumberFlow from "@number-flow/react";
-import { motion } from "motion/react";
-import { useId, useState } from "react";
+import { motion, useScroll, useSpring, useTransform } from "motion/react";
+import { useId, useRef, useState } from "react";
 import { redSea, LANES, RATE_CARD, rateFor, type Lane } from "@/content/redsea";
 import { whatsappLink } from "@/content/facts";
 import type { Locale } from "@/content/i18n";
@@ -153,9 +153,9 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
 
         {/* Sabya: the contrast beat, in dry Jazan sun */}
         <div className="mt-5 grid overflow-hidden rounded-3xl shadow-[0_30px_60px_-35px_rgba(120,80,20,0.45)] lg:grid-cols-[1.4fr_1fr]">
-          <div className="relative min-h-[320px] overflow-hidden sm:min-h-[380px]">
+          <div className="relative min-h-[380px] overflow-hidden sm:min-h-[460px]">
             {warehousePhoto ? (
-              <img src="/warehouse.jpg" alt={s.title} className="absolute inset-0 size-full object-cover" loading="lazy" />
+              <SabyaDoor alt={s.title} reduce={reduce} />
             ) : (
               <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(80%_90%_at_85%_0%,#fff6dc,rgba(255,246,220,0)_60%),linear-gradient(160deg,#f3dfb6,#e6c48b_55%,#d9ae6c)]" />
             )}
@@ -215,5 +215,26 @@ export function Money({ cur, approx = false, ar, children }: { cur: string; appr
       {approx ? <span className="text-lg">≈</span> : null}
       {ar ? <>{children}<span className="text-lg">{cur}</span></> : <><span className="text-lg">{cur}</span>{children}</>}
     </span>
+  );
+}
+
+/**
+ * MSG's own warehouse: the front of the building, then, as the visitor scrolls, the camera pushes
+ * through the open doorway and the street dissolves into the floor inside.
+ */
+function SabyaDoor({ alt, reduce }: { alt: string; reduce: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.85", "end 0.25"] });
+  const p = useSpring(scrollYProgress, { stiffness: 80, damping: 22 });
+  const frontScale = useTransform(p, [0, 0.75], [1.02, 2.4]);
+  const frontOpacity = useTransform(p, [0.35, 0.7], [1, 0]);
+  const floorScale = useTransform(p, [0.35, 1], [1.25, 1]);
+  const floorOpacity = useTransform(p, [0.35, 0.7], [0, 1]);
+  if (reduce) return <img src="/photos/msg/warehouse-floor.webp" alt={alt} className="absolute inset-0 size-full object-cover" loading="lazy" />;
+  return (
+    <div ref={ref} className="absolute inset-0">
+      <motion.img src="/photos/msg/warehouse-floor.webp" alt={alt} loading="lazy" style={{ scale: floorScale, opacity: floorOpacity }} className="absolute inset-0 size-full object-cover" />
+      <motion.img aria-hidden="true" src="/photos/msg/warehouse-front.webp" alt="" loading="lazy" style={{ scale: frontScale, opacity: frontOpacity, transformOrigin: "43% 57%" }} className="absolute inset-0 size-full object-cover [object-position:43%_50%]" />
+    </div>
   );
 }

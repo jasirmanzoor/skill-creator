@@ -6,7 +6,7 @@ export const PHOTO: Record<StageId, string> = {
   enquiry: "/photos/clean/business.webp",
   requirements: "/photos/clean/courier-mall.webp",
   guide: "/photos/clean/team.webp",
-  recommendations: "/photos/clean/warehouse.webp",
+  recommendations: "/photos/msg/warehouse-floor.webp",
   agreement: "/photos/clean/riyadh-night.webp",
   testing: "/photos/clean/fleet-car.webp",
   live: "/photos/clean/doorstep.webp",

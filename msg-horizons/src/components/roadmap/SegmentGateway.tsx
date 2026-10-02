@@ -18,7 +18,7 @@ const PHOTO: Record<Segment, [string, string]> = {
   offline: ["/photos/clean/courier-mall.webp", "35% 50%"],
   social: ["/photos/clean/doorstep.webp", "60% 40%"],
   neighborhood: ["/photos/clean/riyadh-night.webp", "50% 60%"],
-  enterprise: ["/photos/clean/warehouse.webp", "50% 50%"],
+  enterprise: ["/photos/msg/warehouse-front.webp", "50% 40%"],
   sme: ["/photos/clean/fleet-car.webp", "50% 65%"],
   aggregator: ["/photos/clean/team.webp", "50% 100%"],
 };

@@ -29,7 +29,7 @@ export default function GuideDevice({ lang, step, segment, net }: { lang: Locale
   return (
     <div className="relative flex h-full min-h-[440px] items-center justify-center overflow-hidden bg-[radial-gradient(80%_70%_at_50%_40%,rgba(255,255,255,0.9),transparent_70%),linear-gradient(160deg,#e2f4f3,#c4e9e7)] px-6 py-8">
       {/* MSG's warehouse, dissolved behind the phone */}
-      <EmbeddedPhoto src="/photos/clean/warehouse.webp" tone="teal" fade="all" strength={0.35} className="absolute inset-0 opacity-35" />
+      <EmbeddedPhoto src="/photos/msg/warehouse-floor.webp" tone="teal" fade="all" strength={0.35} className="absolute inset-0 opacity-35" />
       <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(19,113,121,0.12)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:radial-gradient(70%_60%_at_50%_50%,#000,transparent)]" />
       {/* the phone */}
       <div className="relative w-full max-w-[290px] rounded-[34px] bg-[#0f1411] p-2.5 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.9),0_0_0_1px_rgba(255,255,255,0.08),0_0_60px_-10px_rgba(19,113,121,0.35)]">

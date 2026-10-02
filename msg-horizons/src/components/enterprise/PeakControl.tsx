@@ -19,7 +19,7 @@ const Y = (v: number) => BOT - v * (BOT - TOP);
 const line = (f: (t: number) => number) => Array.from({ length: 121 }, (_, i) => { const t = i / 120; return `${i ? "L" : "M"}${X(t).toFixed(1)} ${Y(f(t)).toFixed(1)}`; }).join(" ");
 const area = (f: (t: number) => number) => `${line(f)} L${X(1)} ${BOT} L${X(0)} ${BOT} Z`;
 const STARTS = [0, 0.2, 0.4, 0.6, 0.8];
-const PHOTOS = ["/photos/clean/business.webp", "/photos/clean/team.webp", "/photos/clean/courier-mall.webp", "/photos/clean/fleet-car.webp", "/photos/clean/warehouse.webp"];
+const PHOTOS = ["/photos/clean/business.webp", "/photos/clean/team.webp", "/photos/clean/courier-mall.webp", "/photos/clean/fleet-car.webp", "/photos/msg/warehouse-floor.webp"];
 const POS = ["50% 40%", "50% 100%", "55% 50%", "50% 65%", "50% 50%"];
 
 /**
