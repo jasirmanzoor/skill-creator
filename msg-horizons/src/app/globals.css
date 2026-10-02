@@ -277,21 +277,3 @@ html.lenis-on, html.lenis-on body { height: auto; }
 [dir="rtl"] .nb-ribbon { animation-direction: reverse !important; }
 @media (prefers-reduced-motion: reduce) { .nb-ribbon { animation: none !important; } }
 
-/* one-stop operations (components/sections/Needs.tsx) */
-.ops-col { opacity: 0; translate: 0 22px; }
-.needs-grid[data-inview] .ops-col { animation: need-in 0.9s var(--ease-out-expo) var(--d, 0ms) forwards; }
-.ops-spine { animation: ops-spine 3.2s linear infinite; }
-@keyframes ops-spine { from { left: -25%; } to { left: 100%; } }
-[dir="rtl"] .ops-spine { animation-direction: reverse; }
-.ops-tick { transform: scaleX(0); transform-origin: left; }
-[dir="rtl"] .ops-tick { transform-origin: right; }
-.needs-grid[data-inview] .ops-tick { animation: ops-tick 0.5s var(--ease-out-expo) var(--d, 0ms) forwards; }
-@keyframes ops-tick { to { transform: none; } }
-@media (prefers-reduced-motion: reduce) {
-  .ops-col, .ops-tick { opacity: 1 !important; translate: none !important; transform: none !important; animation: none !important; }
-  .ops-spine { animation: none; left: 37%; }
-}
-.ops-pod { scale: 0.6; opacity: 0; }
-.needs-grid[data-inview] .ops-pod { animation: ops-pod 0.7s var(--ease-out-expo) 1.5s forwards; }
-@keyframes ops-pod { to { scale: 1; opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .ops-pod { scale: 1 !important; opacity: 1 !important; animation: none !important; } }

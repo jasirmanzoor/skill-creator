@@ -60,6 +60,8 @@ type Copy = {
     support: { title: string; body: string; items: string[] };
     track: string[];
     pod: string;
+    cards: { setup: string; store: string; settle: string; settleRows: string[] };
+    scroll: string;
   };
   journey: { eyebrow: string; title: string; lead: string; stages: Record<StageId, { t: string; d: string; tag: string }>; cta: string; ui: JourneyUI };
   partners: { eyebrow: string; title: string; lead: string; hub: string; note: string };
@@ -85,6 +87,8 @@ export const experience: Record<Locale, Copy> = {
       },
       track: ["Picked up", "Hub", "On route", "Delivered"],
       pod: "Proof of delivery captured",
+      cards: { setup: "Ready before your first pickup", store: "Stock on the shelf", settle: "Your statement", settleRows: ["Cash on delivery reconciled", "Remittance on your agreed cycle", "Returns tracked, reason recorded"] },
+      scroll: "Scroll to follow one order through MSG",
       items: {
         cod: { q: "How do I get paid on cash orders?", a: "Cash collected at the door is reconciled and paid to you." },
         remittance: { q: "When does my money arrive?", a: "Remittance cycle and statements are fixed in your agreement." },
@@ -150,6 +154,8 @@ export const experience: Record<Locale, Copy> = {
       },
       track: ["الاستلام", "المحطة", "في الطريق", "تم التسليم"],
       pod: "تم تسجيل إثبات التسليم",
+      cards: { setup: "جاهز قبل أول استلام", store: "المخزون على الرف", settle: "كشف حسابك", settleRows: ["مطابقة مبالغ الدفع عند الاستلام", "التحويل وفق الدورة المتفق عليها", "المرتجعات متتبعة مع تسجيل السبب"] },
+      scroll: "مرّر لتتبع طلباً واحداً عبر مسج",
       items: {
         cod: { q: "كيف أحصل على قيمة الطلبات النقدية؟", a: "النقد المحصّل عند الباب يُطابق ويُحوّل إليك." },
         remittance: { q: "متى تصلني أموالي؟", a: "دورة التحويل والكشوفات محددة في اتفاقيتك." },
