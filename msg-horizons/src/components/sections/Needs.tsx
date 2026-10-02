@@ -1,16 +1,18 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element -- local, pre-optimised webp of MSG's own warehouse */
 import { useEffect, useRef, useState } from "react";
-import { experience, NEED_IDS, type NeedId } from "@/content/experience";
+import { experience, NEED_STAGES, NEEDS_BY_STAGE, type NeedId, type NeedStage } from "@/content/experience";
 import type { Locale } from "@/content/i18n";
 import TrackedLink from "../ui/TrackedLink";
 import { ArrowIcon } from "../ui/icons";
-import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 /**
- * The nine questions every seller asks, each answered in one line.
- * Cards tilt toward the pointer (spatial depth) and each carries a small living icon
- * that plays once the grid is on screen. Under reduced motion everything is static.
+ * One stop, start to finish: the nine seller questions laid out as one structured operation.
+ * Four lifecycle stages (set up, store, deliver, settle) sit on a single spine, each answer
+ * filed under the stage that owns it, and the support system (one team, written terms, pilots,
+ * logged scans, 24/7) closes the section. Columns rise in sequence once on screen; static under
+ * reduced motion (the CSS keeps everything visible).
  */
 export default function Needs({ lang }: { lang: Locale }) {
   const c = experience[lang].needs;
@@ -19,89 +21,142 @@ export default function Needs({ lang }: { lang: Locale }) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const io = new IntersectionObserver(([e]) => e.isIntersecting && setInView(true), { threshold: 0.15 });
+    const io = new IntersectionObserver(([e]) => e.isIntersecting && setInView(true), { threshold: 0.12 });
     io.observe(el);
     return () => io.disconnect();
   }, []);
 
+  let n = 0;
   return (
-    <section id="sellers" aria-labelledby="needs-title" className="relative scroll-mt-16 overflow-hidden bg-paper/90 py-24 backdrop-blur lg:py-32">
-      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+    <section id="sellers" aria-labelledby="needs-title" className="sea-band relative scroll-mt-16 overflow-hidden py-24 lg:py-32">
+      <div className="mx-auto max-w-7xl px-4 sm:px-5 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-2 lg:items-end">
           <div>
             <span className="label">{c.eyebrow}</span>
-            <h2 id="needs-title" className="mt-4 font-display text-4xl font-semibold tracking-[-0.03em] text-ink text-balance sm:text-5xl rtl:tracking-normal">
+            <h2 id="needs-title" className="mt-4 font-display text-4xl font-semibold tracking-[-0.03em] text-teal-deep text-balance sm:text-5xl rtl:tracking-normal">
               {c.title}
             </h2>
           </div>
-          <p className="max-w-xl text-lg text-muted text-pretty lg:justify-self-end">{c.lead}</p>
+          <p className="max-w-xl text-lg text-teal-deep/75 text-pretty lg:justify-self-end">{c.lead}</p>
         </div>
 
-        <div ref={ref} data-inview={inView || undefined} className="needs-grid mt-14 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 [perspective:1400px]">
-          {NEED_IDS.map((id, i) => (
-            <NeedCard key={id} id={id} q={c.items[id].q} a={c.items[id].a} i={i} />
-          ))}
+        <div ref={ref} data-inview={inView || undefined} className="needs-grid relative mt-14">
+          {/* the spine every stage hangs from */}
+          <div aria-hidden="true" className="absolute inset-x-[12.5%] top-[22px] hidden h-0.5 overflow-hidden rounded-full bg-teal/15 lg:block">
+            <span className="ops-spine absolute inset-y-0 w-1/4 rounded-full bg-gradient-to-r from-transparent via-teal to-transparent" />
+          </div>
+          <ol className="grid gap-4 lg:grid-cols-4 lg:gap-5">
+            {NEED_STAGES.map((st, si) => (
+              <li key={st} className="ops-col relative flex flex-col" style={{ ["--d" as string]: `${si * 140}ms` }}>
+                <div className="flex items-center gap-3 lg:flex-col lg:items-center lg:text-center">
+                  <span className="relative z-10 grid size-11 shrink-0 place-items-center rounded-full bg-teal-deep font-display text-sm font-semibold text-white shadow-[0_0_0_6px_rgba(226,244,243,0.9)]">
+                    <span className="num" dir="ltr">0{si + 1}</span>
+                  </span>
+                  <div>
+                    <h3 className="font-display text-xl font-semibold text-teal-deep">{c.stages[st].t}</h3>
+                    <p className="text-sm text-teal-deep/70">{c.stages[st].d}</p>
+                  </div>
+                </div>
+                <div className="sea-glass mt-4 flex flex-1 flex-col gap-2.5 rounded-3xl p-3">
+                  {NEEDS_BY_STAGE[st].map((id) => (
+                    <NeedCard key={id} id={id} q={c.items[id].q} a={c.items[id].a} owner={c.owner} i={n++} />
+                  ))}
+                  <StageFill stage={st} track={c.track} pod={c.pod} />
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
 
-        <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="max-w-xl text-sm text-muted">{c.note}</p>
-          <TrackedLink
-            href="#planner"
-            event="cta_click"
-            props={{ cta: "plan", location: "needs" }}
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-ink px-5 py-3 font-medium text-white transition-colors hover:bg-ink-3"
-          >
-            {c.cta} <ArrowIcon className="size-4 rtl:rotate-180" />
-          </TrackedLink>
+        {/* the support system */}
+        <div className="mt-6 grid gap-8 overflow-hidden rounded-3xl bg-teal-deep p-6 text-white sm:p-8 lg:grid-cols-[1fr_1.4fr] lg:p-10">
+          <div className="flex flex-col">
+            <p className="font-display text-2xl font-semibold text-balance sm:text-3xl">{c.support.title}</p>
+            <p className="mt-3 max-w-md text-white/75">{c.support.body}</p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center lg:mt-auto lg:pt-8">
+              <TrackedLink
+                href="#planner"
+                event="cta_click"
+                props={{ cta: "plan", location: "needs" }}
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-white px-5 py-3 font-medium text-teal-deep transition-colors hover:bg-sea-100"
+              >
+                {c.cta} <ArrowIcon className="size-4 rtl:rotate-180" />
+              </TrackedLink>
+            </div>
+          </div>
+          <div>
+            <ul className="grid gap-2.5 sm:grid-cols-2">
+              {c.support.items.map((it, i) => (
+                <li key={it} className={`flex items-center gap-3 rounded-2xl bg-white/[0.07] px-4 py-3.5 ring-1 ring-white/10 ${i === c.support.items.length - 1 && c.support.items.length % 2 ? "sm:col-span-2" : ""}`}>
+                  <span className="grid size-8 shrink-0 place-items-center rounded-full bg-sea-200 text-teal-deep">
+                    <svg viewBox="0 0 16 16" className="size-4" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                  </span>
+                  <span className="font-medium">{it}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-4 text-sm text-white/65">{c.note}</p>
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-function NeedCard({ id, q, a, i }: { id: NeedId; q: string; a: string; i: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
-  const onMove = (e: React.PointerEvent) => {
-    if (reduce || e.pointerType !== "mouse") return;
-    const el = ref.current!;
-    const r = el.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width - 0.5;
-    const y = (e.clientY - r.top) / r.height - 0.5;
-    el.style.setProperty("--rx", `${(-y * 7).toFixed(2)}deg`);
-    el.style.setProperty("--ry", `${(x * 9).toFixed(2)}deg`);
-    el.style.setProperty("--gx", `${((x + 0.5) * 100).toFixed(1)}%`);
-    el.style.setProperty("--gy", `${((y + 0.5) * 100).toFixed(1)}%`);
-  };
-  const onLeave = () => {
-    const el = ref.current!;
-    el.style.setProperty("--rx", "0deg");
-    el.style.setProperty("--ry", "0deg");
-  };
+/** what fills the rest of each stage: MSG's real warehouse under Store, a closed-out tracker under Deliver */
+function StageFill({ stage, track, pod }: { stage: NeedStage; track: string[]; pod: string }) {
+  if (stage === "store") {
+    return (
+      <div className="relative min-h-40 flex-1 overflow-hidden rounded-2xl">
+        <img src="/photos/msg/warehouse-floor.webp" alt="" loading="lazy" decoding="async" className="absolute inset-0 size-full object-cover" style={{ objectPosition: "50% 60%" }} />
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#0b3a40]/40 to-transparent" />
+      </div>
+    );
+  }
+  if (stage === "deliver") {
+    return (
+      <div className="flex flex-1 flex-col justify-end gap-4 rounded-2xl bg-white/80 p-4 ring-1 ring-teal/10">
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 py-4 text-center">
+          <span className="ops-pod grid size-16 place-items-center rounded-full bg-gradient-to-br from-teal to-teal-deep text-white shadow-[0_14px_30px_-14px_rgba(11,58,64,0.9)]">
+            <svg viewBox="0 0 24 24" className="size-8" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          </span>
+          <p className="font-display text-sm font-semibold text-teal-deep">{pod}</p>
+        </div>
+        <ol className="grid grid-cols-4 gap-1">
+          {track.map((t, i) => (
+            <li key={t} className="text-center">
+              <span className="ops-tick mx-auto block h-1.5 rounded-full bg-teal" style={{ ["--d" as string]: `${600 + i * 220}ms` }} />
+              <span className="mt-1.5 block text-[10px] font-medium leading-tight text-teal-deep/75">{t}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    );
+  }
+  return null;
+}
+
+function NeedCard({ id, q, a, owner, i }: { id: NeedId; q: string; a: string; owner: string; i: number }) {
   return (
-    <div
-      ref={ref}
-      onPointerMove={onMove}
-      onPointerLeave={onLeave}
-      className="need-card group relative overflow-hidden rounded-2xl border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(12,14,17,0.04)] sm:p-7"
-      style={{ ["--d" as string]: `${i * 70}ms` }}
-    >
-      {/* light that follows the pointer */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[radial-gradient(420px_circle_at_var(--gx,50%)_var(--gy,50%),rgba(11,125,54,0.08),transparent_60%)]" />
-      <div className="relative flex items-start gap-5 [transform:translateZ(30px)]">
-        <span className="need-icon inline-flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#16a34a] to-[#0b6b2f] text-white shadow-[0_10px_24px_-10px_rgba(11,125,54,0.7)]">
+    <div className="need-card rounded-2xl bg-white p-4 ring-1 ring-teal/10 transition-shadow hover:shadow-[0_20px_40px_-28px_rgba(11,58,64,0.55)]" style={{ ["--d" as string]: `${200 + i * 70}ms` }}>
+      <div className="flex items-start gap-3.5">
+        <span className="need-icon inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-teal to-teal-deep text-white shadow-[0_10px_20px_-10px_rgba(11,58,64,0.8)] [&_svg]:size-7">
           <NeedIcon id={id} />
         </span>
         <div className="min-w-0">
-          <h3 className="text-sm text-muted">{q}</h3>
-          <p className="mt-1.5 font-display text-lg font-semibold leading-snug tracking-[-0.01em] text-ink text-pretty rtl:tracking-normal">{a}</p>
+          <h4 className="text-[13px] text-teal-deep/70">{q}</h4>
+          <p className="mt-1 font-display text-base font-semibold leading-snug text-teal-deep text-pretty">{a}</p>
+          <p className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-semibold text-teal">
+            <span className="size-1.5 rounded-full bg-teal" />
+            {owner}
+          </p>
         </div>
       </div>
     </div>
   );
 }
 
-const B = "#d9f99d";
+const B = "#a7f0e6";
 function NeedIcon({ id }: { id: NeedId }) {
   const common = { width: 34, height: 34, viewBox: "0 0 34 34", fill: "none", "aria-hidden": true } as const;
   switch (id) {

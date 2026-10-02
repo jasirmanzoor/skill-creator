@@ -12,6 +12,16 @@ import type { Locale } from "@/content/i18n";
 export const NEED_IDS = ["cod", "remittance", "packaging", "storage", "returns", "pod", "overseas", "pickups", "damages"] as const;
 export type NeedId = (typeof NEED_IDS)[number];
 
+/** The same nine answers, grouped into the order lifecycle they belong to. */
+export const NEED_STAGES = ["setup", "store", "deliver", "settle"] as const;
+export type NeedStage = (typeof NEED_STAGES)[number];
+export const NEEDS_BY_STAGE: Record<NeedStage, NeedId[]> = {
+  setup: ["packaging", "pickups", "overseas"],
+  store: ["storage"],
+  deliver: ["pod", "damages"],
+  settle: ["cod", "remittance", "returns"],
+};
+
 export const STAGE_IDS = ["enquiry", "requirements", "guide", "recommendations", "agreement", "testing", "live"] as const;
 export type StageId = (typeof STAGE_IDS)[number];
 
@@ -43,7 +53,14 @@ type JourneyUI = {
 };
 
 type Copy = {
-  needs: { eyebrow: string; title: string; lead: string; items: Record<NeedId, { q: string; a: string }>; cta: string; note: string };
+  needs: {
+    eyebrow: string; title: string; lead: string; items: Record<NeedId, { q: string; a: string }>; cta: string; note: string;
+    stages: Record<NeedStage, { t: string; d: string }>;
+    owner: string;
+    support: { title: string; body: string; items: string[] };
+    track: string[];
+    pod: string;
+  };
   journey: { eyebrow: string; title: string; lead: string; stages: Record<StageId, { t: string; d: string; tag: string }>; cta: string; ui: JourneyUI };
   partners: { eyebrow: string; title: string; lead: string; hub: string; note: string };
 };
@@ -51,9 +68,23 @@ type Copy = {
 export const experience: Record<Locale, Copy> = {
   en: {
     needs: {
-      eyebrow: "The questions every seller asks",
-      title: "Your delivery questions, answered in one line.",
-      lead: "Whether you sell from home, run a growing brand or ship from abroad, these are the things that decide whether delivery works for you.",
+      eyebrow: "One stop, start to finish",
+      title: "One partner for the whole operation.",
+      lead: "Setup, storage, delivery, cash and returns run as one structured operation, with one MSG team accountable at every step. Here is where each of your questions is handled.",
+      stages: {
+        setup: { t: "Set up", d: "Before your first pickup" },
+        store: { t: "Store", d: "Held and shipped from the shelf" },
+        deliver: { t: "Deliver", d: "Tracked to the door" },
+        settle: { t: "Settle", d: "Cash and returns closed out" },
+      },
+      owner: "Handled by MSG",
+      support: {
+        title: "The support system behind it",
+        body: "Structure is agreed before go-live and held after it. You deal with one team, and every commitment is on paper.",
+        items: ["One accountable team, start to finish", "Terms agreed in writing before go-live", "Pilot shipments checked with you first", "Every scan logged, proof on every delivery", "Operations running 24/7"],
+      },
+      track: ["Picked up", "Hub", "On route", "Delivered"],
+      pod: "Proof of delivery captured",
       items: {
         cod: { q: "How do I get paid on cash orders?", a: "Cash collected at the door is reconciled and paid to you." },
         remittance: { q: "When does my money arrive?", a: "Remittance cycle and statements are fixed in your agreement." },
@@ -102,9 +133,23 @@ export const experience: Record<Locale, Copy> = {
   },
   ar: {
     needs: {
-      eyebrow: "الأسئلة التي يطرحها كل بائع",
-      title: "أسئلتك عن التوصيل، بإجابة من سطر واحد.",
-      lead: "سواء كنت تبيع من المنزل أو تدير علامة تنمو أو تشحن من الخارج، هذه هي الأمور التي تحدد نجاح التوصيل معك.",
+      eyebrow: "جهة واحدة، من البداية إلى النهاية",
+      title: "شريك واحد للعملية كاملة.",
+      lead: "الإعداد والتخزين والتوصيل والتحصيل والمرتجعات تُدار كعملية واحدة منظمة، مع فريق واحد من مسج مسؤول عن كل خطوة. وهنا أين تُعالج كل أسئلتك.",
+      stages: {
+        setup: { t: "الإعداد", d: "قبل أول استلام" },
+        store: { t: "التخزين", d: "حفظ وشحن من الرف" },
+        deliver: { t: "التوصيل", d: "متتبع حتى الباب" },
+        settle: { t: "التسوية", d: "إغلاق التحصيل والمرتجعات" },
+      },
+      owner: "تتولاه مسج",
+      support: {
+        title: "منظومة الدعم خلف كل ذلك",
+        body: "يُتفق على الهيكل قبل الإطلاق ويُلتزم به بعده. تتعامل مع فريق واحد، وكل التزام مكتوب.",
+        items: ["فريق واحد مسؤول من البداية إلى النهاية", "شروط مكتوبة ومتفق عليها قبل الإطلاق", "شحنات تجريبية نراجعها معك أولاً", "كل مسح موثّق وإثبات لكل تسليم", "عمليات على مدار الساعة"],
+      },
+      track: ["الاستلام", "المحطة", "في الطريق", "تم التسليم"],
+      pod: "تم تسجيل إثبات التسليم",
       items: {
         cod: { q: "كيف أحصل على قيمة الطلبات النقدية؟", a: "النقد المحصّل عند الباب يُطابق ويُحوّل إليك." },
         remittance: { q: "متى تصلني أموالي؟", a: "دورة التحويل والكشوفات محددة في اتفاقيتك." },
