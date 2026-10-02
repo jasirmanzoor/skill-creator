@@ -9,7 +9,7 @@ export const PHOTO: Record<StageId, string> = {
   recommendations: "/photos/msg/warehouse-floor.webp",
   agreement: "/photos/clean/riyadh-night.webp",
   testing: "/photos/clean/fleet-car.webp",
-  live: "/photos/clean/doorstep.webp",
+  live: "/photos/msg/warehouse-front.webp",
 };
 
 /** MSG's own photography with a small, familiar app card that slides in when the stage is active. */

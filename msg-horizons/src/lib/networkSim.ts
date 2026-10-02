@@ -132,6 +132,8 @@ export class NetworkSim {
   private sortClock = 0;
   private stockClock = 3;
   private shiftClock = 1;
+  private inflowClock = 0.5;
+  private doorAt = 0;
 
   constructor(cfg: SimConfig) {
     this.cfg = cfg;
@@ -212,6 +214,13 @@ export class NetworkSim {
     // pings and heat age
     this.pings = this.pings.filter((p) => (p.age += dt) < 1.6);
 
+    // the rest of the network's shippers keep the hub fed, so couriers are rarely idle
+    this.inflowClock -= dt;
+    if (this.inflowClock <= 0 && this.queue.length < 4) {
+      this.queue.push(this.nextParcel++);
+      this.inflowClock = Math.max(0.35, 1.1 - this.cfg.couriers * 0.04);
+    }
+
     // hub sortation: one parcel every ~0.45s onto a free courier
     this.sortClock -= dt;
     if (this.sortClock <= 0 && this.queue.length) {
@@ -223,6 +232,10 @@ export class NetworkSim {
         this.emit({ key: "sorted", id: `R-${String(3 + (parcel % 17)).padStart(2, "0")}` });
         this.emit({ key: "out", id: free.id });
         if (parcel === this.hero.id) { this.hero.phase = "road"; this.hero.carrier = free.id; }
+        else if (this.hero.phase === "door" && this.t - this.doorAt > 2.5) {
+          // the last tracked parcel is home: pick up the next one leaving the hub
+          this.hero = { id: parcel, phase: "road", pos: { ...this.hub }, carrier: free.id };
+        }
         this.sortClock = 0.45;
       }
     }
@@ -299,7 +312,7 @@ export class NetworkSim {
         this.heat.push({ ...v.pos });
         if (this.heat.length > 220) this.heat.shift();
         this.emit({ key: "delivered" });
-        if (v.load.includes(this.hero.id)) { this.hero.phase = "door"; this.hero.pos = { ...v.pos }; }
+        if (v.load.includes(this.hero.id)) { this.hero.phase = "door"; this.hero.pos = { ...v.pos }; this.doorAt = this.t; }
         v.load = [];
         this.send(v, v.target!, HUB, "back");
       } else {

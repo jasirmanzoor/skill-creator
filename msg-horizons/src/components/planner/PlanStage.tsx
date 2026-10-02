@@ -21,7 +21,7 @@ export default function PlanStage({ locale, input, complete = false }: Props) {
   const origins =
     input?.persona === "platform" ? 5 : input?.persona === "enterprise" ? 3 : input?.persona === "ecommerce" ? 2 : 1;
   const couriers =
-    input?.volume === "high" ? 16 : input?.volume === "scaling" ? 11 : input?.volume === "steady" ? 7 : input ? 4 : 3;
+    input?.volume === "high" ? 18 : input?.volume === "scaling" ? 14 : input?.volume === "steady" ? 10 : 8;
   const storage = Boolean(input?.cargo.includes("storage") || plan?.modules.some((m) => m.id === "warehousing"));
   const freight = Boolean(input?.cargo.includes("freight") || input?.cargo.includes("b2b"));
   const people = Boolean(input?.cargo.includes("people") || plan?.modules.some((m) => m.id === "manpower"));

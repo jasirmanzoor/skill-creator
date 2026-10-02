@@ -3,7 +3,7 @@ import type { ServiceId } from "@/content/facts";
 
 /** MSG's own photography for each service (2026 company profile). */
 const PHOTO: Record<ServiceId, { src: string; pos?: string }> = {
-  "last-mile": { src: "/photos/clean/doorstep.webp", pos: "50% 40%" },
+  "last-mile": { src: "/photos/clean/courier-mall.webp", pos: "50% 35%" },
   warehousing: { src: "/photos/msg/warehouse-floor.webp", pos: "50% 55%" },
   "land-freight": { src: "/photos/clean/riyadh-night.webp", pos: "50% 60%" },
   fleet: { src: "/photos/clean/fleet-car.webp", pos: "50% 62%" },

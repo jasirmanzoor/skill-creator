@@ -270,3 +270,9 @@ html.lenis-on, html.lenis-on body { height: auto; }
 
 /* Hero headline sheen */
 @keyframes hero-sheen { to { background-position: 200% center; } }
+
+/* network band: stat progress and partner ribbon */
+@keyframes nb-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes nb-ribbon { to { transform: translateX(-50%); } }
+[dir="rtl"] .nb-ribbon { animation-direction: reverse !important; }
+@media (prefers-reduced-motion: reduce) { .nb-ribbon { animation: none !important; } }

@@ -16,7 +16,7 @@ const ORDER: { id: Segment; group: "individual" | "business" }[] = [
 ];
 const PHOTO: Record<Segment, [string, string]> = {
   offline: ["/photos/clean/courier-mall.webp", "35% 50%"],
-  social: ["/photos/clean/doorstep.webp", "60% 40%"],
+  social: ["/photos/msg/warehouse-floor.webp", "50% 55%"],
   neighborhood: ["/photos/clean/riyadh-night.webp", "50% 60%"],
   enterprise: ["/photos/msg/warehouse-front.webp", "50% 40%"],
   sme: ["/photos/clean/fleet-car.webp", "50% 65%"],
