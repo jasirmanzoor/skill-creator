@@ -98,7 +98,7 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
                   <a
                     href={item.href}
                     aria-current={isActive ? "location" : undefined}
-                    className={`relative inline-flex px-3 py-2 text-[15px] transition-colors ${
+                    className={`nav-link relative inline-flex px-3 py-2 text-[15px] transition-colors ${
                       isActive
                         ? ink
                           ? "font-semibold text-ink"
@@ -135,9 +135,7 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
           <a
             href="#planner"
             onClick={() => track("cta_click", { cta: "plan", location: "header" })}
-            className={`hidden rounded-md px-4 py-2 text-sm font-medium transition-colors md:inline-flex ${
-              ink ? "bg-ink text-white hover:bg-ink-3" : "bg-white text-ink hover:bg-white/90"
-            }`}
+            className={`btn-primary hidden px-4 py-2 text-sm md:inline-flex ${ink ? "" : "on-dark"}`}
           >
             {t.nav.ctaShort}
           </a>
@@ -158,8 +156,8 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
       </div>
 
       {scrolled && crumb && !open && (
-        <div className={`hidden border-t px-5 text-xs lg:block lg:px-8 ${ink ? "border-line text-muted" : "border-white/10 text-white/70"}`}>
-          <nav aria-label="Breadcrumb" className="mx-auto flex h-8 max-w-7xl items-center gap-2">
+        <div className={`hidden border-t text-xs lg:block ${ink ? "border-line text-muted" : "border-white/10 text-white/70"}`}>
+          <nav aria-label="Breadcrumb" className="mx-auto flex h-8 max-w-7xl items-center gap-2 px-5 lg:px-8">
             <a href={`/${lang}`} className="hover:underline">
               {t.nav.home}
             </a>
@@ -203,7 +201,7 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
               setOpen(false);
               track("cta_click", { cta: "plan", location: "mobile_menu" });
             }}
-            className="rounded-md bg-ink px-5 py-3.5 text-center font-medium text-white"
+            className="btn-primary px-5 py-3.5"
           >
             {t.nav.cta}
           </a>

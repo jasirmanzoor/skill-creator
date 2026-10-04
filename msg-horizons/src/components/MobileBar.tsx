@@ -27,7 +27,7 @@ export default function MobileBar({ t }: { t: Dictionary }) {
       aria-hidden={!show}
     >
       <a href="#planner" tabIndex={show ? 0 : -1} onClick={() => track("cta_click", { cta: "plan", location: "mobile_bar" })}
-        className="rounded-md bg-ink px-5 py-3 text-center font-medium text-white">
+        className="btn-primary px-5 py-3">
         {t.mobileBar.plan}
       </a>
       <a href={whatsappLink(t.wa.general)} target="_blank" rel="noopener noreferrer" tabIndex={show ? 0 : -1}
