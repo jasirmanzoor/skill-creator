@@ -320,3 +320,14 @@ html.lenis-on, html.lenis-on body { height: auto; }
 [dir="rtl"] .nav-link::after { transform-origin: right; }
 .nav-link:hover::after { transform: scaleX(1); }
 .nav-link[aria-current]::after { display: none; }
+
+/* ---------- Live tracking section (components/live) ---------- */
+/* signal travelling from the driver's phone to the tracking page */
+@keyframes sig-x { 0% { transform: translateX(0); opacity: 0; } 15%, 85% { opacity: 1; } 100% { transform: translateX(calc(64px * var(--dir, 1))); opacity: 0; } }
+@keyframes sig-y { 0% { transform: translateY(0); opacity: 0; } 15%, 85% { opacity: 1; } 100% { transform: translateY(48px); opacity: 0; } }
+.sig-x { animation: sig-x 1.5s linear infinite; }
+.sig-y { animation: sig-y 1.3s linear infinite; }
+[dir="rtl"] .sig-x { --dir: -1; }
+/* the "live" dot in the scan-vs-live comparison runs the whole track without a break */
+@keyframes live-run { 0% { inset-inline-start: 12.5%; opacity: 0; } 6%, 94% { opacity: 1; } 100% { inset-inline-start: 87.5%; opacity: 0; } }
+.live-run { animation: live-run 6.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite; }

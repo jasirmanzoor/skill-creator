@@ -311,6 +311,25 @@ await test("reduced motion: hero renders final state immediately", async () => {
   await ctx.close();
 });
 
+await test("live tracking: nothing is live until the driver approves, then the tracking page goes live (en + ar)", async () => {
+  const cases = [
+    ["en", "Approve", "Waiting for driver", "Live location is on", "Live location from the driver's phone"],
+    ["ar", "موافق", "بانتظار المندوب", "الموقع المباشر يعمل", "الموقع المباشر من جوال المندوب"],
+  ];
+  for (const [lang, approve, waiting, liveTitle, liveSub] of cases) {
+    const { page, ctx, errors } = await open(`/${lang}`);
+    const sec = page.locator("#live-tracking");
+    await sec.scrollIntoViewIfNeeded();
+    assert.ok(await sec.getByText(waiting).first().isVisible(), `${lang}: starts waiting`);
+    assert.equal(await sec.getByText(liveSub).count(), 0, `${lang}: no live location before approval`);
+    await sec.getByRole("button", { name: approve, exact: true }).click();
+    await sec.getByText(liveTitle).first().waitFor({ state: "visible", timeout: 5000 });
+    assert.ok(await sec.getByText(liveSub).first().isVisible(), `${lang}: live after approval`);
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  }
+});
+
 await test("accessibility: axe-core finds no serious/critical violations (en + ar)", async () => {
   for (const lang of ["en", "ar"]) {
     const { page, ctx } = await open(`/${lang}`, { reducedMotion: "reduce" });

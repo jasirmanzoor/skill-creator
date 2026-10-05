@@ -25,6 +25,20 @@ and what needs **confirmation** before it can be used.
   Commons, public domain), iMile (EN + AR, from imile.com), Keeta (app icon, from keeta-global.com). AJEX and Logistiqa
   appear as name tiles until MSG supplies their files. MSG should hold each partner's permission to display its mark.
 
+- **Live tracking (5 Oct 2026, from MSG in chat):** when a delivery is assigned the driver gets a request on their
+  phone and must approve it. Once they do, the driver's mobile location is fetched live and shown to the seller or
+  client (SMEs and start-ups) and their customer. It is **not** scan-based hub-to-hub tracking. The "Live tracking"
+  section (`src/components/live`, copy in `src/content/liveTracking.ts`) states exactly this and nothing more.
+
+## Live tracking: still to confirm with MSG
+| Item | Why |
+|---|---|
+| How the seller and their customer open it | Link, WhatsApp, dashboard or app? The demo shows a generic tracking page. |
+| If the driver declines or does not answer | The demo only shows the approve path. |
+| When sharing ends | The copy does not say it stops at delivery; confirm before stating it. |
+| Update frequency, accuracy and ETA | None are stated. The demo shows no times, distances or ETAs. |
+| Consent and privacy wording | The copy says nothing is shared until the driver approves. Confirm the wording and any data-retention terms. |
+
 ## Conflicts (not silently reconciled)
 - **Establishment date.** The source gives "11-04-1446 AH (01/12/2025)". 11 Rabiʿ II 1446 AH falls in
   mid-October 2024, not 1 December 2025. The 2026 growth trajectory also starts at "2024 Q1 Foundation".
@@ -36,6 +50,8 @@ and what needs **confirmation** before it can be used.
 - **Specific cities or regions served.** The source supports "across the Kingdom", "wide regional coverage"
   and "within cities and across regions", but names no cities except the Riyadh HQ. The hero map therefore
   labels only Riyadh HQ, and vehicle trails are abstract.
+- **"No other provider offers live tracking".** Not provable from the source, so it is not published. The section
+  shows the difference (scan updates vs live location) instead of making a claim about anyone else.
 - **Pricing, SLAs, delivery times and success rates.** None are in the source. The planner states that
   pricing is tailored and confirmed by MSG.
 - **Growth trajectory (2024 Q1 → 2025 Q3).** Held back because of the date conflict above.
@@ -43,6 +59,8 @@ and what needs **confirmation** before it can be used.
   one truck, and is captioned as illustrative.
 
 ## Illustrative (clearly labelled as such on the site)
+- Live tracking demo: sample places (Olaya to Al Rawdah) and a generic driver app and tracking page. The moving dot loops
+  along a sample route; it is not real data. Captioned as an illustrative demo.
 - Peak-demand chart: the shape of the curve is illustrative. It is captioned "not actual MSG volumes".
 - Planner volume bands (for example "200 – 2,000 a day") are the visitor's self-estimate, not MSG claims.
 
