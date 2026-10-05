@@ -277,3 +277,46 @@ html.lenis-on, html.lenis-on body { height: auto; }
 [dir="rtl"] .nb-ribbon { animation-direction: reverse !important; }
 @media (prefers-reduced-motion: reduce) { .nb-ribbon { animation: none !important; } }
 
+
+/* ---------- Site chrome: one primary button, one nav-link hover ---------- */
+/* The hero's dark-teal pill is the primary action everywhere (header, menu, mobile bar). */
+:root {
+  --shadow-cta: 0 14px 30px -12px rgba(11, 58, 64, 0.8);
+  --shadow-cta-hover: 0 20px 36px -14px rgba(11, 58, 64, 0.9);
+}
+@layer components {
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    background: var(--color-teal-deep);
+    color: #fff;
+    font-weight: 600;
+    box-shadow: var(--shadow-cta);
+    transition: transform 0.25s var(--ease-out-expo), box-shadow 0.25s var(--ease-out-expo), background-color 0.2s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-cta-hover); }
+  .btn-primary:active { transform: translateY(0) scale(0.98); }
+  /* Over dark sections the header button flips to white. */
+  .btn-primary.on-dark { background: #fff; color: var(--color-teal-deep); box-shadow: none; }
+}
+
+/* Underline grows from the inline start on hover; the active item keeps a full bar. */
+.nav-link::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0.75rem;
+  bottom: -0.125rem;
+  height: 2px;
+  border-radius: 9999px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  opacity: 0.35;
+  transition: transform 0.3s var(--ease-out-expo);
+}
+[dir="rtl"] .nav-link::after { transform-origin: right; }
+.nav-link:hover::after { transform: scaleX(1); }
+.nav-link[aria-current]::after { display: none; }

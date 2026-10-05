@@ -103,7 +103,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
 
           <motion.div {...rise(1.05)} className="mt-8 flex flex-wrap items-center gap-3">
             <TrackedLink href="#planner" event="cta_click" props={{ cta: "plan", location: "hero" }}
-              className="group inline-flex items-center gap-2 rounded-full bg-teal-deep px-6 py-3.5 font-semibold text-white shadow-[0_14px_30px_-12px_rgba(11,58,64,0.8)] transition-transform hover:-translate-y-0.5">
+              className="btn-primary group px-6 py-3.5">
               {c.ctaPlan} <ArrowIcon className="size-4 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
             </TrackedLink>
             <TrackedLink href={whatsappLink(t.wa.general)} target="_blank" rel="noopener noreferrer" event="whatsapp_click" props={{ location: "hero" }}
