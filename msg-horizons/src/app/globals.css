@@ -1,0 +1,322 @@
+@import "tailwindcss";
+
+/*
+ * MSG Horizons design system — editorial / industrial.
+ * Light, restrained, typographic. One brand colour ("horizon" cobalt) used only for data and key accents.
+ * To adopt MSG's official brand colour, change the --color-brand* tokens only.
+ */
+@theme {
+  --color-paper: #fafaf7;
+  --color-surface: #ffffff;
+  --color-subtle: #f1f0eb;
+  --color-line: #e3e1da;
+  --color-line-strong: #cfccc3;
+  --color-ink: #0c0e11;
+  --color-ink-2: #1b1e23;
+  --color-ink-3: #2a2e35;
+  --color-muted: #585e67;
+  --color-faint: #8b9098;
+  --color-brand: #0b7d36;
+  --color-brand-strong: #086a2d;
+  --color-brand-soft: #e8f5ec;
+  --color-brand-bright: #4cc97a; /* on dark backgrounds only */
+  --color-whatsapp: #128c4a;
+  /* Red Sea glass: daylight Jeddah water */
+  --color-sea-50: #f3fbfb;
+  --color-sea-100: #e2f4f3;
+  --color-sea-200: #c4e9e7;
+  --color-sea-400: #6cc3c3;
+  --color-teal: #137179;
+  --color-teal-deep: #0b3a40;
+  --color-silver: #c3cdd2;
+  --color-danger: #b42318;
+
+  --font-display: var(--font-display-latin), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-sans-latin), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-rise: rise 0.8s var(--ease-out-expo) both;
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: none; }
+  }
+}
+
+:root:lang(ar) {
+  --font-display: var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  scroll-behavior: smooth;
+  scroll-padding-top: 7rem;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+body {
+  background: transparent; /* the fixed HorizonBackdrop (z -10) must paint above the body box */
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+:lang(ar) body { line-height: 1.75; }
+
+::selection { background: var(--color-brand); color: #fff; }
+
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.text-balance { text-wrap: balance; }
+.text-pretty { text-wrap: pretty; }
+
+/* Section label: small, sentence case, brand colour. */
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-brand);
+}
+.on-dark .label { color: var(--color-brand-bright); }
+
+
+/* Seller needs grid (components/sections/Needs.tsx) */
+.need-card {
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform-style: preserve-3d;
+  transition: transform 0.35s var(--ease-out-expo), box-shadow 0.35s var(--ease-out-expo), border-color 0.35s;
+  opacity: 0;
+  translate: 0 18px;
+}
+.need-card:hover { border-color: var(--color-line-strong); box-shadow: 0 30px 60px -30px rgba(12, 14, 17, 0.35); }
+.needs-grid[data-inview] .need-card { animation: need-in 0.8s var(--ease-out-expo) var(--d, 0ms) forwards; }
+@keyframes need-in { to { opacity: 1; translate: 0 0; } }
+.needs-grid [class^="nd-"], .needs-grid [class*=" nd-"] { animation-play-state: paused; }
+.needs-grid[data-inview] [class^="nd-"], .needs-grid[data-inview] [class*=" nd-"] { animation-play-state: running; }
+.nd-drop { animation: nd-drop 2.4s var(--ease-out-expo) infinite; }
+@keyframes nd-drop { 0% { transform: translateY(-6px); opacity: 0; } 20% { opacity: 1; } 55%, 100% { transform: translateY(12px); opacity: 0; } }
+.nd-slide { animation: nd-slide 2.2s ease-in-out infinite; }
+@keyframes nd-slide { 0%, 10% { transform: translateX(0); } 60%, 100% { transform: translateX(10px); opacity: 0.2; } }
+.nd-tape, .nd-tick, .nd-arc, .nd-flow { stroke-dasharray: 1; stroke-dashoffset: 1; animation: nd-draw 2.6s var(--ease-out-expo) infinite; }
+@keyframes nd-draw { 0% { stroke-dashoffset: 1; } 55%, 85% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+.nd-pop { transform-box: fill-box; transform-origin: bottom; animation: nd-pop 2.8s var(--ease-out-expo) infinite; }
+@keyframes nd-pop { 0% { transform: scale(0.2); opacity: 0; } 20%, 85% { transform: none; opacity: 1; } 100% { opacity: 0; } }
+.nd-spin { transform-box: view-box; transform-origin: 17px 17px; animation: nd-spin 3.2s var(--ease-out-expo) infinite; }
+@keyframes nd-spin { to { transform: rotate(-360deg); } }
+.nd-pulse { animation: nd-pulse 2.4s ease-in-out infinite; }
+@keyframes nd-pulse { 50% { stroke: #4cc97a; } }
+
+/* Onboarding journey scenes (components/sections/Journey.tsx): play only on the active stage */
+.journey-card [class^="js-"], .journey-card [class*=" js-"] { animation-play-state: paused; }
+.journey-card[data-active] [class^="js-"], .journey-card[data-active] [class*=" js-"] { animation-play-state: running; }
+.js-photo { transform: scale(1.06); transition: transform 1.6s var(--ease-out-expo); }
+.journey-card[data-active] .js-photo { transform: scale(1); }
+.js-ui { opacity: 0; translate: 0 14px; transition: opacity 0.6s var(--ease-out-expo) 0.15s, translate 0.6s var(--ease-out-expo) 0.15s; }
+.journey-card[data-active] .js-ui { opacity: 1; translate: 0 0; }
+.js-sign { stroke-dasharray: 1; stroke-dashoffset: 1; animation: js-draw 2.6s var(--ease-out-expo) 0.4s infinite both; }
+@keyframes js-draw { 0% { stroke-dashoffset: 1; } 45%, 100% { stroke-dashoffset: 0; } }
+.js-bar { transform-origin: left; animation: js-bar 3s var(--ease-out-expo) infinite both; }
+[dir="rtl"] .js-bar { transform-origin: right; }
+@keyframes js-bar { 0% { transform: scaleX(0); } 30%, 100% { transform: none; } }
+.js-live { animation: js-live 1.4s ease-in-out infinite; }
+@keyframes js-live { 50% { opacity: 0.25; } }
+
+/* Partner constellation links carry light toward the hub */
+.partner-link { animation: partner-flow 1.6s linear infinite; }
+@keyframes partner-flow { to { stroke-dashoffset: -20; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .need-card { opacity: 1; translate: none; }
+  [class^="nd-"], [class*=" nd-"], [class^="js-"], [class*=" js-"] { animation: none !important; opacity: 1; stroke-dashoffset: 0; transform: none; }
+  .js-ui { opacity: 1; translate: none; }
+}
+
+/* Glass system (roadmap / estimator) */
+.glass {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.03));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  backdrop-filter: blur(22px) saturate(140%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 24px 60px -24px rgba(0, 0, 0, 0.7),
+    0 60px 120px -60px rgba(15, 150, 65, 0.35);
+}
+.theme-shine {
+  background-image: linear-gradient(100deg, #137179 20%, #6cc3c3 45%, #137179 70%);
+  background-size: 250% 100%;
+  animation: theme-shine 4.5s ease-in-out infinite;
+}
+@keyframes theme-shine { 0% { background-position: 100% 0; } 60%, 100% { background-position: 0 0; } }
+.est-range { -webkit-appearance: none; appearance: none; height: 24px; background: transparent; cursor: pointer; }
+.est-range::-webkit-slider-runnable-track { height: 4px; border-radius: 99px; background: rgba(19, 113, 121, 0.2); }
+.est-range::-moz-range-track { height: 4px; border-radius: 99px; background: rgba(19, 113, 121, 0.2); }
+.est-range::-moz-range-progress { height: 4px; border-radius: 99px; background: #137179; }
+.est-range::-webkit-slider-thumb { -webkit-appearance: none; margin-top: -9px; width: 22px; height: 22px; border-radius: 99px; background: #fff; box-shadow: 0 0 0 5px rgba(19, 113, 121, 0.3), 0 4px 12px rgba(11, 58, 64, 0.3); }
+.est-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 99px; background: #fff; border: 0; box-shadow: 0 0 0 5px rgba(19, 113, 121, 0.3); }
+.est-range:focus-visible { outline: none; }
+.est-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 6px rgba(19, 113, 121, 0.6); }
+@media (prefers-reduced-motion: reduce) { .theme-shine { animation: none; background-position: 50% 0; } }
+
+/* Numbers always render LTR, even inside Arabic text. */
+.num { direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums; }
+
+/* Planner operating canvas — parcel journey animatics. */
+@keyframes plan-dash {
+  to { stroke-dashoffset: -32; }
+}
+.plan-dash {
+  animation: plan-dash 1.15s linear infinite;
+}
+@keyframes plan-ping {
+  0% { transform: scale(0.45); opacity: 0.65; }
+  100% { transform: scale(2.7); opacity: 0; }
+}
+.plan-ping {
+  animation: plan-ping 1.8s var(--ease-out-expo) infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+@keyframes plan-glow {
+  0%, 100% { opacity: 0.14; }
+  50% { opacity: 0.4; }
+}
+.plan-glow {
+  animation: plan-glow 2.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Network sizer range inputs: thin track, filled to the thumb via --fill (set inline where needed). */
+.sizer-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 22px;
+  background: transparent;
+  cursor: pointer;
+  accent-color: var(--color-brand);
+}
+.sizer-range::-webkit-slider-runnable-track { height: 3px; border-radius: 99px; background: var(--color-line-strong); }
+.sizer-range::-moz-range-track { height: 3px; border-radius: 99px; background: var(--color-line-strong); }
+.sizer-range::-moz-range-progress { height: 3px; border-radius: 99px; background: var(--color-ink); }
+.sizer-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  margin-top: -8.5px;
+  width: 20px; height: 20px; border-radius: 99px;
+  background: var(--color-surface);
+  border: 2px solid var(--color-ink);
+  box-shadow: 0 2px 8px rgba(12, 14, 17, 0.18);
+  transition: transform 0.15s var(--ease-out-expo);
+}
+.sizer-range::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 99px;
+  background: var(--color-surface);
+  border: 2px solid var(--color-ink);
+}
+.sizer-range:active::-webkit-slider-thumb { transform: scale(1.15); }
+.sizer-range:focus-visible { outline: none; }
+.sizer-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(11,125,54, 0.25); }
+
+/* ---------- Red Sea glass (network band, price band, peak flow) ---------- */
+.sea-band {
+  background:
+    radial-gradient(90% 60% at 85% 0%, rgba(196, 233, 231, 0.9), transparent 70%),
+    radial-gradient(70% 50% at 0% 100%, rgba(226, 244, 243, 0.95), transparent 70%),
+    linear-gradient(180deg, #f3fbfb 0%, #ffffff 100%);
+  color: var(--color-teal-deep);
+}
+.sea-band .label { color: var(--color-teal); }
+.sea-glass {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.78), rgba(226, 244, 243, 0.55));
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 2px rgba(11, 58, 64, 0.06),
+    0 24px 48px -28px rgba(19, 113, 121, 0.45);
+}
+.sea-range { accent-color: var(--color-teal); }
+
+/* Live network console event feed */
+.feed-in { animation: feed-in 0.45s var(--ease-out-expo) both; }
+@keyframes feed-in { from { opacity: 0; transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) { .feed-in { animation: none; } }
+
+/* "Who are you?" tiles lean toward the pointer */
+.seg-tile { transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transform-style: preserve-3d; }
+@media (prefers-reduced-motion: reduce) { .seg-tile { transform: none; } }
+
+/* Lenis momentum scroll */
+html.lenis-on, html.lenis-on body { height: auto; }
+.lenis-smooth { scroll-behavior: auto !important; }
+.lenis-stopped { overflow: hidden; }
+
+/* EmbeddedPhoto fades toward the inline end in both directions */
+[dir="rtl"] { --fade-end: left; }
+
+/* Hero headline sheen */
+@keyframes hero-sheen { to { background-position: 200% center; } }
+
+/* network band: stat progress and partner ribbon */
+@keyframes nb-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes nb-ribbon { to { transform: translateX(-50%); } }
+[dir="rtl"] .nb-ribbon { animation-direction: reverse !important; }
+@media (prefers-reduced-motion: reduce) { .nb-ribbon { animation: none !important; } }
+
+
+/* ---------- Site chrome: one primary button, one nav-link hover ---------- */
+/* The hero's dark-teal pill is the primary action everywhere (header, menu, mobile bar). */
+:root {
+  --shadow-cta: 0 14px 30px -12px rgba(11, 58, 64, 0.8);
+  --shadow-cta-hover: 0 20px 36px -14px rgba(11, 58, 64, 0.9);
+}
+@layer components {
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    background: var(--color-teal-deep);
+    color: #fff;
+    font-weight: 600;
+    box-shadow: var(--shadow-cta);
+    transition: transform 0.25s var(--ease-out-expo), box-shadow 0.25s var(--ease-out-expo), background-color 0.2s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-cta-hover); }
+  .btn-primary:active { transform: translateY(0) scale(0.98); }
+  /* Over dark sections the header button flips to white. */
+  .btn-primary.on-dark { background: #fff; color: var(--color-teal-deep); box-shadow: none; }
+}
+
+/* Underline grows from the inline start on hover; the active item keeps a full bar. */
+.nav-link::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0.75rem;
+  bottom: -0.125rem;
+  height: 2px;
+  border-radius: 9999px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  opacity: 0.35;
+  transition: transform 0.3s var(--ease-out-expo);
+}
+[dir="rtl"] .nav-link::after { transform-origin: right; }
+.nav-link:hover::after { transform: scaleX(1); }
+.nav-link[aria-current]::after { display: none; }
