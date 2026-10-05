@@ -385,7 +385,8 @@ await test("live tracking: nothing is live until the driver approves, then the t
 
 await test("accessibility: axe-core finds no serious/critical violations (en + ar)", async () => {
   for (const lang of ["en", "ar"]) {
-    const { page, ctx } = await open(`/${lang}`, { reducedMotion: "reduce" });
+    // with the stand-in map services, so the audit covers the real-map version of the route console
+    const { page, ctx } = await open(`/${lang}`, { reducedMotion: "reduce" }, installFakeMap);
     for (let y = 0; y < 16000; y += 800) { await page.evaluate((yy) => window.scrollTo(0, yy), y); await page.waitForTimeout(60); }
     await page.waitForTimeout(800); // let header/theme transitions settle before sampling colours
     await page.addScriptTag({ content: AXE });
