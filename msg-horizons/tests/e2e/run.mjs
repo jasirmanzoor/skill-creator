@@ -5,6 +5,7 @@ import { chromium } from "playwright";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
+import { installFakeMap } from "./fake-map.mjs";
 
 const require = createRequire(import.meta.url);
 const AXE = readFileSync(require.resolve("axe-core/axe.min.js"), "utf8");
@@ -29,8 +30,9 @@ async function test(name, fn) {
   }
 }
 
-async function open(path, opts = {}) {
+async function open(path, opts = {}, setup) {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, ...opts });
+  if (setup) await setup(ctx); // e.g. stand-in map services, installed before the page asks for them
   const page = await ctx.newPage();
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
@@ -308,6 +310,57 @@ await test("reduced motion: hero renders final state immediately", async () => {
   const txt = await page.locator("section[aria-labelledby=hero-title]").innerText();
   assert.match(txt, /1,000\+/);
   assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+// Scroll until the route console is close enough for its lazy-loaded map to start.
+async function toConsole(page) {
+  await page.locator("#planner").scrollIntoViewIfNeeded();
+  for (let k = 0; k < 12; k++) {
+    if (await page.locator("#planner .maplibregl-canvas, #planner canvas[role=img]").count()) break;
+    await page.evaluate(() => window.scrollBy(0, 450));
+    await page.waitForTimeout(400);
+  }
+}
+
+await test("route console: the camera flies the route on a real map (stand-in map services)", async () => {
+  const { page, ctx, errors } = await open("/en", {}, installFakeMap);
+  await toConsole(page);
+  const host = page.locator("#planner [data-cam]");
+  await host.waitFor({ state: "attached", timeout: 20000 });
+  const read = async () => {
+    const [lng, lat, zoom, bearing, pitch, beat] = (await host.getAttribute("data-cam")).split(",").map(Number);
+    return { lng, lat, zoom, bearing, pitch, beat };
+  };
+  const a = await read();
+  await page.waitForTimeout(3000);
+  const b = await read();
+  assert.ok(Math.hypot(b.lng - a.lng, b.lat - a.lat) > 0.002, "the camera travels along the route");
+  assert.ok(b.pitch >= 45, `tilted like a chase camera (pitch ${b.pitch})`);
+  assert.ok(b.zoom > 13 && b.zoom < 17.5, `street-level zoom (${b.zoom})`);
+  const h = await page.locator("#planner .maplibregl-canvas").evaluate((c) => c.clientHeight);
+  assert.ok(h > 330, `the map fills its box (${h}px tall)`);
+  // choosing a step in the strip flies to it
+  await page.locator("#planner ol button").nth(2).click();
+  await page.waitForTimeout(1200);
+  assert.equal((await read()).beat, 2);
+  assert.ok(errors.filter((e) => !/GPU stall/.test(e)).length === 0, errors.join("\n"));
+  await ctx.close();
+});
+
+await test("route console: falls back to the flat map when the map services cannot be reached", async () => {
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  await ctx.route("https://tiles.openfreemap.org/**", (r) => r.abort());
+  const page = await ctx.newPage();
+  const crashed = [];
+  page.on("pageerror", (e) => crashed.push(e.message));
+  await page.goto(BASE + "/en", { waitUntil: "networkidle" });
+  await toConsole(page);
+  await page.locator("#planner canvas[role=img]").waitFor({ state: "attached", timeout: 25000 });
+  assert.equal(await page.locator("#planner .maplibregl-canvas").count(), 0, "no broken map left behind");
+  await page.locator("#planner ol button").nth(1).click();
+  assert.equal(await page.locator("#planner ol button[aria-current=step]").count(), 1, "the steps still work");
+  assert.deepEqual(crashed, []);
   await ctx.close();
 });
 

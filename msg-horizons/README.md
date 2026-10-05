@@ -17,6 +17,17 @@ based in Riyadh. It is bilingual (English / Arabic RTL), built on Next.js 16 and
 | Proof | Metrics, 10 pillars, vision |
 | Contact (night) | Lead form with a WhatsApp/email fallback, plus WhatsApp, phone, email and HQ |
 
+## Route console map
+The planner's route console flies a **real 3D map** (MapLibre GL + OpenFreeMap streets and buildings): the camera
+chases the vehicle along real roads at a tilt, swoops between steps, pulls up on long hops and circles at a site.
+- **Roads:** `src/lib/routing.ts` uses pre-computed routes (`src/content/routesStatic.ts`), then a live OSRM request.
+  Pre-compute them with `node --experimental-strip-types scripts/build-routes.mjs` (needs internet access).
+- **Places:** `src/content/routeGeo.ts` maps the console's districts and cities to real coordinates.
+- **Fallback:** if WebGL, the map or the routes are unavailable, the console quietly shows its flat map instead.
+- **Settings:** see `.env.example` (satellite button via a MapTiler key, custom style, routing server, off switch).
+- **Testing offline:** `tests/e2e/fake-map.mjs` stands in for the map and routing services.
+- **Worker file:** `scripts/copy-maplibre-worker.mjs` copies MapLibre's worker into `public/maplibre/` on install and build.
+
 ## Design system
 Light, editorial, industrial: paper and ink, one cobalt brand colour (tokens in `src/app/globals.css`;
 swap `--color-brand*` for MSG's official colour), Inter Tight and Inter, and IBM Plex Sans Arabic.

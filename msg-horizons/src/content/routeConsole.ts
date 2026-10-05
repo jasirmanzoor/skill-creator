@@ -67,7 +67,7 @@ type Copy = {
   play: string;
   pause: string;
   replay: string;
-  view: Record<"city" | "kingdom", string>;
+  view: Record<"city" | "kingdom" | "satellite" | "street", string>;
   legend: Record<"parcel" | "you" | "cash" | "back", string>;
   pins: { you: string; door: string; drop: string; cash: string; back: string };
   siteName: Record<Site, string>;
@@ -125,7 +125,7 @@ export const routeCopy: Record<Locale, Copy> = {
     play: "Play",
     pause: "Pause",
     replay: "Replay",
-    view: { city: "City view", kingdom: "Kingdom view" },
+    view: { city: "City view", kingdom: "Kingdom view", satellite: "Satellite", street: "Map" },
     legend: { parcel: "MSG moves it", you: "You or your customer", cash: "Cash to you", back: "Return" },
     pins: { you: "You", door: "Customer", drop: "Drop point", cash: "Cash to you", back: "Return" },
     siteName: { riyadh: "Riyadh hub", sabya: "Sabya centre" },
@@ -181,7 +181,7 @@ export const routeCopy: Record<Locale, Copy> = {
     play: "تشغيل",
     pause: "إيقاف",
     replay: "إعادة",
-    view: { city: "عرض المدينة", kingdom: "عرض المملكة" },
+    view: { city: "عرض المدينة", kingdom: "عرض المملكة", satellite: "قمر صناعي", street: "خريطة" },
     legend: { parcel: "مسج تنقلها", you: "أنت أو عميلك", cash: "المبالغ إليك", back: "مرتجع" },
     pins: { you: "أنت", door: "العميل", drop: "نقطة التسليم", cash: "المبالغ إليك", back: "مرتجع" },
     siteName: { riyadh: "محطة الرياض", sabya: "مركز صبيا" },

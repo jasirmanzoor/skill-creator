@@ -331,3 +331,11 @@ html.lenis-on, html.lenis-on body { height: auto; }
 /* the "live" dot in the scan-vs-live comparison runs the whole track without a break */
 @keyframes live-run { 0% { inset-inline-start: 12.5%; opacity: 0; } 6%, 94% { opacity: 1; } 100% { inset-inline-start: 87.5%; opacity: 0; } }
 .live-run { animation: live-run 6.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite; }
+
+/* ---------- Route console real map (components/planner/FlyoverMap) ---------- */
+/* keep the required map credits legible on any imagery */
+.maplibregl-ctrl-attrib.maplibregl-compact,
+.maplibregl-ctrl-attrib { background: rgba(255, 255, 255, 0.95); font-size: 11px; }
+.maplibregl-ctrl-attrib a { color: #0b3a40; }
+.maplibregl-ctrl-attrib-button { background-color: transparent; }
+.maplibregl-canvas:focus, .maplibregl-canvas:focus-visible { outline: none; }

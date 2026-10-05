@@ -1,12 +1,33 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { Locale } from "@/content/i18n";
 import { routeCopy, MODELS, CITIES, SITES, areasFor, type City, type Model, type Site } from "@/content/routeConsole";
 import { planRoute, beatSeconds, type Beat, type Place } from "@/lib/routePlan";
 import { KSA, KSA_DOTS, CITY_XY, type P } from "@/lib/ksaGeo";
 import { W, H, ROWS, COLS, rowY, colX, node, type SimConfig } from "@/lib/networkSim";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import type { Timeline } from "./FlyoverMap";
+
+// The real-map flyover (MapLibre) loads on demand; the flat canvas below is the fallback.
+const FlyoverMap = dynamic(() => import("./FlyoverMap"), { ssr: false });
+const REAL_MAP = process.env.NEXT_PUBLIC_REAL_MAP !== "0";
+const STYLE_STREET = process.env.NEXT_PUBLIC_MAP_STYLE_URL || "https://tiles.openfreemap.org/styles/liberty";
+const MAPTILER_KEY = process.env.NEXT_PUBLIC_MAPTILER_KEY || "";
+const STYLE_SAT = MAPTILER_KEY ? `https://api.maptiler.com/maps/hybrid/style.json?key=${MAPTILER_KEY}` : "";
+/** read once per page: can this browser run the real map? ("pending" while rendering on the server) */
+let capability: "real" | "canvas" | null = null;
+const readCapability = (): "real" | "canvas" => {
+  if (capability) return capability;
+  let ok = false;
+  try {
+    const cv = document.createElement("canvas");
+    ok = !!(cv.getContext("webgl2") || cv.getContext("webgl"));
+  } catch { /* no WebGL */ }
+  return (capability = REAL_MAP && ok ? "real" : "canvas");
+};
+const noopSubscribe = () => () => {};
 
 const TEAL = "#137179";
 const DEEP = "#0b3a40";
@@ -37,6 +58,13 @@ export default function NetworkConsole({ locale, cfg }: { locale: Locale; cfg: S
   const [returns, setReturns] = useState(true);
   const [playing, setPlaying] = useState(true);
   const [active, setActive] = useState(0);
+  const [mapFailed, setMapFailed] = useState(false);
+  const capable = useSyncExternalStore(noopSubscribe, readCapability, () => "pending" as const);
+  const mode: "pending" | "real" | "canvas" = mapFailed ? "canvas" : capable;
+  const [near, setNear] = useState(false);
+  const [mapReady, setMapReady] = useState(false);
+  const [sat, setSat] = useState(false);
+  const [rt, setRt] = useState<Timeline | null>(null);
 
   const plan = useMemo(() => {
     const area = (city: City, id: string) => areasFor(city).find((a) => a.id === id) ?? areasFor(city)[0];
@@ -47,12 +75,17 @@ export default function NetworkConsole({ locale, cfg }: { locale: Locale; cfg: S
       site, cod, returns,
     });
   }, [model, fromCity, fromArea, toCity, toArea, site, cod, returns]);
-  const starts = useMemo(() => {
+  const baseStarts = useMemo(() => {
     const out: number[] = [];
     for (let i = 0; i < plan.beats.length; i++) out.push(i ? out[i - 1] + beatSeconds(plan.beats[i - 1]) : 0);
     return out;
   }, [plan]);
-  const total = starts.length ? starts[starts.length - 1] + beatSeconds(plan.beats[plan.beats.length - 1]) : 0;
+  const baseTotal = baseStarts.length ? baseStarts[baseStarts.length - 1] + beatSeconds(plan.beats[plan.beats.length - 1]) : 0;
+  // on the real map every step lasts as long as its road is long, so the timeline comes from the map
+  const live = mode === "real" && rt && rt.plan === plan ? rt : null;
+  const starts = live ? live.starts : baseStarts;
+  const total = live ? live.total : baseTotal;
+  const durOf = (i: number) => (live ? live.durs[i] : beatSeconds(plan.beats[i]));
 
   const canvas = useRef<HTMLCanvasElement>(null);
   const box = useRef<HTMLDivElement>(null);
@@ -60,6 +93,15 @@ export default function NetworkConsole({ locale, cfg }: { locale: Locale; cfg: S
   const progBar = useRef<HTMLSpanElement>(null);
   const playRef = useRef(playing);
   useEffect(() => { playRef.current = playing && !reduce; }, [playing, reduce]);
+
+  // the map engine is a sizeable download: fetch it only when the console is about to be seen
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setNear(true); io.disconnect(); } }, { rootMargin: "700px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   const cityName = (k: string) => c.cities[k as City] ?? k;
   const fmt = (b: Beat) => {
@@ -75,13 +117,14 @@ export default function NetworkConsole({ locale, cfg }: { locale: Locale; cfg: S
   };
 
   const jump = (i: number) => {
-    clock.current = reduce ? starts[i] + beatSeconds(plan.beats[i]) - 0.001 : starts[i];
+    clock.current = reduce ? starts[i] + durOf(i) - 0.001 : starts[i];
     setActive(i);
     setPlaying(true);
   };
 
   // ---- canvas ----
   useEffect(() => {
+    if (mode !== "canvas") return;
     const cv = canvas.current!;
     const ctx = cv.getContext("2d")!;
     const font = locale === "ar" ? "system-ui, sans-serif" : "Inter, system-ui, sans-serif";
@@ -554,7 +597,7 @@ export default function NetworkConsole({ locale, cfg }: { locale: Locale; cfg: S
     if (reduce) draw();
     else raf = requestAnimationFrame(loop);
     return () => { cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); window.removeEventListener("route-redraw", onJump); };
-  }, [plan, starts, total, reduce, locale, c]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mode, plan, starts, total, reduce, locale, c]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // under reduced motion there is no loop, so a chosen step redraws one still frame
   useEffect(() => { if (reduce) window.dispatchEvent(new Event("route-redraw")); }, [active, reduce]);
@@ -608,7 +651,28 @@ export default function NetworkConsole({ locale, cfg }: { locale: Locale; cfg: S
       <div className="grid lg:grid-cols-[1fr_340px]">
         {/* map */}
         <div ref={box} className="relative h-[360px] w-full overflow-hidden sm:h-[440px] lg:h-auto lg:min-h-[520px]">
-          <canvas ref={canvas} className="absolute inset-0 size-full" role="img" aria-label={c.canvasLabel} />
+          {mode === "canvas" ? <canvas ref={canvas} className="absolute inset-0 size-full" role="img" aria-label={c.canvasLabel} /> : null}
+          {mode === "real" && near ? (
+            <FlyoverMap
+              key={sat && STYLE_SAT ? STYLE_SAT : STYLE_STREET}
+              plan={plan}
+              c={c}
+              locale={locale}
+              styleUrl={sat && STYLE_SAT ? STYLE_SAT : STYLE_STREET}
+              playing={playing}
+              reduce={reduce}
+              clock={clock}
+              progBar={progBar}
+              onTimeline={setRt}
+              onBeat={setActive}
+              onStatus={(s) => (s === "failed" ? setMapFailed(true) : setMapReady(true))}
+            />
+          ) : null}
+          {mode !== "canvas" && !mapReady ? (
+            <div aria-hidden="true" className="absolute inset-0 grid place-items-center bg-[radial-gradient(70%_60%_at_50%_40%,#d6ebe9,#e9f3f2)]">
+              <span className="size-9 animate-spin rounded-full border-[3px] border-teal/20 border-t-teal motion-reduce:animate-none" />
+            </div>
+          ) : null}
           <div className="absolute start-3 top-3 flex flex-wrap items-center gap-2 sm:start-4 sm:top-4">
             <button
               type="button"
@@ -619,6 +683,16 @@ export default function NetworkConsole({ locale, cfg }: { locale: Locale; cfg: S
               {running ? c.pause : c.play}
             </button>
             <span className="rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-teal-deep ring-1 ring-teal/10 backdrop-blur">{viewLabel}</span>
+            {mode === "real" && STYLE_SAT ? (
+              <button
+                type="button"
+                aria-pressed={sat}
+                onClick={() => { setSat((v) => !v); setMapReady(false); }}
+                className="rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-teal-deep ring-1 ring-teal/10 backdrop-blur"
+              >
+                {sat ? c.view.street : c.view.satellite}
+              </button>
+            ) : null}
           </div>
           <Legend c={c} className="absolute end-4 top-4 hidden sm:block" />
           {beat ? (
@@ -636,7 +710,7 @@ export default function NetworkConsole({ locale, cfg }: { locale: Locale; cfg: S
               </span>
             </div>
           ) : null}
-          <p className="pointer-events-none absolute bottom-4 end-4 hidden max-w-[34%] rounded-xl bg-white/85 px-2.5 py-1 text-end text-[10px] text-teal-deep/75 backdrop-blur lg:block">{c.note}</p>
+          <p className={`pointer-events-none absolute end-4 hidden max-w-[34%] ${mode === "real" ? "bottom-10" : "bottom-4"} rounded-xl bg-white/85 px-2.5 py-1 text-end text-[10px] text-teal-deep/75 backdrop-blur lg:block`}>{c.note}</p>
         </div>
 
         {beat ? (
