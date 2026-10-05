@@ -386,6 +386,56 @@ await test("live tracking: nothing is live until the driver approves, then the t
   }
 });
 
+await test("route: the rail follows the scroll, stops jump, ] and [ hop, the map opens and lands on a stop (en + ar)", async () => {
+  for (const [lang, mapName, closeName] of [["en", "Open the route map", "Close the route map"], ["ar", "افتح خريطة المسار", "أغلق خريطة المسار"]]) {
+    const { page, ctx, errors } = await open(`/${lang}`, { viewport: { width: 1920, height: 1000 }, reducedMotion: "reduce" });
+    const rail = page.getByRole("navigation").filter({ has: page.getByRole("button", { name: mapName }) });
+    await rail.waitFor({ state: "visible" });
+    const topOf = (id) => page.evaluate((i) => { let t = 0, e = document.getElementById(i); while (e) { t += e.offsetTop; e = e.offsetParent; } return t; }, id);
+    const here = () => rail.locator('[aria-current="location"]').getAttribute("aria-label");
+    const first = await here();
+    await page.evaluate((y) => window.scrollTo(0, y), (await topOf("planner")) - 64);
+    await page.waitForTimeout(300);
+    assert.notEqual(await here(), first, `${lang}: the rail moves with the scroll`);
+    await rail.getByRole("button").nth(1).click(); // first stop after the map button
+    await page.waitForTimeout(300);
+    assert.ok((await page.evaluate(() => scrollY)) <= 1, `${lang}: first stop is the top`);
+    await page.keyboard.press("]");
+    await page.waitForTimeout(300);
+    const live = await topOf("live-tracking");
+    assert.ok(Math.abs((await page.evaluate(() => scrollY)) - (live - 64)) < 80, `${lang}: ] hops to the next stop`);
+    await page.keyboard.press("[");
+    await page.waitForTimeout(300);
+    assert.ok((await page.evaluate(() => scrollY)) <= 1, `${lang}: [ hops back`);
+    await page.keyboard.press("m");
+    const dlg = page.getByRole("dialog");
+    await dlg.waitFor({ state: "visible" });
+    assert.ok(await dlg.getByRole("button", { name: closeName }).isVisible(), `${lang}: map open`);
+    const lens = dlg.getByRole("radio").nth(3);
+    await lens.click();
+    assert.equal(await lens.getAttribute("aria-checked"), "true", `${lang}: lens chosen`);
+    await dlg.getByRole("button", { name: /fleet|الأسطول/i }).first().click();
+    await dlg.waitFor({ state: "detached" });
+    const fleet = await topOf("fleet");
+    assert.ok(Math.abs((await page.evaluate(() => scrollY)) - (fleet - 64)) < 80, `${lang}: landed on the chosen stop`);
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  }
+});
+
+await test("route: on a phone the progress button opens the route map and a stop lands", async () => {
+  const { page, ctx, errors } = await open("/en", { viewport: { width: 390, height: 844 }, reducedMotion: "reduce", isMobile: true, hasTouch: true });
+  await page.getByRole("button", { name: /^Open the route map/ }).click();
+  const dlg = page.getByRole("dialog");
+  await dlg.waitFor({ state: "visible" });
+  await dlg.getByRole("button", { name: /Go to Services/ }).click();
+  await dlg.waitFor({ state: "detached" });
+  const y = await page.evaluate(() => scrollY);
+  assert.ok(y > 1000, "moved down the page");
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
 await test("accessibility: axe-core finds no serious/critical violations (en + ar)", async () => {
   for (const lang of ["en", "ar"]) {
     // with the stand-in map services, so the audit covers the real-map version of the route console
@@ -400,6 +450,18 @@ await test("accessibility: axe-core finds no serious/critical violations (en + a
         nodes: v.nodes.slice(0, 20).map((n) => n.target.join(" ") + " :: " + (n.any?.[0]?.message || "").slice(0, 110)),
       })),
     );
+    // and once more with the route map open
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.keyboard.press("m");
+    await page.getByRole("dialog").waitFor({ state: "visible" });
+    await page.waitForTimeout(500);
+    const withMap = await page.evaluate(async () =>
+      // eslint-disable-next-line no-undef
+      (await axe.run(document.querySelector('[role="dialog"]'), { resultTypes: ["violations"] })).violations.map((v) => ({
+        id: v.id, impact: v.impact, n: v.nodes.length, nodes: v.nodes.slice(0, 10).map((n) => n.target.join(" ")),
+      })),
+    );
+    res.push(...withMap);
     const serious = res.filter((v) => v.impact === "serious" || v.impact === "critical");
     if (res.length) console.log(`  axe ${lang}:`, JSON.stringify(res, null, 1));
     assert.equal(serious.length, 0, `${lang}: ${serious.map((v) => v.id).join(", ")}`);

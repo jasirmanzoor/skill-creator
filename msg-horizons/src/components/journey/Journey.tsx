@@ -117,8 +117,10 @@ export default function Journey({ lang }: { lang: Locale }) {
       } else if (!open && e.key === "]") {
         go(stepIndex(cur.current.index, 1, n));
       } else if (!open && e.key === "[") {
-        const { index, t: depth } = cur.current;
-        go(depth > 0.12 ? index : stepIndex(index, -1, n));
+        // mid-stop: back to its start; already at the start (where a hop lands): the stop before
+        const { index } = cur.current;
+        const atStart = Math.abs(window.scrollY - Math.max(0, (tops.current[index] ?? 0) - 64)) < 120;
+        go(atStart ? stepIndex(index, -1, n) : index);
       }
     };
     window.addEventListener("keydown", onKey);
