@@ -79,6 +79,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
 
   return (
     <section
+      id="hero"
       ref={stage}
       aria-labelledby="hero-title"
       onPointerMove={onMove}

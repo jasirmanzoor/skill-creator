@@ -2,6 +2,7 @@
 
 import Lenis from "lenis";
 import { useEffect } from "react";
+import { registerScroller } from "@/lib/scroller";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 /**
@@ -15,7 +16,9 @@ export default function SmoothScroll() {
     if (reduce) return;
     const lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 0.95, anchors: { offset: -64 }, autoRaf: true });
     document.documentElement.classList.add("lenis-on");
+    registerScroller(lenis);
     return () => {
+      registerScroller(null);
       lenis.destroy();
       document.documentElement.classList.remove("lenis-on");
     };

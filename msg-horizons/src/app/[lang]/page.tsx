@@ -7,6 +7,7 @@ import HorizonBackdrop from "@/components/HorizonBackdrop";
 import Planner from "@/components/sections/Planner";
 import TrustBar from "@/components/sections/TrustBar";
 import LiveTracking from "@/components/live/LiveTracking";
+import Journey from "@/components/journey/Journey";
 import NetworkBand from "@/components/sections/NetworkBand";
 import GrowthBand from "@/components/sections/GrowthBand";
 import { hasPublicFile } from "@/lib/photo-slot";
@@ -55,6 +56,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       </main>
       <Footer t={t} lang={lang} />
       <MobileBar t={t} />
+      <Journey lang={lang} />
     </PlanProvider>
   );
 }

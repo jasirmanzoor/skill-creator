@@ -339,3 +339,7 @@ html.lenis-on, html.lenis-on body { height: auto; }
 .maplibregl-ctrl-attrib a { color: #0b3a40; }
 .maplibregl-ctrl-attrib-button { background-color: transparent; }
 .maplibregl-canvas:focus, .maplibregl-canvas:focus-visible { outline: none; }
+
+/* ---------- The route: scroll navigation (components/journey) ---------- */
+@keyframes route-in { from { opacity: 0; transform: scale(0.985); } to { opacity: 1; transform: none; } }
+.route-in { animation: route-in 0.35s var(--ease-out-expo) both; }
