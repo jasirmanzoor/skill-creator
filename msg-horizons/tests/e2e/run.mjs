@@ -321,6 +321,9 @@ async function toConsole(page) {
     await page.evaluate(() => window.scrollBy(0, 450));
     await page.waitForTimeout(400);
   }
+  // the map only animates while it is on screen, so bring it fully into view
+  await page.locator("#planner .maplibregl-canvas, #planner canvas[role=img]").first().scrollIntoViewIfNeeded();
+  await page.waitForTimeout(500);
 }
 
 await test("route console: the camera flies the route on a real map (stand-in map services)", async () => {
