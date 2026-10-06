@@ -7,6 +7,7 @@ import HorizonBackdrop from "@/components/HorizonBackdrop";
 import Planner from "@/components/sections/Planner";
 import TrustBar from "@/components/sections/TrustBar";
 import LiveTracking from "@/components/live/LiveTracking";
+import Deck from "@/components/deck/Deck";
 import Journey from "@/components/journey/Journey";
 import NetworkBand from "@/components/sections/NetworkBand";
 import GrowthBand from "@/components/sections/GrowthBand";
@@ -40,9 +41,8 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       <main id="main" className="overflow-x-clip">
         <Hero t={t} lang={lang} />
         <TrustBar t={t} lang={lang} />
-        <Depth><LiveTracking lang={lang} /></Depth>
+        <Deck lang={lang} live={<LiveTracking lang={lang} />} plan={<Planner t={t} lang={lang} />} />
         <Depth><Needs lang={lang} /></Depth>
-        <Depth><Planner t={t} lang={lang} /></Depth>
         <Depth><NetworkBand lang={lang} coastPhoto={hasPublicFile("coast.jpg")} /></Depth>
         <Depth><RoadmapSection t={t} lang={lang} /></Depth>
         <Depth><Services t={t} lang={lang} /></Depth>

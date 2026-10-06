@@ -14,15 +14,15 @@ import { useReducedMotion } from "@/lib/use-reduced-motion";
 /* ───────────────────────── Controls ───────────────────────── */
 
 export function SizerControls({
-  value, onChange, lang,
-}: { value: SizerInput; onChange: (v: SizerInput) => void; lang: Locale }) {
+  value, onChange, lang, wide = false,
+}: { value: SizerInput; onChange: (v: SizerInput) => void; lang: Locale; wide?: boolean }) {
   const c = sizerCopy[lang].inputs;
   const id = useId();
   const set = <K extends keyof SizerInput>(k: K, v: SizerInput[K]) => onChange({ ...value, [k]: v });
 
   return (
-    <div className="grid gap-7">
-      <div>
+    <div className={wide ? "grid gap-x-10 gap-y-6 lg:grid-cols-2" : "grid gap-7"}>
+      <div className={wide ? "lg:col-span-2" : ""}>
         <div className="flex items-end justify-between gap-4">
           <label htmlFor={`${id}-orders`} className="text-sm font-medium text-ink">{c.orders}</label>
           <span className="num font-display text-3xl font-semibold tracking-[-0.03em] text-ink">

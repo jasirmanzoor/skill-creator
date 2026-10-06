@@ -10,11 +10,11 @@ const CELL = (i: number) => `${12.5 + 25 * i}%`;
 export default function ScanVsLive({ c }: { c: LiveCopy }) {
   const k = c.compare;
   return (
-    <figure aria-labelledby="live-compare-title" className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-5 sm:p-8">
-      <figcaption id="live-compare-title" className="font-display text-xl font-semibold sm:text-2xl">{k.title}</figcaption>
+    <figure aria-labelledby="live-compare-title" className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-4 sm:p-5">
+      <figcaption id="live-compare-title" className="font-display text-lg font-semibold sm:text-xl">{k.title}</figcaption>
       <p className="sr-only">{k.summary}</p>
 
-      <div aria-hidden="true" className="mt-7 grid gap-y-5 lg:grid-cols-[13rem_1fr] lg:gap-x-8">
+      <div aria-hidden="true" className="mt-4 grid gap-y-3 lg:grid-cols-[13rem_1fr] lg:gap-x-8">
         <span className="hidden lg:block" />
         <ol className="grid grid-cols-4 text-center text-[11px] font-medium leading-tight text-white/80 sm:text-[12px]">
           {k.stages.map((s) => <li key={s} className="px-1">{s}</li>)}
@@ -25,7 +25,7 @@ export default function ScanVsLive({ c }: { c: LiveCopy }) {
           <p className="font-semibold text-white/85">{k.scan.t}</p>
           <p className="mt-0.5 text-xs text-white/65">{k.scan.d}</p>
         </div>
-        <div className="relative h-10">
+        <div className="relative h-8">
           <span className="absolute inset-x-[12.5%] top-1/2 border-t-2 border-dashed border-white/25" />
           {[0, 1, 2, 3].map((i) => (
             <span key={i} className="absolute top-1/2 -ms-[7px] size-3.5 -translate-y-1/2 rounded-full border-2 border-white/60 bg-[#08262b]" style={{ insetInlineStart: CELL(i) }} />
@@ -38,7 +38,7 @@ export default function ScanVsLive({ c }: { c: LiveCopy }) {
           <p className="font-semibold text-[#4cc97a]">{k.live.t}</p>
           <p className="mt-0.5 text-xs text-white/65">{k.live.d}</p>
         </div>
-        <div className="relative h-10">
+        <div className="relative h-8">
           <span className="absolute inset-x-[12.5%] top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-gradient-to-r from-[#4cc97a]/25 via-[#4cc97a] to-[#4cc97a]/25 rtl:bg-gradient-to-l" />
           {[0, 1, 2, 3].map((i) => (
             <span key={i} className="absolute top-1/2 -ms-1 size-2 -translate-y-1/2 rounded-full bg-white/70" style={{ insetInlineStart: CELL(i) }} />

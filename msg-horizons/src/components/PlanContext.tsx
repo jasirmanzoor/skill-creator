@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import type { Persona, PlanInput } from "@/lib/planner";
+import { focusPanel } from "@/lib/deck";
 
 type Seed = { persona: Persona; n: number } | null;
 type Ctx = {
@@ -18,7 +19,7 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
   const [seed, setSeed] = useState<Seed>(null);
   const startWith = useCallback((persona: Persona) => {
     setSeed((s) => ({ persona, n: (s?.n ?? 0) + 1 }));
-    document.getElementById("planner")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    focusPanel("planner");
   }, []);
   const value = useMemo(() => ({ plan, setPlan, seed, startWith }), [plan, seed, startWith]);
   return <PlanCtx.Provider value={value}>{children}</PlanCtx.Provider>;

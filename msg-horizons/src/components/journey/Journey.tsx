@@ -6,6 +6,7 @@ import { journeyCopy, LENS_OF, STOPS, type Lens, type Stop } from "@/content/jou
 import { pageTop, position, routeFraction, showNext, stepIndex } from "@/lib/journey";
 import { track } from "@/lib/analytics";
 import { scrollToY } from "@/lib/scroller";
+import { DECK_ID, focusPanel, isDeckPanel } from "@/lib/deck";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { usePlan } from "../PlanContext";
 import { ArrowIcon } from "../ui/icons";
@@ -51,16 +52,29 @@ export default function Journey({ lang }: { lang: Locale }) {
       if (!n) return;
       const y = window.scrollY + window.innerHeight * 0.4; // the reading line
       const pos = position(tops.current, document.documentElement.scrollHeight, y);
-      cur.current = { index: pos.index, t: pos.t };
-      hud.current?.style.setProperty("--f", routeFraction(pos.p, n).toFixed(4));
-      setActive((a) => (a === pos.index ? a : pos.index));
-      setNext((v) => (v === showNext(pos.index, pos.t, n) ? v : !v));
+      // the deck holds two stops side by side: the one showing is the one you are at
+      let index = pos.index;
+      let p = pos.p;
+      const onDeck = isDeckPanel(ids.current[index] ?? "");
+      if (onDeck) {
+        const shown = ids.current.indexOf(document.documentElement.dataset.deck ?? "");
+        if (shown >= 0) { index = shown; p = shown + (shown === pos.index ? pos.t : 0); }
+      }
+      cur.current = { index, t: pos.t };
+      hud.current?.style.setProperty("--f", routeFraction(p, n).toFixed(4));
+      setActive((a) => (a === index ? a : index));
+      setNext((v) => (v === (!onDeck && showNext(index, pos.t, n)) ? v : !v));
     };
     const schedule = () => { if (!raf) raf = requestAnimationFrame(update); };
     const measure = () => {
       const found = STOPS.map((s) => ({ s, el: document.getElementById(s.id) })).filter((x): x is { s: Stop; el: HTMLElement } => !!x.el);
-      found.sort((a, b) => pageTop(a.el) - pageTop(b.el));
-      tops.current = found.map((x) => pageTop(x.el));
+      // the deck's panels share one place on the page: order them by their side-by-side position
+      const top = (x: { s: Stop; el: HTMLElement }) => {
+        const deck = x.s.panel ? document.getElementById(DECK_ID) : null;
+        return deck ? pageTop(deck) + (x.s.id === "planner" ? 1 : 0) : pageTop(x.el);
+      };
+      found.sort((a, b) => top(a) - top(b));
+      tops.current = found.map(top);
       const next = found.map((x) => x.s.id);
       if (next.join() !== ids.current.join()) {
         ids.current = next;
@@ -74,7 +88,9 @@ export default function Journey({ lang }: { lang: Locale }) {
     ro.observe(document.body);
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", measure);
+    window.addEventListener("msg-deck-state", schedule);
     return () => {
+      window.removeEventListener("msg-deck-state", schedule);
       cancelAnimationFrame(first);
       cancelAnimationFrame(raf);
       window.clearTimeout(late);
@@ -88,6 +104,7 @@ export default function Journey({ lang }: { lang: Locale }) {
     const id = ids.current[i];
     const el = id ? document.getElementById(id) : null;
     if (!el) return;
+    if (isDeckPanel(id)) { focusPanel(id, immediate || reduce); track("cta_click", { cta: "route_stop", location: id }); return; }
     scrollToY(i === 0 ? 0 : pageTop(el) - 64, { immediate: immediate || reduce });
     track("cta_click", { cta: "route_stop", location: id });
   }, [reduce]);

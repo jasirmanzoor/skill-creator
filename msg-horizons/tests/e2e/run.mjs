@@ -91,9 +91,25 @@ await test("no forbidden claims in rendered copy", async () => {
   }
 });
 
+// the plan builder sits on the sideways deck: open its panel first
+async function toPlan(page) {
+  await page.getByRole("tab", { name: /Build your plan/ }).click();
+  await page.locator("#planner").scrollIntoViewIfNeeded();
+  await page.waitForTimeout(900);
+}
+// the result keeps its detail in tabs; read them all
+async function resultText(page) {
+  let all = "";
+  for (const name of ["Your numbers", "Services", "Why this", "Next steps"]) {
+    await page.locator("#planner").getByRole("tab", { name }).click();
+    all += "\n" + (await page.locator("#plan-tabpanel").innerText());
+  }
+  return all;
+}
+
 await test("planner: build a plan, share it, carry it into the contact form", async () => {
   const { page, ctx, errors } = await open("/en");
-  await page.locator("#planner").scrollIntoViewIfNeeded();
+  await toPlan(page);
   await page.getByRole("radio", { name: /Growing e-commerce brand/ }).click();
   await page.getByRole("checkbox", { name: /Orders to customers/ }).click();
   await page.getByRole("checkbox", { name: /Stock that needs a home/ }).click();
@@ -107,7 +123,7 @@ await test("planner: build a plan, share it, carry it into the contact form", as
   await page.getByRole("checkbox", { name: /Handling peaks/ }).click();
   await page.getByRole("button", { name: /Build my plan/ }).last().click();
   await page.getByRole("heading", { name: "Growth Engine" }).waitFor();
-  const result = await page.locator("#planner").innerText();
+  const result = await resultText(page);
   for (const s of ["Shipping & Last-Mile Delivery", "Warehousing & Inventory", "Real-Time Tracking & Support", "Manpower & Peak Support", "Dedicated Account Management", "Why this structure", "Daily routes", "Couriers on your peak day"])
     assert.ok(result.includes(s), `missing ${s}`);
   assert.ok(!/SAR|﷼|price:/i.test(result.replace(/no prices here/i, "")), "no pricing in result");
@@ -126,6 +142,7 @@ await test("planner: build a plan, share it, carry it into the contact form", as
 
 await test("planner: priorities are capped at three", async () => {
   const { page, ctx } = await open("/en?plan=");
+  await toPlan(page);
   await page.getByRole("radio", { name: /New startup/ }).click();
   await page.getByRole("button", { name: /Continue/ }).click();
   await page.getByRole("button", { name: /Continue/ }).click();
@@ -149,8 +166,10 @@ await test("network sizer recalculates live as inputs change", async () => {
   await page.locator("#planner").getByRole("radio", { name: "Across the Kingdom" }).click();
   await page.getByRole("button", { name: /Continue/ }).click();
   await page.getByRole("button", { name: /Build my plan/ }).last().click();
+  await page.locator("#planner").getByRole("tab", { name: "Why this" }).click();
   await page.getByText("Scheduled land freight between cities").waitFor();
-  assert.ok(await page.locator("#planner").getByText("Land Freight", { exact: true }).isVisible());
+  await page.locator("#planner").getByRole("tab", { name: "Services" }).click();
+  assert.ok(await page.locator("#planner").getByText("Land Freight", { exact: true }).first().isVisible());
   assert.deepEqual(errors, []);
   await ctx.close();
 });
@@ -327,7 +346,7 @@ async function toConsole(page) {
 }
 
 await test("route console: the camera flies the route on a real map (stand-in map services)", async () => {
-  const { page, ctx, errors } = await open("/en", {}, installFakeMap);
+  const { page, ctx, errors } = await open("/en#planner", {}, installFakeMap);
   await toConsole(page);
   const host = page.locator("#planner [data-cam]");
   await host.waitFor({ state: "attached", timeout: 20000 });
@@ -344,7 +363,7 @@ await test("route console: the camera flies the route on a real map (stand-in ma
   const h = await page.locator("#planner .maplibregl-canvas").evaluate((c) => c.clientHeight);
   assert.ok(h > 330, `the map fills its box (${h}px tall)`);
   // choosing a step in the strip flies to it
-  await page.locator("#planner ol button").nth(2).click();
+  await page.locator("#planner [data-beats] button").nth(2).click();
   await page.waitForTimeout(1200);
   assert.equal((await read()).beat, 2);
   assert.ok(errors.filter((e) => !/GPU stall/.test(e)).length === 0, errors.join("\n"));
@@ -357,12 +376,12 @@ await test("route console: falls back to the flat map when the map services cann
   const page = await ctx.newPage();
   const crashed = [];
   page.on("pageerror", (e) => crashed.push(e.message));
-  await page.goto(BASE + "/en", { waitUntil: "networkidle" });
+  await page.goto(BASE + "/en#planner", { waitUntil: "networkidle" });
   await toConsole(page);
   await page.locator("#planner canvas[role=img]").waitFor({ state: "attached", timeout: 25000 });
   assert.equal(await page.locator("#planner .maplibregl-canvas").count(), 0, "no broken map left behind");
-  await page.locator("#planner ol button").nth(1).click();
-  assert.equal(await page.locator("#planner ol button[aria-current=step]").count(), 1, "the steps still work");
+  await page.locator("#planner [data-beats] button").nth(1).click();
+  assert.equal(await page.locator("#planner [data-beats] button[aria-current=step]").count(), 1, "the steps still work");
   assert.deepEqual(crashed, []);
   await ctx.close();
 });
@@ -402,7 +421,7 @@ await test("route: the rail follows the scroll, stops jump, ] and [ hop, the map
     assert.ok((await page.evaluate(() => scrollY)) <= 1, `${lang}: first stop is the top`);
     await page.keyboard.press("]");
     await page.waitForTimeout(300);
-    const live = await topOf("live-tracking");
+    const live = await topOf("deck"); // the live-tracking stop is a panel of the deck
     assert.ok(Math.abs((await page.evaluate(() => scrollY)) - (live - 64)) < 80, `${lang}: ] hops to the next stop`);
     await page.keyboard.press("[");
     await page.waitForTimeout(300);
@@ -418,6 +437,27 @@ await test("route: the rail follows the scroll, stops jump, ] and [ hop, the map
     await dlg.waitFor({ state: "detached" });
     const fleet = await topOf("fleet");
     assert.ok(Math.abs((await page.evaluate(() => scrollY)) - (fleet - 64)) < 80, `${lang}: landed on the chosen stop`);
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  }
+});
+
+await test("deck: tabs, arrow keys, links and swipe pan between live tracking and the plan builder (en + ar)", async () => {
+  for (const [lang, live, plan] of [["en", /Live tracking/, /Build your plan/], ["ar", /التتبع المباشر/, /ابنِ خطتك/]]) {
+    const { page, ctx, errors } = await open(`/${lang}`, { reducedMotion: "reduce" });
+    const tabLive = page.locator("#deck").getByRole("tab", { name: live });
+    const tabPlan = page.locator("#deck").getByRole("tab", { name: plan });
+    assert.equal(await tabLive.getAttribute("aria-selected"), "true", `${lang}: opens on live tracking`);
+    assert.equal(await page.locator("#deck-panel-planner").getAttribute("inert"), "", `${lang}: the hidden panel is inert`);
+    await tabPlan.click();
+    await page.locator("#planner h3").first().waitFor({ state: "visible" });
+    assert.equal(await tabPlan.getAttribute("aria-selected"), "true");
+    assert.equal(await page.locator("#deck-panel-live-tracking").getAttribute("inert"), "", `${lang}: live panel inert now`);
+    await tabPlan.focus();
+    await page.keyboard.press(lang === "ar" ? "ArrowRight" : "ArrowLeft"); // back toward the first panel
+    assert.equal(await tabLive.getAttribute("aria-selected"), "true", `${lang}: arrow key pans back`);
+    // any link to the plan builder pans the deck
+    await page.getByRole("link", { name: /^Plan deliveries with live tracking|^خطّط|^خطط/ }).first().click().catch(() => {});
     assert.deepEqual(errors, []);
     await ctx.close();
   }

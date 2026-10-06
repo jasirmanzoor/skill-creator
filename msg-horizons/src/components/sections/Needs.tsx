@@ -71,7 +71,7 @@ export default function Needs({ lang }: { lang: Locale }) {
         </div>
       </div>
 
-      <div ref={track} className={scrub ? "relative lg:h-[400vh]" : "relative"}>
+      <div ref={track} className={scrub ? "relative lg:h-[280vh]" : "relative"}>
         <div className={`mx-auto max-w-7xl px-4 sm:px-5 lg:px-8 ${scrub ? "lg:sticky lg:top-16 lg:flex lg:h-[calc(100svh-4rem)] lg:flex-col lg:justify-center" : ""}`}>
           <div data-inview={inView || undefined} className={`needs-grid mt-12 grid gap-6 ${scrub ? "lg:mt-0 lg:[grid-template-areas:'stage']" : ""}`}>
             {NEED_STAGES.map((st, si) => {

@@ -16,13 +16,15 @@ export type Stop = {
   hint: Record<Locale, string>;
   /** who this stop matters most to; "all" lens ignores this */
   for: Exclude<Lens, "all">[];
+  /** lives on the sideways deck: reaching it pans the deck rather than scrolling to it */
+  panel?: boolean;
 };
 
 export const STOPS: Stop[] = [
   { id: "hero", for: ["seller", "brand"], title: { en: "Start", ar: "ابدأ" }, hint: { en: "Price a delivery in ten seconds", ar: "سعّر توصيلتك في عشر ثوانٍ" } },
-  { id: "live-tracking", for: ["seller", "brand", "enterprise"], title: { en: "Live tracking", ar: "التتبع المباشر" }, hint: { en: "See your driver live, once they approve", ar: "شاهد المندوب مباشرةً بعد موافقته" } },
+  { id: "live-tracking", panel: true, for: ["seller", "brand", "enterprise"], title: { en: "Live tracking", ar: "التتبع المباشر" }, hint: { en: "See your driver live, once they approve", ar: "شاهد المندوب مباشرةً بعد موافقته" } },
   { id: "sellers", for: ["seller"], title: { en: "Your questions", ar: "أسئلتك" }, hint: { en: "One partner for the whole operation", ar: "شريك واحد للعملية كاملة" } },
-  { id: "planner", for: ["seller", "brand"], title: { en: "Build your plan", ar: "ابنِ خطتك" }, hint: { en: "Four steps to a setup that fits", ar: "أربع خطوات إلى منظومة تناسبك" } },
+  { id: "planner", panel: true, for: ["seller", "brand"], title: { en: "Build your plan", ar: "ابنِ خطتك" }, hint: { en: "Four steps to a setup that fits", ar: "أربع خطوات إلى منظومة تناسبك" } },
   { id: "network", for: ["brand", "enterprise"], title: { en: "The network", ar: "الشبكة" }, hint: { en: "1,000+ couriers, 100+ vehicles", ar: "+1,000 مندوب و+100 مركبة" } },
   { id: "journey", for: ["seller", "brand"], title: { en: "How it works", ar: "كيف نعمل" }, hint: { en: "Our service, mapped step by step", ar: "خدمتنا مرسومة لك خطوة بخطوة" } },
   { id: "services", for: ["seller", "brand", "enterprise"], title: { en: "Services", ar: "الخدمات" }, hint: { en: "One seamless logistics ecosystem", ar: "منظومة لوجستية واحدة متكاملة" } },

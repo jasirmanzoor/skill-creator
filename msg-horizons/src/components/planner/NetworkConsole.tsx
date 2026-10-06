@@ -44,7 +44,7 @@ const suggest = (cfg: SimConfig): Model => (cfg.storage ? "e2e" : cfg.freight ? 
  * beat by beat: on the city map when both ends share a city, on the Kingdom map otherwise. Cash
  * remittance and failed-delivery returns can be added. Illustrative only; captioned as such.
  */
-export default function NetworkConsole({ locale, cfg }: { locale: Locale; cfg: SimConfig; statusIdle?: boolean; complete?: boolean }) {
+export default function NetworkConsole({ locale, cfg, compact = false }: { locale: Locale; cfg: SimConfig; statusIdle?: boolean; complete?: boolean; compact?: boolean }) {
   const c = routeCopy[locale];
   const reduce = useReducedMotion();
   const [picked, setPicked] = useState<Model | null>(null);
@@ -622,9 +622,9 @@ export default function NetworkConsole({ locale, cfg }: { locale: Locale; cfg: S
   const running = playing && !reduce;
 
   return (
-    <div className="relative overflow-hidden bg-[linear-gradient(180deg,#f3fbfb,#ffffff)] text-teal-deep">
+    <div className={`relative overflow-hidden bg-[linear-gradient(180deg,#f3fbfb,#ffffff)] text-teal-deep ${compact ? "flex h-full flex-col" : ""}`}>
       {/* working models */}
-      <div role="radiogroup" aria-label={c.title} className="flex snap-x gap-2 overflow-x-auto border-b border-teal/10 p-3 sm:grid sm:grid-cols-2 sm:overflow-visible sm:p-4 xl:grid-cols-4">
+      <div role="radiogroup" aria-label={c.title} className={compact ? "flex gap-1.5 overflow-x-auto border-b border-teal/10 p-2.5" : "flex snap-x gap-2 overflow-x-auto border-b border-teal/10 p-3 sm:grid sm:grid-cols-2 sm:overflow-visible sm:p-4 xl:grid-cols-4"}>
         {MODELS.map((m) => {
           const on = m === model;
           return (
@@ -634,23 +634,23 @@ export default function NetworkConsole({ locale, cfg }: { locale: Locale; cfg: S
               role="radio"
               aria-checked={on}
               onClick={() => { setPicked(m); setPlaying(true); }}
-              className={`flex min-w-[220px] shrink-0 snap-start items-start gap-3 rounded-2xl p-3 text-start ring-1 transition-all sm:min-w-0 ${on ? "bg-teal-deep text-white shadow-[0_16px_30px_-18px_rgba(11,58,64,0.8)] ring-teal-deep" : "bg-white ring-teal/15 hover:ring-teal/40"}`}
+              className={`flex shrink-0 snap-start items-start gap-3 text-start ring-1 transition-all ${compact ? "items-center gap-2 rounded-full py-1.5 pe-3.5 ps-1.5" : "min-w-[220px] rounded-2xl p-3 sm:min-w-0"} ${on ? "bg-teal-deep text-white shadow-[0_16px_30px_-18px_rgba(11,58,64,0.8)] ring-teal-deep" : "bg-white ring-teal/15 hover:ring-teal/40"}`}
             >
-              <span className={`grid size-9 shrink-0 place-items-center rounded-xl ${on ? "bg-white/15" : "bg-sea-50 text-teal"}`}>
+              <span className={`grid shrink-0 place-items-center ${compact ? "size-7 rounded-full" : "size-9 rounded-xl"} ${on ? "bg-white/15" : "bg-sea-50 text-teal"}`}>
                 <ModelIcon m={m} />
               </span>
               <span>
                 <span className="block text-sm font-semibold">{c.models[m].t}</span>
-                <span className={`mt-0.5 block text-xs leading-snug ${on ? "text-white/80" : "text-teal-deep/70"}`}>{c.models[m].d}</span>
+                {compact ? null : <span className={`mt-0.5 block text-xs leading-snug ${on ? "text-white/80" : "text-teal-deep/70"}`}>{c.models[m].d}</span>}
               </span>
             </button>
           );
         })}
       </div>
 
-      <div className="grid lg:grid-cols-[1fr_340px]">
+      <div className={compact ? "flex min-h-0 flex-1 flex-col" : "grid lg:grid-cols-[1fr_340px]"}>
         {/* map */}
-        <div ref={box} className="relative h-[360px] w-full overflow-hidden sm:h-[440px] lg:h-auto lg:min-h-[520px]">
+        <div ref={box} className={compact ? "relative min-h-[340px] w-full flex-1 overflow-hidden" : "relative h-[360px] w-full overflow-hidden sm:h-[440px] lg:h-auto lg:min-h-[520px]"}>
           {mode === "canvas" ? <canvas ref={canvas} className="absolute inset-0 size-full" role="img" aria-label={c.canvasLabel} /> : null}
           {mode === "real" && near ? (
             <FlyoverMap
@@ -721,7 +721,7 @@ export default function NetworkConsole({ locale, cfg }: { locale: Locale; cfg: S
         ) : null}
 
         {/* controls */}
-        <aside className="flex flex-col gap-4 border-t border-teal/10 bg-white/75 p-4 lg:border-s lg:border-t-0">
+        {compact ? null : <aside className="flex flex-col gap-4 border-t border-teal/10 bg-white/75 p-4 lg:border-s lg:border-t-0">
           <EndPicker
             label={fromLabel} c={c} city={fromCity} area={fromArea}
             onCity={(v) => { setFromCity(v); setFromArea(areasFor(v)[0].id); }} onArea={setFromArea}
@@ -773,13 +773,13 @@ export default function NetworkConsole({ locale, cfg }: { locale: Locale; cfg: S
               </dd>
             </div>
           </dl>
-        </aside>
+        </aside>}
       </div>
 
       {/* the route, step by step */}
-      <div className="border-t border-teal/10 bg-white/80 px-3 py-3 sm:px-4">
+      {<div className="border-t border-teal/10 bg-white/80 px-3 py-3 sm:px-4">
         <p className="sr-only">{c.route}</p>
-        <ol ref={strip} className="flex snap-x gap-2 overflow-x-auto pb-1">
+        <ol ref={strip} data-beats className="flex snap-x gap-2 overflow-x-auto pb-1">
           {plan.beats.map((b, i) => {
             const now = i === active;
             const done = i < active;
@@ -790,7 +790,7 @@ export default function NetworkConsole({ locale, cfg }: { locale: Locale; cfg: S
                   type="button"
                   onClick={() => jump(i)}
                   aria-current={now ? "step" : undefined}
-                  className={`flex h-full w-[190px] flex-col gap-1.5 rounded-xl p-2.5 text-start ring-1 transition-all duration-300 ${now ? "bg-teal-deep text-white ring-teal-deep" : done ? "bg-sea-50 ring-teal/20" : "bg-white ring-teal/10 hover:ring-teal/30"}`}
+                  className={`flex h-full w-[170px] flex-col gap-1 rounded-xl p-2 text-start ring-1 transition-all duration-300 ${now ? "bg-teal-deep text-white ring-teal-deep" : done ? "bg-sea-50 ring-teal/20" : "bg-white ring-teal/10 hover:ring-teal/30"}`}
                 >
                   <span className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] rtl:tracking-normal">
                     <span className={`grid size-4 place-items-center rounded-full text-[9px] text-white ${now ? "bg-white/25" : tone}`}>
@@ -805,7 +805,7 @@ export default function NetworkConsole({ locale, cfg }: { locale: Locale; cfg: S
           })}
         </ol>
         <p className="mt-2 text-[10px] text-teal-deep/75 lg:hidden">{c.note}</p>
-      </div>
+      </div>}
     </div>
   );
 }
