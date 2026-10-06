@@ -111,3 +111,15 @@ Domain: the website goes on www.msg-horizons.com only. msg-horizons.com (apex) s
 - **Not published, needs MSG's decision:** "100% compliant" (an absolute legal claim and a percentage; copy says
   "compliant" instead) and "over 6 years of logistics and last mile". The 6 years conflicts with the establishment date
   above (the profile gives 2024/2025); say whether it refers to the founding team's experience before MSG.
+
+## Warehouse photos in the hero (6 Oct 2026, supplied by MSG in chat)
+- Files: `public/media/msg/` (facade, sky layer, sign glow, two inside views), prepared by
+  `scripts/prepare-hero-photos.py`. The hero caption says "Real photo, retouched for presentation."
+- The retouched facade MSG supplied had garbled the sign (it read "فوريزونز"). The sign is restored from MSG's
+  original photo of the same facade, so it reads "ام اس جي هوريزونز" as on the building. Road litter and a stain were
+  removed. Nothing was added: no vehicles, signage or structures.
+- **Still to confirm:** which site this is (the copy names no city; if it is the Sabya logistics centre, the same photo
+  can fill the `warehouse.jpg` slot). Higher-resolution originals would sharpen the hero on large screens.
+- **Not used yet:** the two photos of the iMile-branded outlet. They show another company's sign, a readable car
+  number plate and neighbouring shops. Confirm MSG runs this outlet for iMile and has permission to show it; the
+  plate would be blurred.
