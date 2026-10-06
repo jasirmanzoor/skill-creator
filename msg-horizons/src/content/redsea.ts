@@ -2,8 +2,8 @@ import type { Locale } from "@/content/i18n";
 
 /**
  * "Red Sea glass" bands: the network band, the live price band and the Sabya beat.
- * Every number here was supplied by MSG on 30 Sept 2026 (1 kg next-day rate card and the Sabya
- * 800 m² logistics centre). Nothing is derived or invented beyond orders × the stated rate.
+ * Every number here was supplied by MSG: the 1 kg next-day rate card (30 Sept 2026) and the Sabya hub and the
+ * iMile franchise outlet (6 Oct 2026). Nothing is derived or invented beyond orders × the stated rate.
  */
 
 export const LANES = ["intra", "inter", "sabyaLocal", "sabyaMajor"] as const;
@@ -50,6 +50,7 @@ type Copy = {
     wa: string;
     milestones: { first: string; peak: string };
   };
+  outlet: { eyebrow: string; title: string; body: string; alt: string; radius: string };
   sabya: {
     eyebrow: string;
     title: string;
@@ -57,6 +58,7 @@ type Copy = {
     approx: string;
     local: string;
     major: string;
+    points: string[];
     cta: string;
     wa: string;
   };
@@ -94,13 +96,21 @@ export const redSea: Record<Locale, Copy> = {
       wa: "Hello MSG Horizons, I ship about {n} orders a month ({lane}). Please send my quote.",
       milestones: { first: "First order", peak: "Peak season" },
     },
+    outlet: {
+      eyebrow: "Our outlet",
+      title: "An iMile outlet, owned and run by MSG",
+      body: "MSG owns and runs this iMile franchise store. It works as a walk-in parcel kiosk, and MSG delivers to the surrounding district within a 5 km radius.",
+      alt: "The iMile franchise outlet that MSG owns and runs, with its iMile sign above a glass shopfront",
+      radius: "5 km delivery radius",
+    },
     sabya: {
-      eyebrow: "Sabya · Jazan",
-      title: "800 m² equipped with all necessary components",
-      sub: "Our logistics centre in Sabya: doorstep delivery across Jazan, and line-haul north to the major cities.",
+      eyebrow: "MSG Sabya hub · Jazan",
+      title: "A 1,000 m² hub, with our own fleet and our own drivers",
+      sub: "From Sabya we cover around 300,000 km² of very different ground: hard mountain passes, bridges and far-off villages, with line-haul north to the major cities.",
       approx: "Approx. cost per order · 1 kg next-day",
       local: "Inside Sabya",
       major: "Sabya to major cities",
+      points: ["1,000 m² hub", "Our own Hiace vans", "In-house drivers", "About 300,000 km² covered"],
       cta: "Ask about Sabya",
       wa: "Hello MSG Horizons, I want to ship from Sabya.",
     },
@@ -136,13 +146,21 @@ export const redSea: Record<Locale, Copy> = {
       wa: "مرحباً مسج هورايزونز، أشحن نحو {n} طلب شهرياً ({lane}). أرسلوا لي عرض السعر.",
       milestones: { first: "أول طلب", peak: "موسم الذروة" },
     },
+    outlet: {
+      eyebrow: "منفذنا",
+      title: "منفذ iMile تملكه وتديره مسج",
+      body: "تملك مسج هذا المتجر بنظام امتياز iMile وتديره. يعمل كنقطة طرود يزورها العملاء، وتوصّل مسج إلى الحي المحيط ضمن نطاق 5 كم.",
+      alt: "منفذ امتياز iMile الذي تملكه مسج وتديره، ولوحة iMile فوق واجهة زجاجية",
+      radius: "نطاق توصيل 5 كم",
+    },
     sabya: {
-      eyebrow: "صبيا · جازان",
-      title: "800 م² مجهزة بكل المكونات اللازمة",
-      sub: "مركزنا اللوجستي في صبيا: توصيل حتى الباب في أنحاء جازان، ونقل بري شمالاً إلى المدن الكبرى.",
+      eyebrow: "مركز مسج في صبيا · جازان",
+      title: "مركز بمساحة 1,000 م²، بأسطولنا ومناديبنا",
+      sub: "من صبيا نغطي نحو 300 ألف كم² من تضاريس متنوعة: ممرات جبلية وعرة وجسور وقرى نائية، مع نقل بري شمالاً إلى المدن الكبرى.",
       approx: "التكلفة التقريبية للطلب · 1 كجم اليوم التالي",
       local: "داخل صبيا",
       major: "من صبيا إلى المدن الكبرى",
+      points: ["مركز 1,000 م²", "مركبات هايس مملوكة لنا", "مناديب من فريقنا", "تغطية نحو 300 ألف كم²"],
       cta: "اسأل عن صبيا",
       wa: "مرحباً مسج هورايزونز، أريد الشحن من صبيا.",
     },

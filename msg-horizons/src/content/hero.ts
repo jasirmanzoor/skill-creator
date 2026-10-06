@@ -66,15 +66,15 @@ export const heroCopy: Record<Locale, Copy> = {
       caption: "Illustrative network view",
     },
     facade: {
-      alt: "The MSG Horizons warehouse, with the company sign above the open loading door",
-      caption: "Our warehouse. Real photo, retouched for presentation.",
+      alt: "The MSG Horizons Sabya hub, with the company sign above the open loading door",
+      caption: "Our Sabya hub. Real photo, retouched for presentation.",
       hint: "Scroll to step inside",
     },
     inside: {
-      eyebrow: "Inside the warehouse",
+      eyebrow: "Inside the Sabya hub",
       title: "Stored, sorted and sent out, under one roof.",
       lead: "Racks for your stock, cages for sorting, and a floor ready for every pickup and dispatch.",
-      alt: "Inside the MSG Horizons warehouse: racks of parcels, sorting cages and an open floor",
+      alt: "Inside the MSG Horizons Sabya hub: racks of parcels, sorting cages and an open floor",
       spots: { storage: "Your stock, on racks", sorting: "Sorting", dispatch: "Ready for dispatch" },
     },
     kingdom: {
@@ -117,15 +117,15 @@ export const heroCopy: Record<Locale, Copy> = {
       caption: "عرض توضيحي للشبكة",
     },
     facade: {
-      alt: "مستودع مسج هورايزونز، ولوحة الشركة فوق باب التحميل المفتوح",
-      caption: "مستودعنا. صورة حقيقية مُحسَّنة للعرض.",
+      alt: "مركز مسج هورايزونز في صبيا، ولوحة الشركة فوق باب التحميل المفتوح",
+      caption: "مركزنا في صبيا. صورة حقيقية مُحسَّنة للعرض.",
       hint: "مرّر لتدخل",
     },
     inside: {
-      eyebrow: "داخل المستودع",
+      eyebrow: "داخل مركز صبيا",
       title: "تخزين وفرز وانطلاق، تحت سقف واحد.",
       lead: "أرفف لمخزونك، وأقفاص للفرز، وأرضية جاهزة لكل استلام وشحن.",
-      alt: "داخل مستودع مسج هورايزونز: أرفف طرود وأقفاص فرز وأرضية مفتوحة",
+      alt: "داخل مركز مسج هورايزونز في صبيا: أرفف طرود وأقفاص فرز وأرضية مفتوحة",
       spots: { storage: "مخزونك على الأرفف", sorting: "الفرز", dispatch: "جاهز للشحن" },
     },
     kingdom: {

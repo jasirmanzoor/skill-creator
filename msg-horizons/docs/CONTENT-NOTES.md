@@ -82,12 +82,12 @@ The skin is "Red Sea glass": daylight aqua, sea-foam, white, silver and deep tea
 
 - Hero: "You have something to sell. We already have the drivers." The earlier SEO line, "Last-mile delivery across Saudi Arabia", now sits in the h1 eyebrow.
 - 1 kg next-day rates, SAR per shipment: walk-in 33 intra-city / 52 inter-city; 299 a month 21 / 30.
-- Sabya: 800 m² logistics centre; walk-in 29 local / 48 to major cities; 299 a month 17 / 28.
+- Sabya: 800 m² logistics centre (updated to 1,000 m² by MSG on 6 Oct 2026, see below); walk-in 29 local / 48 to major cities; 299 a month 17 / 28.
 - The price band multiplies monthly shipments by the listed rate. Walk-in applies below 299 a month; the 299 band applies from 299. It makes no other assumption.
 - Rates appear only inside `<aside data-rate-card>`. The e2e claims test exempts only those blocks.
 
 Photo slots. MSG supplies these files; no generated stand-ins:
-- `public/warehouse.jpg`: the real Sabya warehouse, used behind "800 m² equipped with all necessary components". Until it exists, the card shows a plain sun-toned panel.
+- `public/warehouse.jpg`: the real Sabya warehouse, used in the Sabya card. Until it exists, the card shows a plain sun-toned panel.
 - `public/coast.jpg` (optional): a coastal highway or Corniche shot with a white truck. Until it exists, the network band paints a daylight Red Sea scene around MSG's own car photo.
 
 Open questions for MSG:
@@ -118,8 +118,14 @@ Domain: the website goes on www.msg-horizons.com only. msg-horizons.com (apex) s
 - The retouched facade MSG supplied had garbled the sign (it read "فوريزونز"). The sign is restored from MSG's
   original photo of the same facade, so it reads "ام اس جي هوريزونز" as on the building. Road litter and a stain were
   removed. Nothing was added: no vehicles, signage or structures.
-- **Still to confirm:** which site this is (the copy names no city; if it is the Sabya logistics centre, the same photo
-  can fill the `warehouse.jpg` slot). Higher-resolution originals would sharpen the hero on large screens.
-- **Not used yet:** the two photos of the iMile-branded outlet. They show another company's sign, a readable car
-  number plate and neighbouring shops. Confirm MSG runs this outlet for iMile and has permission to show it; the
-  plate would be blurred.
+- Confirmed by MSG: the photos are the **MSG Sabya hub**. The same corrected facade replaces
+  `public/photos/msg/warehouse-front.webp`, which had carried the garbled sign since 2 Oct.
+- Higher-resolution originals would sharpen the hero on large screens.
+
+## Sabya hub and the iMile outlet (6 Oct 2026, from MSG in chat)
+- Sabya hub: 1,000 m² (replaces the earlier 800 m²), MSG's own Hiace vans and in-house drivers, covering around
+  300,000 km² including hard mountain passes, bridges and remote villages. In `facts.sabyaHub` and the Sabya card.
+- iMile outlet: MSG owns and runs it as an iMile franchise (trademark model). It is a walk-in parcel kiosk and MSG
+  delivers to the surrounding district within 5 km. Photo: `public/media/msg/outlet.jpg` (the close-up; the wide shot
+  with a readable car plate and neighbouring shops is not used). A torn "shop for transfer" notice left on the glass
+  was removed from the photo. The outlet's city is not named until MSG gives it.

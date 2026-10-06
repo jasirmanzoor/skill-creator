@@ -197,7 +197,7 @@ await test("red sea bands: no walk-in table, live approx cost per order, Sabya s
     assert.equal(await page.locator("#network [data-rate-card]").count(), 0, `${lang}: no rate table in the network band`);
     const sabya = await page.locator("#growth aside[data-rate-card]").last().locator("dd").allTextContents();
     assert.deepEqual(sabya.map((t) => t.replace(/\D/g, "")), ["17", "28"], `${lang}: Sabya approx per order`);
-    assert.match(await page.locator("#growth h3").innerText(), /800/);
+    assert.match(await page.locator("#growth h3").first().innerText(), /1,000/);
     // price band: 120 intra-city = walk-in 33 → 3,960; 300 = 299 band 21 → 6,300
     const panel = page.locator("#growth aside[data-rate-card]").first();
     const slider = page.locator("#growth input[type=range]");

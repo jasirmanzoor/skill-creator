@@ -35,6 +35,7 @@ const fmt = { useGrouping: true } as const;
 export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; warehousePhoto: boolean }) {
   const c = redSea[lang].growth;
   const s = redSea[lang].sabya;
+  const o = redSea[lang].outlet;
   const reduce = useReducedMotion();
   const id = useId();
   const [lane, setLane] = useState<Lane>("intra");
@@ -166,6 +167,11 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
                 {s.title}
               </h3>
               <p className={`mt-3 max-w-lg ${warehousePhoto ? "text-white/85" : "text-[#4a2e0b]"}`}>{s.sub}</p>
+              <ul className="mt-5 flex flex-wrap gap-2">
+                {s.points.map((pt) => (
+                  <li key={pt} className={`rounded-full px-3 py-1.5 text-xs font-semibold ring-1 backdrop-blur ${warehousePhoto ? "bg-black/30 text-white ring-white/25" : "bg-white/60 text-[#3b2408] ring-[#3b2408]/15"}`}>{pt}</li>
+                ))}
+              </ul>
             </div>
           </div>
           <aside data-rate-card aria-label={s.eyebrow} className="flex flex-col justify-center bg-[linear-gradient(180deg,#fffaf0,#fbf1dc)] p-6 text-[#3b2408] sm:p-10">
@@ -192,8 +198,40 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
             </TrackedLink>
           </aside>
         </div>
+
+        {/* the outlet: an iMile franchise store MSG owns and runs */}
+        <div className="mt-5 grid overflow-hidden rounded-3xl bg-white shadow-[0_30px_60px_-35px_rgba(11,58,64,0.45)] ring-1 ring-teal/10 sm:grid-cols-[0.8fr_1.2fr]">
+          <div className="relative min-h-[300px] overflow-hidden">
+            <img src="/media/msg/outlet.jpg" alt={o.alt} loading="lazy" className="absolute inset-0 size-full object-cover [object-position:50%_42%]" />
+          </div>
+          <div className="flex flex-col justify-center gap-5 p-6 sm:p-10 lg:flex-row lg:items-center lg:gap-10">
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-teal">{o.eyebrow}</p>
+              <h3 className="mt-2 font-display text-2xl font-semibold leading-tight tracking-[-0.02em] text-teal-deep text-balance sm:text-3xl rtl:tracking-normal">{o.title}</h3>
+              <p className="mt-3 max-w-lg text-teal-deep/80">{o.body}</p>
+            </div>
+            <RadiusRings label={o.radius} reduce={reduce} />
+          </div>
+        </div>
       </div>
     </section>
+  );
+}
+
+/** the outlet at the centre, its delivery district around it */
+function RadiusRings({ label, reduce }: { label: string; reduce: boolean }) {
+  return (
+    <div className="relative mx-auto grid size-44 shrink-0 place-items-center" aria-hidden="true">
+      {[1, 0.72, 0.44].map((k, i) => (
+        <span key={k} className="absolute rounded-full border border-teal/25 bg-teal/[0.04]" style={{ width: `${k * 100}%`, height: `${k * 100}%` }}>
+          {!reduce && i === 0 ? <span className="absolute inset-0 rounded-full border-2 border-[#4cc97a]/60 motion-safe:animate-ping [animation-duration:2.8s]" /> : null}
+        </span>
+      ))}
+      <span className="relative grid size-10 place-items-center rounded-full bg-teal-deep text-white shadow-lg">
+        <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 10h16l-1.5-5h-13zM5 10v9h14v-9M10 19v-5h4v5" /></svg>
+      </span>
+      <span className="absolute -bottom-3 rounded-full bg-[#0b7d36] px-3 py-1 text-xs font-bold text-white">{label}</span>
+    </div>
   );
 }
 
@@ -219,22 +257,18 @@ export function Money({ cur, approx = false, ar, children }: { cur: string; appr
 }
 
 /**
- * MSG's own warehouse: the front of the building, then, as the visitor scrolls, the camera pushes
- * through the open doorway and the street dissolves into the floor inside.
+ * Inside MSG's Sabya hub. The hero already walks through the front door, so here the floor simply settles into
+ * place as the card scrolls in.
  */
 function SabyaDoor({ alt, reduce }: { alt: string; reduce: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.85", "end 0.25"] });
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const p = useSpring(scrollYProgress, { stiffness: 80, damping: 22 });
-  const frontScale = useTransform(p, [0, 0.75], [1.02, 2.4]);
-  const frontOpacity = useTransform(p, [0.35, 0.7], [1, 0]);
-  const floorScale = useTransform(p, [0.35, 1], [1.25, 1]);
-  const floorOpacity = useTransform(p, [0.35, 0.7], [0, 1]);
+  const scale = useTransform(p, [0, 1], [1.18, 1]);
   if (reduce) return <img src="/photos/msg/warehouse-floor.webp" alt={alt} className="absolute inset-0 size-full object-cover" loading="lazy" />;
   return (
     <div ref={ref} className="absolute inset-0">
-      <motion.img src="/photos/msg/warehouse-floor.webp" alt={alt} loading="lazy" style={{ scale: floorScale, opacity: floorOpacity }} className="absolute inset-0 size-full object-cover" />
-      <motion.img aria-hidden="true" src="/photos/msg/warehouse-front.webp" alt="" loading="lazy" style={{ scale: frontScale, opacity: frontOpacity, transformOrigin: "43% 57%" }} className="absolute inset-0 size-full object-cover [object-position:43%_50%]" />
+      <motion.img src="/photos/msg/warehouse-floor.webp" alt={alt} loading="lazy" style={{ scale }} className="absolute inset-0 size-full object-cover" />
     </div>
   );
 }
