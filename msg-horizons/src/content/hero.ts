@@ -26,6 +26,10 @@ type Copy = {
   };
   map: { label: string; hub: string; sabya: string; delivered: string; caption: string };
   cities: Record<string, string>;
+  /** the warehouse walk-in: real MSG photos (public/media/msg, see docs/CONTENT-NOTES.md) */
+  facade: { alt: string; caption: string; hint: string };
+  inside: { eyebrow: string; title: string; lead: string; alt: string; spots: { storage: string; sorting: string; dispatch: string } };
+  kingdom: { eyebrow: string; title: string; lead: string };
 };
 
 export const heroCopy: Record<Locale, Copy> = {
@@ -61,6 +65,23 @@ export const heroCopy: Record<Locale, Copy> = {
       delivered: "Delivered",
       caption: "Illustrative network view",
     },
+    facade: {
+      alt: "The MSG Horizons warehouse, with the company sign above the open loading door",
+      caption: "Our warehouse. Real photo, retouched for presentation.",
+      hint: "Scroll to step inside",
+    },
+    inside: {
+      eyebrow: "Inside the warehouse",
+      title: "Stored, sorted and sent out, under one roof.",
+      lead: "Racks for your stock, cages for sorting, and a floor ready for every pickup and dispatch.",
+      alt: "Inside the MSG Horizons warehouse: racks of parcels, sorting cages and an open floor",
+      spots: { storage: "Your stock, on racks", sorting: "Sorting", dispatch: "Ready for dispatch" },
+    },
+    kingdom: {
+      eyebrow: "Then out across the Kingdom",
+      title: "From this floor to your customer's door.",
+      lead: "Line-haul between cities, then couriers to the door, every day of the week.",
+    },
     cities: { riyadh: "Riyadh", jeddah: "Jeddah", makkah: "Makkah", madinah: "Madinah", dammam: "Dammam", abha: "Abha", tabuk: "Tabuk", hail: "Hail", buraidah: "Buraidah", sabya: "Sabya", najran: "Najran", ahsa: "Al Ahsa", taif: "Taif" },
   },
   ar: {
@@ -94,6 +115,23 @@ export const heroCopy: Record<Locale, Copy> = {
       sabya: "مركز صبيا",
       delivered: "تم التسليم",
       caption: "عرض توضيحي للشبكة",
+    },
+    facade: {
+      alt: "مستودع مسج هورايزونز، ولوحة الشركة فوق باب التحميل المفتوح",
+      caption: "مستودعنا. صورة حقيقية مُحسَّنة للعرض.",
+      hint: "مرّر لتدخل",
+    },
+    inside: {
+      eyebrow: "داخل المستودع",
+      title: "تخزين وفرز وانطلاق، تحت سقف واحد.",
+      lead: "أرفف لمخزونك، وأقفاص للفرز، وأرضية جاهزة لكل استلام وشحن.",
+      alt: "داخل مستودع مسج هورايزونز: أرفف طرود وأقفاص فرز وأرضية مفتوحة",
+      spots: { storage: "مخزونك على الأرفف", sorting: "الفرز", dispatch: "جاهز للشحن" },
+    },
+    kingdom: {
+      eyebrow: "ثم إلى أنحاء المملكة",
+      title: "من هذه الأرضية إلى باب عميلك.",
+      lead: "نقل بين المدن، ثم مناديب حتى الباب، كل أيام الأسبوع.",
     },
     cities: { riyadh: "الرياض", jeddah: "جدة", makkah: "مكة", madinah: "المدينة", dammam: "الدمام", abha: "أبها", tabuk: "تبوك", hail: "حائل", buraidah: "بريدة", sabya: "صبيا", najran: "نجران", ahsa: "الأحساء", taif: "الطائف" },
   },
