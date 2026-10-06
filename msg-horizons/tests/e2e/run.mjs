@@ -100,7 +100,7 @@ async function toPlan(page) {
 // the result keeps its detail in tabs; read them all
 async function resultText(page) {
   let all = "";
-  for (const name of ["Your numbers", "Services", "Why this", "Next steps"]) {
+  for (const name of ["Your quote", "We handle", "Services", "Next steps"]) {
     await page.locator("#planner").getByRole("tab", { name }).click();
     all += "\n" + (await page.locator("#plan-tabpanel").innerText());
   }
@@ -124,9 +124,10 @@ await test("planner: build a plan, share it, carry it into the contact form", as
   await page.getByRole("button", { name: /Build my plan/ }).last().click();
   await page.getByRole("heading", { name: "Growth Engine" }).waitFor();
   const result = await resultText(page);
-  for (const s of ["Shipping & Last-Mile Delivery", "Warehousing & Inventory", "Real-Time Tracking & Support", "Manpower & Peak Support", "Dedicated Account Management", "Why this structure", "Daily routes", "Couriers on your peak day"])
+  for (const s of ["Shipping & Last-Mile Delivery", "Warehousing & Inventory", "Real-Time Tracking & Support", "Manpower & Peak Support", "Dedicated Account Management", "Price quote", "Proof of delivery", "Live tracking", "Cash on delivery, on time", "ZATCA", "Licences"])
     assert.ok(result.includes(s), `missing ${s}`);
-  assert.ok(!/SAR|﷼|price:/i.test(result.replace(/no prices here/i, "")), "no pricing in result");
+  assert.ok(!/Daily routes|Couriers on|peak-only|1 courier, every day/i.test(result), "no operating matrix in the client's result");
+  assert.ok(await page.locator("#planner [data-rate-card]").count() >= 0);
   assert.match(decodeURIComponent(page.url()), /[?&]plan=ecommerce~parcels\.storage~scaling~visibility\.peaks/);
   const wa = await page.getByRole("link", { name: /Send on WhatsApp/ }).getAttribute("href");
   assert.match(wa, /^https:\/\/wa\.me\/966578061556\?text=/);
@@ -153,21 +154,20 @@ await test("planner: priorities are capped at three", async () => {
   await ctx.close();
 });
 
-await test("network sizer recalculates live as inputs change", async () => {
+await test("volume step: the quote follows the numbers, and no operating matrix is shown", async () => {
   const { page, ctx, errors } = await open("/en?persona=seller#planner");
   await page.getByRole("button", { name: /Continue/ }).click();
-  const live = page.locator("#planner aside[aria-label='Calculated live']");
-  await live.waitFor();
-  const peak = () => live.locator("dd").nth(2).getAttribute("data-value");
-  const before = await peak();
-  await page.locator("#planner input[type=range]").first().fill("900");
-  await page.waitForTimeout(900);
-  assert.notEqual(await peak(), before, "peak couriers should change with orders");
+  const quote = page.locator("#planner aside[data-rate-card]:visible");
+  await quote.waitFor();
+  const before = await quote.innerText();
   await page.locator("#planner").getByRole("radio", { name: "Across the Kingdom" }).click();
+  assert.notEqual(await quote.innerText(), before, "the quote changes with where the orders go");
+  const text = await page.locator("#planner").innerText();
+  const hit = text.match(/Daily routes|Couriers on|Peak-only|Calculated live/i);
+  assert.ok(!hit, `routes and courier counts are not shown to the client (${hit})`);
+  for (const s of ["Price quote", "Proof of delivery", "Live tracking", "Cash on delivery, on time"]) assert.ok(text.includes(s), `missing ${s}`);
   await page.getByRole("button", { name: /Continue/ }).click();
   await page.getByRole("button", { name: /Build my plan/ }).last().click();
-  await page.locator("#planner").getByRole("tab", { name: "Why this" }).click();
-  await page.getByText("Scheduled land freight between cities").waitFor();
   await page.locator("#planner").getByRole("tab", { name: "Services" }).click();
   assert.ok(await page.locator("#planner").getByText("Land Freight", { exact: true }).first().isVisible());
   assert.deepEqual(errors, []);
@@ -247,6 +247,8 @@ await test("roadmap: segment → steps → estimator → curated plan with appro
   // SME opens at 400 a day in Riyadh = 12,000 a month → intra-city card rate 21
   assert.match(txt, /≈\s*SAR\s*21\b/, "approx cost per order from MSG's rate card");
   assert.match(txt, /252,000 a month for 12,000 orders/);
+  assert.ok(!/Daily routes|Couriers, (normal|peak)|Operational assets/i.test(txt), "no operating matrix in the roadmap plan");
+  for (const s of ["Proof of delivery", "Live tracking", "Cash on delivery, on time"]) assert.ok(txt.includes(s), `plan covers ${s}`);
   const wa = await est.getByRole("link", { name: /Get my quote on WhatsApp/ }).getAttribute("href");
   assert.match(wa, /^https:\/\/wa\.me\/966578061556\?text=/);
   await est.getByRole("button", { name: "Send plan to MSG" }).click();

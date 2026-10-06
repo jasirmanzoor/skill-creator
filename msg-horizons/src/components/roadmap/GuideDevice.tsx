@@ -2,10 +2,10 @@
 
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
-import { guideCopy, roadmapCopy, SEGMENT_PERSONA, type Segment } from "@/content/roadmap";
+import { guideCopy, roadmapCopy, type Segment } from "@/content/roadmap";
 import type { Locale } from "@/content/i18n";
 import type { SizerInput } from "@/lib/sizer";
-import { size } from "@/lib/sizer";
+import { coveredCopy } from "@/content/covered";
 import { approxCost } from "@/lib/estimate";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import EmbeddedPhoto from "../ui/EmbeddedPhoto";
@@ -175,39 +175,27 @@ function Guide({ g, area }: SceneProps) {
   );
 }
 
-function Plan({ g, net, segment, lang }: SceneProps) {
+function Plan({ g, net, lang }: SceneProps) {
   const r = useReveal();
-  const s = size(net, SEGMENT_PERSONA[segment ?? "social"]);
   const cost = approxCost(net);
-  const chips = [g.services.lastMile, ...(net.cod > 0 ? [g.services.cod] : []), ...(net.stock ? [g.services.storage] : []), g.services.tracking];
+  const musts = coveredCopy[lang].musts;
   return (
     <div className="flex h-full flex-col">
       <AppBar title={g.planTitle} />
       <div className="flex-1 space-y-2.5 p-3">
-        <motion.div {...r(0)} className="grid grid-cols-2 gap-2">
-          {([[g.routes, s.baseRoutes], [g.couriers, s.baseCouriers]] as const).map(([k, v]) => (
-            <div key={k} className="rounded-xl bg-white p-3 shadow-sm">
-              <p className="text-[10px] text-muted">{k}</p>
-              <p className="num font-display text-2xl font-semibold">{v}</p>
-            </div>
-          ))}
-        </motion.div>
-        <motion.div {...r(1)} className="rounded-xl bg-[#0b3a26] p-3 text-white">
+        <motion.div {...r(0)} className="rounded-xl bg-[#0b3a26] p-3 text-white">
           <p className="text-[10px] text-white/70">{g.perOrder}</p>
           <p className="num font-display text-3xl font-semibold" dir={lang === "ar" ? "rtl" : "ltr"}>
             ≈ {lang === "ar" ? <>{cost.perOrder} <span className="text-base">ريال</span></> : <><span className="text-base">SAR</span> {cost.perOrder}</>}
           </p>
         </motion.div>
-        <motion.dl {...r(2)} className="divide-y divide-line rounded-xl bg-white px-3 shadow-sm">
-          {([[g.peak, s.peakCouriers], [g.flex, `+${s.flex}`]] as const).map(([k, v]) => (
-            <div key={k} className="flex items-center justify-between gap-2 py-2">
-              <dt className="text-[11px] text-muted">{k}</dt>
-              <dd className="num text-[13px] font-semibold">{v}</dd>
-            </div>
+        <motion.ul {...r(1)} className="divide-y divide-line rounded-xl bg-white px-3 shadow-sm">
+          {musts.map((m) => (
+            <li key={m.id} className="flex items-center gap-2 py-2 text-[12px] font-semibold"><Check />{m.t}</li>
           ))}
-        </motion.dl>
-        <motion.div {...r(3)} className="flex flex-wrap gap-1.5">
-          {chips.map((c) => <span key={c} className="rounded-full bg-brand-soft px-2.5 py-1 text-[11px] font-semibold text-brand-strong">{c}</span>)}
+        </motion.ul>
+        <motion.div {...r(2)} className="flex flex-wrap gap-1.5">
+          {[g.services.lastMile, ...(net.cod > 0 ? [g.services.cod] : []), ...(net.stock ? [g.services.storage] : []), g.services.tracking].map((c) => <span key={c} className="rounded-full bg-brand-soft px-2.5 py-1 text-[11px] font-semibold text-brand-strong">{c}</span>)}
         </motion.div>
       </div>
     </div>

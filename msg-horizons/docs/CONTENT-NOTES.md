@@ -99,3 +99,15 @@ Update, 30 Sept 2026 (MSG): walk-in prices are no longer shown separately. The n
 Update, 30 Sept 2026 (MSG): Naqel, Landmark and Logistiq are confirmed partners. "Logistiq" follows the logo and MSG's spelling; the profile's "Logistiqa" is retired. Text lists now read: iMile · J&T · Keeta · Landmark · AJEX · Naqel · Logistiq.
 
 Domain: the website goes on www.msg-horizons.com only. msg-horizons.com (apex) stays on MSG's Odoo server (5.189.157.17); Google Workspace MX and SPF are unchanged. Once www resolves to Vercel, set NEXT_PUBLIC_SITE_URL=https://www.msg-horizons.com and redeploy. Canonicals, sitemap and hreflang then switch, and msg-horizons.vercel.app 308-redirects to www (next.config.ts).
+
+## Plan builder: what the client sees (6 Oct 2026, from MSG in chat)
+- The plan result and the volume step show **a price quote and what is covered**, not the operating matrix. Daily routes,
+  courier counts, peak couriers, vehicle mix and pickup/dispatch models are no longer shown to visitors (the sizer still
+  runs and the lead sent to MSG's team still carries it). The WhatsApp/email summary lists only what the client entered.
+- The four checkpoints in every plan: price quote, proof of delivery, live tracking, cash on delivery remitted on time.
+- The six areas MSG handles (src/content/covered.ts): legal, compliant infrastructure (own warehouses, line-haul vehicles
+  and delivery fleet, ZATCA-compliant tax filing and VAT paid), licences, people and resources (within labour
+  regulations), connectivity and visibility, and a proven record with partners.
+- **Not published, needs MSG's decision:** "100% compliant" (an absolute legal claim and a percentage; copy says
+  "compliant" instead) and "over 6 years of logistics and last mile". The 6 years conflicts with the establishment date
+  above (the profile gives 2024/2025); say whether it refers to the founding team's experience before MSG.

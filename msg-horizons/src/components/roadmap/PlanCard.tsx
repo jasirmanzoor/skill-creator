@@ -2,17 +2,18 @@
 
 import { motion } from "motion/react";
 import { roadmapCopy, SEGMENT_PERSONA, type Segment } from "@/content/roadmap";
-import { sizerCopy } from "@/content/sizerCopy";
 import { whatsappLink } from "@/content/facts";
 import type { Dictionary, Locale } from "@/content/i18n";
 import { buildPlan, type PlanInput } from "@/lib/planner";
-import { volumeBand, type SizerInput, type Structure } from "@/lib/sizer";
+import { volumeBand, type SizerInput } from "@/lib/sizer";
 import { approxCost } from "@/lib/estimate";
 import { planSummary } from "@/lib/plan-summary";
 import { track } from "@/lib/analytics";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { usePlan } from "../PlanContext";
 import { ServiceIcon, WhatsAppIcon } from "../ui/icons";
+import { CoverIcon } from "../ui/coverIcons";
+import { coveredCopy } from "@/content/covered";
 
 /**
  * Terminal state of the estimator: the Curated Recommendation Plan.
@@ -21,10 +22,9 @@ import { ServiceIcon, WhatsAppIcon } from "../ui/icons";
  * pricing to MSG with the plan attached.
  */
 export default function PlanCard({
-  t, lang, segment, net, structure: s, onEdit,
-}: { t: Dictionary; lang: Locale; segment: Segment; net: SizerInput; structure: Structure; onEdit: () => void }) {
+  t, lang, segment, net, onEdit,
+}: { t: Dictionary; lang: Locale; segment: Segment; net: SizerInput; onEdit: () => void }) {
   const c = roadmapCopy[lang].plan;
-  const sc = sizerCopy[lang];
   const reduce = useReducedMotion();
   const { setPlan } = usePlan();
   const input: PlanInput = {
@@ -38,15 +38,6 @@ export default function PlanCard({
   const cost = approxCost(net);
   const cur = (n: number) => n.toLocaleString("en-US");
   const summary = planSummary(t, input, lang);
-  const find = (id: string) => s.decisions.find((d) => d.id === id);
-  const assets: [string, string | number][] = [
-    [c.routes, s.baseRoutes],
-    [c.couriers, s.baseCouriers],
-    [c.peak, s.peakCouriers],
-    [c.vehicles, find("vehicles") ? sc.decision(find("vehicles")!).title : "—"],
-    [c.pickup, sc.decision(find("pickup")!).title],
-    [c.dispatch, sc.decision(find("cadence")!).title],
-  ];
   const stagger = (k: number) => (reduce ? {} : { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, transition: { delay: 0.1 + k * 0.05, duration: 0.4 } });
 
   return (
@@ -69,7 +60,7 @@ export default function PlanCard({
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal rtl:tracking-normal">{c.eyebrow}</p>
           <h3 className="mt-2 font-display text-4xl font-semibold tracking-[-0.03em] text-teal-deep rtl:tracking-normal">{t.planner.result.models[plan.model].name}</h3>
-          <p className="mt-2 max-w-2xl text-teal-deep/80">{sc.headline(s, net)}</p>
+          
         </div>
         <button type="button" onClick={onEdit} className="rounded-full border border-teal/28 px-4 py-2 text-sm text-teal-deep/85 hover:border-teal/40 hover:text-teal-deep">{c.edit}</button>
       </div>
@@ -88,15 +79,15 @@ export default function PlanCard({
         </section>
 
         <section className="rounded-2xl border border-teal/18 bg-white/75 p-5 backdrop-blur-md">
-          <h4 className="text-sm font-semibold text-teal-deep/85">{c.assets}</h4>
-          <dl className="mt-4 divide-y divide-white/10">
-            {assets.map(([k, v], i) => (
-              <motion.div key={k} {...stagger(i)} className="flex items-baseline justify-between gap-3 py-2.5">
-                <dt className="text-sm text-teal-deep/70">{k}</dt>
-                <dd className={`text-end ${typeof v === "number" ? "num font-display text-2xl font-semibold text-teal-deep" : "text-sm font-medium text-teal-deep"}`}>{typeof v === "number" ? v.toLocaleString("en-US") : v}</dd>
-              </motion.div>
+          <h4 className="text-sm font-semibold text-teal-deep/85">{c.covered}</h4>
+          <ul className="mt-4 space-y-3">
+            {coveredCopy[lang].musts.map((m, k) => (
+              <motion.li key={m.id} {...stagger(k)} className="flex items-center gap-3">
+                <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#0b7d36] text-white"><CoverIcon id={m.id} className="size-4" /></span>
+                <span className="text-sm text-teal-deep/95">{m.t}</span>
+              </motion.li>
             ))}
-          </dl>
+          </ul>
         </section>
 
         <section className="flex flex-col rounded-2xl border border-teal/30 bg-gradient-to-b from-sea-100 to-white/80 p-5 backdrop-blur-md">

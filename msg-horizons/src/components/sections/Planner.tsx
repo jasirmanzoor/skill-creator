@@ -18,7 +18,9 @@ import { ArrowIcon, CheckIcon, OptionIcon, ServiceIcon, WhatsAppIcon } from "../
 import PlanStage from "../planner/PlanStage";
 import PlanModules from "../planner/PlanPreview";
 import { cockpitCopy } from "@/content/cockpit";
-import { SizerControls, SizerDecisions, SizerLive, useStructure } from "../planner/Sizer";
+import { coveredCopy } from "@/content/covered";
+import { SizerControls } from "../planner/Sizer";
+import { MustList, Pillars, QuoteBlock } from "../planner/Covered";
 
 /** Starting numbers per persona, so the sizer opens on a realistic picture instead of a blank. */
 const PRESET: Record<Persona, Partial<SizerInput>> = {
@@ -85,7 +87,6 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
   const liveInput: PlanInput | null = persona
     ? { persona, cargo, volume: volume ?? "starting", priorities, ...(volume ? { net } : {}) }
     : null;
-  const structure = useStructure(net, persona);
   const plan = input ? buildPlan(input) : null;
 
   const go = (s: Step, detail?: string) => {
@@ -142,6 +143,7 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
     : { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -6 }, transition: { duration: 0.28, ease: [0.16, 1, 0.3, 1] as const } };
 
   const k = cockpitCopy[lang];
+  const cv = coveredCopy[lang];
   const sizing = step === 2;
 
   return (
@@ -224,9 +226,9 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
                         {step === 2 && (
                           <>
                             <SizerControls value={net} onChange={onNet} lang={lang} wide />
-                            {/* below lg the live readout sits under the controls */}
+                            {/* below lg the quote sits under the controls */}
                             <div className="mt-8 border-t border-line pt-6 lg:hidden">
-                              <SizerLive input={net} structure={structure} lang={lang} compact />
+                              <QuoteBlock net={net} lang={lang} />
                             </div>
                           </>
                         )}
@@ -296,9 +298,11 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
 
             {/* the evidence: the network that is being configured, running live */}
             {sizing ? (
-              <aside aria-label={sz.live} className="hidden border-s border-line bg-paper p-8 lg:block">
+              <aside aria-label={cv.ui.quoteTitle} className="hidden border-s border-line bg-paper p-8 lg:block">
                 <div className="lg:sticky lg:top-24">
-                  <SizerLive input={net} structure={structure} lang={lang} />
+                  <QuoteBlock net={net} lang={lang} />
+                  <p className="mb-3 mt-7 text-xs font-semibold uppercase tracking-[0.12em] text-muted rtl:tracking-normal">{cv.ui.included}</p>
+                  <MustList lang={lang} compact />
                 </div>
               </aside>
             ) : (
@@ -346,7 +350,7 @@ function Option({
   );
 }
 
-type TabId = "numbers" | "services" | "why" | "next";
+type TabId = "quote" | "handled" | "services" | "next";
 
 function Result({
   t, lang, input, plan, headingRef, onRestart, onSend, onCopy, copied,
@@ -365,11 +369,10 @@ function Result({
   const model = r.models[plan.model];
   const summary = planSummary(t, input, lang);
   const net = input.net ?? DEFAULT_SIZER;
-  const structure = useStructure(net, input.persona);
-  const sz = sizerCopy[lang];
+  const cv = coveredCopy[lang];
   const k = cockpitCopy[lang];
-  const [tab, setTab] = useState<TabId>("numbers");
-  const ids: TabId[] = ["numbers", "services", "why", "next"];
+  const [tab, setTab] = useState<TabId>("quote");
+  const ids: TabId[] = ["quote", "handled", "services", "next"];
   const onTabKey = (e: React.KeyboardEvent) => {
     const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
     if (!d) return;
@@ -406,7 +409,14 @@ function Result({
       </div>
 
       <div id="plan-tabpanel" role="tabpanel" aria-labelledby={`plan-tab-${tab}`} className="mt-5 flex-1">
-        {tab === "numbers" && <SizerLive input={net} structure={structure} lang={lang} compact />}
+        {tab === "quote" && (
+          <>
+            <QuoteBlock net={net} lang={lang} />
+            <p className="mb-3 mt-6 text-xs font-semibold uppercase tracking-[0.12em] text-muted rtl:tracking-normal">{cv.ui.included}</p>
+            <MustList lang={lang} />
+          </>
+        )}
+        {tab === "handled" && <Pillars lang={lang} />}
         {tab === "services" && (
           <>
             <ol className="divide-y divide-line border-y border-line">
@@ -433,12 +443,6 @@ function Result({
               })}
             </ol>
             <p className="mt-4 border-s-2 border-brand ps-4 text-sm text-muted">{r.noPricing}</p>
-          </>
-        )}
-        {tab === "why" && (
-          <>
-            <h4 className="mb-3 font-display text-lg font-semibold text-ink">{sz.whyTitle}</h4>
-            <SizerDecisions input={net} structure={structure} lang={lang} />
           </>
         )}
         {tab === "next" && (

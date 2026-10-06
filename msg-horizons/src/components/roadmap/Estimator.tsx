@@ -1,15 +1,15 @@
 "use client";
 
-import NumberFlow from "@number-flow/react";
 import { AnimatePresence, LayoutGroup, motion } from "motion/react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { roadmapCopy, SEGMENTS, SEGMENT_PERSONA, type Segment } from "@/content/roadmap";
 import type { Dictionary, Locale } from "@/content/i18n";
-import { ordersFromSlider, size, sliderFromOrders, volumeBand, AREAS, type SizerInput } from "@/lib/sizer";
+import { ordersFromSlider, sliderFromOrders, volumeBand, AREAS, type SizerInput } from "@/lib/sizer";
 import { operatingModel } from "@/lib/planner";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { track } from "@/lib/analytics";
 import PlanCard from "./PlanCard";
+import { MustList, QuoteBlock } from "../planner/Covered";
 
 /**
  * The terminus of the roadmap: profile, volume, cash share, area and storage in; a live structure out.
@@ -26,9 +26,7 @@ export default function Estimator({
   const reduce = useReducedMotion();
   const [phase, setPhase] = useState<"input" | "plan">("input");
   const persona = SEGMENT_PERSONA[segment];
-  const s = useMemo(() => size(net, persona), [net, persona]);
   const set = <K extends keyof SizerInput>(k: K, v: SizerInput[K]) => onNet({ ...net, [k]: v });
-  const flow = reduce ? { animated: false } : {};
 
   return (
     <div id="estimator" className="sea-glass relative scroll-mt-24 overflow-hidden rounded-3xl p-5 sm:p-8">
@@ -91,18 +89,8 @@ export default function Estimator({
                   <span className="relative inline-flex size-2"><span className="absolute inset-0 animate-ping rounded-full bg-teal/60 motion-reduce:hidden" /><span className="relative size-2 rounded-full bg-teal" /></span>
                   {t.planner.result.models[operatingModel({ persona, cargo: [], volume: volumeBand(net.orders), priorities: [] })].name}
                 </p>
-                <dl className="mt-4 grid grid-cols-2 gap-3">
-                  {[
-                    [c.plan.routes, s.baseRoutes],
-                    [c.plan.couriers, s.baseCouriers],
-                    [c.plan.peak, s.peakCouriers],
-                  ].map(([k, v]) => (
-                    <motion.div layout key={k as string} className="rounded-xl bg-white/75 p-3">
-                      <dt className="text-xs text-teal-deep/70">{k}</dt>
-                      <dd className="num mt-1 font-display text-3xl font-semibold text-teal-deep"><NumberFlow value={v as number} locales="en-US" {...flow} /></dd>
-                    </motion.div>
-                  ))}
-                </dl>
+                <div className="mt-4"><QuoteBlock net={net} lang={lang} tone="tint" /></div>
+                <div className="mt-4"><MustList lang={lang} compact /></div>
                 <button
                   type="button"
                   onClick={() => { setPhase("plan"); track("planner_complete", { model: "roadmap_estimator", modules: segment }); document.getElementById("estimator")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" }); }}
@@ -114,7 +102,7 @@ export default function Estimator({
               </motion.div>
             </motion.div>
           ) : (
-            <PlanCard key="plan" t={t} lang={lang} segment={segment} net={net} structure={s} onEdit={() => setPhase("input")} />
+            <PlanCard key="plan" t={t} lang={lang} segment={segment} net={net} onEdit={() => setPhase("input")} />
           )}
         </AnimatePresence>
       </LayoutGroup>

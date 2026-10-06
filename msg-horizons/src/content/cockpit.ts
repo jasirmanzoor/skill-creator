@@ -3,19 +3,19 @@ import type { Locale } from "./i18n";
 /** Short labels for the plan cockpit (src/components/sections/Planner.tsx): the stepper and the result tabs. */
 export const cockpitCopy: Record<Locale, {
   steps: [string, string, string, string];
-  tabs: { numbers: string; services: string; why: string; next: string };
+  tabs: { quote: string; handled: string; services: string; next: string };
   tabsLabel: string;
   setup: string;
 }> = {
   en: {
     steps: ["You", "Cargo", "Volume", "Priorities"],
-    tabs: { numbers: "Your numbers", services: "Services", why: "Why this", next: "Next steps" },
+    tabs: { quote: "Your quote", handled: "We handle", services: "Services", next: "Next steps" },
     tabsLabel: "Your plan",
     setup: "Your setup so far",
   },
   ar: {
     steps: ["أنت", "شحنتك", "الحجم", "الأولويات"],
-    tabs: { numbers: "أرقامك", services: "الخدمات", why: "لماذا هذا", next: "الخطوات التالية" },
+    tabs: { quote: "عرض السعر", handled: "نتولاه عنك", services: "الخدمات", next: "الخطوات التالية" },
     tabsLabel: "خطتك",
     setup: "منظومتك حتى الآن",
   },
