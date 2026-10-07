@@ -423,7 +423,7 @@ await test("route: the rail follows the scroll, stops jump, ] and [ hop, the map
     assert.ok((await page.evaluate(() => scrollY)) <= 1, `${lang}: first stop is the top`);
     await page.keyboard.press("]");
     await page.waitForTimeout(300);
-    const live = await topOf("deck"); // the live-tracking stop is a panel of the deck
+    const live = await topOf("why"); // the stop after the start: why MSG
     assert.ok(Math.abs((await page.evaluate(() => scrollY)) - (live - 64)) < 80, `${lang}: ] hops to the next stop`);
     await page.keyboard.press("[");
     await page.waitForTimeout(300);

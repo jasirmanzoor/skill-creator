@@ -22,6 +22,7 @@ export type Stop = {
 
 export const STOPS: Stop[] = [
   { id: "hero", for: ["seller", "brand"], title: { en: "Start", ar: "ابدأ" }, hint: { en: "Price a delivery in ten seconds", ar: "سعّر توصيلتك في عشر ثوانٍ" } },
+  { id: "why", for: ["seller", "brand", "enterprise"], title: { en: "Why MSG", ar: "لماذا مسج" }, hint: { en: "Six hard problems, already solved", ar: "ست مشكلات صعبة، محلولة مسبقاً" } },
   { id: "live-tracking", panel: true, for: ["seller", "brand", "enterprise"], title: { en: "Live tracking", ar: "التتبع المباشر" }, hint: { en: "See your driver live, once they approve", ar: "شاهد المندوب مباشرةً بعد موافقته" } },
   { id: "sellers", for: ["seller"], title: { en: "Your questions", ar: "أسئلتك" }, hint: { en: "One partner for the whole operation", ar: "شريك واحد للعملية كاملة" } },
   { id: "planner", panel: true, for: ["seller", "brand"], title: { en: "Build your plan", ar: "ابنِ خطتك" }, hint: { en: "Four steps to a setup that fits", ar: "أربع خطوات إلى منظومة تناسبك" } },

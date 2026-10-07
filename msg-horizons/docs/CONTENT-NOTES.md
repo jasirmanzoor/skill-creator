@@ -129,3 +129,8 @@ Domain: the website goes on www.msg-horizons.com only. msg-horizons.com (apex) s
   delivers to the surrounding district within 5 km. Photo: `public/media/msg/outlet.jpg` (the close-up; the wide shot
   with a readable car plate and neighbouring shops is not used). A torn "shop for transfer" notice left on the glass
   was removed from the photo. The outlet's city is not named until MSG gives it.
+
+## The pitch section, "Why MSG" (7 Oct 2026, from MSG in chat)
+- `src/content/pitch.ts`: the problem (products and ideas stall at getting to the customer; hardest part is licences,
+  compliance, paperwork, warehousing and labour rules) and MSG's answer, row by row. Wording follows MSG's message of
+  6 Oct. "100% compliant" and "6 years" are still not used.
