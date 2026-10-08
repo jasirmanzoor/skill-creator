@@ -27,7 +27,7 @@ export function StageScene({ id, lang }: { id: StageId; lang: Locale }) {
 }
 
 const Tick = () => (
-  <span className="inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-[#0b7d36] text-white">
+  <span className="inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-brand text-white">
     <svg viewBox="0 0 12 12" className="size-2.5"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
   </span>
 );
@@ -37,7 +37,7 @@ export function UICard({ id, u }: { id: StageId; u: (typeof experience)["en"]["j
     case "enquiry":
       return (
         <div className="space-y-1.5">
-          <p className="flex items-center gap-1.5 text-[11px] font-semibold text-[#128c4a]"><span className="size-2 rounded-full bg-[#25d366]" />WhatsApp · {u.chatName}</p>
+          <p className="flex items-center gap-1.5 text-[11px] font-semibold text-whatsapp"><span className="size-2 rounded-full bg-[#25d366]" />WhatsApp · {u.chatName}</p>
           <p className="ms-auto w-fit max-w-[90%] rounded-lg rounded-se-sm bg-[#dcf8c6] px-2.5 py-1.5">{u.chatMsg}</p>
           <p className="w-fit max-w-[90%] rounded-lg rounded-ss-sm bg-subtle px-2.5 py-1.5">{u.chatReply}</p>
         </div>
@@ -89,21 +89,21 @@ export function UICard({ id, u }: { id: StageId; u: (typeof experience)["en"]["j
         <div>
           <p className="flex items-center justify-between text-[11px]"><span className="font-semibold text-muted">{u.testTitle}</span><span className="num font-semibold text-brand">{u.testDone}</span></p>
           <div className="mt-2 grid grid-cols-3 gap-1.5">
-            {[0, 1, 2].map((k) => <span key={k} className="js-bar h-1.5 rounded-full bg-[#0b7d36]" style={{ animationDelay: `${0.2 + k * 0.35}s` }} />)}
+            {[0, 1, 2].map((k) => <span key={k} className="js-bar h-1.5 rounded-full bg-brand" style={{ animationDelay: `${0.2 + k * 0.35}s` }} />)}
           </div>
         </div>
       );
     case "live":
       return (
         <div className="flex items-center gap-3">
-          <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-[#0b7d36] text-white">
+          <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-brand text-white">
             <svg viewBox="0 0 20 20" className="size-5"><path d="M4.5 10.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </span>
           <div>
             <p className="font-semibold">{u.liveTitle}</p>
             <p className="text-[12px] text-muted">{u.liveBody}</p>
           </div>
-          <span className="ms-auto inline-flex items-center gap-1 text-[11px] font-semibold text-[#0f9641]"><span className="js-live size-2 rounded-full bg-[#0b7d36]" />LIVE</span>
+          <span className="ms-auto inline-flex items-center gap-1 text-[11px] font-semibold text-[#0f9641]"><span className="js-live size-2 rounded-full bg-brand" />LIVE</span>
         </div>
       );
   }

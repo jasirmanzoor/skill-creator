@@ -28,25 +28,24 @@ export default function ScanVsLive({ c }: { c: LiveCopy }) {
         <div className="relative h-8">
           <span className="absolute inset-x-[12.5%] top-1/2 border-t-2 border-dashed border-white/25" />
           {[0, 1, 2, 3].map((i) => (
-            <span key={i} className="absolute top-1/2 -ms-[7px] size-3.5 -translate-y-1/2 rounded-full border-2 border-white/60 bg-[#08262b]" style={{ insetInlineStart: CELL(i) }} />
+            <span key={i} className="absolute top-1/2 -ms-[7px] size-3.5 -translate-y-1/2 rounded-full border-2 border-white/60 bg-deep" style={{ insetInlineStart: CELL(i) }} />
           ))}
           <span className="absolute inset-x-[37.5%] top-[calc(50%+12px)] text-center text-[10px] font-medium text-white/50">{k.scan.gap}</span>
         </div>
 
         {/* MSG live: one unbroken line with the driver moving along it */}
         <div className="lg:pt-1.5">
-          <p className="font-semibold text-[#4cc97a]">{k.live.t}</p>
+          <p className="font-semibold text-brand-bright">{k.live.t}</p>
           <p className="mt-0.5 text-xs text-white/65">{k.live.d}</p>
         </div>
         <div className="relative h-8">
-          <span className="absolute inset-x-[12.5%] top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-gradient-to-r from-[#4cc97a]/25 via-[#4cc97a] to-[#4cc97a]/25 rtl:bg-gradient-to-l" />
+          <span className="absolute inset-x-[12.5%] top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-gradient-to-r from-brand-bright/25 via-brand-bright to-brand-bright/25 rtl:bg-gradient-to-l" />
           {[0, 1, 2, 3].map((i) => (
             <span key={i} className="absolute top-1/2 -ms-1 size-2 -translate-y-1/2 rounded-full bg-white/70" style={{ insetInlineStart: CELL(i) }} />
           ))}
-          <span
-            className="live-run absolute top-1/2 -ms-2 size-4 -translate-y-1/2 rounded-full bg-[#4cc97a] shadow-[0_0_0_6px_rgba(76,201,122,0.25)] motion-reduce:[animation:none]"
-            style={{ insetInlineStart: CELL(2) }}
-          />
+          <span className="live-run pointer-events-none absolute inset-y-0 start-[12.5%] w-[75%] motion-reduce:translate-x-2/3 motion-reduce:[animation:none] rtl:motion-reduce:-translate-x-2/3">
+            <span className="absolute start-0 top-1/2 -ms-2 size-4 -translate-y-1/2 rounded-full bg-brand-bright shadow-[0_0_0_6px_rgba(76,201,122,0.25)]" />
+          </span>
         </div>
       </div>
     </figure>

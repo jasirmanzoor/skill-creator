@@ -8,10 +8,10 @@ export default function Gallery({ t, lang }: { t: Dictionary; lang: Locale }) {
   const items = [...media.warehouse, ...media.operations, ...media.team, ...media.fleet.slice(1)];
   if (!items.length) return null;
   return (
-    <section id="gallery" aria-labelledby="gallery-title" className="scroll-mt-24 border-t border-line bg-surface/92 py-24 backdrop-blur">
+    <section id="gallery" aria-labelledby="gallery-title" className="scroll-mt-24 border-t border-line bg-surface/92 sec backdrop-blur">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <span className="label">{t.gallery.eyebrow}</span>
-        <h2 id="gallery-title" className="mt-4 font-display text-4xl font-semibold tracking-[-0.025em] text-ink">{t.gallery.title}</h2>
+        <h2 id="gallery-title" className="h-section mt-4 text-ink">{t.gallery.title}</h2>
         <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((m) => (
             <li key={m.src} className="overflow-hidden rounded-xl border border-line">

@@ -148,7 +148,7 @@ export default function ContactForm({ t, lang }: { t: Dictionary; lang: Locale }
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => track("whatsapp_click", { location: "form_handoff" })}
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-[#128c4a] px-5 py-3 font-medium text-white"
+            className="inline-flex items-center justify-center gap-2 rounded-md bg-whatsapp px-5 py-3 font-medium text-white"
           >
             <WhatsAppIcon className="size-5" /> {f.sendWhatsapp}
           </a>

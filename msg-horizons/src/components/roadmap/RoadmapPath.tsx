@@ -153,7 +153,7 @@ export default function RoadmapPath({
               <motion.span
                 animate={{ scale: lit ? 1.12 : 1 }}
                 transition={{ type: "spring", stiffness: 400, damping: 24 }}
-                className={`relative flex size-14 items-center justify-center rounded-2xl border font-display text-lg font-semibold backdrop-blur-md transition-colors duration-300 group-focus-visible:ring-2 group-focus-visible:ring-[#4cc97a] ${
+                className={`relative flex size-14 items-center justify-center rounded-2xl border font-display text-lg font-semibold backdrop-blur-md transition-colors duration-300 group-focus-visible:ring-2 group-focus-visible:ring-brand-bright ${
                   on
                     ? "border-teal bg-teal text-white shadow-[0_10px_30px_-8px_rgba(19,113,121,0.8)]"
                     : done

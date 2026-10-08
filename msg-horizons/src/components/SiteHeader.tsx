@@ -5,24 +5,13 @@ import Logo from "./ui/Logo";
 import SiteSearch from "./SiteSearch";
 import { track } from "@/lib/analytics";
 import { whatsappLink } from "@/content/facts";
-import { PRIMARY_NAV, type NavId } from "@/content/nav";
+import { PRIMARY_NAV } from "@/content/nav";
 import { useActiveSection } from "@/lib/use-active-section";
 import type { Dictionary, Locale } from "@/content/i18n";
 
 const NAV_LABEL: Record<(typeof PRIMARY_NAV)[number]["id"], keyof Dictionary["nav"]> = {
   services: "services",
   fleet: "fleet",
-  enterprise: "enterprise",
-  contact: "contact",
-};
-
-const CRUMB_LABEL: Partial<Record<NavId, keyof Dictionary["nav"]>> = {
-  planner: "planFull",
-  sellers: "sellers",
-  services: "services",
-  fleet: "fleet",
-  proof: "proof",
-  gallery: "proof",
   enterprise: "enterprise",
   contact: "contact",
 };
@@ -61,12 +50,11 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
   }, [open]);
 
   const other = lang === "en" ? "ar" : "en";
-  const solid = (scrolled || open) && !overDark;
+  const solid = open || (scrolled && !overDark);
   // ink text on the light hero and light sections; white only over dark sections
   const ink = !overDark || open;
   const dark = overDark && !open;
   const linkBase = ink ? "text-muted hover:text-ink" : "text-white/80 hover:text-white";
-  const crumb = active ? CRUMB_LABEL[active] : null;
 
   return (
     <header
@@ -85,7 +73,7 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
         {t.nav.skip}
       </a>
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-5 lg:px-8">
-        <a href={`/${lang}`} className="rounded" aria-label="MSG Horizons">
+        <a href={`/${lang}`} className="tap rounded" aria-label="MSG Horizons">
           <Logo inverted={!ink} />
         </a>
 
@@ -128,7 +116,7 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
             lang={other}
             aria-label={t.nav.langSwitchLabel}
             onClick={() => track("lang_switch", { to: other })}
-            className={`text-[15px] transition-colors ${linkBase}`}
+            className={`tap inline-flex min-w-11 items-center justify-center text-[15px] transition-colors ${linkBase}`}
           >
             {t.nav.langSwitch}
           </a>
@@ -141,7 +129,7 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
           </a>
           <button
             type="button"
-            className={`inline-flex items-center gap-2 rounded-md px-2 py-2 lg:hidden ${ink ? "text-ink" : "text-white"}`}
+            className={`inline-flex min-h-11 items-center gap-2 rounded-md px-2 py-2 lg:hidden ${ink ? "text-ink" : "text-white"}`}
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? t.nav.close : t.nav.menu}
@@ -154,20 +142,6 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
           </button>
         </div>
       </div>
-
-      {scrolled && crumb && !open && (
-        <div className={`hidden border-t text-xs lg:block ${ink ? "border-line text-muted" : "border-white/10 text-white/70"}`}>
-          <nav aria-label="Breadcrumb" className="mx-auto flex h-8 max-w-7xl items-center gap-2 px-5 lg:px-8">
-            <a href={`/${lang}`} className="hover:underline">
-              {t.nav.home}
-            </a>
-            <span aria-hidden="true">/</span>
-            <span className={ink ? "font-medium text-ink" : "font-medium text-white"}>
-              {t.nav[crumb]}
-            </span>
-          </nav>
-        </div>
-      )}
 
       <div id="mobile-nav" hidden={!open} className="h-[calc(100dvh-4rem)] overflow-y-auto border-t border-line bg-paper px-5 pb-10 lg:hidden">
         <nav aria-label={t.nav.menu}>
@@ -210,7 +184,7 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => track("whatsapp_click", { location: "mobile_menu" })}
-            className="rounded-md border border-line-strong px-5 py-3.5 text-center font-medium text-ink"
+            className="rounded-full border border-line-strong px-5 py-3.5 text-center font-medium text-ink"
           >
             {t.nav.talk} · {t.nav.whatsapp}
           </a>

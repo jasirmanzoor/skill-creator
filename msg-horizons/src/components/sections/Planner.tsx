@@ -326,7 +326,7 @@ function Option({
       role={role}
       aria-checked={checked}
       onClick={onClick}
-      className={`group flex items-start gap-3.5 rounded-2xl border p-4 text-start transition-all duration-200 ${
+      className={`group flex items-start gap-3.5 rounded-2xl border p-4 text-start transition-ui duration-200 ${
         checked ? "border-brand bg-brand-soft shadow-[0_14px_30px_-20px_rgba(19,113,121,0.8)]" : "border-line hover:-translate-y-0.5 hover:border-line-strong hover:bg-paper hover:shadow-[0_14px_30px_-22px_rgba(12,14,17,0.5)]"
       }`}
     >
@@ -401,7 +401,7 @@ function Result({
             aria-controls="plan-tabpanel"
             tabIndex={tab === id ? 0 : -1}
             onClick={() => setTab(id)}
-            className={`min-w-0 flex-1 rounded-full px-2 py-2 text-xs font-semibold leading-tight transition-all sm:text-sm ${tab === id ? "bg-surface text-ink shadow-[0_1px_3px_rgba(12,14,17,0.15)]" : "text-muted hover:text-ink"}`}
+            className={`min-w-0 flex-1 rounded-full px-2 py-2 text-xs font-semibold leading-tight transition-ui sm:text-sm ${tab === id ? "bg-surface text-ink shadow-[0_1px_3px_rgba(12,14,17,0.15)]" : "text-muted hover:text-ink"}`}
           >
             {k.tabs[id]}
           </button>

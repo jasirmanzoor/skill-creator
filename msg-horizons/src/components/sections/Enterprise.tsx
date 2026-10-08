@@ -11,12 +11,12 @@ export default function Enterprise({ t }: { t: Dictionary }) {
   const e = t.enterprise;
   const wf = e.workforce;
   return (
-    <section id="enterprise" aria-labelledby="enterprise-title" className="sea-band scroll-mt-16 py-24 lg:py-32">
+    <section id="enterprise" aria-labelledby="enterprise-title" className="sea-band sec scroll-mt-16">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal className="grid gap-6 lg:grid-cols-2 lg:items-end">
           <div>
             <span className="label">{e.eyebrow}</span>
-            <h2 id="enterprise-title" className="mt-4 font-display text-4xl font-semibold tracking-[-0.025em] text-balance sm:text-5xl rtl:tracking-normal">
+            <h2 id="enterprise-title" className="h-section mt-4">
               {e.title}
             </h2>
           </div>

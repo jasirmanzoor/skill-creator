@@ -91,11 +91,11 @@ export default function TrackerCard({ c, live, reduce }: { c: LiveCopy; live: bo
       <div className="flex items-center justify-between gap-3 px-4 py-3.5 sm:px-5">
         <p className="font-display text-[15px] font-semibold text-teal-deep">{tr.title}</p>
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold transition-colors duration-500 ${live ? "bg-[#e8f5ec] text-[#086a2d]" : "bg-subtle text-muted"}`}
+          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold transition-colors duration-500 ${live ? "bg-[#e8f5ec] text-brand-strong" : "bg-subtle text-muted"}`}
         >
           <span className="relative flex size-2">
-            {live ? <span className="plan-ping absolute inset-0 rounded-full bg-[#0b7d36] motion-reduce:hidden" aria-hidden="true" /> : null}
-            <span className={`relative size-2 rounded-full ${live ? "bg-[#0b7d36]" : "bg-faint"}`} />
+            {live ? <span className="plan-ping absolute inset-0 rounded-full bg-brand motion-reduce:hidden" aria-hidden="true" /> : null}
+            <span className={`relative size-2 rounded-full ${live ? "bg-brand" : "bg-faint"}`} />
           </span>
           {live ? tr.chipLive : tr.chipWaiting}
         </span>
@@ -158,7 +158,7 @@ export default function TrackerCard({ c, live, reduce }: { c: LiveCopy; live: bo
           {tr.mapPickup}
         </span>
         <span
-          className="absolute -translate-x-1/2 translate-y-3.5 whitespace-nowrap rounded-full bg-[#0b7d36] px-2 py-0.5 text-[11px] font-semibold text-white shadow-[0_6px_16px_-8px_rgba(11,125,54,0.8)]"
+          className="absolute -translate-x-1/2 translate-y-3.5 whitespace-nowrap rounded-full bg-brand px-2 py-0.5 text-[11px] font-semibold text-white shadow-[0_6px_16px_-8px_rgba(11,125,54,0.8)]"
           style={{ left: pct(END.x, VB.w), top: pct(END.y, VB.h) }}
         >
           {tr.mapDrop}
@@ -202,18 +202,18 @@ export default function TrackerCard({ c, live, reduce }: { c: LiveCopy; live: bo
       <ol className="flex items-start border-t border-line px-3 pb-4 pt-3.5 sm:px-5">
         {tr.rail.map((label, i) => {
           const s = state[i];
-          const bar = (on: boolean) => `h-0.5 flex-1 rounded-full transition-colors duration-500 ${on ? "bg-[#0b7d36]" : "bg-line-strong"}`;
+          const bar = (on: boolean) => `h-0.5 flex-1 rounded-full transition-colors duration-500 ${on ? "bg-brand" : "bg-line-strong"}`;
           return (
             <li key={label} aria-current={s === "active" ? "step" : undefined} className="flex flex-1 flex-col items-center gap-2 text-center">
               <span className="flex w-full items-center">
                 <span className={i === 0 ? "h-0.5 flex-1 opacity-0" : bar(s !== "todo")} />
                 <span
-                  className={`relative grid size-6 shrink-0 place-items-center rounded-full text-white transition-colors duration-500 ${s === "todo" ? "border-2 border-line-strong bg-white" : "bg-[#0b7d36]"}`}
+                  className={`relative grid size-6 shrink-0 place-items-center rounded-full text-white transition-colors duration-500 ${s === "todo" ? "border-2 border-line-strong bg-white" : "bg-brand"}`}
                 >
                   {s === "done" ? <CheckIcon className="size-3.5" /> : null}
                   {s === "active" ? (
                     <>
-                      <span className="absolute inset-0 animate-ping rounded-full bg-[#0b7d36]/45 motion-reduce:hidden" aria-hidden="true" />
+                      <span className="absolute inset-0 animate-ping rounded-full bg-brand/45 motion-reduce:hidden" aria-hidden="true" />
                       <span className="relative size-2 rounded-full bg-white" />
                     </>
                   ) : null}

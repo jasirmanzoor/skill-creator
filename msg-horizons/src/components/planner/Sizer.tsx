@@ -99,7 +99,7 @@ function Segmented<T extends string>({
             role="radio"
             aria-checked={value === o}
             onClick={() => onChange(o)}
-            className={`rounded-md px-2 py-2 text-sm leading-tight transition-all duration-200 ${
+            className={`rounded-md px-2 py-2 text-sm leading-tight transition-ui duration-200 ${
               value === o ? "bg-surface font-medium text-ink shadow-[0_1px_3px_rgba(12,14,17,0.12)]" : "text-muted hover:text-ink"
             }`}
           >
@@ -172,7 +172,7 @@ function CourierField({ structure: s, legend }: { structure: Structure; legend: 
         {Array.from({ length: shown }, (_, i) => (
           <span
             key={i}
-            className={`size-[7px] rounded-full transition-all duration-500 ${i < base ? "bg-ink" : "bg-brand"}`}
+            className={`size-[7px] rounded-full transition-ui duration-500 ${i < base ? "bg-ink" : "bg-brand"}`}
             style={{ transitionDelay: `${Math.min(i, 60) * 6}ms` }}
           />
         ))}

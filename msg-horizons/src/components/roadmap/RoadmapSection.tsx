@@ -68,7 +68,7 @@ export default function RoadmapSection({ t, lang }: { t: Dictionary; lang: Local
   };
 
   return (
-    <section id="journey" ref={ref} aria-labelledby="roadmap-title" className="sea-band relative scroll-mt-16 overflow-hidden py-24 text-teal-deep lg:py-32">
+    <section id="journey" ref={ref} aria-labelledby="roadmap-title" className="sea-band relative scroll-mt-16 overflow-hidden sec text-teal-deep">
       {/* backdrop: MSG's warehouse dissolved into the sea-glass light, with a slow parallax */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden [contain:paint]">
         <motion.div style={reduce ? undefined : { y: bgY }} className="absolute inset-x-0 -top-[8%] h-[70%]">
@@ -82,14 +82,9 @@ export default function RoadmapSection({ t, lang }: { t: Dictionary; lang: Local
         <div className="max-w-4xl">
           <p className="text-sm font-semibold text-teal">{c.eyebrow}</p>
           <HookRoll phrases={c.rolls} className="mt-3 text-lg font-medium text-teal-deep/90 sm:text-xl" />
-          <h2 id="roadmap-title" className="mt-2 font-display text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-balance sm:text-6xl rtl:leading-[1.3] rtl:tracking-normal">
+          <h2 id="roadmap-title" className="h-display mt-2">
             {c.title}
           </h2>
-          <p className="mt-5 flex flex-wrap gap-x-3 gap-y-1 text-lg">
-            {c.theme.map((ph, i) => (
-              <span key={ph} className="theme-shine bg-clip-text text-transparent" style={{ animationDelay: `${i * 0.6}s` }}>{ph}</span>
-            ))}
-          </p>
         </div>
 
         <div className="mt-12">
@@ -116,7 +111,7 @@ export default function RoadmapSection({ t, lang }: { t: Dictionary; lang: Local
             {step < 5 ? (
               <button type="button" onClick={() => go(step + 1)} className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-teal-deep ring-1 ring-teal/28 backdrop-blur hover:bg-white">{c.next}</button>
             ) : (
-              <button type="button" onClick={toEstimator} className="rounded-full bg-[#0b7d36] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_0_30px_-6px_rgba(76,201,122,0.9)] hover:bg-[#12a84b]">{c.toEstimator}</button>
+              <button type="button" onClick={toEstimator} className="rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-[0_0_30px_-6px_rgba(76,201,122,0.9)] hover:bg-[#12a84b]">{c.toEstimator}</button>
             )}
           </div>
         </div>

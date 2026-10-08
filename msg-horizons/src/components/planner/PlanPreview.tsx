@@ -21,7 +21,7 @@ export default function PlanModules({ t, input, label }: { t: Dictionary; input:
           return (
             <li
               key={id}
-              className={`inline-flex items-center gap-1.5 rounded-full py-1 pe-3 ps-1.5 text-xs transition-all duration-500 ${
+              className={`inline-flex items-center gap-1.5 rounded-full py-1 pe-3 ps-1.5 text-xs transition-ui duration-500 ${
                 m ? (m.core ? "bg-brand font-semibold text-white" : "bg-brand-soft font-semibold text-brand") : "bg-subtle text-muted"
               }`}
             >

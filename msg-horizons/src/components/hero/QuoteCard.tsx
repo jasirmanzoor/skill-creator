@@ -40,7 +40,7 @@ export default function QuoteCard({
             {(["intra", "inter", "sabya"] as const).map((k) => (
               <button key={k} type="button" role="radio" aria-checked={lane === k}
                 onClick={() => { onLane(k); track("planner_step", { step: "hero_quote", value: k }); }}
-                className="relative rounded-full px-2 py-2 text-[12px] font-semibold leading-tight">
+                className="tap relative rounded-full px-2 py-2 text-[12px] font-semibold leading-tight">
                 {lane === k ? <motion.span layoutId={`${id}-lane`} transition={{ type: "spring", stiffness: 420, damping: 34 }} className="absolute inset-0 rounded-full bg-white shadow-[0_4px_14px_-6px_rgba(11,58,64,0.5)]" /> : null}
                 <span className={`relative ${lane === k ? "text-teal-deep" : "text-teal-deep/70"}`}>{c.quote.lanes[k]}</span>
               </button>
@@ -70,7 +70,7 @@ export default function QuoteCard({
             </div>
           </div>
           <TrackedLink href={wa} target="_blank" rel="noopener noreferrer" event="whatsapp_click" props={{ location: "hero_quote" }}
-            className="mt-3 flex items-center justify-center gap-2 rounded-xl bg-[#0b7d36] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#086a2d]">
+            className="mt-3 flex items-center justify-center gap-2 min-h-11 rounded-xl bg-brand px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-strong">
             <WhatsAppIcon className="size-4" /> {c.quote.cta}
           </TrackedLink>
         </div>

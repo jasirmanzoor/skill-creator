@@ -44,7 +44,7 @@ export default function SegmentGateway({
           <div key={grp}>
             <p className="mb-2.5 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-teal rtl:tracking-normal">
               {g[grp]}
-              <span aria-hidden="true" className="h-px flex-1 bg-gradient-to-r from-[#4cc97a]/40 to-transparent rtl:bg-gradient-to-l" />
+              <span aria-hidden="true" className="h-px flex-1 bg-gradient-to-r from-brand-bright/40 to-transparent rtl:bg-gradient-to-l" />
             </p>
             <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-5 px-5 pb-1 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0">
               {ORDER.filter((o) => o.group === grp).map(({ id }) => (
@@ -65,7 +65,7 @@ export default function SegmentGateway({
             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
             className="overflow-hidden"
           >
-            <div className="mt-4 flex flex-col gap-4 rounded-2xl border border-[#4cc97a]/30 bg-[#0b7d36]/20 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+            <div className="mt-4 flex flex-col gap-4 rounded-2xl border border-brand-bright/30 bg-brand/20 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
               <div>
                 <p className="text-sm text-teal-deep/80">{g.selected}</p>
                 <p className="mt-0.5 font-display text-xl font-semibold text-teal-deep">{g.segments[value].t}</p>
@@ -74,7 +74,7 @@ export default function SegmentGateway({
                 </p>
               </div>
               {onWalk ? (
-                <button type="button" onClick={onWalk} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-[#0b7d36] px-5 py-3 text-sm font-semibold text-white shadow-[0_0_30px_-6px_rgba(76,201,122,0.9)] hover:bg-[#12a84b]">
+                <button type="button" onClick={onWalk} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-semibold text-white shadow-[0_0_30px_-6px_rgba(76,201,122,0.9)] hover:bg-[#12a84b]">
                   <svg viewBox="0 0 12 12" className="size-3 rtl:-scale-x-100" aria-hidden="true"><path d="M3 1.8v8.4L10 6z" fill="currentColor" /></svg>
                   {g.walk}
                 </button>
@@ -114,13 +114,13 @@ function Tile({ id, t, d, on, dim, onPick, reduce }: { id: Segment; t: string; d
       onClick={onPick}
       onPointerMove={move}
       onPointerLeave={leave}
-      className={`seg-tile group relative aspect-[4/3] w-[68%] shrink-0 snap-start overflow-hidden sm:w-auto rounded-2xl text-start shadow-[0_18px_40px_-24px_rgba(0,0,0,0.9)] transition-[box-shadow,filter] duration-500 sm:aspect-[16/10] ${on ? "ring-[3px] ring-[#4cc97a] shadow-[0_0_0_6px_rgba(76,201,122,0.18),0_24px_50px_-20px_rgba(76,201,122,0.55)]" : "ring-1 ring-white/15 hover:ring-white/40"} ${dim ? "saturate-[0.55] brightness-90 hover:saturate-100 hover:brightness-100" : ""}`}
+      className={`seg-tile group relative aspect-[4/3] w-[68%] shrink-0 snap-start overflow-hidden sm:w-auto rounded-2xl text-start shadow-[0_18px_40px_-24px_rgba(0,0,0,0.9)] transition-[box-shadow,filter] duration-500 sm:aspect-[16/10] ${on ? "ring-[3px] ring-brand-bright shadow-[0_0_0_6px_rgba(76,201,122,0.18),0_24px_50px_-20px_rgba(76,201,122,0.55)]" : "ring-1 ring-white/15 hover:ring-white/40"} ${dim ? "saturate-[0.55] brightness-90 hover:saturate-100 hover:brightness-100" : ""}`}
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- MSG's own photography */}
       <img src={src} alt="" loading="lazy" decoding="async" style={{ objectPosition: pos }} className="absolute inset-0 size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]" />
       <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
       <span aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[radial-gradient(240px_circle_at_var(--gx,50%)_var(--gy,50%),rgba(255,255,255,0.18),transparent_60%)]" />
-      <span aria-hidden="true" className={`absolute end-3 top-3 inline-flex size-7 items-center justify-center rounded-full transition-all duration-300 ${on ? "scale-100 bg-[#4cc97a] text-[#04110a] shadow-[0_0_20px_rgba(76,201,122,0.8)]" : "scale-90 border-2 border-white/80 bg-black/25 backdrop-blur"}`}>
+      <span aria-hidden="true" className={`absolute end-3 top-3 inline-flex size-7 items-center justify-center rounded-full transition-ui duration-300 ${on ? "scale-100 bg-brand-bright text-[#04110a] shadow-[0_0_20px_rgba(76,201,122,0.8)]" : "scale-90 border-2 border-white/80 bg-black/25 backdrop-blur"}`}>
         {on ? <svg viewBox="0 0 12 12" className="size-3.5"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg> : null}
       </span>
       <span className="absolute inset-x-0 bottom-0 block p-3 sm:p-4 [transform:translateZ(24px)]">

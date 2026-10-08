@@ -25,8 +25,8 @@ export default function Deck({ lang, live, plan }: Props) {
   const touch = useRef<{ x: number; y: number } | null>(null);
   const panels = [live, plan];
 
-  const show = useCallback((i: number) => {
-    setInstant(false);
+  const show = useCallback((i: number, immediately = false) => {
+    setInstant(immediately);
     setIdx(Math.max(0, Math.min(DECK_PANELS.length - 1, i)));
   }, []);
 
@@ -79,7 +79,7 @@ export default function Deck({ lang, live, plan }: Props) {
     const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
     if (!d || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return; // fields and sliders keep their arrows
     if (t.getAttribute("role") === "tab" && !t.id.startsWith("deck-tab-")) return; // so do the plan's own tabs
-    show(idx + d * (rtl ? -1 : 1));
+    show(idx + d * (rtl ? -1 : 1), true); // arrow keys are repeated: no travel time
   };
 
   const onTouchStart = (e: React.TouchEvent) => {
@@ -96,7 +96,9 @@ export default function Deck({ lang, live, plan }: Props) {
   };
 
   const shift = (rtl ? 1 : -1) * idx * 100;
-  const glide = instant || reduce ? "" : "transition-[transform,height] duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)]";
+  // on-screen movement: the strong ease-in-out; the height simply follows, it is not animated
+  const still = instant || reduce;
+  const glide = still ? "" : "transition-transform duration-[520ms] ease-in-out";
 
   return (
     <section
@@ -104,7 +106,7 @@ export default function Deck({ lang, live, plan }: Props) {
       data-theme="dark"
       aria-label={c.label}
       onKeyDown={onKeyDown}
-      className="on-dark relative scroll-mt-16 overflow-hidden bg-[#08262b] text-white"
+      className="on-dark relative scroll-mt-16 overflow-hidden bg-deep text-white"
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_85%_0%,rgba(19,113,121,0.55),transparent_70%),radial-gradient(50%_45%_at_0%_100%,rgba(11,125,54,0.28),transparent_70%)]" />
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)] bg-[size:56px_56px] [mask-image:radial-gradient(80%_70%_at_50%_30%,#000,transparent)]" />
@@ -124,16 +126,16 @@ export default function Deck({ lang, live, plan }: Props) {
                 aria-controls={`deck-panel-${id}`}
                 tabIndex={on ? 0 : -1}
                 onClick={() => show(i)}
-                className={`group relative overflow-hidden rounded-2xl border p-3 text-start transition-colors duration-500 sm:p-4 ${on ? "border-white/25 bg-white/10" : "border-white/10 bg-white/[0.03] hover:bg-white/[0.07]"}`}
+                className={`group relative overflow-hidden rounded-2xl border p-3 text-start transition-colors sm:p-4 ${on ? "border-white/25 bg-white/10" : "border-white/10 bg-white/[0.03] hover:bg-white/[0.07]"}`}
               >
                 <span className="flex items-center gap-3">
-                  <span className={`num grid size-8 shrink-0 place-items-center rounded-full text-xs font-bold transition-colors duration-500 sm:size-10 sm:text-sm ${on ? "bg-[#4cc97a] text-[#08262b]" : "border border-white/25 text-white/70"}`}>{tab.n}</span>
+                  <span className={`num grid size-8 shrink-0 place-items-center rounded-full text-xs font-bold transition-colors sm:size-10 sm:text-sm ${on ? "bg-brand-bright text-deep" : "border border-white/25 text-white/70"}`}>{tab.n}</span>
                   <span className="min-w-0">
                     <span className="block font-display text-base font-semibold leading-tight sm:text-xl">{tab.t}</span>
-                    <span className={`mt-0.5 hidden text-sm transition-colors duration-500 sm:block ${on ? "text-white/75" : "text-white/55"}`}>{tab.d}</span>
+                    <span className={`mt-0.5 hidden text-sm transition-colors sm:block ${on ? "text-white/75" : "text-white/55"}`}>{tab.d}</span>
                   </span>
                 </span>
-                <span aria-hidden="true" className={`absolute inset-x-0 bottom-0 h-0.5 origin-left bg-[#4cc97a] transition-transform duration-700 rtl:origin-right ${on ? "scale-x-100" : "scale-x-0"}`} />
+                <span aria-hidden="true" className={`absolute inset-x-0 bottom-0 h-0.5 origin-left bg-brand-bright transition-transform duration-300 rtl:origin-right ${on ? "scale-x-100" : "scale-x-0"}`} />
               </button>
             );
           })}
@@ -141,7 +143,7 @@ export default function Deck({ lang, live, plan }: Props) {
       </div>
 
       <div
-        className={`relative overflow-clip ${glide}`}
+        className="relative overflow-clip"
         style={{ height: height ? `${height}px` : undefined }}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
@@ -157,7 +159,7 @@ export default function Deck({ lang, live, plan }: Props) {
                 role="tabpanel"
                 aria-labelledby={`deck-tab-${id}`}
                 inert={on ? undefined : true}
-                className={`deck-panel w-full shrink-0 transition-[opacity,transform] duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${on ? "scale-100 opacity-100" : "scale-[0.94] opacity-0"}`}
+                className={`deck-panel w-full shrink-0 ${still ? "" : "transition-[opacity,scale] duration-[520ms] ease-in-out"} ${on ? "scale-100 opacity-100" : "scale-[0.97] opacity-0"}`}
               >
                 {panels[i]}
               </div>

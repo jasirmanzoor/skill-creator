@@ -60,7 +60,7 @@ export default function LiveTracking({ lang }: { lang: Locale }) {
         <div className="grid gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:gap-12">
           <div>
             <span className="label on-dark">{c.eyebrow}</span>
-            <h2 id="live-title" className="mt-3 font-display text-4xl font-semibold tracking-[-0.03em] text-balance sm:text-5xl rtl:leading-[1.3] rtl:tracking-normal">
+            <h2 id="live-title" className="h-section mt-3">
               {c.title}
             </h2>
             <p className="mt-4 max-w-xl text-lg leading-relaxed text-white/75 text-pretty">{c.lead}</p>
@@ -76,10 +76,10 @@ export default function LiveTracking({ lang }: { lang: Locale }) {
                   >
                     <span
                       className={`relative z-10 grid size-9 shrink-0 place-items-center rounded-full text-sm font-semibold transition-colors duration-500 ${
-                        st === "done" ? "bg-[#4cc97a] text-[#08262b]" : st === "active" ? "border-2 border-[#4cc97a] bg-[#08262b] text-[#4cc97a]" : "border border-white/25 bg-[#08262b] text-white/60"
+                        st === "done" ? "bg-brand-bright text-deep" : st === "active" ? "border-2 border-brand-bright bg-deep text-brand-bright" : "border border-white/25 bg-deep text-white/60"
                       }`}
                     >
-                      {st === "active" ? <span className="plan-ping absolute inset-0 rounded-full bg-[#4cc97a]/40 motion-reduce:hidden" aria-hidden="true" /> : null}
+                      {st === "active" ? <span className="plan-ping absolute inset-0 rounded-full bg-brand-bright/40 motion-reduce:hidden" aria-hidden="true" /> : null}
                       {st === "done" ? <CheckIcon className="relative size-4" /> : <span className="num relative">{i + 1}</span>}
                     </span>
                     <span>
@@ -99,11 +99,11 @@ export default function LiveTracking({ lang }: { lang: Locale }) {
 
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm sm:p-8">
             <div ref={stage} className="flex flex-col items-center xl:flex-row xl:justify-center">
-              <div className="relative pb-10 xl:pb-0">
+              <div className="relative pb-10">
                 <DriverPhone c={c} live={live} reduce={reduce} onApprove={approve} onReplay={replay} />
                 <p
                   aria-hidden={live}
-                  className={`absolute inset-x-0 top-[calc(100%-1.75rem)] text-center text-[13px] font-semibold text-[#4cc97a] transition-opacity duration-500 xl:top-full xl:mt-3 ${live ? "opacity-0" : "opacity-100"}`}
+                  className={`absolute inset-x-0 top-[calc(100%-1.75rem)] text-center text-[13px] font-semibold text-brand-bright transition-opacity duration-500 ${live ? "opacity-0" : "opacity-100"}`}
                 >
                   {c.tryIt}
                 </p>
@@ -111,12 +111,12 @@ export default function LiveTracking({ lang }: { lang: Locale }) {
 
               {/* the signal: nothing travels until the driver approves */}
               <div aria-hidden="true" className="relative hidden h-px w-[3.5rem] shrink-0 xl:block">
-                <span className={`absolute inset-0 border-t-2 border-dashed transition-colors duration-700 ${live ? "border-[#4cc97a]" : "border-white/25"}`} />
-                {live ? [0, 1, 2].map((i) => <span key={i} className="sig-x absolute -top-[3px] start-0 size-2 rounded-full bg-[#4cc97a] motion-reduce:hidden" style={{ animationDelay: `${i * 0.5}s` }} />) : null}
+                <span className={`absolute inset-0 border-t-2 border-dashed transition-colors duration-700 ${live ? "border-brand-bright" : "border-white/25"}`} />
+                {live ? [0, 1, 2].map((i) => <span key={i} className="sig-x absolute -top-[3px] start-0 size-2 rounded-full bg-brand-bright motion-reduce:hidden" style={{ animationDelay: `${i * 0.5}s` }} />) : null}
               </div>
               <div aria-hidden="true" className="relative h-14 w-px shrink-0 xl:hidden">
-                <span className={`absolute inset-0 border-s-2 border-dashed transition-colors duration-700 ${live ? "border-[#4cc97a]" : "border-white/25"}`} />
-                {live ? [0, 1, 2].map((i) => <span key={i} className="sig-y absolute -start-[3px] top-0 size-2 rounded-full bg-[#4cc97a] motion-reduce:hidden" style={{ animationDelay: `${i * 0.45}s` }} />) : null}
+                <span className={`absolute inset-0 border-s-2 border-dashed transition-colors duration-700 ${live ? "border-brand-bright" : "border-white/25"}`} />
+                {live ? [0, 1, 2].map((i) => <span key={i} className="sig-y absolute -start-[3px] top-0 size-2 rounded-full bg-brand-bright motion-reduce:hidden" style={{ animationDelay: `${i * 0.45}s` }} />) : null}
               </div>
 
               <div className="w-full max-w-[34rem] xl:max-w-none xl:flex-1">

@@ -8,12 +8,12 @@ export default function Fleet({ t, lang }: { t: Dictionary; lang: Locale }) {
   const f = t.fleet;
   const photo = media.fleet[0];
   return (
-    <section id="fleet" aria-labelledby="fleet-title" className="scroll-mt-16 border-t border-line bg-surface/90 py-24 backdrop-blur lg:py-32">
+    <section id="fleet" aria-labelledby="fleet-title" className="scroll-mt-16 border-t border-line bg-surface/90 sec backdrop-blur">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
           <Reveal>
             <span className="label">{f.eyebrow}</span>
-            <h2 id="fleet-title" className="mt-4 font-display text-4xl font-semibold tracking-[-0.025em] text-ink text-balance sm:text-5xl rtl:tracking-normal">
+            <h2 id="fleet-title" className="h-section mt-4 text-ink">
               {f.title}
             </h2>
             <p className="mt-6 max-w-xl text-lg text-muted text-pretty">{f.lead}</p>

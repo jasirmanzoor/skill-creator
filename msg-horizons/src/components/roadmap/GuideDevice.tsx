@@ -64,7 +64,7 @@ function Scene(p: SceneProps) {
 }
 
 const Check = ({ className = "" }: { className?: string }) => (
-  <span className={`inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-[#0b7d36] text-white ${className}`}>
+  <span className={`inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-brand text-white ${className}`}>
     <svg viewBox="0 0 12 12" className="size-2.5" aria-hidden="true"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
   </span>
 );
@@ -75,7 +75,7 @@ function AppBar({ title, sub }: { title: string; sub?: string }) {
       <span className="flex size-8 items-center justify-center rounded-full bg-[#0b3a26]"><Mark inverted className="h-3.5 w-auto" /></span>
       <div className="min-w-0">
         <p className="truncate text-[13px] font-semibold">{title}</p>
-        {sub ? <p className="text-[10px] text-[#0b7d36]">{sub}</p> : null}
+        {sub ? <p className="text-[10px] text-brand">{sub}</p> : null}
       </div>
     </div>
   );
@@ -106,7 +106,7 @@ function Chat({ g, net, segment }: SceneProps) {
         {replied ? (
           <motion.div initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
             <p className="max-w-[85%] rounded-xl rounded-ss-sm bg-white px-3 py-2 shadow-sm">{g.reply}</p>
-            <span className="inline-block rounded-full border border-[#0f9641] bg-white px-3 py-1 text-[11px] font-semibold text-[#0b7d36]">{g.quick}</span>
+            <span className="inline-block rounded-full border border-[#0f9641] bg-white px-3 py-1 text-[11px] font-semibold text-brand">{g.quick}</span>
           </motion.div>
         ) : null}
       </div>
@@ -159,7 +159,7 @@ function Guide({ g, area }: SceneProps) {
             {Array.from({ length: 38 }, (_, i) => <span key={i} className="bg-ink" style={{ width: i % 3 ? 1.5 : 3, height: `${60 + ((i * 37) % 40)}%` }} />)}
           </div>
           <div className="mt-2 flex justify-between text-[9px] font-semibold">
-            <span className="text-[#0b7d36]">{g.label.cod}</span>
+            <span className="text-brand">{g.label.cod}</span>
             <span className="text-muted">{g.label.handle}</span>
           </div>
         </motion.div>
@@ -250,16 +250,16 @@ function Pilot({ g }: SceneProps) {
           <div key={k} className="rounded-xl bg-white p-3 shadow-sm">
             <div className="flex items-center justify-between text-[11px]">
               <span className="num font-semibold">MSG-P{k + 1}</span>
-              {done > k ? <span className="inline-flex items-center gap-1 font-semibold text-[#0b7d36]"><Check />{g.pod}</span> : <span className="text-muted">…</span>}
+              {done > k ? <span className="inline-flex items-center gap-1 font-semibold text-brand"><Check />{g.pod}</span> : <span className="text-muted">…</span>}
             </div>
             <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-subtle">
-              <motion.div className="h-full rounded-full bg-[#0b7d36]" initial={reduce ? false : { width: "0%" }} animate={{ width: done > k ? "100%" : "35%" }} transition={{ duration: 0.8 }} />
+              <motion.div className="h-full rounded-full bg-brand" initial={reduce ? false : { width: "0%" }} animate={{ width: done > k ? "100%" : "35%" }} transition={{ duration: 0.8 }} />
             </div>
           </div>
         ))}
         {live ? (
           <motion.div initial={reduce ? false : { opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-3 rounded-xl bg-[#0b3a26] p-3 text-white">
-            <span className="relative flex size-3"><span className="absolute inset-0 animate-ping rounded-full bg-[#4cc97a] motion-reduce:hidden" /><span className="relative size-3 rounded-full bg-[#4cc97a]" /></span>
+            <span className="relative flex size-3"><span className="absolute inset-0 animate-ping rounded-full bg-brand-bright motion-reduce:hidden" /><span className="relative size-3 rounded-full bg-brand-bright" /></span>
             <div>
               <p className="text-[13px] font-semibold">{g.live}</p>
               <p className="text-[10.5px] text-white/70">{g.liveBody}</p>

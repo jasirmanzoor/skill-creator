@@ -42,13 +42,13 @@ export default function NetworkBand({ lang, coastPhoto }: { lang: Locale; coastP
   }, [playing, active, frames.length]);
 
   return (
-    <section id="network" aria-labelledby="network-title" className="sea-band relative scroll-mt-16 overflow-hidden py-20 lg:py-28">
+    <section id="network" aria-labelledby="network-title" className="sea-band relative scroll-mt-16 sec overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-5 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[5fr_7fr] lg:gap-14">
           {/* rail */}
           <div className="flex flex-col">
             <span className="label">{c.eyebrow}</span>
-            <h2 id="network-title" className="mt-3 font-display text-4xl font-semibold tracking-[-0.03em] text-balance sm:text-5xl rtl:tracking-normal">
+            <h2 id="network-title" className="h-section mt-3">
               {c.title}
             </h2>
             <p className="mt-3 font-display text-xl font-medium text-teal text-balance">{c.sub}</p>
@@ -118,7 +118,7 @@ export default function NetworkBand({ lang, coastPhoto }: { lang: Locale; coastP
             </motion.div>
             {/* sea wash: ties the photo into the band */}
             <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(120%_80%_at_100%_0%,rgba(226,244,243,0.35),transparent_55%)]" />
-            <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-[#0b3a40]/55 to-transparent" />
+            <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-teal-deep/55 to-transparent" />
 
             <div className="absolute inset-x-4 bottom-4 flex items-end justify-between gap-4 sm:inset-x-6 sm:bottom-6">
               <div aria-live="polite" className="sea-glass rounded-2xl px-5 py-3 sm:px-6 sm:py-4">

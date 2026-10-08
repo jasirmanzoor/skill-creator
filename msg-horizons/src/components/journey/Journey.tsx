@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { fmt, type Locale } from "@/content/i18n";
 import { journeyCopy, LENS_OF, STOPS, type Lens, type Stop } from "@/content/journey";
 import { pageTop, position, routeFraction, showNext, stepIndex } from "@/lib/journey";
@@ -12,6 +13,9 @@ import { usePlan } from "../PlanContext";
 import { ArrowIcon } from "../ui/icons";
 import { VanGlyph } from "../live/glyphs";
 import RouteMap from "./RouteMap";
+import { MOBILE_BAR_ATTR, MOBILE_BAR_EVENT, ROUTE_SLOT_ID } from "../MobileBar";
+
+const onBar = (cb: () => void) => { window.addEventListener(MOBILE_BAR_EVENT, cb); return () => window.removeEventListener(MOBILE_BAR_EVENT, cb); };
 
 /**
  * The page as a route. Every section is a stop; a courier marker moves along the route as you scroll, so
@@ -33,6 +37,8 @@ export default function Journey({ lang }: { lang: Locale }) {
   const ids = useRef<string[]>([]);
   const cur = useRef({ index: 0, t: 0 });
   const touchedLens = useRef(false);
+  // on phones the progress button sits inside the action bar whenever the bar is showing
+  const docked = useSyncExternalStore(onBar, () => document.documentElement.hasAttribute(MOBILE_BAR_ATTR), () => false);
 
   // who the visitor says they are (from the planner or the hero) picks the starting lens, until they choose one
   const fromPlan = plan?.persona ?? seed?.persona;
@@ -61,7 +67,9 @@ export default function Journey({ lang }: { lang: Locale }) {
         if (shown >= 0) { index = shown; p = shown + (shown === pos.index ? pos.t : 0); }
       }
       cur.current = { index, t: pos.t };
-      hud.current?.style.setProperty("--f", routeFraction(p, n).toFixed(4));
+      const f = routeFraction(p, n).toFixed(4);
+      hud.current?.style.setProperty("--f", f);
+      document.getElementById(ROUTE_SLOT_ID)?.style.setProperty("--f", f);
       setActive((a) => (a === index ? a : index));
       setNext((v) => (v === (!onDeck && showNext(index, pos.t, n)) ? v : !v));
     };
@@ -150,6 +158,16 @@ export default function Journey({ lang }: { lang: Locale }) {
   const label = (s: Stop) => s.title[lang];
   const ofTotal = fmt(c.stopOf, { n: active + 1, total: n });
   const nextStop = stops[Math.min(active + 1, n - 1)];
+  const slot = docked ? document.getElementById(ROUTE_SLOT_ID) : null;
+  const ring = (
+    <span className="relative grid size-12 place-items-center lg:size-11">
+      <svg viewBox="0 0 36 36" className="absolute inset-0 size-full -rotate-90 rtl:rotate-90" aria-hidden="true">
+        <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="3" />
+        <circle cx="18" cy="18" r="15" fill="none" stroke="var(--color-brand-bright)" strokeWidth="3" strokeLinecap="round" strokeDasharray="94.25" style={{ strokeDashoffset: "calc(94.25px * (1 - var(--f)))" }} />
+      </svg>
+      <span className="num relative text-[11px] font-bold" dir="ltr">{active + 1}/{n}</span>
+    </span>
+  );
 
   return (
     <>
@@ -180,7 +198,7 @@ export default function Journey({ lang }: { lang: Locale }) {
                 className="group absolute start-1/2 grid size-5 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full rtl:translate-x-1/2"
                 style={{ top: `${(i / (n - 1)) * 100}%` }}
               >
-                <span className={`block rounded-full transition-all duration-300 ${i < active ? "size-2.5 bg-brand-bright" : i === active ? "size-2.5 bg-white" : "size-2 bg-white/35 group-hover:bg-white/80"}`} />
+                <span className={`block size-2.5 rounded-full transition-ui ${i < active ? "bg-brand-bright" : i === active ? "bg-white" : "scale-[0.8] bg-white/35 group-hover:bg-white/80"}`} />
                 <span className="pointer-events-none absolute end-full top-1/2 me-4 hidden -translate-y-1/2 whitespace-nowrap rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-ink shadow-lg group-hover:block group-focus-visible:block">
                   {label(s)}
                 </span>
@@ -204,15 +222,9 @@ export default function Journey({ lang }: { lang: Locale }) {
           onClick={openMap}
           aria-label={`${c.openMap}. ${ofTotal}: ${label(here)}`}
           aria-haspopup="dialog"
-          className="pointer-events-auto absolute bottom-[5.5rem] end-3 flex items-center gap-2.5 rounded-full bg-ink/85 py-1.5 pe-1.5 ps-1.5 text-white shadow-[0_18px_40px_-16px_rgba(0,0,0,0.7)] ring-1 ring-white/10 backdrop-blur-md transition-transform hover:-translate-y-0.5 lg:bottom-6 lg:end-6 lg:pe-4 2xl:hidden"
+          className={`pointer-events-auto absolute bottom-3 end-3 flex items-center gap-2.5 rounded-full bg-ink/85 p-1.5 text-white shadow-[var(--shadow-float)] ring-1 ring-white/10 backdrop-blur-md lg:bottom-6 lg:end-6 lg:pe-4 2xl:hidden ${docked || active === n - 1 ? "max-lg:hidden" : ""}`}
         >
-          <span className="relative grid size-11 place-items-center">
-            <svg viewBox="0 0 36 36" className="absolute inset-0 size-full -rotate-90 rtl:rotate-90" aria-hidden="true">
-              <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="3" />
-              <circle cx="18" cy="18" r="15" fill="none" stroke="#4cc97a" strokeWidth="3" strokeLinecap="round" strokeDasharray="94.25" style={{ strokeDashoffset: "calc(94.25px * (1 - var(--f)))" }} />
-            </svg>
-            <span className="num relative text-[11px] font-bold" dir="ltr">{active + 1}/{n}</span>
-          </span>
+          {ring}
           <span className="hidden max-w-[11rem] truncate text-sm font-semibold lg:block">{label(here)}</span>
         </button>
 
@@ -223,7 +235,7 @@ export default function Journey({ lang }: { lang: Locale }) {
             onClick={() => go(active + 1)}
             tabIndex={next && !open ? 0 : -1}
             aria-hidden={!(next && !open)}
-            className={`group flex items-center gap-2.5 rounded-full bg-white py-2.5 pe-3 ps-5 text-sm font-semibold text-ink shadow-[0_20px_50px_-18px_rgba(12,14,17,0.55)] ring-1 ring-ink/10 transition-all duration-500 ${next && !open ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"}`}
+            className={`group flex items-center gap-2.5 rounded-full bg-white py-2.5 pe-3 ps-5 text-sm font-semibold text-ink shadow-[0_20px_50px_-18px_rgba(12,14,17,0.55)] ring-1 ring-ink/10 transition-ui duration-[240ms] ${next && !open ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"}`}
           >
             <span className="text-muted">{c.next}</span>
             <span>{label(nextStop)}</span>
@@ -233,6 +245,19 @@ export default function Journey({ lang }: { lang: Locale }) {
           </button>
         </div>
       </div>
+
+      {docked && slot ? createPortal(
+        <button
+          type="button"
+          onClick={openMap}
+          aria-label={`${c.openMap}. ${ofTotal}: ${label(here)}`}
+          aria-haspopup="dialog"
+          className="shrink-0 rounded-full bg-ink text-white"
+        >
+          {ring}
+        </button>,
+        slot,
+      ) : null}
 
       {open ? (
         <RouteMap

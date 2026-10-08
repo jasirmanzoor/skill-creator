@@ -105,7 +105,7 @@ export default function RouteMap({ stops, active, lang, c, lens, onLens, reduce,
       aria-modal="true"
       aria-labelledby="route-title"
       onKeyDown={onKeyDown}
-      className={`route-in fixed inset-0 z-[70] overflow-y-auto bg-[#061c20]/[0.97] text-white backdrop-blur-xl transition-opacity duration-300 ${leaving ? "opacity-0" : "opacity-100"}`}
+      className={`route-in fixed inset-0 z-[70] overflow-y-auto bg-pitch/[0.97] text-white backdrop-blur-xl transition-opacity duration-300 ${leaving ? "opacity-0" : "opacity-100"}`}
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_85%_0%,rgba(19,113,121,0.5),transparent_70%),radial-gradient(50%_45%_at_0%_100%,rgba(11,125,54,0.25),transparent_70%)]" />
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:56px_56px] [mask-image:radial-gradient(80%_70%_at_50%_30%,#000,transparent)]" />

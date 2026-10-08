@@ -81,10 +81,10 @@ export default function Partners({ lang }: { lang: Locale }) {
   }, [reduce]);
 
   return (
-    <section id="partners" aria-labelledby="partners-title" className="relative scroll-mt-16 overflow-hidden border-y border-line bg-surface/[0.93] py-24 backdrop-blur lg:py-28">
+    <section id="partners" aria-labelledby="partners-title" className="relative scroll-mt-16 overflow-hidden border-y border-line bg-surface/[0.93] sec backdrop-blur">
       <div className="mx-auto max-w-7xl px-5 text-center lg:px-8">
         <span className="label">{c.eyebrow}</span>
-        <h2 id="partners-title" className="mx-auto mt-4 max-w-3xl font-display text-4xl font-semibold tracking-[-0.03em] text-ink text-balance sm:text-5xl rtl:tracking-normal">
+        <h2 id="partners-title" className="h-section mx-auto mt-4 max-w-3xl text-ink">
           {c.title}
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-lg text-muted">{c.lead}</p>

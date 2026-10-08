@@ -74,7 +74,7 @@ export default function PeakControl({ stages, labels }: { stages: Stage[]; label
                     role="tab"
                     aria-selected={i === active}
                     onClick={() => jump(i)}
-                    className={`num h-8 min-w-8 rounded-full px-2.5 text-xs font-semibold transition-all duration-500 ${i === active ? "bg-teal text-white shadow-[0_8px_20px_-8px_rgba(19,113,121,0.9)]" : i < active ? "bg-sea-200 text-teal-deep" : "bg-white text-teal-deep/60 ring-1 ring-teal/15"}`}
+                    className={`tap num h-8 min-w-8 rounded-full px-2.5 text-xs font-semibold transition-colors duration-300 ${i === active ? "bg-teal-deep text-white shadow-[0_8px_20px_-8px_rgba(19,113,121,0.9)]" : i < active ? "bg-sea-200 text-teal-deep" : "bg-white text-teal-deep/75 ring-1 ring-teal/15"}`}
                   >
                     0{i + 1}
                   </button>

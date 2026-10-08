@@ -6,6 +6,7 @@ import { motion, useMotionValue, useMotionValueEvent, useScroll, useSpring, useT
 import { useEffect, useRef, useState } from "react";
 import { heroCopy, type HeroLane } from "@/content/hero";
 import { whatsappLink } from "@/content/facts";
+import { rateFor, type Lane } from "@/content/redsea";
 import type { Dictionary, Locale } from "@/content/i18n";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import TrackedLink from "../ui/TrackedLink";
@@ -28,6 +29,7 @@ const FACADE = {
   sign: { x: 469 / 1448, y: 153 / 1086, w: 283 / 1448, h: 101 / 1086 },
   lamp: { x: 0.4365, y: 0.399 },
 };
+const RATE_LANE: Record<HeroLane, Lane> = { intra: "intra", inter: "inter", sabya: "sabyaMajor" };
 type Pt = { x: number; y: number };
 type Inside = { src: string; ar: number; lamps: Pt[]; spots: Record<"storage" | "sorting" | "dispatch", Pt> };
 const INSIDE_WIDE: Inside = {
@@ -126,7 +128,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
 
   // inside: the lights flicker on, then the camera settles
   const inOpacity = useTransform(p, [0.42, 0.46, 0.77, 0.85], [0, 1, 1, 0]);
-  const inLight = useTransform(p, [0.44, 0.465, 0.48, 0.5, 0.53], ["brightness(0.06)", "brightness(0.6)", "brightness(0.22)", "brightness(0.85)", "brightness(1)"]);
+  const inDark = useTransform(p, [0.44, 0.465, 0.48, 0.5, 0.53], [0.94, 0.4, 0.78, 0.15, 0]);
   const inScale = useTransform(p, [0.43, 0.8, 0.86], [1.22, 1, 0.92]);
   const lamps = useTransform(p, [0.465, 0.49, 0.53], [0, 1, 0.8]);
   const inCopy = useTransform(p, [0.52, 0.57, 0.72, 0.78], [0, 1, 1, 0]);
@@ -141,6 +143,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
     <Facade
       c={c}
       staged={staged}
+      idle={staged && beat !== 1}
       zoom={staged ? zoom : undefined}
       fx={staged ? facadeFx : undefined}
       skyX={staged ? skyX : undefined}
@@ -150,36 +153,51 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   );
 
   const promise = (
-    <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-4 pb-10 sm:px-5 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-end lg:gap-10 lg:px-8 lg:pb-14">
-      <div className="text-white">
+    <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-4 pb-10 text-white sm:px-5 lg:px-8 lg:pb-14">
+      <div>
         <p className="inline-flex items-center gap-2 rounded-full bg-black/35 px-3 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20 backdrop-blur">
-          <span className="relative flex size-2"><span className="absolute inset-0 animate-ping rounded-full bg-[#4cc97a]/70 motion-reduce:hidden" /><span className="relative size-2 rounded-full bg-[#4cc97a]" /></span>
+          <span className="relative flex size-2"><span className="absolute inset-0 animate-ping rounded-full bg-brand-bright/70 motion-reduce:hidden" /><span className="relative size-2 rounded-full bg-brand-bright" /></span>
           {c.live}
         </p>
-        <h1 id="hero-title" className="mt-4 font-display text-[clamp(2.3rem,4.6vw,3.9rem)] font-semibold leading-[1.02] tracking-[-0.035em] text-balance [text-shadow:0_2px_30px_rgba(0,0,0,0.45)] rtl:leading-[1.25] rtl:tracking-normal">
-          <span className="block">{c.title[0]}</span>
-          <span className="block bg-gradient-to-r from-[#b8f5cf] via-white to-[#b8f5cf] bg-[length:200%_auto] bg-clip-text text-transparent motion-safe:animate-[hero-sheen_6s_linear_infinite]">{c.title[1]}</span>
+        <h1 id="hero-title" className="mt-4 font-display text-[clamp(2.3rem,4.6vw,3.9rem)] font-semibold leading-[1.02] tracking-[-0.03em] [word-spacing:0.06em] text-balance [text-shadow:0_2px_30px_rgba(0,0,0,0.45)] rtl:[word-spacing:normal] rtl:leading-[1.25] rtl:tracking-normal">
+          <span className="block lg:whitespace-nowrap">{c.title[0]}</span>
+          <span className="block text-brand-mint lg:whitespace-nowrap">{c.title[1]}</span>
         </h1>
+      </div>
+      <div className="lg:mt-2 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-end lg:gap-10">
+      <div>
         <p className="mt-4 max-w-xl text-base leading-relaxed text-white/85 text-pretty sm:text-lg">{c.lead}</p>
+        {/* phones: the price is on the first screen; the full card waits below the walk-in */}
+        <aside data-rate-card aria-label={c.quote.title} className="mt-4 lg:hidden">
+          <a href="#hero-quote" className="inline-flex max-w-full flex-wrap items-baseline gap-x-2 gap-y-0.5 rounded-2xl bg-white/95 px-4 py-2.5 text-sm text-teal-deep shadow-[var(--shadow-float)]">
+            <span className="text-teal-deep/75">{c.quote.perOrder}</span>
+            <span className="num font-display text-lg font-semibold" dir="ltr">≈ {c.quote.cur} {rateFor(RATE_LANE[lane], orders)}</span>
+            <span className="flex basis-full items-center gap-1.5 text-teal-deep/75">
+              {c.quote.lanes[lane]} · <span className="num" dir="ltr">{orders.toLocaleString("en-US")}</span> {c.quote.perMonth}
+              <svg viewBox="0 0 24 24" className="size-3.5 text-teal" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M6 13l6 6 6-6" /></svg>
+            </span>
+          </a>
+        </aside>
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <TrackedLink href="#planner" event="cta_click" props={{ cta: "plan", location: "hero" }} className="btn-primary on-dark group px-6 py-3.5">
             {c.ctaPlan} <ArrowIcon className="size-4 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
           </TrackedLink>
           <TrackedLink href={whatsappLink(t.wa.general)} target="_blank" rel="noopener noreferrer" event="whatsapp_click" props={{ location: "hero" }}
             className="inline-flex items-center gap-2 rounded-full bg-white/10 px-5 py-3.5 font-semibold text-white ring-1 ring-white/30 backdrop-blur transition-colors hover:bg-white/20">
-            <WhatsAppIcon className="size-5 text-[#4cc97a]" /> {c.ctaTalk}
+            <WhatsAppIcon className="size-5 text-brand-bright" /> {c.ctaTalk}
           </TrackedLink>
         </div>
-        <p className="mt-5 text-[11px] text-white/65">{c.facade.caption}</p>
+        <p className="mt-5 text-xs text-white/70 max-lg:pe-16">{c.facade.caption}</p>
       </div>
       <QuoteCard lang={L} reduce={reduce} lane={lane} onLane={setLane} orders={orders} onOrders={setOrders} className="hidden lg:block" />
+      </div>
     </div>
   );
 
   const inside = (
     <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-4 pb-12 text-white sm:px-5 lg:px-8 lg:pb-16">
       <p className="text-sm font-semibold text-[#9be7b8]">{c.inside.eyebrow}</p>
-      <h2 className="mt-2 max-w-2xl font-display text-[clamp(2rem,4.2vw,3.6rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-balance [text-shadow:0_2px_30px_rgba(0,0,0,0.5)] rtl:leading-[1.3] rtl:tracking-normal">{c.inside.title}</h2>
+      <h2 className="h-scene mt-2 max-w-2xl [text-shadow:0_2px_30px_rgba(0,0,0,0.5)]">{c.inside.title}</h2>
       <p className="mt-3 max-w-xl text-white/85 text-pretty sm:text-lg">{c.inside.lead}</p>
     </div>
   );
@@ -188,7 +206,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
 
   if (!staged) {
     return (
-      <section id="hero" ref={section} aria-labelledby="hero-title" className="relative bg-[#08262b]">
+      <section id="hero" ref={section} aria-labelledby="hero-title" className="relative bg-deep">
         <div ref={frame} data-theme="dark" className="relative h-[100svh] min-h-[640px] overflow-hidden [container-type:size]">
           {facade}
           <Scrim />
@@ -200,14 +218,14 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
           <div className="absolute inset-0">{inside}</div>
         </div>
         <div className="relative bg-[linear-gradient(180deg,#f3fbfb,#ffffff)] py-16">{kingdom}</div>
-        <div className="px-4 pb-12 pt-2 lg:hidden"><QuoteCard lang={L} reduce={reduce} lane={lane} onLane={setLane} orders={orders} onOrders={setOrders} /></div>
+        <div id="hero-quote" className="scroll-mt-20 px-4 pb-12 pt-2 lg:hidden"><QuoteCard lang={L} reduce={reduce} lane={lane} onLane={setLane} orders={orders} onOrders={setOrders} /></div>
       </section>
     );
   }
 
   return (
     <>
-    <section id="hero" ref={section} aria-labelledby="hero-title" className="relative h-[290svh] bg-[#08262b]">
+    <section id="hero" ref={section} aria-labelledby="hero-title" className="relative h-[230svh] bg-deep lg:h-[290svh]">
       <div
         ref={frame}
         data-theme={beat < 3 ? "dark" : undefined}
@@ -220,7 +238,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
         <motion.div aria-hidden="true" style={{ opacity: veil }} className="absolute inset-0 z-[2] bg-[#030a0b]" />
 
         <motion.div style={{ opacity: inOpacity }} className="absolute inset-0 z-[3]">
-          <Interior c={c} light={inLight} scale={inScale} lamps={lamps} copy={inCopy} />
+          <Interior c={c} dark={inDark} scale={inScale} lamps={lamps} copy={inCopy} />
         </motion.div>
 
         <motion.div style={{ opacity: kOpacity }} className="absolute inset-0 z-[4] bg-[radial-gradient(90%_70%_at_80%_10%,#c4e9e7_0%,rgba(196,233,231,0)_60%),radial-gradient(70%_60%_at_0%_100%,#e2f4f3_0%,rgba(226,244,243,0)_60%),linear-gradient(180deg,#f3fbfb,#ffffff)]" />
@@ -240,12 +258,12 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
 
         <motion.p aria-hidden="true" style={{ opacity: hint }} className="pointer-events-none absolute inset-x-0 bottom-3 z-[7] hidden flex-col items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/80 lg:flex rtl:tracking-normal">
           {c.facade.hint}
-          <span className="block h-7 w-px overflow-hidden bg-white/25"><span className="block h-3 w-px animate-[hero-drip_1.6s_ease-in-out_infinite] bg-white" /></span>
+          <span className="block h-7 w-px overflow-hidden bg-white/25"><span className="block h-3 w-px animate-[hero-drip_1.6s_var(--ease-ambient)_infinite] bg-white" /></span>
         </motion.p>
       </div>
     </section>
     {/* on phones the ten-second price follows the walk-in */}
-    <div className="relative bg-white px-4 pb-12 pt-8 lg:hidden">
+    <div id="hero-quote" className="relative scroll-mt-20 bg-white px-4 pb-12 pt-8 lg:hidden">
       <QuoteCard lang={L} reduce={reduce} lane={lane} onLane={setLane} orders={orders} onOrders={setOrders} />
     </div>
     </>
@@ -262,20 +280,21 @@ function Scrim() {
 type C = (typeof heroCopy)["en"];
 
 function Facade({
-  c, staged, zoom, fx, skyX, bldX, bldY,
+  c, staged, idle, zoom, fx, skyX, bldX, bldY,
 }: {
-  c: C; staged: boolean; zoom?: MotionValue<number>; fx?: MotionValue<string>; skyX?: MotionValue<number>; bldX?: MotionValue<number>; bldY?: MotionValue<number>;
+  c: C; staged: boolean; idle?: boolean; zoom?: MotionValue<number>; fx?: MotionValue<string>; skyX?: MotionValue<number>; bldX?: MotionValue<number>; bldY?: MotionValue<number>;
 }) {
   const d = FACADE.door;
   return (
     <motion.div
       className="absolute"
+      data-idle={idle || undefined}
       style={{ ...cover(FACADE.ar, d.x, FACADE.anchorY), scale: zoom, filter: fx, transformOrigin: `${d.x * 100}% ${d.y * 100}%` }}
     >
-      <div className={`absolute inset-0 ${staged ? "motion-safe:animate-[hero-breathe_22s_ease-in-out_infinite_alternate]" : ""}`} style={{ transformOrigin: `${d.x * 100}% ${d.y * 100}%` }}>
+      <div className={`absolute inset-0 ${staged ? "motion-safe:animate-[hero-breathe_22s_var(--ease-ambient)_infinite_alternate]" : ""}`} style={{ transformOrigin: `${d.x * 100}% ${d.y * 100}%` }}>
         {/* the sky, on its own layer behind the roof */}
         <motion.div aria-hidden="true" className="absolute inset-x-0 top-0 h-[30.39%] scale-[1.06]" style={{ x: skyX }}>
-          <div className="absolute inset-0 motion-safe:animate-[hero-sky_46s_ease-in-out_infinite_alternate]">
+          <div className="absolute inset-0 motion-safe:animate-[hero-sky_46s_var(--ease-ambient)_infinite_alternate]">
             <Image src="/media/msg/facade-sky.jpg" alt="" fill sizes="100vw" className="object-cover object-top" />
           </div>
         </motion.div>
@@ -285,22 +304,22 @@ function Facade({
           <Image src="/media/msg/facade.jpg" alt={c.facade.alt} fill priority sizes="(max-aspect-ratio: 4/3) 134vh, 100vw" className="object-cover" />
           {/* light passing over the walls */}
           <div aria-hidden="true" className="absolute inset-0 overflow-hidden mix-blend-soft-light">
-            <div className="absolute inset-y-0 -left-1/2 w-1/2 bg-[linear-gradient(100deg,transparent_0%,rgba(255,244,214,0.75)_50%,transparent_100%)] motion-safe:animate-[hero-sweep_9s_ease-in-out_infinite]" />
+            <div className="absolute inset-y-0 -left-1/2 w-1/2 bg-[linear-gradient(100deg,transparent_0%,rgba(255,244,214,0.75)_50%,transparent_100%)] motion-safe:animate-[hero-sweep_9s_var(--ease-ambient)_infinite]" />
           </div>
           {/* the sign, lit */}
           <div aria-hidden="true" className="absolute" style={{ left: `${FACADE.sign.x * 100}%`, top: `${FACADE.sign.y * 100}%`, width: `${FACADE.sign.w * 100}%`, height: `${FACADE.sign.h * 100}%` }}>
-            <span className="absolute inset-[-40%_-12%] rounded-[40%] bg-[radial-gradient(closest-side,rgba(255,252,240,0.35),transparent)] mix-blend-screen motion-safe:animate-[hero-sign_4.5s_ease-in-out_infinite]" />
-            <Image src="/media/msg/sign-glow.png" alt="" fill sizes="20vw" className="object-fill opacity-90 mix-blend-screen blur-[3px] motion-safe:animate-[hero-sign_4.5s_ease-in-out_infinite]" />
+            <span className="absolute inset-[-40%_-12%] rounded-[40%] bg-[radial-gradient(closest-side,rgba(255,252,240,0.35),transparent)] mix-blend-screen motion-safe:animate-[hero-sign_4.5s_var(--ease-ambient)_infinite]" />
+            <Image src="/media/msg/sign-glow.png" alt="" fill sizes="20vw" className="object-fill opacity-90 mix-blend-screen blur-[3px] motion-safe:animate-[hero-sign_4.5s_var(--ease-ambient)_infinite]" />
             <Image src="/media/msg/sign-glow.png" alt="" fill sizes="20vw" className="object-fill opacity-40 mix-blend-screen" />
           </div>
           {/* a lamp glimmering inside the doorway */}
-          <span aria-hidden="true" className="absolute size-[3.4%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(255,255,240,0.6),rgba(255,255,240,0))] mix-blend-screen motion-safe:animate-[hero-lamp_3.2s_ease-in-out_infinite]" style={at(FACADE.lamp)} />
+          <span aria-hidden="true" className="absolute size-[3.4%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(255,255,240,0.6),rgba(255,255,240,0))] mix-blend-screen motion-safe:animate-[hero-lamp_3.2s_var(--ease-ambient)_infinite]" style={at(FACADE.lamp)} />
           {/* deliveries leaving the door */}
           <svg aria-hidden="true" viewBox="0 0 1448 1086" preserveAspectRatio="none" className="absolute inset-0 size-full">
             <defs>
               <radialGradient id="hero-threshold"><stop offset="0" stopColor="#4cc97a" stopOpacity="0.55" /><stop offset="1" stopColor="#4cc97a" stopOpacity="0" /></radialGradient>
             </defs>
-            <ellipse cx="630" cy="700" rx="240" ry="34" fill="url(#hero-threshold)" className="motion-safe:animate-[hero-lamp_3.2s_ease-in-out_infinite]" />
+            <ellipse cx="630" cy="700" rx="240" ry="34" fill="url(#hero-threshold)" className="motion-safe:animate-[hero-lamp_3.2s_var(--ease-ambient)_infinite]" />
             {ROUTES.map((d, i) => (
               <g key={i}>
                 <path d={d} fill="none" stroke="#4cc97a" strokeOpacity="0.25" strokeWidth="9" strokeLinecap="round" />
@@ -326,16 +345,17 @@ const ROUTES = [
 ];
 
 function Interior({
-  c, light, scale, lamps, copy,
+  c, dark, scale, lamps, copy,
 }: {
-  c: C; light?: MotionValue<string>; scale?: MotionValue<number>; lamps?: MotionValue<number>; copy?: MotionValue<number>;
+  c: C; dark?: MotionValue<number>; scale?: MotionValue<number>; lamps?: MotionValue<number>; copy?: MotionValue<number>;
 }) {
   return (
     <motion.div className="absolute inset-0 overflow-hidden" style={{ scale }}>
       {([["hidden landscape:block", INSIDE_WIDE], ["hidden portrait:block", INSIDE_TALL]] as const).map(([vis, v]) => (
         <div key={v.src} className={`absolute inset-0 ${vis}`}>
-          <motion.div className="absolute" style={{ ...cover(v.ar, 0.5, 0.5), filter: light }}>
+          <div className="absolute" style={cover(v.ar, 0.5, 0.5)}>
             <Image src={v.src} alt={c.inside.alt} fill sizes="(max-aspect-ratio: 4/3) 134vh, 100vw" className="object-cover" />
+            {dark ? <motion.div aria-hidden="true" className="absolute inset-0 bg-[#020607]" style={{ opacity: dark }} /> : null}
             {/* the overhead lights and the light they throw */}
             <motion.div aria-hidden="true" className="absolute inset-0 mix-blend-screen" style={{ opacity: lamps }}>
               {v.lamps.map((l, i) => (
@@ -351,14 +371,14 @@ function Interior({
                 // labels open toward the middle of the picture so they never run off its edge
                 <span key={k} className={`absolute flex -translate-y-1/2 items-center gap-2 ${v.spots[k].x > 0.55 ? "-translate-x-[calc(100%-10px)] flex-row-reverse" : "-translate-x-[10px]"}`} style={at(v.spots[k])} dir="ltr">
                   <span className="relative grid size-5 place-items-center">
-                    <span className="absolute inset-0 rounded-full bg-[#4cc97a]/50 motion-safe:animate-ping" />
-                    <span className="relative size-2.5 rounded-full bg-[#4cc97a] ring-2 ring-white" />
+                    <span className="absolute inset-0 rounded-full bg-brand-bright/50 motion-safe:animate-ping" />
+                    <span className="relative size-2.5 rounded-full bg-brand-bright ring-2 ring-white" />
                   </span>
                   <span dir="auto" className="whitespace-nowrap rounded-full bg-black/55 px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/20 backdrop-blur">{c.inside.spots[k]}</span>
                 </span>
               ))}
             </motion.div>
-          </motion.div>
+          </div>
         </div>
       ))}
     </motion.div>
@@ -370,7 +390,7 @@ function Kingdom({ c, lang, lane, go, map, reduce }: { c: C; lang: Locale; lane:
     <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 text-teal-deep sm:px-5 lg:grid-cols-[0.9fr_1.1fr] lg:gap-10 lg:px-8">
       <div className="order-2 lg:order-1">
         <p className="text-sm font-semibold text-teal">{c.kingdom.eyebrow}</p>
-        <h2 className="mt-2 font-display text-[clamp(2rem,4vw,3.4rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-balance rtl:leading-[1.3] rtl:tracking-normal">{c.kingdom.title}</h2>
+        <h2 className="h-scene mt-2">{c.kingdom.title}</h2>
         <p className="mt-3 max-w-lg text-teal-deep/80 text-pretty sm:text-lg">{c.kingdom.lead}</p>
         <dl className="mt-6 grid max-w-md grid-cols-3 divide-x divide-teal/15 rtl:divide-x-reverse">
           {c.stats.map((s, i) => (

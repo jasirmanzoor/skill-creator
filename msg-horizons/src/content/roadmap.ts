@@ -39,7 +39,6 @@ export const ROADMAP_STEPS: { id: string; visual: StageId }[] = [
 type Copy = {
   eyebrow: string;
   title: string;
-  theme: string[];
   rolls: string[];
   gate: {
     hook: string;
@@ -89,7 +88,6 @@ export const roadmapCopy: Record<Locale, Copy> = {
   en: {
     eyebrow: "The MSG roadmap",
     title: "Our effortless service, mapped out for you.",
-    theme: ["Navigate the unseen.", "Animate your reach.", "Experience VFX logistics."],
     rolls: ["Need to scale online?", "Launch your homemade creations nationwide.", "From your door to the Kingdom—seamlessly handled."],
     gate: {
       hook: "Delivering across KSA? We bridge the distance.",
@@ -151,7 +149,6 @@ export const roadmapCopy: Record<Locale, Copy> = {
   ar: {
     eyebrow: "خارطة MSG",
     title: "خدمة سلسة، مرسومة لك خطوة بخطوة.",
-    theme: ["استكشف ما لا يُرى.", "وسّع وصولك.", "لوجستيات بتجربة بصرية."],
     rolls: ["تريد التوسع أونلاين؟", "أوصل منتجاتك المنزلية إلى كل المملكة.", "من بابك إلى المملكة، بسلاسة تامة."],
     gate: {
       hook: "توصّل في أنحاء المملكة؟ نحن نختصر المسافة.",

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { motion, useScroll, useSpring, useTransform } from "motion/react";
+import { MotionConfig, motion, useScroll, useSpring, useTransform } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import type { Dictionary, Locale } from "@/content/i18n";
 import { pitchCopy } from "@/content/pitch";
@@ -54,26 +54,28 @@ export default function Pitch({ t, lang }: { t: Dictionary; lang: Locale }) {
       ref={sec}
       data-theme="dark"
       aria-labelledby="why-title"
-      className="on-dark relative isolate scroll-mt-16 overflow-hidden bg-[#061c20] py-20 text-white lg:py-28"
+      className="on-dark relative isolate scroll-mt-16 overflow-hidden bg-pitch sec text-white"
     >
       {/* MSG's own hub, a layer behind the pitch */}
       <motion.div aria-hidden="true" className="absolute inset-0 -z-10" style={reduce ? undefined : { scale: photoScale, y: photoY }}>
+        {/* the hub in colour, and a grey copy over it that fades away once MSG takes over */}
+        <Image src="/media/msg/facade.jpg" alt="" fill sizes="100vw" className="object-cover opacity-45 [filter:saturate(1.1)_brightness(0.9)]" />
         <Image
           src="/media/msg/facade.jpg"
           alt=""
           fill
           sizes="100vw"
-          className={`object-cover transition-[filter,opacity] duration-[1400ms] ease-out ${msg ? "opacity-45 [filter:saturate(1.1)_brightness(0.9)]" : "opacity-25 [filter:grayscale(1)_brightness(0.55)]"}`}
+          className={`object-cover transition-opacity duration-[1200ms] ease-out [filter:grayscale(1)_brightness(0.4)] ${msg ? "opacity-0" : "opacity-100"}`}
         />
       </motion.div>
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,#061c20_0%,rgba(6,28,32,0.82)_30%,rgba(6,28,32,0.9)_70%,#061c20_100%)]" />
-      <div aria-hidden="true" className={`absolute inset-0 -z-10 transition-opacity duration-[1400ms] ${msg ? "opacity-100" : "opacity-0"} bg-[radial-gradient(60%_50%_at_75%_30%,rgba(76,201,122,0.18),transparent_70%)]`} />
+      <div aria-hidden="true" className={`absolute inset-0 -z-10 transition-opacity duration-[1200ms] ease-out ${msg ? "opacity-100" : "opacity-0"} bg-[radial-gradient(60%_50%_at_75%_30%,rgba(76,201,122,0.18),transparent_70%)]`} />
 
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:items-end">
           <div>
             <span className="label">{c.eyebrow}</span>
-            <h2 id="why-title" className="mt-3 font-display text-[clamp(2rem,4.4vw,3.6rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-balance rtl:leading-[1.3] rtl:tracking-normal">
+            <h2 id="why-title" className="h-scene mt-3">
               {c.title}
             </h2>
           </div>
@@ -84,7 +86,7 @@ export default function Pitch({ t, lang }: { t: Dictionary; lang: Locale }) {
         <div role="radiogroup" aria-label={c.toggleLabel} className="relative mt-10 inline-grid grid-cols-2 rounded-full bg-white/10 p-1.5 ring-1 ring-white/15 backdrop-blur">
           <span
             aria-hidden="true"
-            className={`absolute inset-y-1.5 w-[calc(50%-0.375rem)] rounded-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${msg ? "start-1/2 bg-[#4cc97a]" : "start-1.5 bg-white/85"}`}
+            className={`absolute inset-y-1.5 start-1.5 w-[calc(50%-0.375rem)] rounded-full transition-ui duration-[240ms] ease-in-out ${msg ? "translate-x-full bg-brand-bright rtl:-translate-x-full" : "bg-white/85"}`}
           />
           {c.toggle.map((label, i) => {
             const on = (i === 1) === msg;
@@ -95,7 +97,7 @@ export default function Pitch({ t, lang }: { t: Dictionary; lang: Locale }) {
                 role="radio"
                 aria-checked={on}
                 onClick={() => choose(i === 1)}
-                className={`relative rounded-full px-5 py-2.5 text-sm font-bold transition-colors duration-300 sm:px-7 sm:text-base ${on ? "text-[#061c20]" : "text-white/75 hover:text-white"}`}
+                className={`relative min-h-11 rounded-full px-5 py-2.5 text-sm font-bold transition-colors sm:px-7 sm:text-base ${on ? "text-pitch" : "text-white/75 hover:text-white"}`}
               >
                 {label}
               </button>
@@ -103,44 +105,57 @@ export default function Pitch({ t, lang }: { t: Dictionary; lang: Locale }) {
           })}
         </div>
 
+        <MotionConfig reducedMotion="user">
         <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3" aria-live="polite">
-          {c.rows.map((r, i) => (
+          {c.rows.map((r, i) => {
+            const d = reduce ? 0 : i * 60; // the six answers land one after another
+            return (
             <li
               key={r.pain}
-              className={`relative overflow-hidden rounded-2xl p-5 ring-1 backdrop-blur-md transition-[background-color,box-shadow] duration-700 ${msg ? "bg-[#0b3a26]/70 ring-[#4cc97a]/40 shadow-[0_20px_50px_-30px_rgba(76,201,122,0.6)]" : "bg-white/[0.05] ring-white/10"}`}
-              style={{ transitionDelay: reduce ? undefined : `${i * 90}ms` }}
+              className={`relative overflow-hidden rounded-2xl p-5 ring-1 backdrop-blur-md transition-[background-color,box-shadow] duration-500 ${msg ? "bg-[#0b3a26]/70 ring-brand-bright/40 shadow-[0_20px_50px_-30px_rgba(76,201,122,0.6)]" : "bg-white/[0.05] ring-white/10"}`}
+              style={{ transitionDelay: `${d}ms` }}
             >
-              <div className="flex items-start gap-4">
+              <div className="flex items-center gap-4">
                 <span
                   aria-hidden="true"
-                  className={`grid size-10 shrink-0 place-items-center rounded-full transition-all duration-500 ${msg ? "scale-100 bg-[#4cc97a] text-[#061c20]" : "bg-[#e5735c]/20 text-[#ffb3a3] ring-1 ring-[#e5735c]/40"}`}
-                  style={{ transitionDelay: reduce ? undefined : `${i * 90 + 150}ms` }}
+                  className={`grid size-10 shrink-0 place-items-center rounded-full transition-colors duration-300 ${msg ? "bg-brand-bright text-pitch" : "bg-[#e5735c]/20 text-[#ffb3a3] ring-1 ring-[#e5735c]/40"}`}
+                  style={{ transitionDelay: `${d}ms` }}
                 >
                   {msg ? <CheckIcon className="size-5" /> : <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M7 7l10 10M17 7 7 17" /></svg>}
                 </span>
-                <div className="min-w-0">
-                  {/* the problem: crossed out once MSG takes it */}
-                  <p className={`relative inline font-semibold transition-all duration-500 ${msg ? "text-sm text-white/55" : "text-lg text-white"}`}>
-                    {r.pain}
-                    <span
-                      aria-hidden="true"
-                      className={`absolute inset-x-0 top-1/2 h-0.5 origin-left bg-[#4cc97a] transition-transform duration-500 rtl:origin-right ${msg ? "scale-x-100" : "scale-x-0"}`}
-                      style={{ transitionDelay: reduce ? undefined : `${i * 90 + 100}ms` }}
-                    />
-                  </p>
-                  <p
-                    className={`grid transition-[grid-template-rows,opacity] duration-500 ${msg ? "mt-1.5 grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
-                    style={{ transitionDelay: reduce ? undefined : `${i * 90 + 220}ms` }}
-                  >
-                    <span className="overflow-hidden font-display text-lg font-semibold leading-snug text-white">{r.fix}</span>
-                  </p>
+                <div className="grid min-w-0 flex-1">
+                  {/* holds the height of both lines, so no card changes size when the answer appears */}
+                  <div aria-hidden="true" className="invisible col-start-1 row-start-1">
+                    <p className="font-semibold">{r.pain}</p>
+                    <p className="mt-1.5 font-display text-lg font-semibold leading-snug">{r.fix}</p>
+                  </div>
+                  <div className={`relative col-start-1 row-start-1 flex flex-col ${msg ? "justify-start" : "justify-center"}`}>
+                    {/* the problem: steps up and is crossed out once MSG takes it */}
+                    <motion.p
+                      layout="position"
+                      transition={{ type: "spring", duration: 0.45, bounce: 0, delay: d / 1000 }}
+                      className={`self-start font-semibold line-through decoration-2 transition-colors duration-300 ${msg ? "text-white/60 decoration-brand-bright" : "text-white decoration-transparent"}`}
+                      style={{ transitionDelay: `${d}ms` }}
+                    >
+                      {r.pain}
+                    </motion.p>
+                    <p
+                      aria-hidden={!msg}
+                      className={`font-display text-lg font-semibold leading-snug text-white transition-opacity duration-300 ${msg ? "mt-1.5 opacity-100" : "absolute inset-x-0 bottom-0 opacity-0"}`}
+                      style={{ transitionDelay: msg ? `${d + 120}ms` : "0ms" }}
+                    >
+                      {r.fix}
+                    </p>
+                  </div>
                 </div>
               </div>
             </li>
-          ))}
+            );
+          })}
         </ul>
+        </MotionConfig>
 
-        <div className={`mt-10 flex flex-col gap-6 rounded-3xl p-6 ring-1 transition-all duration-700 sm:p-8 lg:flex-row lg:items-center lg:justify-between ${msg ? "bg-white text-teal-deep ring-white" : "bg-white/[0.06] text-white ring-white/10"}`}>
+        <div className={`mt-10 flex flex-col gap-6 rounded-3xl p-6 ring-1 transition-colors duration-500 sm:p-8 lg:flex-row lg:items-center lg:justify-between ${msg ? "bg-white text-teal-deep ring-white" : "bg-white/[0.06] text-white ring-white/10"}`}>
           <div>
             <p className="font-display text-2xl font-semibold leading-tight tracking-[-0.02em] sm:text-3xl rtl:tracking-normal">{c.close}</p>
             <p className={`mt-2 ${msg ? "text-teal-deep/75" : "text-white/70"}`}>{c.closeLead}</p>

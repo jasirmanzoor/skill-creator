@@ -11,11 +11,11 @@ export default function Contact({ t, lang }: { t: Dictionary; lang: Locale }) {
   const ch = c.channels;
   const row = "flex items-center gap-4 border-b border-white/15 py-4 transition-colors";
   return (
-    <section id="contact" data-theme="dark" aria-labelledby="contact-title" className="on-dark scroll-mt-16 bg-[#07090f]/80 py-28 text-white backdrop-blur-[2px] lg:py-40">
+    <section id="contact" data-theme="dark" aria-labelledby="contact-title" className="on-dark scroll-mt-16 bg-night/80 sec-finale text-white backdrop-blur-[2px]">
       <div className="mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-[1fr_1.15fr] lg:px-8">
         <Reveal>
           <span className="label">{c.eyebrow}</span>
-          <h2 id="contact-title" className="mt-4 font-display text-5xl font-semibold tracking-[-0.03em] text-balance sm:text-6xl rtl:tracking-normal">
+          <h2 id="contact-title" className="h-display mt-4">
             {c.title}
           </h2>
           <p className="mt-6 max-w-md text-lg text-white/75">{c.lead}</p>

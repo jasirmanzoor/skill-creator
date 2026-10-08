@@ -634,7 +634,7 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
               role="radio"
               aria-checked={on}
               onClick={() => { setPicked(m); setPlaying(true); }}
-              className={`flex shrink-0 snap-start items-start gap-3 text-start ring-1 transition-all ${compact ? "items-center gap-2 rounded-full py-1.5 pe-3.5 ps-1.5" : "min-w-[220px] rounded-2xl p-3 sm:min-w-0"} ${on ? "bg-teal-deep text-white shadow-[0_16px_30px_-18px_rgba(11,58,64,0.8)] ring-teal-deep" : "bg-white ring-teal/15 hover:ring-teal/40"}`}
+              className={`flex shrink-0 snap-start items-start gap-3 text-start ring-1 transition-ui ${compact ? "items-center gap-2 rounded-full py-1.5 pe-3.5 ps-1.5" : "min-w-[220px] rounded-2xl p-3 sm:min-w-0"} ${on ? "bg-teal-deep text-white shadow-[0_16px_30px_-18px_rgba(11,58,64,0.8)] ring-teal-deep" : "bg-white ring-teal/15 hover:ring-teal/40"}`}
             >
               <span className={`grid shrink-0 place-items-center ${compact ? "size-7 rounded-full" : "size-9 rounded-xl"} ${on ? "bg-white/15" : "bg-sea-50 text-teal"}`}>
                 <ModelIcon m={m} />
@@ -697,16 +697,16 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
           <Legend c={c} className="absolute end-4 top-4 hidden sm:block" />
           {beat ? (
             <div className="absolute bottom-4 start-4 hidden w-[min(24rem,60%)] overflow-hidden rounded-2xl bg-white/95 px-3.5 pb-3 pt-2.5 shadow-[0_12px_30px_-16px_rgba(11,58,64,0.6)] ring-1 ring-teal/10 backdrop-blur sm:block sm:px-4 sm:pt-3">
-              <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#0b7d36] rtl:tracking-normal">
+              <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand rtl:tracking-normal">
                 <span className="relative inline-flex size-2">
-                  <span className="plan-ping absolute inset-0 rounded-full bg-[#0b7d36]" />
-                  <span className="relative size-2 rounded-full bg-[#0b7d36]" />
+                  <span className="plan-ping absolute inset-0 rounded-full bg-brand" />
+                  <span className="relative size-2 rounded-full bg-brand" />
                 </span>
                 <span className="num" dir="ltr">{active + 1}/{plan.beats.length}</span> · {c.who[beat.who]}
               </p>
               <p className="mt-0.5 font-display text-sm font-semibold leading-snug sm:text-base" aria-live="polite">{fmt(beat)}</p>
               <span aria-hidden="true" className="mt-2.5 block h-1 overflow-hidden rounded-full bg-teal/15">
-                <span ref={progBar} className="block h-full origin-left rounded-full bg-[#0b7d36] rtl:origin-right" style={{ transform: "scaleX(0)" }} />
+                <span ref={progBar} className="block h-full origin-left rounded-full bg-brand rtl:origin-right" style={{ transform: "scaleX(0)" }} />
               </span>
             </div>
           ) : null}
@@ -766,7 +766,7 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
               <dd className="mt-1 flex flex-wrap gap-1.5">
                 {vehicles.map((v) => (
                   <span key={v} className="inline-flex items-center gap-1.5 rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold ring-1 ring-teal/10">
-                    <span className={`size-2 rounded-full ${v === "truck" ? "bg-teal-deep" : v === "van" ? "bg-[#0b7d36]" : "bg-teal"}`} />
+                    <span className={`size-2 rounded-full ${v === "truck" ? "bg-teal-deep" : v === "van" ? "bg-brand" : "bg-teal"}`} />
                     {c.kinds[v]}
                   </span>
                 ))}
@@ -790,7 +790,7 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
                   type="button"
                   onClick={() => jump(i)}
                   aria-current={now ? "step" : undefined}
-                  className={`flex h-full w-[170px] flex-col gap-1 rounded-xl p-2 text-start ring-1 transition-all duration-300 ${now ? "bg-teal-deep text-white ring-teal-deep" : done ? "bg-sea-50 ring-teal/20" : "bg-white ring-teal/10 hover:ring-teal/30"}`}
+                  className={`flex h-full w-[170px] flex-col gap-1 rounded-xl p-2 text-start ring-1 transition-ui duration-300 ${now ? "bg-teal-deep text-white ring-teal-deep" : done ? "bg-sea-50 ring-teal/20" : "bg-white ring-teal/10 hover:ring-teal/30"}`}
                 >
                   <span className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] rtl:tracking-normal">
                     <span className={`grid size-4 place-items-center rounded-full text-[9px] text-white ${now ? "bg-white/25" : tone}`}>
@@ -866,7 +866,7 @@ function Toggle({ on, onClick, label, hint, dot, disabled = false }: { on: boole
         </span>
       </span>
       <span className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${on ? "bg-teal" : "bg-teal-deep/20"}`}>
-        <span className={`absolute top-0.5 size-4 rounded-full bg-white shadow transition-all ${on ? "start-[18px]" : "start-0.5"}`} />
+        <span className={`absolute start-0.5 top-0.5 size-4 rounded-full bg-white shadow transition-transform ${on ? "translate-x-4 rtl:-translate-x-4" : ""}`} />
       </span>
     </button>
   );

@@ -71,7 +71,7 @@ export default function PlanCard({
           <ul className="mt-4 space-y-3">
             {plan.modules.map((m, k) => (
               <motion.li key={m.id} {...stagger(k)} className="flex items-center gap-3">
-                <span className={`inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${m.core ? "bg-[#0b7d36] text-white" : "bg-white text-teal"}`}><ServiceIcon id={m.id} className="size-4" /></span>
+                <span className={`inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${m.core ? "bg-brand text-white" : "bg-white text-teal"}`}><ServiceIcon id={m.id} className="size-4" /></span>
                 <span className="text-sm text-teal-deep/95">{t.planner.services[m.id].name}</span>
               </motion.li>
             ))}
@@ -83,7 +83,7 @@ export default function PlanCard({
           <ul className="mt-4 space-y-3">
             {coveredCopy[lang].musts.map((m, k) => (
               <motion.li key={m.id} {...stagger(k)} className="flex items-center gap-3">
-                <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#0b7d36] text-white"><CoverIcon id={m.id} className="size-4" /></span>
+                <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand text-white"><CoverIcon id={m.id} className="size-4" /></span>
                 <span className="text-sm text-teal-deep/95">{m.t}</span>
               </motion.li>
             ))}
@@ -108,7 +108,7 @@ export default function PlanCard({
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => { track("whatsapp_click", { location: "roadmap_plan" }); track("plan_share", { channel: "whatsapp" }); }}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#128c4a] px-4 py-3 font-semibold text-white hover:bg-[#0f7a40]"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-whatsapp px-4 py-3 font-semibold text-white hover:bg-[#0f7a40]"
             >
               <WhatsAppIcon className="size-5" /> {c.whatsapp}
             </a>

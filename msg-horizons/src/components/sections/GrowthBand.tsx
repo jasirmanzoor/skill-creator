@@ -48,10 +48,10 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
   const wa = whatsappLink(c.wa.replace("{n}", String(n)).replace("{lane}", c.lanes[lane]));
 
   return (
-    <section id="growth" aria-labelledby="growth-title" className="sea-band relative scroll-mt-16 overflow-hidden py-20 lg:py-28">
+    <section id="growth" aria-labelledby="growth-title" className="sea-band relative scroll-mt-16 sec overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-5 lg:px-8">
         <span className="label">{c.eyebrow}</span>
-        <h2 id="growth-title" className="mt-3 font-display text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-balance sm:text-6xl rtl:leading-[1.3] rtl:tracking-normal">
+        <h2 id="growth-title" className="h-display mt-3">
           <span className="block">{c.title[0]}</span>
           <span className="block">{c.title[1]}</span>
           <span className="block text-teal">{c.title[2]}</span>
@@ -224,13 +224,13 @@ function RadiusRings({ label, reduce }: { label: string; reduce: boolean }) {
     <div className="relative mx-auto grid size-44 shrink-0 place-items-center" aria-hidden="true">
       {[1, 0.72, 0.44].map((k, i) => (
         <span key={k} className="absolute rounded-full border border-teal/25 bg-teal/[0.04]" style={{ width: `${k * 100}%`, height: `${k * 100}%` }}>
-          {!reduce && i === 0 ? <span className="absolute inset-0 rounded-full border-2 border-[#4cc97a]/60 motion-safe:animate-ping [animation-duration:2.8s]" /> : null}
+          {!reduce && i === 0 ? <span className="absolute inset-0 rounded-full border-2 border-brand-bright/60 motion-safe:animate-ping [animation-duration:2.8s]" /> : null}
         </span>
       ))}
       <span className="relative grid size-10 place-items-center rounded-full bg-teal-deep text-white shadow-lg">
         <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 10h16l-1.5-5h-13zM5 10v9h14v-9M10 19v-5h4v5" /></svg>
       </span>
-      <span className="absolute -bottom-3 rounded-full bg-[#0b7d36] px-3 py-1 text-xs font-bold text-white">{label}</span>
+      <span className="absolute -bottom-3 rounded-full bg-brand px-3 py-1 text-xs font-bold text-white">{label}</span>
     </div>
   );
 }

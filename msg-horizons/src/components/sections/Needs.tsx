@@ -58,12 +58,12 @@ export default function Needs({ lang }: { lang: Locale }) {
 
   let n = 0;
   return (
-    <section id="sellers" aria-labelledby="needs-title" className="sea-band relative scroll-mt-16 py-24 lg:py-28">
+    <section id="sellers" aria-labelledby="needs-title" className="sea-band relative sec scroll-mt-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-5 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-2 lg:items-end">
           <div>
             <span className="label">{c.eyebrow}</span>
-            <h2 id="needs-title" className="mt-4 font-display text-4xl font-semibold tracking-[-0.03em] text-teal-deep text-balance sm:text-5xl rtl:tracking-normal">
+            <h2 id="needs-title" className="h-section mt-4 text-teal-deep">
               {c.title}
             </h2>
           </div>
@@ -107,8 +107,8 @@ export default function Needs({ lang }: { lang: Locale }) {
                       strength={1.6}
                       className={`absolute inset-0 transition-transform duration-[1400ms] ease-out ${on ? "scale-100" : "scale-110"}`}
                     />
-                    <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#0b3a40]/55 via-transparent to-transparent" />
-                    <div className={`absolute inset-x-4 bottom-4 transition-all delay-200 duration-700 sm:inset-x-6 sm:bottom-6 ${on ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}>
+                    <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-teal-deep/55 via-transparent to-transparent" />
+                    <div className={`absolute inset-x-4 bottom-4 transition-ui delay-200 duration-700 sm:inset-x-6 sm:bottom-6 ${on ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}>
                       <StageCard stage={st} c={c} guide={guide} />
                     </div>
                   </div>
@@ -134,15 +134,15 @@ export default function Needs({ lang }: { lang: Locale }) {
                 {NEED_STAGES.map((st, i) => (
                   <li key={st} className="flex justify-center">
                     <button type="button" onClick={() => goTo(i)} aria-current={i === active ? "step" : undefined} className="group flex flex-col items-center gap-2">
-                      <span className={`grid size-8 place-items-center rounded-full text-xs font-semibold transition-colors duration-500 ${i <= active ? "bg-teal text-white" : "bg-white text-teal-deep/60 ring-1 ring-teal/20"}`}>
+                      <span className={`grid size-8 place-items-center rounded-full text-xs font-semibold transition-colors duration-500 ${i <= active ? "bg-teal text-white" : "bg-white text-teal-deep/75 ring-1 ring-teal/20"}`}>
                         <span className="num" dir="ltr">0{i + 1}</span>
                       </span>
-                      <span className={`text-sm font-semibold transition-colors ${i === active ? "text-teal-deep" : "text-teal-deep/60 group-hover:text-teal-deep"}`}>{c.stages[st].t}</span>
+                      <span className={`text-sm font-semibold transition-colors ${i === active ? "text-teal-deep" : "text-teal-deep/75 group-hover:text-teal-deep"}`}>{c.stages[st].t}</span>
                     </button>
                   </li>
                 ))}
               </ol>
-              <p className="mt-3 text-center text-xs text-teal-deep/60">{c.scroll}</p>
+              <p className="mt-3 text-center text-xs text-teal-deep/75">{c.scroll}</p>
             </div>
           ) : null}
         </div>
@@ -240,7 +240,7 @@ function StageCard({ stage, c, guide }: { stage: NeedStage; c: NeedsCopy; guide:
 function NeedRow({ id, q, a, owner, i, k, on }: { id: NeedId; q: string; a: string; owner: string; i: number; k: number; on: boolean }) {
   return (
     <li
-      className={`need-card flex items-start gap-4 py-4 transition-all duration-700 ${on ? "" : "lg:translate-y-3"}`}
+      className={`need-card flex items-start gap-4 py-4 transition-ui duration-700 ${on ? "" : "lg:translate-y-3"}`}
       style={{ ["--d" as string]: `${i * 60}ms`, transitionDelay: on ? `${150 + k * 110}ms` : "0ms" }}
     >
       <span className="need-icon inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-teal to-teal-deep text-white shadow-[0_10px_20px_-10px_rgba(11,58,64,0.8)] [&_svg]:size-7">

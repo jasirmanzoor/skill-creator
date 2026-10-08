@@ -26,11 +26,11 @@ export default function DriverPhone({
 
         <div className="flex items-center justify-between px-4 pb-3 pt-10">
           <span className="flex items-center gap-2">
-            <span className="grid size-7 place-items-center rounded-lg bg-[#0b7d36] text-[9px] font-extrabold tracking-tight text-white" aria-hidden="true">MSG</span>
+            <span className="grid size-7 place-items-center rounded-lg bg-brand text-[9px] font-extrabold tracking-tight text-white" aria-hidden="true">MSG</span>
             <span className="font-display text-[14px] font-semibold text-teal-deep">{d.app}</span>
           </span>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-2 py-1 text-[11px] font-semibold text-teal-deep ring-1 ring-line">
-            <span className="size-1.5 rounded-full bg-[#0b7d36]" aria-hidden="true" />
+            <span className="size-1.5 rounded-full bg-brand" aria-hidden="true" />
             {d.online}
           </span>
         </div>
@@ -47,8 +47,8 @@ export default function DriverPhone({
             >
               <div className="mx-4 rounded-2xl bg-white p-3.5 shadow-[0_10px_30px_-18px_rgba(11,58,64,0.45)] ring-1 ring-line">
                 <p className="flex items-center gap-2.5 text-[14px] font-semibold">
-                  <span className="relative grid size-8 place-items-center rounded-full bg-[#e8f5ec] text-[#0b7d36]">
-                    <span className="absolute inset-0 animate-ping rounded-full bg-[#0b7d36]/30 motion-reduce:hidden" aria-hidden="true" />
+                  <span className="relative grid size-8 place-items-center rounded-full bg-[#e8f5ec] text-brand">
+                    <span className="absolute inset-0 animate-ping rounded-full bg-brand/30 motion-reduce:hidden" aria-hidden="true" />
                     <BellGlyph className="relative size-4" />
                   </span>
                   {d.request}
@@ -63,7 +63,7 @@ export default function DriverPhone({
                     </span>
                   </li>
                   <li className="flex gap-3">
-                    <span className="mt-1 size-2.5 shrink-0 rounded-full bg-[#0b7d36]" aria-hidden="true" />
+                    <span className="mt-1 size-2.5 shrink-0 rounded-full bg-brand" aria-hidden="true" />
                     <span>
                       <span className="block text-[11px] text-muted">{d.drop}</span>
                       <span className="block text-[13px] font-semibold">{d.dropPlace}</span>
@@ -73,11 +73,11 @@ export default function DriverPhone({
               </div>
               <p className="mx-5 mt-3.5 text-[12px] leading-snug text-muted">{d.consent}</p>
               <div className="relative mx-4 mb-4 mt-auto">
-                <span aria-hidden="true" className="absolute inset-0 animate-ping rounded-2xl bg-[#0b7d36]/35 motion-reduce:hidden" />
+                <span aria-hidden="true" className="absolute inset-0 animate-ping rounded-2xl bg-brand/35 motion-reduce:hidden" />
                 <button
                   type="button"
                   onClick={onApprove}
-                  className="relative w-full rounded-2xl bg-[#0b7d36] py-3.5 text-[15px] font-semibold text-white shadow-[0_14px_28px_-14px_rgba(11,125,54,0.9)] transition-transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
+                  className="relative w-full rounded-2xl bg-brand py-3.5 text-[15px] font-semibold text-white shadow-[0_14px_28px_-14px_rgba(11,125,54,0.9)] transition-transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
                 >
                   {d.approve}
                 </button>
@@ -92,7 +92,7 @@ export default function DriverPhone({
               exit={reduce ? { opacity: 0 } : { opacity: 0, y: -14 }}
               transition={swap}
             >
-              <div className="mx-4 rounded-2xl bg-gradient-to-br from-[#0b7d36] to-[#075f29] p-4 text-white shadow-[0_18px_36px_-20px_rgba(11,125,54,0.9)]">
+              <div className="mx-4 rounded-2xl bg-gradient-to-br from-brand to-[#075f29] p-4 text-white shadow-[0_18px_36px_-20px_rgba(11,125,54,0.9)]">
                 <span className="relative grid size-12 place-items-center rounded-full bg-white/15">
                   <span className="plan-ping absolute inset-0 rounded-full bg-white/35 motion-reduce:hidden" aria-hidden="true" />
                   <LocateGlyph className="relative size-6" />
@@ -106,7 +106,7 @@ export default function DriverPhone({
                   {d.viewers.map((v) => (
                     <li key={v} className="flex items-center justify-between text-[13px] font-semibold">
                       {v}
-                      <span className="size-2 rounded-full bg-[#0b7d36]" aria-hidden="true" />
+                      <span className="size-2 rounded-full bg-brand" aria-hidden="true" />
                     </li>
                   ))}
                 </ul>
