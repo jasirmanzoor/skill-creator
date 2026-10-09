@@ -94,6 +94,27 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
     setBeat((x) => (x === b ? x : b));
   });
 
+  // the opening (see "Hero opening" in globals.css) yields to the first scroll, touch or key press
+  useEffect(() => {
+    const el = section.current;
+    if (!el || !staged || el.dataset.intro === "skip") return;
+    const skip = () => { el.dataset.intro = "skip"; off(); };
+    const onScroll = () => { if (window.scrollY > 24) skip(); };
+    const off = () => {
+      window.removeEventListener("wheel", skip);
+      window.removeEventListener("touchmove", skip);
+      window.removeEventListener("keydown", skip);
+      window.removeEventListener("scroll", onScroll);
+      window.clearTimeout(done);
+    };
+    const done = window.setTimeout(skip, 4200); // it has finished: later re-renders must never replay it
+    window.addEventListener("wheel", skip, { passive: true });
+    window.addEventListener("touchmove", skip, { passive: true });
+    window.addEventListener("keydown", skip);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return off;
+  }, [staged]);
+
   // the header picks its colours from the section under it; tell it when the scene changes
   useEffect(() => { window.dispatchEvent(new Event("scroll")); }, [beat]);
 
@@ -156,20 +177,20 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   const promise = (
     <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-4 pb-10 text-white sm:px-5 lg:px-8 lg:pb-14">
       <div>
-        <p className="inline-flex items-center gap-2 rounded-full bg-black/35 px-3 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20 backdrop-blur">
+        <p className="hi hi-fade inline-flex items-center gap-2 rounded-full bg-black/35 px-3 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20 backdrop-blur" style={{ ["--hi" as string]: "1.0s" }}>
           <span className="relative flex size-2"><span className="absolute inset-0 animate-ping rounded-full bg-brand-bright/70 motion-reduce:hidden" /><span className="relative size-2 rounded-full bg-brand-bright" /></span>
           {c.live}
         </p>
         <h1 id="hero-title" className="mt-4 font-display text-[clamp(2.3rem,4.6vw,3.9rem)] font-semibold leading-[1.02] tracking-[-0.03em] [word-spacing:0.06em] text-balance [text-shadow:0_2px_30px_rgba(0,0,0,0.45)] rtl:[word-spacing:normal] rtl:leading-[1.25] rtl:tracking-normal">
-          <span className="block lg:whitespace-nowrap">{c.title[0]}</span>
-          <span className="block text-brand-mint lg:whitespace-nowrap">{c.title[1]}</span>
+          <span className="-mb-[0.16em] block overflow-hidden pb-[0.16em] lg:whitespace-nowrap"><span className="hi hi-line block" style={{ ["--hi" as string]: "1.25s" }}>{c.title[0]}</span></span>
+          <span className="-mb-[0.16em] block overflow-hidden pb-[0.16em] text-brand-mint lg:whitespace-nowrap"><span className="hi hi-line block" style={{ ["--hi" as string]: "1.4s" }}>{c.title[1]}</span></span>
         </h1>
       </div>
       <div className="lg:mt-2 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-end lg:gap-10">
       <div>
-        <p className="mt-4 max-w-xl text-base leading-relaxed text-white/85 text-pretty sm:text-lg">{c.lead}</p>
+        <p className="hi hi-rise mt-4 max-w-xl text-base leading-relaxed text-white/85 text-pretty sm:text-lg" style={{ ["--hi" as string]: "1.8s" }}>{c.lead}</p>
         {/* phones: the price is on the first screen; the full card waits below the walk-in */}
-        <aside data-rate-card aria-label={c.quote.title} className="mt-4 lg:hidden">
+        <aside data-rate-card aria-label={c.quote.title} className="hi hi-rise mt-4 lg:hidden" style={{ ["--hi" as string]: "1.95s" }}>
           <a href="#hero-quote" className="inline-flex max-w-full flex-wrap items-baseline gap-x-2 gap-y-0.5 rounded-2xl bg-white/95 px-4 py-2.5 text-sm text-teal-deep shadow-[var(--shadow-float)]">
             <span className="text-teal-deep/75">{c.quote.perOrder}</span>
             <span className="num font-display text-lg font-semibold" dir="ltr">≈ {c.quote.cur} {rateFor(RATE_LANE[lane], orders)}</span>
@@ -179,7 +200,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
             </span>
           </a>
         </aside>
-        <div className="mt-6 flex flex-wrap items-center gap-3">
+        <div className="hi hi-rise mt-6 flex flex-wrap items-center gap-3" style={{ ["--hi" as string]: "2.05s" }}>
           <TrackedLink href="#planner" event="cta_click" props={{ cta: "plan", location: "hero" }} className="btn-primary on-dark group px-6 py-3.5">
             {c.ctaPlan} <ArrowIcon className="size-4 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
           </TrackedLink>
@@ -188,9 +209,9 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
             <WhatsAppIcon className="size-5 text-brand-bright" /> {c.ctaTalk}
           </TrackedLink>
         </div>
-        <p className="mt-5 text-xs text-white/70 max-lg:pe-16">{c.facade.caption}</p>
+        <p className="hi hi-fade mt-5 text-xs text-white/70 max-lg:pe-16" style={{ ["--hi" as string]: "2.4s" }}>{c.facade.caption}</p>
       </div>
-      <QuoteCard lang={L} reduce={reduce} lane={lane} onLane={setLane} orders={orders} onOrders={setOrders} className="hidden lg:block" />
+      <QuoteCard lang={L} reduce={reduce} lane={lane} onLane={setLane} orders={orders} onOrders={setOrders} className="hi hi-rise hidden [--hi:2.15s] lg:block" />
       </div>
     </div>
   );
@@ -226,7 +247,9 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
 
   return (
     <>
-    <section id="hero" ref={section} aria-labelledby="hero-title" className="relative h-[230svh] bg-deep lg:h-[290svh]">
+    <section id="hero" ref={section} suppressHydrationWarning aria-labelledby="hero-title" className="relative h-[230svh] bg-deep lg:h-[290svh]">
+      {/* runs before first paint: a returning visitor, or a page restored part-way down, skips the opening */}
+      <script dangerouslySetInnerHTML={{ __html: INTRO_GATE }} />
       <div
         ref={frame}
         data-theme={beat < 3 ? "dark" : undefined}
@@ -258,8 +281,8 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
         </motion.div>
 
         <motion.p aria-hidden="true" style={{ opacity: hint }} className="pointer-events-none absolute inset-x-0 bottom-3 z-[7] hidden flex-col items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/80 lg:flex rtl:tracking-normal">
-          {c.facade.hint}
-          <span className="block h-7 w-px overflow-hidden bg-white/25"><span className="block h-3 w-px animate-[hero-drip_1.6s_var(--ease-ambient)_infinite] bg-white" /></span>
+          <span className="hi hi-fade" style={{ ["--hi" as string]: "2.9s" }}>{c.facade.hint}</span>
+          <span className="hi hi-fade block h-7 w-px overflow-hidden bg-white/25" style={{ ["--hi" as string]: "2.9s" }}><span className="block h-3 w-px animate-[hero-drip_1.6s_var(--ease-ambient)_infinite] bg-white" /></span>
         </motion.p>
       </div>
     </section>
@@ -292,29 +315,40 @@ function Facade({
       data-idle={idle || undefined}
       style={{ ...cover(FACADE.ar, d.x, FACADE.anchorY), scale: zoom, filter: fx, transformOrigin: `${d.x * 100}% ${d.y * 100}%` }}
     >
+      <div className={staged ? "hi hi-push absolute inset-0" : "absolute inset-0"} style={{ transformOrigin: `${d.x * 100}% ${d.y * 100}%` }}>
       <div className={`absolute inset-0 ${staged ? "motion-safe:animate-[hero-breathe_22s_var(--ease-ambient)_infinite_alternate]" : ""}`} style={{ transformOrigin: `${d.x * 100}% ${d.y * 100}%` }}>
         {/* the sky, on its own layer behind the roof */}
         <motion.div aria-hidden="true" className="absolute inset-x-0 top-0 h-[30.39%] scale-[1.06]" style={{ x: skyX }}>
           <div className="absolute inset-0 motion-safe:animate-[hero-sky_46s_var(--ease-ambient)_infinite_alternate]">
             <Image src="/media/msg/facade-sky.jpg" alt="" fill sizes="100vw" className="object-cover object-top" />
           </div>
+          {staged ? <div className="hi hi-night absolute inset-0 bg-[#02070a]" /> : null}
         </motion.div>
 
         {/* the building */}
         <motion.div className="absolute inset-0 scale-[1.02]" style={{ x: bldX, y: bldY, clipPath: FACADE.building }}>
           <Image src="/media/msg/facade.jpg" alt={c.facade.alt} fill priority sizes="(max-aspect-ratio: 4/3) 134vh, 100vw" className="object-cover" />
+          {/* night over the building; the sign, the doorway and the routes glow above it */}
+          {staged ? <div aria-hidden="true" className="hi hi-night absolute inset-0 bg-[#02070a]" /> : null}
           {/* light passing over the walls */}
           <div aria-hidden="true" className="absolute inset-0 overflow-hidden mix-blend-soft-light">
             <div className="absolute inset-y-0 -left-1/2 w-1/2 bg-[linear-gradient(100deg,transparent_0%,rgba(255,244,214,0.75)_50%,transparent_100%)] motion-safe:animate-[hero-sweep_9s_var(--ease-ambient)_infinite]" />
           </div>
           {/* the sign, lit */}
-          <div aria-hidden="true" className="absolute" style={{ left: `${FACADE.sign.x * 100}%`, top: `${FACADE.sign.y * 100}%`, width: `${FACADE.sign.w * 100}%`, height: `${FACADE.sign.h * 100}%` }}>
+          <div aria-hidden="true" className={staged ? "hi hi-sign absolute" : "absolute"} style={{ left: `${FACADE.sign.x * 100}%`, top: `${FACADE.sign.y * 100}%`, width: `${FACADE.sign.w * 100}%`, height: `${FACADE.sign.h * 100}%` }}>
             <span className="absolute inset-[-40%_-12%] rounded-[40%] bg-[radial-gradient(closest-side,rgba(255,252,240,0.35),transparent)] mix-blend-screen motion-safe:animate-[hero-sign_4.5s_var(--ease-ambient)_infinite]" />
             <Image src="/media/msg/sign-glow.png" alt="" fill sizes="20vw" className="object-fill opacity-90 mix-blend-screen blur-[3px] motion-safe:animate-[hero-sign_4.5s_var(--ease-ambient)_infinite]" />
             <Image src="/media/msg/sign-glow.png" alt="" fill sizes="20vw" className="object-fill opacity-40 mix-blend-screen" />
           </div>
           {/* a lamp glimmering inside the doorway */}
           <span aria-hidden="true" className="absolute size-[3.4%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(255,255,240,0.6),rgba(255,255,240,0))] mix-blend-screen motion-safe:animate-[hero-lamp_3.2s_var(--ease-ambient)_infinite]" style={at(FACADE.lamp)} />
+          {/* the doorway: warm light inside, and the shutter that rolls up to open the day */}
+          {staged ? (
+            <div aria-hidden="true" className="absolute overflow-hidden" style={{ left: `${(d.x - d.w / 2) * 100}%`, top: `${(d.y - d.h / 2) * 100}%`, width: `${d.w * 100}%`, height: `${d.h * 100}%` }}>
+              <span className="hi hi-spill absolute inset-0 bg-[radial-gradient(85%_75%_at_50%_72%,rgba(255,232,180,0.8),rgba(255,232,180,0)_78%)] mix-blend-screen" />
+              <span className="hi hi-shutter absolute inset-0 bg-[#10181a] bg-[repeating-linear-gradient(180deg,rgba(255,255,255,0.08)_0_2px,rgba(0,0,0,0.3)_2px_10px)] shadow-[0_8px_16px_rgba(0,0,0,0.65)]" />
+            </div>
+          ) : null}
           {/* deliveries leaving the door */}
           <svg aria-hidden="true" viewBox="0 0 1448 1086" preserveAspectRatio="none" className="absolute inset-0 size-full">
             <defs>
@@ -323,21 +357,26 @@ function Facade({
             <ellipse cx="630" cy="700" rx="240" ry="34" fill="url(#hero-threshold)" className="motion-safe:animate-[hero-lamp_3.2s_var(--ease-ambient)_infinite]" />
             {ROUTES.map((d, i) => (
               <g key={i}>
-                <path d={d} fill="none" stroke="var(--color-brand-bright)" strokeOpacity="0.25" strokeWidth="9" strokeLinecap="round" />
+                <path d={d} pathLength={1} fill="none" stroke="var(--color-brand-bright)" strokeOpacity="0.25" strokeWidth="9" strokeLinecap="round" className={staged ? "hi hi-draw" : undefined} style={{ ["--hi" as string]: `${1.9 + i * 0.12}s` }} />
+                <g className={staged ? "hi hi-fade" : undefined} style={{ ["--hi" as string]: "2.5s" }}>
                 <path d={d} fill="none" stroke="#b8f5cf" strokeWidth="3" strokeLinecap="round" strokeDasharray="3 22" className={staged ? "motion-safe:animate-[hero-flow_1.4s_linear_infinite]" : ""} />
                 {staged ? (
                   <circle r="7" fill="#eafff1" className="motion-reduce:hidden" style={{ filter: "drop-shadow(0 0 8px #4cc97a)" }}>
-                    <animateMotion dur={`${3.2 + i * 0.6}s`} begin={`${i * 0.9}s`} repeatCount="indefinite" path={d} />
+                    <animateMotion dur={`${3.2 + i * 0.6}s`} begin={`${2.6 + i * 0.9}s`} repeatCount="indefinite" path={d} />
                   </circle>
                 ) : null}
+                </g>
               </g>
             ))}
           </svg>
         </motion.div>
       </div>
+      </div>
     </motion.div>
   );
 }
+
+const INTRO_GATE = `try{var s=document.currentScript.parentElement;if(sessionStorage.getItem("msg-intro")||window.scrollY>40)s.dataset.intro="skip";else sessionStorage.setItem("msg-intro","1")}catch(e){}`;
 
 const ROUTES = [
   "M630 702 C 520 738 300 762 -40 792",
