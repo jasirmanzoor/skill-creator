@@ -26,13 +26,17 @@ type Copy = {
   };
   map: { label: string; hub: string; sabya: string; delivered: string; caption: string };
   cities: Record<string, string>;
+  /** the warehouse walk-in: real MSG photos (public/media/msg, see docs/CONTENT-NOTES.md) */
+  facade: { alt: string; caption: string; hint: string };
+  inside: { eyebrow: string; title: string; lead: string; alt: string; spots: { storage: string; sorting: string; dispatch: string } };
+  kingdom: { eyebrow: string; title: string; lead: string };
 };
 
 export const heroCopy: Record<Locale, Copy> = {
   en: {
     live: "Operating now · Riyadh · 24/7",
     title: ["You have something to sell.", "We already have the drivers."],
-    lead: "Last-mile delivery, storage and line-haul across Saudi Arabia, run as one accountable operation. Price your deliveries in ten seconds, then build the full plan.",
+    lead: "Have a product, an idea or a shop that should be selling online? MSG runs the storage, shipping and delivery, with the licences, compliance and people already in place. Price a delivery in ten seconds.",
     ctaPlan: "Build my logistics plan",
     ctaTalk: "Talk to MSG on WhatsApp",
     stats: [
@@ -50,7 +54,7 @@ export const heroCopy: Record<Locale, Copy> = {
       monthly: "Approx. per month",
       cur: "SAR",
       note: "1 kg, next-day, from MSG's rate card at your volume. Cash on delivery and returns are quoted with your plan.",
-      cta: "Lock this rate on WhatsApp",
+      cta: "Get this quote on WhatsApp",
       full: "Build the full plan",
       wa: "Hello MSG Horizons, I'd like the {lane} rate for about {n} orders a month.",
     },
@@ -61,12 +65,29 @@ export const heroCopy: Record<Locale, Copy> = {
       delivered: "Delivered",
       caption: "Illustrative network view",
     },
+    facade: {
+      alt: "The MSG Horizons Sabya hub, with the company sign above the open loading door",
+      caption: "Our Sabya hub. Real photo, retouched for presentation.",
+      hint: "Scroll to step inside",
+    },
+    inside: {
+      eyebrow: "Inside the Sabya hub",
+      title: "Stored, sorted and sent out, under one roof.",
+      lead: "Racks for your stock, cages for sorting, and a floor ready for every pickup and dispatch.",
+      alt: "Inside the MSG Horizons Sabya hub: racks of parcels, sorting cages and an open floor",
+      spots: { storage: "Your stock, on racks", sorting: "Sorting", dispatch: "Ready for dispatch" },
+    },
+    kingdom: {
+      eyebrow: "Then out across the Kingdom",
+      title: "From this floor to your customer's door.",
+      lead: "Line-haul between cities, then couriers to the door, every day of the week.",
+    },
     cities: { riyadh: "Riyadh", jeddah: "Jeddah", makkah: "Makkah", madinah: "Madinah", dammam: "Dammam", abha: "Abha", tabuk: "Tabuk", hail: "Hail", buraidah: "Buraidah", sabya: "Sabya", najran: "Najran", ahsa: "Al Ahsa", taif: "Taif" },
   },
   ar: {
     live: "نعمل الآن · الرياض · على مدار الساعة",
     title: ["لديك ما تبيعه.", "ولدينا المناديب بالفعل."],
-    lead: "توصيل الميل الأخير والتخزين والنقل بين المدن في أنحاء المملكة، كعملية واحدة مسؤولة. احسب تكلفة توصيلاتك في عشر ثوانٍ، ثم ابنِ خطتك كاملة.",
+    lead: "لديك منتج أو فكرة أو متجر يجب أن يبيع أونلاين؟ مسج تتولى التخزين والشحن والتوصيل، مع التراخيص والامتثال والفريق جاهزة مسبقاً. احسب تكلفة التوصيل في عشر ثوانٍ.",
     ctaPlan: "ابنِ خطتك اللوجستية",
     ctaTalk: "تحدث مع مسج عبر واتساب",
     stats: [
@@ -84,7 +105,7 @@ export const heroCopy: Record<Locale, Copy> = {
       monthly: "تقريباً شهرياً",
       cur: "ريال",
       note: "شحنة 1 كجم في اليوم التالي، من جدول أسعار مسج حسب حجمك. الدفع عند الاستلام والمرتجعات تُسعّر مع خطتك.",
-      cta: "ثبّت هذا السعر عبر واتساب",
+      cta: "اطلب هذا السعر عبر واتساب",
       full: "ابنِ الخطة كاملة",
       wa: "مرحباً مسج هورايزونز، أريد سعر ({lane}) لنحو {n} طلب شهرياً.",
     },
@@ -94,6 +115,23 @@ export const heroCopy: Record<Locale, Copy> = {
       sabya: "مركز صبيا",
       delivered: "تم التسليم",
       caption: "عرض توضيحي للشبكة",
+    },
+    facade: {
+      alt: "مركز مسج هورايزونز في صبيا، ولوحة الشركة فوق باب التحميل المفتوح",
+      caption: "مركزنا في صبيا. صورة حقيقية مُحسَّنة للعرض.",
+      hint: "مرّر لتدخل",
+    },
+    inside: {
+      eyebrow: "داخل مركز صبيا",
+      title: "تخزين وفرز وانطلاق، تحت سقف واحد.",
+      lead: "أرفف لمخزونك، وأقفاص للفرز، وأرضية جاهزة لكل استلام وشحن.",
+      alt: "داخل مركز مسج هورايزونز في صبيا: أرفف طرود وأقفاص فرز وأرضية مفتوحة",
+      spots: { storage: "مخزونك على الأرفف", sorting: "الفرز", dispatch: "جاهز للشحن" },
+    },
+    kingdom: {
+      eyebrow: "ثم إلى أنحاء المملكة",
+      title: "من هذه الأرضية إلى باب عميلك.",
+      lead: "نقل بين المدن، ثم مناديب حتى الباب، كل أيام الأسبوع.",
     },
     cities: { riyadh: "الرياض", jeddah: "جدة", makkah: "مكة", madinah: "المدينة", dammam: "الدمام", abha: "أبها", tabuk: "تبوك", hail: "حائل", buraidah: "بريدة", sabya: "صبيا", najran: "نجران", ahsa: "الأحساء", taif: "الطائف" },
   },

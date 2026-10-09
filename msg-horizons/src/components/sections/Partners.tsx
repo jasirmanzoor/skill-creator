@@ -81,10 +81,9 @@ export default function Partners({ lang }: { lang: Locale }) {
   }, [reduce]);
 
   return (
-    <section id="partners" aria-labelledby="partners-title" className="relative scroll-mt-16 overflow-hidden border-y border-line bg-surface/[0.93] py-24 backdrop-blur lg:py-28">
+    <section id="partners" aria-labelledby="partners-title" className="relative scroll-mt-16 overflow-hidden border-y border-line bg-surface/[0.94] sec">
       <div className="mx-auto max-w-7xl px-5 text-center lg:px-8">
-        <span className="label">{c.eyebrow}</span>
-        <h2 id="partners-title" className="mx-auto mt-4 max-w-3xl font-display text-4xl font-semibold tracking-[-0.03em] text-ink text-balance sm:text-5xl rtl:tracking-normal">
+        <h2 id="partners-title" className="h-section mx-auto max-w-3xl text-ink">
           {c.title}
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-lg text-muted">{c.lead}</p>
@@ -95,7 +94,7 @@ export default function Partners({ lang }: { lang: Locale }) {
         <div aria-hidden="true" className="absolute left-1/2 top-1/2 h-[60%] w-[80%] max-w-[920px] -translate-x-1/2 -translate-y-1/2 rounded-[50%] border border-dashed border-line-strong" />
         <svg aria-hidden="true" className="absolute inset-0 h-full w-full">
           {PARTNERS.map((p, i) => (
-            <line key={p.id} ref={(el) => { links.current[i] = el; }} stroke="#0f9641" strokeWidth="1.4" strokeDasharray="3 7" className="partner-link" />
+            <line key={p.id} ref={(el) => { links.current[i] = el; }} stroke="var(--color-brand-vivid)" strokeWidth="1.4" strokeDasharray="3 7" className="partner-link" />
           ))}
         </svg>
         {/* hub */}

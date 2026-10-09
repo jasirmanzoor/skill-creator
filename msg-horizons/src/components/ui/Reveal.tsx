@@ -37,8 +37,8 @@ export default function Reveal({
   return (
     <Tag
       ref={ref as React.Ref<never>}
-      className={`${className} transition-[opacity,transform] duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-        state === "hidden" ? "translate-y-5 opacity-0" : "translate-y-0 opacity-100"
+      className={`${className} transition-[opacity,translate] duration-500 ease-out ${
+        state === "hidden" ? "translate-y-3 opacity-0" : "translate-y-0 opacity-100"
       }`}
       style={{ transitionDelay: state === "in" ? `${delay}ms` : undefined }}
     >

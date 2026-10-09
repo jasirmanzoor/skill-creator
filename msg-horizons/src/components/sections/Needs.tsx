@@ -1,5 +1,6 @@
 "use client";
 
+import { SPRING_SMOOTH } from "@/lib/motion";
 import { motion, useMotionValueEvent, useScroll, useSpring, useTransform } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { experience, NEED_STAGES, NEEDS_BY_STAGE, type NeedId, type NeedStage } from "@/content/experience";
@@ -33,7 +34,7 @@ export default function Needs({ lang }: { lang: Locale }) {
   const [active, setActive] = useState(0);
 
   const { scrollYProgress } = useScroll({ target: track, offset: ["start start", "end end"] });
-  const p = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.4 });
+  const p = useSpring(scrollYProgress, { ...SPRING_SMOOTH, mass: 0.4 });
   const fill = useTransform(p, [0.04, 0.96], ["0%", "100%"]);
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     const s = Math.min(NEED_STAGES.length - 1, Math.max(0, Math.floor(v * NEED_STAGES.length)));
@@ -58,12 +59,11 @@ export default function Needs({ lang }: { lang: Locale }) {
 
   let n = 0;
   return (
-    <section id="sellers" aria-labelledby="needs-title" className="sea-band relative scroll-mt-16 py-24 lg:py-28">
+    <section id="sellers" aria-labelledby="needs-title" className="sea-band relative sec scroll-mt-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-5 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-2 lg:items-end">
           <div>
-            <span className="label">{c.eyebrow}</span>
-            <h2 id="needs-title" className="mt-4 font-display text-4xl font-semibold tracking-[-0.03em] text-teal-deep text-balance sm:text-5xl rtl:tracking-normal">
+            <h2 id="needs-title" className="h-section text-teal-deep">
               {c.title}
             </h2>
           </div>
@@ -71,7 +71,7 @@ export default function Needs({ lang }: { lang: Locale }) {
         </div>
       </div>
 
-      <div ref={track} className={scrub ? "relative lg:h-[400vh]" : "relative"}>
+      <div ref={track} className={scrub ? "relative lg:h-[280vh]" : "relative"}>
         <div className={`mx-auto max-w-7xl px-4 sm:px-5 lg:px-8 ${scrub ? "lg:sticky lg:top-16 lg:flex lg:h-[calc(100svh-4rem)] lg:flex-col lg:justify-center" : ""}`}>
           <div data-inview={inView || undefined} className={`needs-grid mt-12 grid gap-6 ${scrub ? "lg:mt-0 lg:[grid-template-areas:'stage']" : ""}`}>
             {NEED_STAGES.map((st, si) => {
@@ -107,8 +107,8 @@ export default function Needs({ lang }: { lang: Locale }) {
                       strength={1.6}
                       className={`absolute inset-0 transition-transform duration-[1400ms] ease-out ${on ? "scale-100" : "scale-110"}`}
                     />
-                    <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#0b3a40]/55 via-transparent to-transparent" />
-                    <div className={`absolute inset-x-4 bottom-4 transition-all delay-200 duration-700 sm:inset-x-6 sm:bottom-6 ${on ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}>
+                    <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-teal-deep/55 via-transparent to-transparent" />
+                    <div className={`absolute inset-x-4 bottom-4 transition-ui delay-200 duration-700 sm:inset-x-6 sm:bottom-6 ${on ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}>
                       <StageCard stage={st} c={c} guide={guide} />
                     </div>
                   </div>
@@ -134,15 +134,15 @@ export default function Needs({ lang }: { lang: Locale }) {
                 {NEED_STAGES.map((st, i) => (
                   <li key={st} className="flex justify-center">
                     <button type="button" onClick={() => goTo(i)} aria-current={i === active ? "step" : undefined} className="group flex flex-col items-center gap-2">
-                      <span className={`grid size-8 place-items-center rounded-full text-xs font-semibold transition-colors duration-500 ${i <= active ? "bg-teal text-white" : "bg-white text-teal-deep/60 ring-1 ring-teal/20"}`}>
+                      <span className={`grid size-8 place-items-center rounded-full text-xs font-semibold transition-colors duration-500 ${i <= active ? "bg-teal text-white" : "bg-white text-teal-deep/75 ring-1 ring-teal/20"}`}>
                         <span className="num" dir="ltr">0{i + 1}</span>
                       </span>
-                      <span className={`text-sm font-semibold transition-colors ${i === active ? "text-teal-deep" : "text-teal-deep/60 group-hover:text-teal-deep"}`}>{c.stages[st].t}</span>
+                      <span className={`text-sm font-semibold transition-colors ${i === active ? "text-teal-deep" : "text-teal-deep/75 group-hover:text-teal-deep"}`}>{c.stages[st].t}</span>
                     </button>
                   </li>
                 ))}
               </ol>
-              <p className="mt-3 text-center text-xs text-teal-deep/60">{c.scroll}</p>
+              <p className="mt-3 text-center text-xs text-teal-deep/75">{c.scroll}</p>
             </div>
           ) : null}
         </div>
@@ -211,7 +211,7 @@ function StageCard({ stage, c, guide }: { stage: NeedStage; c: NeedsCopy; guide:
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-teal rtl:tracking-normal">{c.cards.store}</p>
         <div aria-hidden="true" className="mt-3 grid grid-cols-6 gap-1.5">
           {Array.from({ length: 18 }, (_, i) => (
-            <span key={i} className={`h-4 rounded-[4px] ${[2, 7, 11, 16].includes(i) ? "bg-sea-200" : i % 5 === 3 ? "bg-[#c9962e]/80" : "bg-teal"}`} />
+            <span key={i} className={`h-4 rounded-[4px] ${[2, 7, 11, 16].includes(i) ? "bg-sea-200" : i % 5 === 3 ? "bg-sand-500/80" : "bg-teal"}`} />
           ))}
         </div>
       </div>
@@ -240,8 +240,8 @@ function StageCard({ stage, c, guide }: { stage: NeedStage; c: NeedsCopy; guide:
 function NeedRow({ id, q, a, owner, i, k, on }: { id: NeedId; q: string; a: string; owner: string; i: number; k: number; on: boolean }) {
   return (
     <li
-      className={`need-card flex items-start gap-4 py-4 transition-all duration-700 ${on ? "" : "lg:translate-y-3"}`}
-      style={{ ["--d" as string]: `${i * 60}ms`, transitionDelay: on ? `${150 + k * 110}ms` : "0ms" }}
+      className={`need-card flex items-start gap-4 py-4 transition-ui duration-700 ${on ? "" : "lg:translate-y-3"}`}
+      style={{ ["--d" as string]: `${i * 60}ms`, transitionDelay: on ? `${k * 60}ms` : "0ms" }}
     >
       <span className="need-icon inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-teal to-teal-deep text-white shadow-[0_10px_20px_-10px_rgba(11,58,64,0.8)] [&_svg]:size-7">
         <NeedIcon id={id} />

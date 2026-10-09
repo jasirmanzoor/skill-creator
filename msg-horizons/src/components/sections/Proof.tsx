@@ -5,37 +5,36 @@ import type { Dictionary } from "@/content/i18n";
 export default function Proof({ t }: { t: Dictionary }) {
   const p = t.proof;
   return (
-    <section id="proof" aria-labelledby="proof-title" className="scroll-mt-24 border-t border-line bg-surface/92 py-24 backdrop-blur lg:py-32">
+    <section id="proof" aria-labelledby="proof-title" className="scroll-mt-24 border-t border-line bg-surface/[0.94] sec">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal className="max-w-2xl">
-          <span className="label">{p.eyebrow}</span>
-          <h2 id="proof-title" className="mt-4 font-display text-4xl font-semibold tracking-[-0.025em] text-ink text-balance sm:text-5xl rtl:tracking-normal">
+          <h2 id="proof-title" className="h-section text-ink">
             {p.title}
           </h2>
         </Reveal>
 
-        <dl className="mt-14 grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
-          {p.metrics.map((m, i) => (
-            <Reveal key={m.label} delay={i * 70} className="bg-surface p-8">
-              <dt className="text-sm text-muted">{m.label}</dt>
-              <dd className="mt-3">
-                <CountUp value={m.value} className="num block font-display text-5xl font-semibold tracking-[-0.03em] text-ink" />
-                <span className="mt-2 block text-sm text-muted">{m.d}</span>
-              </dd>
-            </Reveal>
-          ))}
-        </dl>
-
-        <div className="mt-24 grid gap-12 lg:grid-cols-[1fr_1.4fr]">
-          <h3 className="font-display text-2xl font-semibold tracking-[-0.02em] text-ink rtl:tracking-normal">{p.pillarsTitle}</h3>
-          <ol className="grid gap-x-10 sm:grid-cols-2">
-            {p.pillars.map((pl, i) => (
-              <li key={pl} className="flex items-baseline gap-4 border-b border-line py-4">
-                <span className="num w-6 shrink-0 text-sm text-brand">{String(i + 1).padStart(2, "0")}</span>
-                <span className="text-ink">{pl}</span>
-              </li>
+        <div className="mt-14 grid gap-x-16 gap-y-14 lg:grid-cols-[1.1fr_1fr]">
+          <dl className="border-t border-line">
+            {p.metrics.map((m) => (
+              <div key={m.label} className="grid grid-cols-[9.5rem_1fr] items-baseline gap-x-5 border-b border-line py-5 sm:grid-cols-[16rem_1fr] sm:gap-x-6">
+                <dd className="order-1">
+                  <CountUp value={m.value} className="num block whitespace-nowrap font-display text-[1.75rem] font-semibold tracking-[-0.03em] text-ink sm:text-5xl" />
+                </dd>
+                <dt className="order-2">
+                  <span className="block font-medium text-ink">{m.label}</span>
+                  <span className="mt-0.5 block text-sm text-muted">{m.d}</span>
+                </dt>
+              </div>
             ))}
-          </ol>
+          </dl>
+          <div>
+            <h3 className="font-display text-2xl font-semibold tracking-[-0.02em] text-ink rtl:tracking-normal">{p.pillarsTitle}</h3>
+            <ul className="mt-5 grid gap-x-10 border-t border-line sm:grid-cols-2">
+              {p.pillars.map((pl) => (
+                <li key={pl} className="border-b border-line py-3 text-ink">{pl}</li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         <Reveal className="mt-24 border-t border-line pt-12">

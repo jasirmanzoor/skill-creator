@@ -14,15 +14,15 @@ import { useReducedMotion } from "@/lib/use-reduced-motion";
 /* ───────────────────────── Controls ───────────────────────── */
 
 export function SizerControls({
-  value, onChange, lang,
-}: { value: SizerInput; onChange: (v: SizerInput) => void; lang: Locale }) {
+  value, onChange, lang, wide = false,
+}: { value: SizerInput; onChange: (v: SizerInput) => void; lang: Locale; wide?: boolean }) {
   const c = sizerCopy[lang].inputs;
   const id = useId();
   const set = <K extends keyof SizerInput>(k: K, v: SizerInput[K]) => onChange({ ...value, [k]: v });
 
   return (
-    <div className="grid gap-7">
-      <div>
+    <div className={wide ? "grid gap-x-10 gap-y-6 lg:grid-cols-2" : "grid gap-7"}>
+      <div className={wide ? "lg:col-span-2" : ""}>
         <div className="flex items-end justify-between gap-4">
           <label htmlFor={`${id}-orders`} className="text-sm font-medium text-ink">{c.orders}</label>
           <span className="num font-display text-3xl font-semibold tracking-[-0.03em] text-ink">
@@ -99,7 +99,7 @@ function Segmented<T extends string>({
             role="radio"
             aria-checked={value === o}
             onClick={() => onChange(o)}
-            className={`rounded-md px-2 py-2 text-sm leading-tight transition-all duration-200 ${
+            className={`rounded-md px-2 py-2 text-sm leading-tight transition-ui duration-200 ${
               value === o ? "bg-surface font-medium text-ink shadow-[0_1px_3px_rgba(12,14,17,0.12)]" : "text-muted hover:text-ink"
             }`}
           >
@@ -172,7 +172,7 @@ function CourierField({ structure: s, legend }: { structure: Structure; legend: 
         {Array.from({ length: shown }, (_, i) => (
           <span
             key={i}
-            className={`size-[7px] rounded-full transition-all duration-500 ${i < base ? "bg-ink" : "bg-brand"}`}
+            className={`size-[7px] rounded-full transition-ui duration-500 ${i < base ? "bg-ink" : "bg-brand"}`}
             style={{ transitionDelay: `${Math.min(i, 60) * 6}ms` }}
           />
         ))}

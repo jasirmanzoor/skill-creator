@@ -39,7 +39,6 @@ export const ROADMAP_STEPS: { id: string; visual: StageId }[] = [
 type Copy = {
   eyebrow: string;
   title: string;
-  theme: string[];
   rolls: string[];
   gate: {
     hook: string;
@@ -74,13 +73,7 @@ type Copy = {
   plan: {
     eyebrow: string;
     config: string;
-    assets: string;
-    routes: string;
-    couriers: string;
-    peak: string;
-    vehicles: string;
-    pickup: string;
-    dispatch: string;
+    covered: string;
     cost: string;
     costMonthly: string;
     costNote: string;
@@ -94,8 +87,7 @@ type Copy = {
 export const roadmapCopy: Record<Locale, Copy> = {
   en: {
     eyebrow: "The MSG roadmap",
-    title: "Our effortless service, mapped out for you.",
-    theme: ["Navigate the unseen.", "Animate your reach.", "Experience VFX logistics."],
+    title: "Our service, mapped out for you step by step.",
     rolls: ["Need to scale online?", "Launch your homemade creations nationwide.", "From your door to the Kingdom—seamlessly handled."],
     gate: {
       hook: "Delivering across KSA? We bridge the distance.",
@@ -119,7 +111,7 @@ export const roadmapCopy: Record<Locale, Copy> = {
       { t: "Submit your enquiry", d: "Two minutes on the web, or one WhatsApp message.", points: ["No sign-up", "Arabic or English", "Straight to MSG's team"] },
       { t: "We map your requirements", d: "Volumes, areas, peaks, cash share and returns.", points: ["Your real numbers", "Peak seasons planned", "Cash and returns covered"] },
       { t: "Our standard guide", d: "Packaging, labelling, pickup windows and handover rules.", points: ["Shared before day one", "Clear handover rules", "Fewer failed deliveries"] },
-      { t: "Curated recommendations", d: "A structure sized to your numbers, with absolute clarity.", points: ["Routes and couriers", "Pickup and dispatch model", "The reason for each choice"] },
+      { t: "Curated recommendations", d: "Your price quote and everything your plan covers, with absolute clarity.", points: ["A written price quote", "Every checkpoint covered", "Proof of delivery, live tracking, cash on time"] },
       { t: "Project agreement", d: "Scope, remittance, returns and claims, signed in writing.", points: ["Remittance cycle agreed", "Returns and claims terms", "No surprises after launch"] },
       { t: "Testing & go-live", d: "Pilot shipments verified end to end, then launch with 24/7 tracked operations.", points: ["Pilot shipments checked", "Proof of delivery verified", "24/7 tracking from day one"] },
     ],
@@ -144,13 +136,7 @@ export const roadmapCopy: Record<Locale, Copy> = {
     plan: {
       eyebrow: "Curated recommendation plan",
       config: "Your configuration",
-      assets: "Operational assets",
-      routes: "Daily routes",
-      couriers: "Couriers, normal day",
-      peak: "Couriers, peak day",
-      vehicles: "Vehicle mix",
-      pickup: "Pickup",
-      dispatch: "Dispatch",
+      covered: "Covered in your plan",
       cost: "Approx. cost per order",
       costMonthly: "≈ SAR {total} a month for {n} orders",
       costNote: "1 kg next-day, from MSG's rate card at your volume. Cash on delivery, storage and returns are confirmed in your quote.",
@@ -163,7 +149,6 @@ export const roadmapCopy: Record<Locale, Copy> = {
   ar: {
     eyebrow: "خارطة MSG",
     title: "خدمة سلسة، مرسومة لك خطوة بخطوة.",
-    theme: ["استكشف ما لا يُرى.", "وسّع وصولك.", "لوجستيات بتجربة بصرية."],
     rolls: ["تريد التوسع أونلاين؟", "أوصل منتجاتك المنزلية إلى كل المملكة.", "من بابك إلى المملكة، بسلاسة تامة."],
     gate: {
       hook: "توصّل في أنحاء المملكة؟ نحن نختصر المسافة.",
@@ -187,7 +172,7 @@ export const roadmapCopy: Record<Locale, Copy> = {
       { t: "أرسل استفسارك", d: "دقيقتان على الموقع، أو رسالة واتساب واحدة.", points: ["دون تسجيل", "بالعربية أو الإنجليزية", "مباشرة إلى فريق MSG"] },
       { t: "نحدد متطلباتك", d: "الأحجام والمناطق والذروات ونسبة النقد والمرتجعات.", points: ["أرقامك الفعلية", "مواسم الذروة مخطط لها", "النقد والمرتجعات مغطاة"] },
       { t: "دليلنا المعياري", d: "التغليف والملصقات ومواعيد الاستلام وقواعد التسليم.", points: ["قبل اليوم الأول", "قواعد تسليم واضحة", "توصيلات فاشلة أقل"] },
-      { t: "توصيات مخصصة", d: "هيكل بحجم أرقامك، بوضوح تام.", points: ["المسارات والمناديب", "نموذج الاستلام والانطلاق", "سبب كل اختيار"] },
+      { t: "توصيات مخصصة", d: "عرض السعر وكل ما تشمله خطتك، بوضوح تام.", points: ["عرض سعر مكتوب", "كل نقطة مغطاة", "إثبات التسليم والتتبع والنقد في وقته"] },
       { t: "اتفاقية المشروع", d: "النطاق والتحويلات والمرتجعات والمطالبات، موقّعة كتابياً.", points: ["دورة التحويل متفق عليها", "شروط المرتجعات والمطالبات", "دون مفاجآت بعد الإطلاق"] },
       { t: "الاختبار والإطلاق", d: "شحنات تجريبية موثقة من البداية للنهاية، ثم إطلاق بتتبع على مدار الساعة.", points: ["فحص الشحنات التجريبية", "التحقق من إثبات التسليم", "تتبع ٢٤/٧ من اليوم الأول"] },
     ],
@@ -212,13 +197,7 @@ export const roadmapCopy: Record<Locale, Copy> = {
     plan: {
       eyebrow: "خطة التوصية المخصصة",
       config: "إعدادك",
-      assets: "الأصول التشغيلية",
-      routes: "مسارات يومية",
-      couriers: "مناديب، يوم عادي",
-      peak: "مناديب، يوم الذروة",
-      vehicles: "المركبات",
-      pickup: "الاستلام",
-      dispatch: "الانطلاق",
+      covered: "مشمول في خطتك",
       cost: "التكلفة التقريبية للطلب",
       costMonthly: "≈ {total} ريال شهرياً مقابل {n} طلب",
       costNote: "شحنة 1 كجم في اليوم التالي، من جدول أسعار MSG حسب حجمك. الدفع عند الاستلام والتخزين والمرتجعات تُؤكد في عرض السعر.",
@@ -257,11 +236,7 @@ export const guideCopy: Record<
       guideItems: string[];
       label: { to: string; cod: string; handle: string };
       planTitle: string;
-      routes: string;
-      couriers: string;
       perOrder: string;
-      peak: string;
-      flex: string;
       services: { lastMile: string; cod: string; storage: string; tracking: string };
       docTitle: string;
       docItems: string[];
@@ -283,7 +258,7 @@ export const guideCopy: Record<
       { you: "Send one WhatsApp message or the two-minute form.", msg: "Replies in Arabic or English and assigns your contact." },
       { you: "Share your numbers: orders, areas, cash share and returns.", msg: "Turns them into a delivery profile you can check line by line." },
       { you: "Prepare parcels with the packaging and label guide.", msg: "Sets your pickup window and handover rules before day one." },
-      { you: "Review the plan and ask anything.", msg: "Sizes routes, couriers and pickup to your volume, with the reason for each." },
+      { you: "Review the plan and ask anything.", msg: "Prepares your price quote and shows every checkpoint your plan covers." },
       { you: "Sign scope, remittance, returns and claims.", msg: "Puts every term in writing before the first parcel moves." },
       { you: "Hand over the pilot parcels.", msg: "Delivers them with proof, reviews them with you, then switches you to live." },
     ],
@@ -304,11 +279,7 @@ export const guideCopy: Record<
       guideItems: ["Packaging", "Shipping label", "Pickup window", "Handover rules"],
       label: { to: "Deliver to", cod: "Cash on delivery", handle: "Handle with care" },
       planTitle: "Recommended plan",
-      routes: "Routes",
-      couriers: "Couriers",
       perOrder: "Approx. per order",
-      peak: "Couriers on peak days",
-      flex: "Flex couriers switched on for peaks",
       services: { lastMile: "Last-mile", cod: "Cash collection", storage: "Storage", tracking: "Live tracking" },
       docTitle: "Project agreement",
       docItems: ["Scope", "Remittance", "Returns", "Claims"],
@@ -329,7 +300,7 @@ export const guideCopy: Record<
       { you: "أرسل رسالة واتساب واحدة أو النموذج في دقيقتين.", msg: "ترد بالعربية أو الإنجليزية وتعيّن لك جهة تواصل." },
       { you: "شارك أرقامك: الطلبات والمناطق ونسبة النقد والمرتجعات.", msg: "تحوّلها إلى ملف توصيل تراجعه سطراً بسطر." },
       { you: "جهّز الطرود وفق دليل التغليف والملصقات.", msg: "تحدد موعد الاستلام وقواعد التسليم قبل اليوم الأول." },
-      { you: "راجع الخطة واسأل عن أي شيء.", msg: "تحدد المسارات والمناديب والاستلام حسب حجمك، مع سبب كل اختيار." },
+      { you: "راجع الخطة واسأل عن أي شيء.", msg: "تجهّز عرض السعر وتريك كل نقطة تشملها خطتك." },
       { you: "وقّع النطاق والتحويلات والمرتجعات والمطالبات.", msg: "تكتب كل الشروط قبل أن يتحرك أول طرد." },
       { you: "سلّم الطرود التجريبية.", msg: "توصلها مع إثبات التسليم وتراجعها معك، ثم تنقلك إلى التشغيل." },
     ],
@@ -350,11 +321,7 @@ export const guideCopy: Record<
       guideItems: ["التغليف", "ملصق الشحن", "موعد الاستلام", "قواعد التسليم"],
       label: { to: "التسليم إلى", cod: "الدفع عند الاستلام", handle: "يُرجى العناية" },
       planTitle: "الخطة الموصى بها",
-      routes: "المسارات",
-      couriers: "المناديب",
       perOrder: "تقريباً للطلب",
-      peak: "مناديب أيام الذروة",
-      flex: "مناديب مرنة تُفعّل للذروة",
       services: { lastMile: "الميل الأخير", cod: "تحصيل النقد", storage: "التخزين", tracking: "تتبع مباشر" },
       docTitle: "اتفاقية المشروع",
       docItems: ["النطاق", "التحويلات", "المرتجعات", "المطالبات"],

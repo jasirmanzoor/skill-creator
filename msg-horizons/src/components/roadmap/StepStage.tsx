@@ -1,5 +1,6 @@
 "use client";
 
+import { EASE_OUT, EASE_IN_OUT } from "@/lib/motion";
 import { AnimatePresence, motion } from "motion/react";
 import { guideCopy, roadmapCopy, type Segment } from "@/content/roadmap";
 import type { Locale } from "@/content/i18n";
@@ -25,10 +26,10 @@ export default function StepStage({
   const pop = reduce
     ? {}
     : {
-        initial: { opacity: 0, scale: 0.96, filter: "blur(10px)", x: 40 * dir },
-        animate: { opacity: 1, scale: 1, filter: "blur(0px)", x: 0 },
-        exit: { opacity: 0, scale: 0.98, filter: "blur(8px)", x: -30 * dir },
-        transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] as const },
+        initial: { opacity: 0, transform: `translateX(${12 * dir}px)` },
+        animate: { opacity: 1, transform: "translateX(0px)" },
+        exit: { opacity: 0, transform: `translateX(${-8 * dir}px)`, transition: { duration: 0.16, ease: EASE_OUT } },
+        transition: { duration: 0.24, ease: EASE_OUT },
       };
   return (
     <div id="roadmap-stage" role="tabpanel" aria-live="polite" className="relative mt-4 overflow-hidden rounded-3xl">
@@ -47,9 +48,9 @@ export default function StepStage({
               {([[gc.you, role.you, "you"], [gc.msg, role.msg, "msg"]] as const).map(([k, v, who], i) => (
                 <motion.div
                   key={who}
-                  initial={reduce ? false : { opacity: 0, x: 12 * dir }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.15 + i * 0.1, duration: 0.4 }}
+                  initial={reduce ? false : { opacity: 0, transform: `translateX(${12 * dir}px)` }}
+                  animate={{ opacity: 1, transform: "translateX(0px)" }}
+                  transition={{ delay: i * 0.06, duration: 0.3, ease: EASE_OUT }}
                   className={`rounded-2xl p-4 ring-1 ${who === "you" ? "bg-white/75 ring-teal/18" : "bg-sea-100 ring-teal/30"}`}
                 >
                   <dt className={`text-xs font-semibold ${who === "you" ? "text-teal-deep/75" : "text-teal"}`}>{k}</dt>
@@ -70,7 +71,7 @@ export default function StepStage({
                 {touring ? (
                   <svg viewBox="0 0 12 12" className="size-3" aria-hidden="true"><path d="M3 2h2v8H3zM7 2h2v8H7z" fill="currentColor" /></svg>
                 ) : (
-                  <svg viewBox="0 0 12 12" className="size-3 rtl:-scale-x-100" aria-hidden="true"><path d="M3 1.8v8.4L10 6z" fill="currentColor" /></svg>
+                  <svg viewBox="0 0 12 12" className="tap size-3 rtl:-scale-x-100" aria-hidden="true"><path d="M3 1.8v8.4L10 6z" fill="currentColor" /></svg>
                 )}
                 {touring ? gc.pause : gc.walk}
               </button>
@@ -82,13 +83,12 @@ export default function StepStage({
           ) : null}
           {/* holographic flash-up */}
           {!reduce ? (
-            <motion.span
-              aria-hidden="true"
-              initial={{ left: "-50%", opacity: 0 }}
-              animate={{ left: ["-50%", "110%"], opacity: [0, 1, 1, 0] }}
-              transition={{ duration: 1.1, ease: [0.4, 0, 0.2, 1] }}
-              className="pointer-events-none absolute inset-y-0 w-1/2 -skew-x-12 bg-gradient-to-r from-transparent via-[#b5f5cc]/15 to-transparent mix-blend-screen"
-            />
+            <motion.span aria-hidden="true" initial={{ transform: "translateX(-50%)", opacity: 0 }}
+              animate={{ transform: ["translateX(-50%)", "translateX(110%)"], opacity: [0, 1, 1, 0] }}
+              transition={{ duration: 1.1, ease: EASE_IN_OUT }}
+              className="pointer-events-none absolute inset-0 overflow-hidden mix-blend-screen">
+              <span className="absolute inset-y-0 start-0 w-1/2 -skew-x-12 bg-gradient-to-r from-transparent via-brand-mint/15 to-transparent" />
+            </motion.span>
           ) : null}
         </motion.div>
       </AnimatePresence>

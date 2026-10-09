@@ -71,7 +71,7 @@ const cadenceAr: Record<Cadence, string> = {
 export const sizerCopy: Record<Locale, Copy> = {
   en: {
     title: "Your numbers",
-    hint: "Move the controls. The structure recalculates as you go.",
+    hint: "Move the controls and your price quote updates as you go.",
     inputs: {
       orders: "Orders or shipments on a normal day",
       ordersUnit: "a day",
@@ -166,7 +166,7 @@ export const sizerCopy: Record<Locale, Copy> = {
   },
   ar: {
     title: "أرقامك",
-    hint: "حرّك المؤشرات، ويُعاد حساب الهيكل مباشرة.",
+    hint: "حرّك المؤشرات، ويتحدّث عرض السعر مباشرة.",
     inputs: {
       orders: "الطلبات أو الشحنات في يوم عادي",
       ordersUnit: "يومياً",

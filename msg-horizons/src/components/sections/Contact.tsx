@@ -11,11 +11,10 @@ export default function Contact({ t, lang }: { t: Dictionary; lang: Locale }) {
   const ch = c.channels;
   const row = "flex items-center gap-4 border-b border-white/15 py-4 transition-colors";
   return (
-    <section id="contact" data-theme="dark" aria-labelledby="contact-title" className="on-dark scroll-mt-16 bg-[#07090f]/80 py-28 text-white backdrop-blur-[2px] lg:py-40">
+    <section id="contact" data-theme="dark" aria-labelledby="contact-title" className="on-dark scroll-mt-16 bg-night/80 sec-finale text-white backdrop-blur-[2px]">
       <div className="mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-[1fr_1.15fr] lg:px-8">
         <Reveal>
-          <span className="label">{c.eyebrow}</span>
-          <h2 id="contact-title" className="mt-4 font-display text-5xl font-semibold tracking-[-0.03em] text-balance sm:text-6xl rtl:tracking-normal">
+          <h2 id="contact-title" className="h-display">
             {c.title}
           </h2>
           <p className="mt-6 max-w-md text-lg text-white/75">{c.lead}</p>
@@ -23,7 +22,7 @@ export default function Contact({ t, lang }: { t: Dictionary; lang: Locale }) {
           <ul className="mt-10 border-t border-white/15">
             <li>
               <TrackedLink href={whatsappLink(t.wa.general)} target="_blank" rel="noopener noreferrer" event="whatsapp_click" props={{ location: "contact" }} className={`${row} hover:text-white`}>
-                <span className="inline-flex size-10 items-center justify-center rounded-md bg-[#25d366] text-white"><WhatsAppIcon /></span>
+                <span className="inline-flex size-10 items-center justify-center rounded-md bg-whatsapp-bright text-white"><WhatsAppIcon /></span>
                 <span className="flex-1">
                   <span className="block font-semibold">{ch.whatsapp}</span>
                   <span className="text-sm text-white/65">{ch.whatsappD}</span>

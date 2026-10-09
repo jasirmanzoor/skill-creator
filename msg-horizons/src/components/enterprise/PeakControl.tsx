@@ -1,5 +1,6 @@
 "use client";
 
+import { EASE_OUT, SPRING_SMOOTH } from "@/lib/motion";
 import { motion, useMotionValueEvent, useScroll, useSpring, useTransform } from "motion/react";
 import { useRef, useState } from "react";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
@@ -31,7 +32,7 @@ export default function PeakControl({ stages, labels }: { stages: Stage[]; label
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-  const p = useSpring(scrollYProgress, { stiffness: 90, damping: 22, mass: 0.4 });
+  const p = useSpring(scrollYProgress, { ...SPRING_SMOOTH, mass: 0.4 });
   const head = useTransform(p, [0.04, 0.96], [0, 1], { clamp: true });
   const headX = useTransform(head, (t) => X(t));
   const headY = useTransform(head, (t) => Y(capacity(t)));
@@ -74,7 +75,7 @@ export default function PeakControl({ stages, labels }: { stages: Stage[]; label
                     role="tab"
                     aria-selected={i === active}
                     onClick={() => jump(i)}
-                    className={`num h-8 min-w-8 rounded-full px-2.5 text-xs font-semibold transition-all duration-500 ${i === active ? "bg-teal text-white shadow-[0_8px_20px_-8px_rgba(19,113,121,0.9)]" : i < active ? "bg-sea-200 text-teal-deep" : "bg-white text-teal-deep/60 ring-1 ring-teal/15"}`}
+                    className={`tap num h-8 min-w-8 rounded-full px-2.5 text-xs font-semibold transition-colors duration-300 ${i === active ? "bg-teal-deep text-white shadow-[var(--shadow-teal)]" : i < active ? "bg-sea-200 text-teal-deep" : "bg-white text-teal-deep/75 ring-1 ring-teal/15"}`}
                   >
                     0{i + 1}
                   </button>
@@ -83,9 +84,9 @@ export default function PeakControl({ stages, labels }: { stages: Stage[]; label
               <div className="relative mt-6 min-h-[150px] sm:min-h-[170px]">
                 <motion.div
                   key={active}
-                  initial={reduce ? false : { opacity: 0, y: 18, filter: "blur(6px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                  initial={reduce ? false : { opacity: 0, transform: "translateY(8px)" }}
+                  animate={{ opacity: 1, transform: "translateY(0px)" }}
+                  transition={{ duration: 0.3, ease: EASE_OUT }}
                 >
                   <p className="num text-sm font-semibold text-teal">0{active + 1} / 05</p>
                   <h4 className="mt-1 font-display text-4xl font-semibold tracking-[-0.02em] text-teal-deep sm:text-5xl rtl:tracking-normal">{stages[active].t}</h4>
@@ -105,12 +106,12 @@ export default function PeakControl({ stages, labels }: { stages: Stage[]; label
                 <svg viewBox={`0 0 ${VW} ${VH}`} className="absolute inset-0 size-full overflow-visible" role="img" aria-label={`${stages[active].t}: ${stages[active].d}. ${labels.illustrative}`}>
                   <defs>
                     <linearGradient id="pk-cap" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0" stopColor="#137179" stopOpacity="0.95" />
-                      <stop offset="1" stopColor="#137179" stopOpacity="0.55" />
+                      <stop offset="0" stopColor="var(--color-teal)" stopOpacity="0.95" />
+                      <stop offset="1" stopColor="var(--color-teal)" stopOpacity="0.55" />
                     </linearGradient>
                     <linearGradient id="pk-dem" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0" stopColor="#6cc3c3" stopOpacity="0.35" />
-                      <stop offset="1" stopColor="#6cc3c3" stopOpacity="0" />
+                      <stop offset="0" stopColor="var(--color-sea-400)" stopOpacity="0.35" />
+                      <stop offset="1" stopColor="var(--color-sea-400)" stopOpacity="0" />
                     </linearGradient>
                     <clipPath id="pk-past">
                       {reduce ? <rect x="0" y="0" width={VW} height={VH} /> : <motion.rect x="0" y="0" height={VH} width={reveal} />}
@@ -131,7 +132,7 @@ export default function PeakControl({ stages, labels }: { stages: Stage[]; label
                   <g clipPath="url(#pk-past)">
                     <path d={area(demand)} fill="url(#pk-dem)" />
                     <path d={area(capacity)} fill="url(#pk-cap)" />
-                    <path d={line(demand)} fill="none" stroke="#0b3a40" strokeWidth="2.6" />
+                    <path d={line(demand)} fill="none" stroke="var(--color-teal-deep)" strokeWidth="2.6" />
                   </g>
                   {/* standby pool */}
                   <g style={{ opacity: active >= 1 ? 1 : 0.25, transition: "opacity .6s" }}>
@@ -151,14 +152,14 @@ export default function PeakControl({ stages, labels }: { stages: Stage[]; label
                   </g>
                   {/* review tick */}
                   <g style={{ opacity: active === 4 ? 1 : 0, transition: "opacity .6s" }}>
-                    <circle cx={X(0.9)} cy={Y(capacity(0.9)) - 26} r="13" fill="#0b7d36" />
+                    <circle cx={X(0.9)} cy={Y(capacity(0.9)) - 26} r="13" fill="var(--color-brand)" />
                     <path d={`M${X(0.9) - 5} ${Y(capacity(0.9)) - 26} l3.5 3.5 l6.5 -7`} stroke="#fff" strokeWidth="2.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                   </g>
                   {/* playhead */}
                   {!reduce ? (
                     <g>
-                      <motion.line y1={TOP - 16} y2={BOT} stroke="#0b3a40" strokeWidth="1.5" x1={headX} x2={headX} />
-                      <motion.circle r="9" fill="#fff" stroke="#137179" strokeWidth="3" cx={headX} cy={headY} />
+                      <motion.line y1={TOP - 16} y2={BOT} stroke="var(--color-teal-deep)" strokeWidth="1.5" x1={headX} x2={headX} />
+                      <motion.circle r="9" fill="#fff" stroke="var(--color-teal)" strokeWidth="3" cx={headX} cy={headY} />
                       <motion.circle r="20" fill="rgba(19,113,121,0.18)" cx={headX} cy={headY} />
                     </g>
                   ) : null}

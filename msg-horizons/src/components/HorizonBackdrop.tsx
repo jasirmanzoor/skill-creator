@@ -1,5 +1,6 @@
 "use client";
 
+import { EASE_OUT } from "@/lib/motion";
 import { motion, useScroll, useTransform, type MotionValue } from "motion/react";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { useEffect, useState } from "react";
@@ -150,7 +151,7 @@ function Letters({ opacity, lit = false, reduce }: { opacity?: MotionValue<numbe
         className="w-[64vw] max-w-[60vh] -translate-y-[95.8%] lg:w-[36vw]"
         initial={reduce ? false : { opacity: 0, filter: "blur(10px)" }}
         animate={{ opacity: 1, filter: "blur(0.45px)" }}
-        transition={{ duration: 2.4, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+        transition={{ duration: 2.4, ease: EASE_OUT, delay: 0.3 }}
         aria-hidden="true"
       >
         <defs>

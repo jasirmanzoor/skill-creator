@@ -1,5 +1,6 @@
 "use client";
 
+import { EASE_OUT, SPRING_UI } from "@/lib/motion";
 import { motion, useMotionValue, useSpring } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
@@ -49,9 +50,9 @@ export default function RoadmapPath({
   const [hover, setHover] = useState<number | null>(null);
   const gx = useMotionValue(0);
   const gy = useMotionValue(0);
-  const sx = useSpring(gx, { stiffness: 260, damping: 26, mass: 0.6 });
-  const sy = useSpring(gy, { stiffness: 260, damping: 26, mass: 0.6 });
-  const scale = useSpring(1, { stiffness: 300, damping: 22 });
+  const sx = useSpring(gx, { ...SPRING_UI, mass: 0.6 });
+  const sy = useSpring(gy, { ...SPRING_UI, mass: 0.6 });
+  const scale = useSpring(1, { ...SPRING_UI });
 
   const nodePx = useCallback((i: number) => {
     const r = box.current!.getBoundingClientRect();
@@ -122,12 +123,12 @@ export default function RoadmapPath({
           strokeLinecap="round"
           initial={false}
           animate={{ pathLength: Math.max(0.001, active / (NODES.length - 1)) }}
-          transition={{ duration: reduce ? 0 : 0.9, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: reduce ? 0 : 0.9, ease: EASE_OUT }}
         />
         <defs>
           <linearGradient id="roadmap-fill" x1={rtl ? "1" : "0"} x2={rtl ? "0" : "1"}>
-            <stop offset="0" stopColor="#137179" />
-            <stop offset="1" stopColor="#6cc3c3" />
+            <stop offset="0" stopColor="var(--color-teal)" />
+            <stop offset="1" stopColor="var(--color-sea-400)" />
           </linearGradient>
         </defs>
       </svg>
@@ -151,9 +152,9 @@ export default function RoadmapPath({
               style={{ left: `${n.x / 10}%`, top: `${(n.y / 220) * 100}%` }}
             >
               <motion.span
-                animate={{ scale: lit ? 1.12 : 1 }}
-                transition={{ type: "spring", stiffness: 400, damping: 24 }}
-                className={`relative flex size-14 items-center justify-center rounded-2xl border font-display text-lg font-semibold backdrop-blur-md transition-colors duration-300 group-focus-visible:ring-2 group-focus-visible:ring-[#4cc97a] ${
+                animate={{ transform: lit ? "scale(1.12)" : "scale(1)" }}
+                transition={{ type: "spring", ...SPRING_UI }}
+                className={`relative flex size-14 items-center justify-center rounded-2xl border font-display text-lg font-semibold backdrop-blur-md transition-colors duration-300 group-focus-visible:ring-2 group-focus-visible:ring-brand-bright ${
                   on
                     ? "border-teal bg-teal text-white shadow-[0_10px_30px_-8px_rgba(19,113,121,0.8)]"
                     : done

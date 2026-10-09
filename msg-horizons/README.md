@@ -10,11 +10,23 @@ based in Riyadh. It is bilingual (English / Arabic RTL), built on Next.js 16 and
 | Hero | The brand in the sky, the message on the sand; the "Who are you?" quick-start opens the planner |
 | Network panel | 1,000 dots (one per courier) and tracking-style vehicle markers from Riyadh HQ, with rolling counters |
 | Interludes | Full-screen, pinned statements that reveal line by line (verified facts only); the landmark steps out of frame |
+| Live tracking | Straight after the hero and partner logos: a driver's phone gets a request, the driver approves, and only then does the seller's tracking page show the driver's live location. Visitors can tap Approve themselves; a scan-vs-live strip shows the difference. Copy: `src/content/liveTracking.ts` |
 | Planner | Four-step configurator with a live preview → a shareable MSG configuration (no pricing) → WhatsApp or lead form |
 | Sellers, Services, Fleet | Approachable seller path, a service index with key facts, and a live Riyadh 24/7 clock |
 | Enterprise (dusk) | Workforce pipeline, scroll-driven peak-demand flow, governance |
 | Proof | Metrics, 10 pillars, vision |
 | Contact (night) | Lead form with a WhatsApp/email fallback, plus WhatsApp, phone, email and HQ |
+
+## Route console map
+The planner's route console flies a **real 3D map** (MapLibre GL + OpenFreeMap streets and buildings): the camera
+chases the vehicle along real roads at a tilt, swoops between steps, pulls up on long hops and circles at a site.
+- **Roads:** `src/lib/routing.ts` uses pre-computed routes (`src/content/routesStatic.ts`), then a live OSRM request.
+  Pre-compute them with `node --experimental-strip-types scripts/build-routes.mjs` (needs internet access).
+- **Places:** `src/content/routeGeo.ts` maps the console's districts and cities to real coordinates.
+- **Fallback:** if WebGL, the map or the routes are unavailable, the console quietly shows its flat map instead.
+- **Settings:** see `.env.example` (satellite button via a MapTiler key, custom style, routing server, off switch).
+- **Testing offline:** `tests/e2e/fake-map.mjs` stands in for the map and routing services.
+- **Worker file:** `scripts/copy-maplibre-worker.mjs` copies MapLibre's worker into `public/maplibre/` on install and build.
 
 ## Design system
 Light, editorial, industrial: paper and ink, one cobalt brand colour (tokens in `src/app/globals.css`;

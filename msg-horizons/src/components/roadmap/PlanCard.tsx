@@ -1,18 +1,20 @@
 "use client";
 
+import { EASE_OUT, EASE_IN_OUT } from "@/lib/motion";
 import { motion } from "motion/react";
 import { roadmapCopy, SEGMENT_PERSONA, type Segment } from "@/content/roadmap";
-import { sizerCopy } from "@/content/sizerCopy";
 import { whatsappLink } from "@/content/facts";
 import type { Dictionary, Locale } from "@/content/i18n";
 import { buildPlan, type PlanInput } from "@/lib/planner";
-import { volumeBand, type SizerInput, type Structure } from "@/lib/sizer";
+import { volumeBand, type SizerInput } from "@/lib/sizer";
 import { approxCost } from "@/lib/estimate";
 import { planSummary } from "@/lib/plan-summary";
 import { track } from "@/lib/analytics";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { usePlan } from "../PlanContext";
 import { ServiceIcon, WhatsAppIcon } from "../ui/icons";
+import { CoverIcon } from "../ui/coverIcons";
+import { coveredCopy } from "@/content/covered";
 
 /**
  * Terminal state of the estimator: the Curated Recommendation Plan.
@@ -21,10 +23,9 @@ import { ServiceIcon, WhatsAppIcon } from "../ui/icons";
  * pricing to MSG with the plan attached.
  */
 export default function PlanCard({
-  t, lang, segment, net, structure: s, onEdit,
-}: { t: Dictionary; lang: Locale; segment: Segment; net: SizerInput; structure: Structure; onEdit: () => void }) {
+  t, lang, segment, net, onEdit,
+}: { t: Dictionary; lang: Locale; segment: Segment; net: SizerInput; onEdit: () => void }) {
   const c = roadmapCopy[lang].plan;
-  const sc = sizerCopy[lang];
   const reduce = useReducedMotion();
   const { setPlan } = usePlan();
   const input: PlanInput = {
@@ -38,38 +39,31 @@ export default function PlanCard({
   const cost = approxCost(net);
   const cur = (n: number) => n.toLocaleString("en-US");
   const summary = planSummary(t, input, lang);
-  const find = (id: string) => s.decisions.find((d) => d.id === id);
-  const assets: [string, string | number][] = [
-    [c.routes, s.baseRoutes],
-    [c.couriers, s.baseCouriers],
-    [c.peak, s.peakCouriers],
-    [c.vehicles, find("vehicles") ? sc.decision(find("vehicles")!).title : "—"],
-    [c.pickup, sc.decision(find("pickup")!).title],
-    [c.dispatch, sc.decision(find("cadence")!).title],
-  ];
   const stagger = (k: number) => (reduce ? {} : { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, transition: { delay: 0.1 + k * 0.05, duration: 0.4 } });
 
   return (
     <motion.div
       layout
-      initial={reduce ? false : { opacity: 0, scale: 0.96, filter: "blur(12px)" }}
-      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-      exit={reduce ? undefined : { opacity: 0, scale: 0.98, filter: "blur(8px)" }}
-      transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+      initial={reduce ? false : { opacity: 0, scale: 0.96 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={reduce ? undefined : { opacity: 0, scale: 0.98, transition: { duration: 0.16, ease: EASE_OUT } }}
+      transition={{ duration: 0.3, ease: EASE_OUT }}
       className="relative"
     >
       {!reduce ? (
-        <motion.span aria-hidden="true" initial={{ left: "-50%", opacity: 0 }}
-              animate={{ left: ["-50%", "110%"], opacity: [0, 1, 1, 0] }}
-              transition={{ duration: 1.3, ease: [0.4, 0, 0.2, 1] }}
-          className="pointer-events-none absolute inset-y-0 z-10 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-[#b5f5cc]/20 to-transparent" />
+        <motion.span aria-hidden="true" initial={{ transform: "translateX(-50%)", opacity: 0 }}
+              animate={{ transform: ["translateX(-50%)", "translateX(110%)"], opacity: [0, 1, 1, 0] }}
+              transition={{ duration: 1.3, ease: EASE_IN_OUT }}
+              className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
+              <span className="absolute inset-y-0 start-0 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-brand-mint/20 to-transparent" />
+            </motion.span>
       ) : null}
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal rtl:tracking-normal">{c.eyebrow}</p>
           <h3 className="mt-2 font-display text-4xl font-semibold tracking-[-0.03em] text-teal-deep rtl:tracking-normal">{t.planner.result.models[plan.model].name}</h3>
-          <p className="mt-2 max-w-2xl text-teal-deep/80">{sc.headline(s, net)}</p>
+          
         </div>
         <button type="button" onClick={onEdit} className="rounded-full border border-teal/28 px-4 py-2 text-sm text-teal-deep/85 hover:border-teal/40 hover:text-teal-deep">{c.edit}</button>
       </div>
@@ -80,7 +74,7 @@ export default function PlanCard({
           <ul className="mt-4 space-y-3">
             {plan.modules.map((m, k) => (
               <motion.li key={m.id} {...stagger(k)} className="flex items-center gap-3">
-                <span className={`inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${m.core ? "bg-[#0b7d36] text-white" : "bg-white text-teal"}`}><ServiceIcon id={m.id} className="size-4" /></span>
+                <span className={`inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${m.core ? "bg-brand text-white" : "bg-white text-teal"}`}><ServiceIcon id={m.id} className="size-4" /></span>
                 <span className="text-sm text-teal-deep/95">{t.planner.services[m.id].name}</span>
               </motion.li>
             ))}
@@ -88,15 +82,15 @@ export default function PlanCard({
         </section>
 
         <section className="rounded-2xl border border-teal/18 bg-white/75 p-5 backdrop-blur-md">
-          <h4 className="text-sm font-semibold text-teal-deep/85">{c.assets}</h4>
-          <dl className="mt-4 divide-y divide-white/10">
-            {assets.map(([k, v], i) => (
-              <motion.div key={k} {...stagger(i)} className="flex items-baseline justify-between gap-3 py-2.5">
-                <dt className="text-sm text-teal-deep/70">{k}</dt>
-                <dd className={`text-end ${typeof v === "number" ? "num font-display text-2xl font-semibold text-teal-deep" : "text-sm font-medium text-teal-deep"}`}>{typeof v === "number" ? v.toLocaleString("en-US") : v}</dd>
-              </motion.div>
+          <h4 className="text-sm font-semibold text-teal-deep/85">{c.covered}</h4>
+          <ul className="mt-4 space-y-3">
+            {coveredCopy[lang].musts.map((m, k) => (
+              <motion.li key={m.id} {...stagger(k)} className="flex items-center gap-3">
+                <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand text-white"><CoverIcon id={m.id} className="size-4" /></span>
+                <span className="text-sm text-teal-deep/95">{m.t}</span>
+              </motion.li>
             ))}
-          </dl>
+          </ul>
         </section>
 
         <section className="flex flex-col rounded-2xl border border-teal/30 bg-gradient-to-b from-sea-100 to-white/80 p-5 backdrop-blur-md">
@@ -117,7 +111,7 @@ export default function PlanCard({
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => { track("whatsapp_click", { location: "roadmap_plan" }); track("plan_share", { channel: "whatsapp" }); }}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#128c4a] px-4 py-3 font-semibold text-white hover:bg-[#0f7a40]"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-whatsapp px-4 py-3 font-semibold text-white hover:bg-[#0f7a40]"
             >
               <WhatsAppIcon className="size-5" /> {c.whatsapp}
             </a>

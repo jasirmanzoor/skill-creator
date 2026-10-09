@@ -42,13 +42,12 @@ export default function NetworkBand({ lang, coastPhoto }: { lang: Locale; coastP
   }, [playing, active, frames.length]);
 
   return (
-    <section id="network" aria-labelledby="network-title" className="sea-band relative scroll-mt-16 overflow-hidden py-20 lg:py-28">
+    <section id="network" aria-labelledby="network-title" className="sea-band relative scroll-mt-16 sec overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-5 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[5fr_7fr] lg:gap-14">
           {/* rail */}
           <div className="flex flex-col">
-            <span className="label">{c.eyebrow}</span>
-            <h2 id="network-title" className="mt-3 font-display text-4xl font-semibold tracking-[-0.03em] text-balance sm:text-5xl rtl:tracking-normal">
+            <h2 id="network-title" className="h-section">
               {c.title}
             </h2>
             <p className="mt-3 font-display text-xl font-medium text-teal text-balance">{c.sub}</p>
@@ -110,15 +109,15 @@ export default function NetworkBand({ lang, coastPhoto }: { lang: Locale; coastP
                   loading="lazy"
                   decoding="async"
                   style={{ objectPosition: f.pos }}
-                  className={`absolute inset-0 size-full object-cover transition-[opacity,transform,filter] duration-[1100ms] ease-[cubic-bezier(.2,.7,.2,1)] ${
-                    i === active ? "scale-100 opacity-100 blur-0" : "scale-[1.06] opacity-0 blur-[6px]"
+                  className={`absolute inset-0 size-full object-cover transition-[opacity,scale] duration-700 ease-out ${
+                    i === active ? "scale-100 opacity-100" : "scale-[1.04] opacity-0"
                   }`}
                 />
               ))}
             </motion.div>
             {/* sea wash: ties the photo into the band */}
             <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(120%_80%_at_100%_0%,rgba(226,244,243,0.35),transparent_55%)]" />
-            <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-[#0b3a40]/55 to-transparent" />
+            <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-teal-deep/55 to-transparent" />
 
             <div className="absolute inset-x-4 bottom-4 flex items-end justify-between gap-4 sm:inset-x-6 sm:bottom-6">
               <div aria-live="polite" className="sea-glass rounded-2xl px-5 py-3 sm:px-6 sm:py-4">
@@ -137,23 +136,12 @@ export default function NetworkBand({ lang, coastPhoto }: { lang: Locale; coastP
         {/* partner ribbon */}
         <div className="sea-glass mt-6 flex flex-col gap-3 overflow-hidden rounded-3xl py-5 sm:flex-row sm:items-center sm:gap-0 sm:py-0">
           <p className="shrink-0 px-6 text-sm font-semibold text-teal sm:border-e sm:border-teal-deep/10 sm:py-6">{c.partners}</p>
-          <div dir="ltr" className="relative min-w-0 flex-1 overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]">
-            <ul className="sr-only">
-              {PARTNER_TEXT.map((p) => <li key={p}>{p}</li>)}
-            </ul>
-            <div aria-hidden="true" className="nb-ribbon flex w-max" style={{ animation: "nb-ribbon 32s linear infinite" }}>
-              {[0, 1].map((k) => (
-                <div key={k} className="flex shrink-0 items-center">
-                  {[...PARTNER_TEXT, ...PARTNER_TEXT].map((p, i) => (
-                    <span key={`${k}-${i}`} className="flex items-center font-display text-2xl font-semibold tracking-[-0.01em] text-teal-deep sm:text-3xl">
-                      <span className="px-7">{p}</span>
-                      <span className="size-1.5 rounded-full bg-teal/40" />
-                    </span>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* the confirmed partner names, set once and still */}
+          <ul dir="ltr" className="flex min-w-0 flex-1 flex-wrap items-center gap-x-6 gap-y-2 px-6 sm:py-6">
+            {PARTNER_TEXT.map((p) => (
+              <li key={p} className="font-display text-lg font-semibold tracking-[-0.01em] text-teal-deep sm:text-xl">{p}</li>
+            ))}
+          </ul>
         </div>
 
         {/* the way in: the roadmap turns a visitor's numbers into a plan and an approximate cost per order */}

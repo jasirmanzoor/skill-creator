@@ -44,7 +44,7 @@ export const en = {
       company: "Company",
     },
     desc: {
-      planner: "Enter your numbers and get routes, couriers and a delivery structure, calculated live.",
+      planner: "Enter your numbers and get a price quote and a plan that shows everything covered.",
       sellers: "Last-mile delivery for online sellers and growing stores.",
       services: "Last-mile, warehousing, land freight, tracking and account management.",
       fleet: "100+ specialised vehicles, telematics and 24/7 operations.",
@@ -63,7 +63,7 @@ export const en = {
     caption: "Each grey dot is one MSG courier. Blue markers are vehicles on their routes.",
     lead: "MSG Horizons runs last-mile delivery, warehousing, land freight and people as one accountable operation, for online sellers, growing e-commerce brands and enterprises. From a first order to peak season. Based in Riyadh, operating 24/7.",
     forWhom: "For online sellers, growing stores and enterprises across the Kingdom.",
-    nextStep: "Enter your numbers. Get routes, couriers and a structure, calculated live.",
+    nextStep: "Enter your numbers. Get a price quote and everything your plan covers.",
     ctaMicro: "No sign-up. MSG confirms scope and pricing once they see your volumes.",
     proofBeside: "1,000+ couriers · 100+ vehicles · 24/7 · AJEX · Keeta · iMile · Logistiq · J&T Express · Naqel · Landmark",
     ctaPlan: "Build my logistics plan",
@@ -83,7 +83,7 @@ export const en = {
   planner: {
     eyebrow: "Build your logistics",
     title: "What are you trying to move?",
-    lead: "Four steps: who you are, what you move, your real numbers and what matters. The structure is calculated live from MSG's real services. Under a minute, no sign-up.",
+    lead: "Four steps: who you are, what you move, your numbers and what matters. You get a price quote and a plan that shows everything covered. Under a minute, no sign-up.",
     stepOf: "Step {n} of {total}",
     steps: {
       persona: {
@@ -228,7 +228,7 @@ export const en = {
       account: { v: "1 team", l: "dedicated to your operation" },
     },
     eyebrow: "One accountable partner",
-    title: "One seamless logistics ecosystem.",
+    title: "Seven services. One partner accountable for all of them.",
     lead: "End-to-end services designed around control, speed and a single accountable partner. Use one, or combine them.",
     explore: "Add to my plan",
     featuredPoints: ["Fast, accurate, reliable delivery to the door", "Real-time tracking on every shipment", "Round-the-clock shipping and distribution", "Backed by 1,000+ couriers"],
@@ -310,7 +310,7 @@ export const en = {
     ],
     partnersTitle: "Valued partners",
     partnersNote: "Strategic alliances with industry leaders to deliver seamless, end-to-end logistics across the Kingdom.",
-    pillarsTitle: "The MSG experience: 10 pillars of excellence",
+    pillarsTitle: "What working with MSG looks like",
     pillars: [
       "Fast & efficient execution",
       "Strict on-time delivery",

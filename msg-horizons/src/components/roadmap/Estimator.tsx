@@ -1,15 +1,16 @@
 "use client";
 
-import NumberFlow from "@number-flow/react";
+import { EASE_OUT, SPRING_UI } from "@/lib/motion";
 import { AnimatePresence, LayoutGroup, motion } from "motion/react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { roadmapCopy, SEGMENTS, SEGMENT_PERSONA, type Segment } from "@/content/roadmap";
 import type { Dictionary, Locale } from "@/content/i18n";
-import { ordersFromSlider, size, sliderFromOrders, volumeBand, AREAS, type SizerInput } from "@/lib/sizer";
+import { ordersFromSlider, sliderFromOrders, volumeBand, AREAS, type SizerInput } from "@/lib/sizer";
 import { operatingModel } from "@/lib/planner";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { track } from "@/lib/analytics";
 import PlanCard from "./PlanCard";
+import { MustList, QuoteBlock } from "../planner/Covered";
 
 /**
  * The terminus of the roadmap: profile, volume, cash share, area and storage in; a live structure out.
@@ -26,9 +27,7 @@ export default function Estimator({
   const reduce = useReducedMotion();
   const [phase, setPhase] = useState<"input" | "plan">("input");
   const persona = SEGMENT_PERSONA[segment];
-  const s = useMemo(() => size(net, persona), [net, persona]);
   const set = <K extends keyof SizerInput>(k: K, v: SizerInput[K]) => onNet({ ...net, [k]: v });
-  const flow = reduce ? { animated: false } : {};
 
   return (
     <div id="estimator" className="sea-glass relative scroll-mt-24 overflow-hidden rounded-3xl p-5 sm:p-8">
@@ -39,10 +38,10 @@ export default function Estimator({
             <motion.div
               key="input"
               layout
-              initial={reduce ? false : { opacity: 0, y: 20, filter: "blur(8px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              exit={reduce ? undefined : { opacity: 0, scale: 0.97, filter: "blur(10px)" }}
-              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              initial={reduce ? false : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduce ? undefined : { opacity: 0, scale: 0.97, transition: { duration: 0.16, ease: EASE_OUT } }}
+              transition={{ duration: 0.3, ease: EASE_OUT }}
               className="relative grid gap-8 lg:grid-cols-[1.25fr_1fr]"
             >
               <div>
@@ -54,8 +53,8 @@ export default function Estimator({
                   {SEGMENTS.map((id) => {
                     const on = id === segment;
                     return (
-                      <button key={id} type="button" role="radio" aria-checked={on} onClick={() => onSegment(id)} className="relative rounded-full px-3.5 py-2 text-sm transition-colors">
-                        {on ? <motion.span layoutId="est-seg" transition={{ type: "spring", stiffness: 420, damping: 32 }} className="absolute inset-0 rounded-full bg-teal shadow-[0_8px_20px_-8px_rgba(19,113,121,0.9)]" /> : <span className="absolute inset-0 rounded-full border border-teal/23" />}
+                      <button key={id} type="button" role="radio" aria-checked={on} onClick={() => onSegment(id)} className="tap relative rounded-full px-3.5 py-2 text-sm transition-colors">
+                        {on ? <motion.span layoutId="est-seg" transition={{ type: "spring", ...SPRING_UI }} className="absolute inset-0 rounded-full bg-teal shadow-[var(--shadow-teal)]" /> : <span className="absolute inset-0 rounded-full border border-teal/23" />}
                         <span className={`relative ${on ? "text-white" : "text-teal-deep/80"}`}>{c.gate.segments[id].t}</span>
                       </button>
                     );
@@ -69,8 +68,8 @@ export default function Estimator({
                 <p className="mt-6 text-sm font-medium text-teal-deep/85">{e.area}</p>
                 <div role="radiogroup" aria-label={e.area} className="mt-2 grid grid-cols-3 gap-1 rounded-xl bg-white/75 p-1">
                   {AREAS.map((a) => (
-                    <button key={a} type="button" role="radio" aria-checked={net.area === a} onClick={() => set("area", a)} className="relative rounded-lg px-2 py-2 text-sm">
-                      {net.area === a ? <motion.span layoutId="est-area" className="absolute inset-0 rounded-lg bg-white ring-1 ring-teal/28" transition={{ type: "spring", stiffness: 420, damping: 32 }} /> : null}
+                    <button key={a} type="button" role="radio" aria-checked={net.area === a} onClick={() => set("area", a)} className="tap relative rounded-lg px-2 py-2 text-sm">
+                      {net.area === a ? <motion.span layoutId="est-area" className="absolute inset-0 rounded-lg bg-white ring-1 ring-teal/28" transition={{ type: "spring", ...SPRING_UI }} /> : null}
                       <span className={`relative ${net.area === a ? "text-teal-deep" : "text-teal-deep/75"}`}>{e.areas[a]}</span>
                     </button>
                   ))}
@@ -79,8 +78,8 @@ export default function Estimator({
                 <div className="mt-6 flex items-center justify-between gap-4">
                   <p className="text-sm font-medium text-teal-deep/85">{e.stock}</p>
                   <button type="button" role="switch" aria-checked={net.stock} aria-label={e.stock} onClick={() => set("stock", !net.stock)}
-                    className={`relative h-7 w-12 rounded-full transition-colors ${net.stock ? "bg-teal" : "bg-white ring-1 ring-teal/25"}`}>
-                    <motion.span layout transition={{ type: "spring", stiffness: 600, damping: 32 }} className={`absolute top-1 size-5 rounded-full bg-white shadow ${net.stock ? "end-1" : "start-1"}`} />
+                    className={`tap relative h-7 w-12 rounded-full transition-colors ${net.stock ? "bg-teal" : "bg-white ring-1 ring-teal/25"}`}>
+                    <motion.span layout transition={{ type: "spring", ...SPRING_UI }} className={`absolute top-1 size-5 rounded-full bg-white shadow ${net.stock ? "end-1" : "start-1"}`} />
                   </button>
                 </div>
               </div>
@@ -91,18 +90,8 @@ export default function Estimator({
                   <span className="relative inline-flex size-2"><span className="absolute inset-0 animate-ping rounded-full bg-teal/60 motion-reduce:hidden" /><span className="relative size-2 rounded-full bg-teal" /></span>
                   {t.planner.result.models[operatingModel({ persona, cargo: [], volume: volumeBand(net.orders), priorities: [] })].name}
                 </p>
-                <dl className="mt-4 grid grid-cols-2 gap-3">
-                  {[
-                    [c.plan.routes, s.baseRoutes],
-                    [c.plan.couriers, s.baseCouriers],
-                    [c.plan.peak, s.peakCouriers],
-                  ].map(([k, v]) => (
-                    <motion.div layout key={k as string} className="rounded-xl bg-white/75 p-3">
-                      <dt className="text-xs text-teal-deep/70">{k}</dt>
-                      <dd className="num mt-1 font-display text-3xl font-semibold text-teal-deep"><NumberFlow value={v as number} locales="en-US" {...flow} /></dd>
-                    </motion.div>
-                  ))}
-                </dl>
+                <div className="mt-4"><QuoteBlock net={net} lang={lang} tone="tint" /></div>
+                <div className="mt-4"><MustList lang={lang} compact /></div>
                 <button
                   type="button"
                   onClick={() => { setPhase("plan"); track("planner_complete", { model: "roadmap_estimator", modules: segment }); document.getElementById("estimator")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" }); }}
@@ -114,7 +103,7 @@ export default function Estimator({
               </motion.div>
             </motion.div>
           ) : (
-            <PlanCard key="plan" t={t} lang={lang} segment={segment} net={net} structure={s} onEdit={() => setPhase("input")} />
+            <PlanCard key="plan" t={t} lang={lang} segment={segment} net={net} onEdit={() => setPhase("input")} />
           )}
         </AnimatePresence>
       </LayoutGroup>

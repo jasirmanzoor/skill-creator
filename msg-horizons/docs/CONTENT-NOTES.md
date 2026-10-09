@@ -25,6 +25,20 @@ and what needs **confirmation** before it can be used.
   Commons, public domain), iMile (EN + AR, from imile.com), Keeta (app icon, from keeta-global.com). AJEX and Logistiqa
   appear as name tiles until MSG supplies their files. MSG should hold each partner's permission to display its mark.
 
+- **Live tracking (5 Oct 2026, from MSG in chat):** when a delivery is assigned the driver gets a request on their
+  phone and must approve it. Once they do, the driver's mobile location is fetched live and shown to the seller or
+  client (SMEs and start-ups) and their customer. It is **not** scan-based hub-to-hub tracking. The "Live tracking"
+  section (`src/components/live`, copy in `src/content/liveTracking.ts`) states exactly this and nothing more.
+
+## Live tracking: still to confirm with MSG
+| Item | Why |
+|---|---|
+| How the seller and their customer open it | Link, WhatsApp, dashboard or app? The demo shows a generic tracking page. |
+| If the driver declines or does not answer | The demo only shows the approve path. |
+| When sharing ends | The copy does not say it stops at delivery; confirm before stating it. |
+| Update frequency, accuracy and ETA | None are stated. The demo shows no times, distances or ETAs. |
+| Consent and privacy wording | The copy says nothing is shared until the driver approves. Confirm the wording and any data-retention terms. |
+
 ## Conflicts (not silently reconciled)
 - **Establishment date.** The source gives "11-04-1446 AH (01/12/2025)". 11 Rabiʿ II 1446 AH falls in
   mid-October 2024, not 1 December 2025. The 2026 growth trajectory also starts at "2024 Q1 Foundation".
@@ -36,6 +50,8 @@ and what needs **confirmation** before it can be used.
 - **Specific cities or regions served.** The source supports "across the Kingdom", "wide regional coverage"
   and "within cities and across regions", but names no cities except the Riyadh HQ. The hero map therefore
   labels only Riyadh HQ, and vehicle trails are abstract.
+- **"No other provider offers live tracking".** Not provable from the source, so it is not published. The section
+  shows the difference (scan updates vs live location) instead of making a claim about anyone else.
 - **Pricing, SLAs, delivery times and success rates.** None are in the source. The planner states that
   pricing is tailored and confirmed by MSG.
 - **Growth trajectory (2024 Q1 → 2025 Q3).** Held back because of the date conflict above.
@@ -43,6 +59,8 @@ and what needs **confirmation** before it can be used.
   one truck, and is captioned as illustrative.
 
 ## Illustrative (clearly labelled as such on the site)
+- Live tracking demo: sample places (Olaya to Al Rawdah) and a generic driver app and tracking page. The moving dot loops
+  along a sample route; it is not real data. Captioned as an illustrative demo.
 - Peak-demand chart: the shape of the curve is illustrative. It is captioned "not actual MSG volumes".
 - Planner volume bands (for example "200 – 2,000 a day") are the visitor's self-estimate, not MSG claims.
 
@@ -64,12 +82,12 @@ The skin is "Red Sea glass": daylight aqua, sea-foam, white, silver and deep tea
 
 - Hero: "You have something to sell. We already have the drivers." The earlier SEO line, "Last-mile delivery across Saudi Arabia", now sits in the h1 eyebrow.
 - 1 kg next-day rates, SAR per shipment: walk-in 33 intra-city / 52 inter-city; 299 a month 21 / 30.
-- Sabya: 800 m² logistics centre; walk-in 29 local / 48 to major cities; 299 a month 17 / 28.
+- Sabya: 800 m² logistics centre (updated to 1,000 m² by MSG on 6 Oct 2026, see below); walk-in 29 local / 48 to major cities; 299 a month 17 / 28.
 - The price band multiplies monthly shipments by the listed rate. Walk-in applies below 299 a month; the 299 band applies from 299. It makes no other assumption.
 - Rates appear only inside `<aside data-rate-card>`. The e2e claims test exempts only those blocks.
 
 Photo slots. MSG supplies these files; no generated stand-ins:
-- `public/warehouse.jpg`: the real Sabya warehouse, used behind "800 m² equipped with all necessary components". Until it exists, the card shows a plain sun-toned panel.
+- `public/warehouse.jpg`: the real Sabya warehouse, used in the Sabya card. Until it exists, the card shows a plain sun-toned panel.
 - `public/coast.jpg` (optional): a coastal highway or Corniche shot with a white truck. Until it exists, the network band paints a daylight Red Sea scene around MSG's own car photo.
 
 Open questions for MSG:
@@ -81,3 +99,38 @@ Update, 30 Sept 2026 (MSG): walk-in prices are no longer shown separately. The n
 Update, 30 Sept 2026 (MSG): Naqel, Landmark and Logistiq are confirmed partners. "Logistiq" follows the logo and MSG's spelling; the profile's "Logistiqa" is retired. Text lists now read: iMile · J&T · Keeta · Landmark · AJEX · Naqel · Logistiq.
 
 Domain: the website goes on www.msg-horizons.com only. msg-horizons.com (apex) stays on MSG's Odoo server (5.189.157.17); Google Workspace MX and SPF are unchanged. Once www resolves to Vercel, set NEXT_PUBLIC_SITE_URL=https://www.msg-horizons.com and redeploy. Canonicals, sitemap and hreflang then switch, and msg-horizons.vercel.app 308-redirects to www (next.config.ts).
+
+## Plan builder: what the client sees (6 Oct 2026, from MSG in chat)
+- The plan result and the volume step show **a price quote and what is covered**, not the operating matrix. Daily routes,
+  courier counts, peak couriers, vehicle mix and pickup/dispatch models are no longer shown to visitors (the sizer still
+  runs and the lead sent to MSG's team still carries it). The WhatsApp/email summary lists only what the client entered.
+- The four checkpoints in every plan: price quote, proof of delivery, live tracking, cash on delivery remitted on time.
+- The six areas MSG handles (src/content/covered.ts): legal, compliant infrastructure (own warehouses, line-haul vehicles
+  and delivery fleet, ZATCA-compliant tax filing and VAT paid), licences, people and resources (within labour
+  regulations), connectivity and visibility, and a proven record with partners.
+- **Not published, needs MSG's decision:** "100% compliant" (an absolute legal claim and a percentage; copy says
+  "compliant" instead) and "over 6 years of logistics and last mile". The 6 years conflicts with the establishment date
+  above (the profile gives 2024/2025); say whether it refers to the founding team's experience before MSG.
+
+## Warehouse photos in the hero (6 Oct 2026, supplied by MSG in chat)
+- Files: `public/media/msg/` (facade, sky layer, sign glow, two inside views), prepared by
+  `scripts/prepare-hero-photos.py`. The hero caption says "Real photo, retouched for presentation."
+- The retouched facade MSG supplied had garbled the sign (it read "فوريزونز"). The sign is restored from MSG's
+  original photo of the same facade, so it reads "ام اس جي هوريزونز" as on the building. Road litter and a stain were
+  removed. Nothing was added: no vehicles, signage or structures.
+- Confirmed by MSG: the photos are the **MSG Sabya hub**. The same corrected facade replaces
+  `public/photos/msg/warehouse-front.webp`, which had carried the garbled sign since 2 Oct.
+- Higher-resolution originals would sharpen the hero on large screens.
+
+## Sabya hub and the iMile outlet (6 Oct 2026, from MSG in chat)
+- Sabya hub: 1,000 m² (replaces the earlier 800 m²), MSG's own Hiace vans and in-house drivers, covering around
+  300,000 km² including hard mountain passes, bridges and remote villages. In `facts.sabyaHub` and the Sabya card.
+- iMile outlet: MSG owns and runs it as an iMile franchise (trademark model). It is a walk-in parcel kiosk and MSG
+  delivers to the surrounding district within 5 km. Photo: `public/media/msg/outlet.jpg` (the close-up; the wide shot
+  with a readable car plate and neighbouring shops is not used). A torn "shop for transfer" notice left on the glass
+  was removed from the photo. The outlet's city is not named until MSG gives it.
+
+## The pitch section, "Why MSG" (7 Oct 2026, from MSG in chat)
+- `src/content/pitch.ts`: the problem (products and ideas stall at getting to the customer; hardest part is licences,
+  compliance, paperwork, warehousing and labour rules) and MSG's answer, row by row. Wording follows MSG's message of
+  6 Oct. "100% compliant" and "6 years" are still not used.

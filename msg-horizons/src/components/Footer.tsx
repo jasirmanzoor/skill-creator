@@ -18,7 +18,7 @@ export default function Footer({ t, lang }: { t: Dictionary; lang: Locale }) {
   const f = t.footer;
   const year = new Date().getFullYear();
   return (
-    <footer data-theme="dark" className="border-t border-white/10 bg-[#07090f] pb-28 pt-16 text-white lg:pb-12">
+    <footer data-theme="dark" className="border-t border-white/10 bg-night pb-28 pt-16 text-white lg:pb-12">
       <div className="mx-auto grid max-w-7xl gap-12 px-5 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
         <div>
           <Logo inverted />
@@ -28,10 +28,10 @@ export default function Footer({ t, lang }: { t: Dictionary; lang: Locale }) {
 
         <nav aria-label={f.services}>
           <p className="text-sm font-semibold">{f.services}</p>
-          <ul className="mt-4 grid gap-2 text-sm text-white/65">
+          <ul className="mt-3 grid gap-0.5 text-sm text-white/65">
             {SERVICE_SLUGS.map((slug) => (
               <li key={slug}>
-                <a className="hover:text-white" href={`/${lang}/services/${slug}`}>
+                <a className="inline-flex min-h-11 items-center hover:text-white" href={`/${lang}/services/${slug}`}>
                   {servicePages[lang][slug].eyebrow}
                 </a>
               </li>
@@ -41,16 +41,16 @@ export default function Footer({ t, lang }: { t: Dictionary; lang: Locale }) {
 
         <nav aria-label={f.company}>
           <p className="text-sm font-semibold">{f.company}</p>
-          <ul className="mt-4 grid gap-2 text-sm text-white/65">
+          <ul className="mt-3 grid gap-0.5 text-sm text-white/65">
             {FOOTER_NAV.company.map((item) => (
               <li key={item.id}>
-                <a className="hover:text-white" href={`/${lang}${item.href}`}>
+                <a className="inline-flex min-h-11 items-center hover:text-white" href={`/${lang}${item.href}`}>
                   {t.nav[LABEL[item.id]]}
                 </a>
               </li>
             ))}
             <li>
-              <a className="hover:text-white" href={`/${lang === "en" ? "ar" : "en"}`} hrefLang={lang === "en" ? "ar" : "en"}>
+              <a className="inline-flex min-h-11 items-center hover:text-white" href={`/${lang === "en" ? "ar" : "en"}`} hrefLang={lang === "en" ? "ar" : "en"}>
                 {t.nav.langSwitch}
               </a>
             </li>
@@ -59,23 +59,23 @@ export default function Footer({ t, lang }: { t: Dictionary; lang: Locale }) {
 
         <div>
           <p className="text-sm font-semibold">{f.talk}</p>
-          <ul className="mt-4 grid gap-2 text-sm text-white/65">
+          <ul className="mt-3 grid gap-0.5 text-sm text-white/65">
             <li>
-              <a className="hover:text-white" href={`tel:${facts.contact.phoneE164}`}>
+              <a className="inline-flex min-h-11 items-center hover:text-white" href={`tel:${facts.contact.phoneE164}`}>
                 {facts.contact.phoneDisplay}
               </a>
             </li>
             <li>
-              <a className="hover:text-white" href={`mailto:${facts.contact.email}`}>
+              <a className="inline-flex min-h-11 items-center hover:text-white" href={`mailto:${facts.contact.email}`}>
                 {facts.contact.email}
               </a>
             </li>
             <li>
-              <a className="hover:text-white" href={whatsappLink()} target="_blank" rel="noopener noreferrer">
+              <a className="inline-flex min-h-11 items-center hover:text-white" href={whatsappLink()} target="_blank" rel="noopener noreferrer">
                 {t.nav.whatsapp}
               </a>
             </li>
-            <li>{lang === "ar" ? "الملز، الرياض 12836" : facts.contact.addressDisplay}</li>
+            <li className="flex min-h-11 items-center">{lang === "ar" ? "الملز، الرياض 12836" : facts.contact.addressDisplay}</li>
           </ul>
           <p className="mt-6 text-sm font-semibold">{f.legal}</p>
           <dl className="mt-3 grid gap-1 text-sm text-white/65">

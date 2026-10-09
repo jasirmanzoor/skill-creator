@@ -121,7 +121,7 @@ export default function ContactForm({ t, lang }: { t: Dictionary; lang: Locale }
 
   if (status === "sent") {
     return (
-      <div role="status" className="rounded-xl bg-surface p-8 text-ink shadow-[0_40px_100px_-30px_rgba(0,0,0,0.6)]">
+      <div role="status" className="rounded-xl bg-surface p-8 text-ink shadow-[var(--shadow-scene)]">
         <p className="font-display text-2xl font-semibold text-ink">{f.successTitle}</p>
         <p className="mt-3 text-muted">{f.successBody}</p>
         <a
@@ -131,7 +131,7 @@ export default function ContactForm({ t, lang }: { t: Dictionary; lang: Locale }
           onClick={() => track("whatsapp_click", { location: "form_success" })}
           className="mt-6 inline-flex items-center gap-2 rounded-md bg-ink px-5 py-3 font-medium text-white"
         >
-          <WhatsAppIcon className="size-5 text-[#25d366]" /> {t.contact.channels.whatsapp}
+          <WhatsAppIcon className="size-5 text-whatsapp-bright" /> {t.contact.channels.whatsapp}
         </a>
       </div>
     );
@@ -139,7 +139,7 @@ export default function ContactForm({ t, lang }: { t: Dictionary; lang: Locale }
 
   if (status === "handoff" || status === "error") {
     return (
-      <div role="status" className="rounded-xl bg-surface p-8 text-ink shadow-[0_40px_100px_-30px_rgba(0,0,0,0.6)]">
+      <div role="status" className="rounded-xl bg-surface p-8 text-ink shadow-[var(--shadow-scene)]">
         <p className="font-display text-2xl font-semibold text-ink">{f.fallbackTitle}</p>
         <p className="mt-3 text-muted">{status === "error" ? f.errors.network : f.fallbackBody}</p>
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -148,7 +148,7 @@ export default function ContactForm({ t, lang }: { t: Dictionary; lang: Locale }
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => track("whatsapp_click", { location: "form_handoff" })}
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-[#128c4a] px-5 py-3 font-medium text-white"
+            className="inline-flex items-center justify-center gap-2 rounded-md bg-whatsapp px-5 py-3 font-medium text-white"
           >
             <WhatsAppIcon className="size-5" /> {f.sendWhatsapp}
           </a>
@@ -171,7 +171,7 @@ export default function ContactForm({ t, lang }: { t: Dictionary; lang: Locale }
       action="/api/lead"
       data-ready={ready || undefined}
       noValidate={ready}
-      className="rounded-xl bg-surface p-6 text-ink shadow-[0_40px_100px_-30px_rgba(0,0,0,0.6)] sm:p-8" aria-describedby={`${uid}-privacy`}>
+      className="rounded-xl bg-surface p-6 text-ink shadow-[var(--shadow-scene)] sm:p-8" aria-describedby={`${uid}-privacy`}>
       {plan ? (
         <div className="mb-6 flex items-center justify-between gap-3 rounded-md border border-brand/25 bg-brand-soft px-4 py-3 text-sm">
           <span className="text-brand-strong">✓ {f.planAttached}: <strong className="text-ink">{t.planner.result.models[operatingModel(plan)].name}</strong></span>

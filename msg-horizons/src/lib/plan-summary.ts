@@ -1,6 +1,5 @@
 import type { Dictionary, Locale } from "@/content/i18n";
 import { sizerCopy } from "@/content/sizerCopy";
-import { size } from "./sizer";
 import { buildPlan, type PlanInput } from "./planner";
 
 /** Human-readable plan summary for WhatsApp / email / the lead record. */
@@ -17,9 +16,16 @@ export function planSummary(t: Dictionary, input: PlanInput, lang: Locale = "en"
   if (input.priorities.length)
     lines.push(`• ${s.priorities.q} ${input.priorities.map((p) => s.priorities.options[p].t).join(", ")}`);
   if (input.net) {
-    const c = sizerCopy[lang];
-    const st = size(input.net, input.persona);
-    lines.push("", ...c.summary(st, input.net).map((l) => `• ${l}`), c.headline(st, input.net));
+    // what the client told us, nothing more: the operating detail is MSG's to work out
+    const c = sizerCopy[lang].inputs;
+    const ar = lang === "ar";
+    lines.push(
+      "",
+      `• ${ar ? "الطلبات يومياً" : "Orders a day"}: ${input.net.orders.toLocaleString("en-US")}`,
+      `• ${c.area} ${c.areas[input.net.area]}`,
+      ...(input.net.cod ? [`• ${ar ? "الدفع عند الاستلام" : "Cash on delivery"}: ${input.net.cod}%`] : []),
+      ...(input.net.stock ? [`• ${c.stock} ${c.stockYes}`] : []),
+    );
   }
   lines.push("", ...plan.modules.map((m) => `✓ ${t.planner.services[m.id].name}`));
   return lines.join("\n");

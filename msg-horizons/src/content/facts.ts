@@ -44,6 +44,11 @@ export const facts = {
     addressDisplay: "Al Malaz, Riyadh 12836, Kingdom of Saudi Arabia",
   },
 
+  /** MSG's Sabya hub (Jazan), confirmed by MSG on 6 Oct 2026. */
+  sabyaHub: { areaM2: 1000, fleet: "MSG-owned Toyota Hiace vans", drivers: "in-house", coverageKm2: 300_000 },
+  /** iMile franchise outlet owned and run by MSG (6 Oct 2026): walk-in parcel kiosk, delivery within 5 km. */
+  outlet: { brand: "iMile", model: "franchise", deliveryRadiusKm: 5 },
+
   /** "Our Valued Partners" — 2026 profile. Text only; no third-party logos without permission. */
   partners: ["AJEX", "Keeta", "iMile", "Logistiq", "J&T Express", "Naqel", "Landmark"],
 

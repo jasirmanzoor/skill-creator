@@ -11,12 +11,11 @@ export default function Enterprise({ t }: { t: Dictionary }) {
   const e = t.enterprise;
   const wf = e.workforce;
   return (
-    <section id="enterprise" aria-labelledby="enterprise-title" className="sea-band scroll-mt-16 py-24 lg:py-32">
+    <section id="enterprise" aria-labelledby="enterprise-title" className="sea-band sec scroll-mt-16">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal className="grid gap-6 lg:grid-cols-2 lg:items-end">
           <div>
-            <span className="label">{e.eyebrow}</span>
-            <h2 id="enterprise-title" className="mt-4 font-display text-4xl font-semibold tracking-[-0.025em] text-balance sm:text-5xl rtl:tracking-normal">
+            <h2 id="enterprise-title" className="h-section">
               {e.title}
             </h2>
           </div>
@@ -67,20 +66,21 @@ export default function Enterprise({ t }: { t: Dictionary }) {
             <h3 className="font-display text-3xl font-semibold tracking-[-0.02em] sm:text-4xl rtl:tracking-normal">{e.governance.title}</h3>
             <p className="mt-3 text-lg text-teal-deep/75">{e.governance.lead}</p>
           </Reveal>
-          <ol className="mt-10 grid gap-px overflow-hidden rounded-lg border border-teal/15 bg-teal/10 sm:grid-cols-2 lg:grid-cols-5">
-            {e.governance.items.map((g, i) => (
-              <Reveal as="li" key={g.t} delay={i * 60} className="bg-white/80 p-6">
-                <span className="num text-sm text-teal">0{i + 1}</span>
-                <p className="mt-3 font-semibold">{g.t}</p>
-                <p className="mt-1 text-sm text-teal-deep/75">{g.d}</p>
-              </Reveal>
-            ))}
-          </ol>
-          <ul className="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-teal-deep/80">
-            {e.governance.outcomes.map((o) => (
-              <li key={o} className="flex items-center gap-2"><span className="size-1 rounded-full bg-teal" /> {o}</li>
-            ))}
-          </ul>
+          <div className="mt-10 grid gap-x-16 gap-y-10 lg:grid-cols-[1.5fr_1fr]">
+            <dl className="border-t border-teal/15">
+              {e.governance.items.map((g) => (
+                <div key={g.t} className="grid gap-1 border-b border-teal/15 py-4 sm:grid-cols-[14rem_1fr] sm:gap-6">
+                  <dt className="font-semibold">{g.t}</dt>
+                  <dd className="text-teal-deep/75">{g.d}</dd>
+                </div>
+              ))}
+            </dl>
+            <ul className="grid content-start gap-3 text-teal-deep/85 lg:border-s lg:border-teal/15 lg:ps-10">
+              {e.governance.outcomes.map((o) => (
+                <li key={o} className="flex items-center gap-3 font-medium"><span className="size-1.5 shrink-0 rounded-full bg-teal" /> {o}</li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         <div className="mt-16 flex flex-col gap-3 sm:flex-row">

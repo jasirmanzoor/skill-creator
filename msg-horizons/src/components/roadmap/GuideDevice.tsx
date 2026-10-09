@@ -1,11 +1,12 @@
 "use client";
 
+import { EASE_OUT } from "@/lib/motion";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
-import { guideCopy, roadmapCopy, SEGMENT_PERSONA, type Segment } from "@/content/roadmap";
+import { guideCopy, roadmapCopy, type Segment } from "@/content/roadmap";
 import type { Locale } from "@/content/i18n";
 import type { SizerInput } from "@/lib/sizer";
-import { size } from "@/lib/sizer";
+import { coveredCopy } from "@/content/covered";
 import { approxCost } from "@/lib/estimate";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import EmbeddedPhoto from "../ui/EmbeddedPhoto";
@@ -49,7 +50,7 @@ function useReveal() {
   return (i: number) =>
     reduce
       ? {}
-      : { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 }, transition: { delay: 0.25 + i * 0.45, duration: 0.45, ease: [0.16, 1, 0.3, 1] as const } };
+      : { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 }, transition: { delay: 0.25 + i * 0.45, duration: 0.45, ease: EASE_OUT } };
 }
 
 function Scene(p: SceneProps) {
@@ -64,7 +65,7 @@ function Scene(p: SceneProps) {
 }
 
 const Check = ({ className = "" }: { className?: string }) => (
-  <span className={`inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-[#0b7d36] text-white ${className}`}>
+  <span className={`inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-brand text-white ${className}`}>
     <svg viewBox="0 0 12 12" className="size-2.5" aria-hidden="true"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
   </span>
 );
@@ -72,10 +73,10 @@ const Check = ({ className = "" }: { className?: string }) => (
 function AppBar({ title, sub }: { title: string; sub?: string }) {
   return (
     <div className="flex items-center gap-2.5 border-b border-line bg-white px-4 pb-3 pt-9">
-      <span className="flex size-8 items-center justify-center rounded-full bg-[#0b3a26]"><Mark inverted className="h-3.5 w-auto" /></span>
+      <span className="flex size-8 items-center justify-center rounded-full bg-brand-deep"><Mark inverted className="h-3.5 w-auto" /></span>
       <div className="min-w-0">
         <p className="truncate text-[13px] font-semibold">{title}</p>
-        {sub ? <p className="text-[10px] text-[#0b7d36]">{sub}</p> : null}
+        {sub ? <p className="text-[10px] text-brand">{sub}</p> : null}
       </div>
     </div>
   );
@@ -104,9 +105,9 @@ function Chat({ g, net, segment }: SceneProps) {
           </span>
         ) : null}
         {replied ? (
-          <motion.div initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
+          <motion.div initial={reduce ? false : { opacity: 0, transform: "translateY(8px)" }} animate={{ opacity: 1, transform: "translateY(0px)" }} transition={{ duration: 0.24, ease: EASE_OUT }} className="space-y-2">
             <p className="max-w-[85%] rounded-xl rounded-ss-sm bg-white px-3 py-2 shadow-sm">{g.reply}</p>
-            <span className="inline-block rounded-full border border-[#0f9641] bg-white px-3 py-1 text-[11px] font-semibold text-[#0b7d36]">{g.quick}</span>
+            <span className="inline-block rounded-full border border-brand-vivid bg-white px-3 py-1 text-[11px] font-semibold text-brand">{g.quick}</span>
           </motion.div>
         ) : null}
       </div>
@@ -159,7 +160,7 @@ function Guide({ g, area }: SceneProps) {
             {Array.from({ length: 38 }, (_, i) => <span key={i} className="bg-ink" style={{ width: i % 3 ? 1.5 : 3, height: `${60 + ((i * 37) % 40)}%` }} />)}
           </div>
           <div className="mt-2 flex justify-between text-[9px] font-semibold">
-            <span className="text-[#0b7d36]">{g.label.cod}</span>
+            <span className="text-brand">{g.label.cod}</span>
             <span className="text-muted">{g.label.handle}</span>
           </div>
         </motion.div>
@@ -175,39 +176,27 @@ function Guide({ g, area }: SceneProps) {
   );
 }
 
-function Plan({ g, net, segment, lang }: SceneProps) {
+function Plan({ g, net, lang }: SceneProps) {
   const r = useReveal();
-  const s = size(net, SEGMENT_PERSONA[segment ?? "social"]);
   const cost = approxCost(net);
-  const chips = [g.services.lastMile, ...(net.cod > 0 ? [g.services.cod] : []), ...(net.stock ? [g.services.storage] : []), g.services.tracking];
+  const musts = coveredCopy[lang].musts;
   return (
     <div className="flex h-full flex-col">
       <AppBar title={g.planTitle} />
       <div className="flex-1 space-y-2.5 p-3">
-        <motion.div {...r(0)} className="grid grid-cols-2 gap-2">
-          {([[g.routes, s.baseRoutes], [g.couriers, s.baseCouriers]] as const).map(([k, v]) => (
-            <div key={k} className="rounded-xl bg-white p-3 shadow-sm">
-              <p className="text-[10px] text-muted">{k}</p>
-              <p className="num font-display text-2xl font-semibold">{v}</p>
-            </div>
-          ))}
-        </motion.div>
-        <motion.div {...r(1)} className="rounded-xl bg-[#0b3a26] p-3 text-white">
+        <motion.div {...r(0)} className="rounded-xl bg-brand-deep p-3 text-white">
           <p className="text-[10px] text-white/70">{g.perOrder}</p>
           <p className="num font-display text-3xl font-semibold" dir={lang === "ar" ? "rtl" : "ltr"}>
             ≈ {lang === "ar" ? <>{cost.perOrder} <span className="text-base">ريال</span></> : <><span className="text-base">SAR</span> {cost.perOrder}</>}
           </p>
         </motion.div>
-        <motion.dl {...r(2)} className="divide-y divide-line rounded-xl bg-white px-3 shadow-sm">
-          {([[g.peak, s.peakCouriers], [g.flex, `+${s.flex}`]] as const).map(([k, v]) => (
-            <div key={k} className="flex items-center justify-between gap-2 py-2">
-              <dt className="text-[11px] text-muted">{k}</dt>
-              <dd className="num text-[13px] font-semibold">{v}</dd>
-            </div>
+        <motion.ul {...r(1)} className="divide-y divide-line rounded-xl bg-white px-3 shadow-sm">
+          {musts.map((m) => (
+            <li key={m.id} className="flex items-center gap-2 py-2 text-[12px] font-semibold"><Check />{m.t}</li>
           ))}
-        </motion.dl>
-        <motion.div {...r(3)} className="flex flex-wrap gap-1.5">
-          {chips.map((c) => <span key={c} className="rounded-full bg-brand-soft px-2.5 py-1 text-[11px] font-semibold text-brand-strong">{c}</span>)}
+        </motion.ul>
+        <motion.div {...r(2)} className="flex flex-wrap gap-1.5">
+          {[g.services.lastMile, ...(net.cod > 0 ? [g.services.cod] : []), ...(net.stock ? [g.services.storage] : []), g.services.tracking].map((c) => <span key={c} className="rounded-full bg-brand-soft px-2.5 py-1 text-[11px] font-semibold text-brand-strong">{c}</span>)}
         </motion.div>
       </div>
     </div>
@@ -262,16 +251,16 @@ function Pilot({ g }: SceneProps) {
           <div key={k} className="rounded-xl bg-white p-3 shadow-sm">
             <div className="flex items-center justify-between text-[11px]">
               <span className="num font-semibold">MSG-P{k + 1}</span>
-              {done > k ? <span className="inline-flex items-center gap-1 font-semibold text-[#0b7d36]"><Check />{g.pod}</span> : <span className="text-muted">…</span>}
+              {done > k ? <span className="inline-flex items-center gap-1 font-semibold text-brand"><Check />{g.pod}</span> : <span className="text-muted">…</span>}
             </div>
             <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-subtle">
-              <motion.div className="h-full rounded-full bg-[#0b7d36]" initial={reduce ? false : { width: "0%" }} animate={{ width: done > k ? "100%" : "35%" }} transition={{ duration: 0.8 }} />
+              <motion.div className="h-full origin-left rounded-full bg-brand rtl:origin-right" initial={reduce ? false : { transform: "scaleX(0)" }} animate={{ transform: done > k ? "scaleX(1)" : "scaleX(0.35)" }} transition={{ duration: 0.6, ease: EASE_OUT }} />
             </div>
           </div>
         ))}
         {live ? (
-          <motion.div initial={reduce ? false : { opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-3 rounded-xl bg-[#0b3a26] p-3 text-white">
-            <span className="relative flex size-3"><span className="absolute inset-0 animate-ping rounded-full bg-[#4cc97a] motion-reduce:hidden" /><span className="relative size-3 rounded-full bg-[#4cc97a]" /></span>
+          <motion.div initial={reduce ? false : { opacity: 0, transform: "scale(0.95)" }} animate={{ opacity: 1, transform: "scale(1)" }} transition={{ duration: 0.24, ease: EASE_OUT }} className="flex items-center gap-3 rounded-xl bg-brand-deep p-3 text-white">
+            <span className="relative flex size-3"><span className="absolute inset-0 animate-ping rounded-full bg-brand-bright motion-reduce:hidden" /><span className="relative size-3 rounded-full bg-brand-bright" /></span>
             <div>
               <p className="text-[13px] font-semibold">{g.live}</p>
               <p className="text-[10.5px] text-white/70">{g.liveBody}</p>
