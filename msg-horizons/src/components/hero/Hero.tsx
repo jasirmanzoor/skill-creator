@@ -10,6 +10,7 @@ import { whatsappLink } from "@/content/facts";
 import { rateFor, type Lane } from "@/content/redsea";
 import type { Dictionary, Locale } from "@/content/i18n";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { usePlan } from "../PlanContext";
 import TrackedLink from "../ui/TrackedLink";
 import { ArrowIcon, WhatsAppIcon } from "../ui/icons";
 import Dust from "./Dust";
@@ -80,8 +81,12 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   const staged = !reduce;
   const section = useRef<HTMLElement>(null);
   const frame = useRef<HTMLDivElement>(null);
-  const [lane, setLane] = useState<HeroLane>("intra");
-  const [orders, setOrders] = useState(300);
+  // the price being built is shared with the rest of the page (PlanContext)
+  const { quote, setQuote } = usePlan();
+  const lane: HeroLane = quote.lane === "intra" || quote.lane === "inter" ? quote.lane : "sabya";
+  const orders = quote.orders;
+  const setLane = (l: HeroLane) => setQuote({ lane: RATE_LANE[l] });
+  const setOrders = (n: number) => setQuote({ orders: n });
   const [beat, setBeat] = useState(1);
 
   // the walk-in is driven by scroll through the (tall) section

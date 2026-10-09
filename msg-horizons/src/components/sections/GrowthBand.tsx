@@ -4,7 +4,8 @@
 import { EASE_OUT, SPRING_SMOOTH } from "@/lib/motion";
 import NumberFlow from "@number-flow/react";
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
-import { useId, useRef, useState } from "react";
+import { useId, useRef } from "react";
+import { usePlan } from "../PlanContext";
 import { redSea, LANES, RATE_CARD, rateFor, type Lane } from "@/content/redsea";
 import { whatsappLink } from "@/content/facts";
 import type { Locale } from "@/content/i18n";
@@ -39,8 +40,12 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
   const o = redSea[lang].outlet;
   const reduce = useReducedMotion();
   const id = useId();
-  const [lane, setLane] = useState<Lane>("intra");
-  const [n, setN] = useState(120);
+  // carries on from the hero's quote: same lane, same monthly orders (this chart tops out at MAX)
+  const { quote, setQuote } = usePlan();
+  const lane = quote.lane;
+  const n = Math.min(quote.orders, MAX);
+  const setLane = (l: Lane) => setQuote({ lane: l });
+  const setN = (v: number) => setQuote({ orders: v });
 
   const rate = rateFor(lane, n);
   const monthly = n * rate;
@@ -51,8 +56,7 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
   return (
     <section id="growth" aria-labelledby="growth-title" className="sea-band relative scroll-mt-16 sec overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-5 lg:px-8">
-        <span className="label">{c.eyebrow}</span>
-        <h2 id="growth-title" className="h-display mt-3">
+        <h2 id="growth-title" className="h-display">
           <span className="block">{c.title[0]}</span>
           <span className="block">{c.title[1]}</span>
           <span className="block text-teal">{c.title[2]}</span>

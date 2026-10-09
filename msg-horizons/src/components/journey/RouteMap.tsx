@@ -16,6 +16,8 @@ type Props = {
   lens: Lens;
   onLens: (l: Lens) => void;
   reduce: boolean;
+  /** opened from the keyboard: appear at once, no entrance */
+  still?: boolean;
   onClose: () => void;
   onGo: (i: number) => void;
 };
@@ -27,7 +29,7 @@ const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v
  * The whole website as one route you can see at once. Pick who you are and the stops that matter to you light
  * up; pick a stop and the courier travels the route to it, then the page is there. Esc or M closes it.
  */
-export default function RouteMap({ stops, active, lang, c, lens, onLens, reduce, onClose, onGo }: Props) {
+export default function RouteMap({ stops, active, lang, c, lens, onLens, reduce, still, onClose, onGo }: Props) {
   const n = stops.length;
   const rtl = lang === "ar";
   const route = useMemo(() => buildRoute(n, rtl), [n, rtl]);
@@ -105,7 +107,7 @@ export default function RouteMap({ stops, active, lang, c, lens, onLens, reduce,
       aria-modal="true"
       aria-labelledby="route-title"
       onKeyDown={onKeyDown}
-      className={`route-in fixed inset-0 z-[70] overflow-y-auto bg-pitch/[0.97] text-white backdrop-blur-xl transition-opacity duration-300 ${leaving ? "opacity-0" : "opacity-100"}`}
+      className={`${still ? "" : "route-in"} fixed inset-0 z-[70] overflow-y-auto bg-pitch/[0.97] text-white backdrop-blur-xl transition-opacity duration-300 ${leaving ? "opacity-0" : "opacity-100"}`}
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_85%_0%,rgba(19,113,121,0.5),transparent_70%),radial-gradient(50%_45%_at_0%_100%,rgba(11,125,54,0.25),transparent_70%)]" />
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:56px_56px] [mask-image:radial-gradient(80%_70%_at_50%_30%,#000,transparent)]" />

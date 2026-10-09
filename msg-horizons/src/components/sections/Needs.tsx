@@ -63,8 +63,7 @@ export default function Needs({ lang }: { lang: Locale }) {
       <div className="mx-auto max-w-7xl px-4 sm:px-5 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-2 lg:items-end">
           <div>
-            <span className="label">{c.eyebrow}</span>
-            <h2 id="needs-title" className="h-section mt-4 text-teal-deep">
+            <h2 id="needs-title" className="h-section text-teal-deep">
               {c.title}
             </h2>
           </div>

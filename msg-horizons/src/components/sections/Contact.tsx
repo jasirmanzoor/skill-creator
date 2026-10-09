@@ -14,8 +14,7 @@ export default function Contact({ t, lang }: { t: Dictionary; lang: Locale }) {
     <section id="contact" data-theme="dark" aria-labelledby="contact-title" className="on-dark scroll-mt-16 bg-night/80 sec-finale text-white backdrop-blur-[2px]">
       <div className="mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-[1fr_1.15fr] lg:px-8">
         <Reveal>
-          <span className="label">{c.eyebrow}</span>
-          <h2 id="contact-title" className="h-display mt-4">
+          <h2 id="contact-title" className="h-display">
             {c.title}
           </h2>
           <p className="mt-6 max-w-md text-lg text-white/75">{c.lead}</p>

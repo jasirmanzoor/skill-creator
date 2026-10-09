@@ -59,8 +59,7 @@ export default function LiveTracking({ lang }: { lang: Locale }) {
       <div className="relative mx-auto max-w-[88rem] px-5 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:gap-12">
           <div>
-            <span className="label on-dark">{c.eyebrow}</span>
-            <h2 id="live-title" className="h-section mt-3">
+            <h2 id="live-title" className="h-section">
               {c.title}
             </h2>
             <p className="mt-4 max-w-xl text-lg leading-relaxed text-white/75 text-pretty">{c.lead}</p>

@@ -47,8 +47,7 @@ export default function NetworkBand({ lang, coastPhoto }: { lang: Locale; coastP
         <div className="grid gap-10 lg:grid-cols-[5fr_7fr] lg:gap-14">
           {/* rail */}
           <div className="flex flex-col">
-            <span className="label">{c.eyebrow}</span>
-            <h2 id="network-title" className="h-section mt-3">
+            <h2 id="network-title" className="h-section">
               {c.title}
             </h2>
             <p className="mt-3 font-display text-xl font-medium text-teal text-balance">{c.sub}</p>

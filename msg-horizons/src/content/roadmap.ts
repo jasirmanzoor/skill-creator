@@ -87,7 +87,7 @@ type Copy = {
 export const roadmapCopy: Record<Locale, Copy> = {
   en: {
     eyebrow: "The MSG roadmap",
-    title: "Our effortless service, mapped out for you.",
+    title: "Our service, mapped out for you step by step.",
     rolls: ["Need to scale online?", "Launch your homemade creations nationwide.", "From your door to the Kingdom—seamlessly handled."],
     gate: {
       hook: "Delivering across KSA? We bridge the distance.",

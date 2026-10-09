@@ -26,10 +26,10 @@ export default function StepStage({
   const pop = reduce
     ? {}
     : {
-        initial: { opacity: 0, scale: 0.96, filter: "blur(10px)", x: 40 * dir },
-        animate: { opacity: 1, scale: 1, filter: "blur(0px)", x: 0 },
-        exit: { opacity: 0, scale: 0.98, filter: "blur(8px)", x: -30 * dir },
-        transition: { duration: 0.45, ease: EASE_OUT },
+        initial: { opacity: 0, transform: `translateX(${12 * dir}px)` },
+        animate: { opacity: 1, transform: "translateX(0px)" },
+        exit: { opacity: 0, transform: `translateX(${-8 * dir}px)`, transition: { duration: 0.16, ease: EASE_OUT } },
+        transition: { duration: 0.24, ease: EASE_OUT },
       };
   return (
     <div id="roadmap-stage" role="tabpanel" aria-live="polite" className="relative mt-4 overflow-hidden rounded-3xl">

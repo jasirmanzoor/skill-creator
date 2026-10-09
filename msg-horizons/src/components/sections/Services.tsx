@@ -22,8 +22,7 @@ export default function Services({ t, lang }: { t: Dictionary; lang: Locale }) {
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-2 lg:items-end">
           <div>
-            <span className="label">{s.eyebrow}</span>
-            <h2 id="services-title" className="h-section mt-4 text-ink">
+            <h2 id="services-title" className="h-section text-ink">
               {s.title}
             </h2>
           </div>

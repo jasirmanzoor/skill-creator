@@ -133,8 +133,10 @@ export default function Journey({ lang }: { lang: Locale }) {
     track("cta_click", { cta: "route_stop", location: id });
   }, [reduce]);
 
-  const openMap = useCallback(() => {
+  const [byKey, setByKey] = useState(false);
+  const openMap = useCallback((fromKey?: unknown) => {
     opener.current = document.activeElement as HTMLElement | null;
+    setByKey(fromKey === true);
     setOpen(true);
     track("cta_click", { cta: "route_map", location: "route" });
   }, []);
@@ -154,14 +156,14 @@ export default function Journey({ lang }: { lang: Locale }) {
       if (e.key === "m" || e.key === "M") {
         e.preventDefault();
         if (open) closeMap();
-        else openMap();
+        else openMap(true);
       } else if (!open && e.key === "]") {
-        go(stepIndex(cur.current.index, 1, n));
+        go(stepIndex(cur.current.index, 1, n), true); // a key press lands straight away
       } else if (!open && e.key === "[") {
         // mid-stop: back to its start; already at the start (where a hop lands): the stop before
         const { index } = cur.current;
         const atStart = Math.abs(window.scrollY - Math.max(0, (tops.current[index] ?? 0) - 64)) < 120;
-        go(atStart ? stepIndex(index, -1, n) : index);
+        go(atStart ? stepIndex(index, -1, n) : index, true);
       }
     };
     window.addEventListener("keydown", onKey);
@@ -286,6 +288,7 @@ export default function Journey({ lang }: { lang: Locale }) {
           lens={lens}
           onLens={chooseLens}
           reduce={reduce}
+          still={byKey}
           onClose={closeMap}
           onGo={(i) => go(i, true)}
         />

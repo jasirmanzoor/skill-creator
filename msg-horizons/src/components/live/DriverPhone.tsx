@@ -14,7 +14,7 @@ export default function DriverPhone({
 }: { c: LiveCopy; live: boolean; reduce: boolean; onApprove: () => void; onReplay: () => void }) {
   const d = c.driver;
   const ease = EASE_OUT;
-  const swap = reduce ? { duration: 0 } : { duration: 0.45, ease };
+  const swap = reduce ? { duration: 0 } : { duration: 0.24, ease };
 
   return (
     <div

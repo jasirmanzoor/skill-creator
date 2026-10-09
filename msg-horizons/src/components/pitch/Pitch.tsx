@@ -75,8 +75,7 @@ export default function Pitch({ t, lang }: { t: Dictionary; lang: Locale }) {
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:items-end">
           <div>
-            <span className="label">{c.eyebrow}</span>
-            <h2 id="why-title" className="h-scene mt-3">
+            <h2 id="why-title" className="h-scene">
               {c.title}
             </h2>
           </div>

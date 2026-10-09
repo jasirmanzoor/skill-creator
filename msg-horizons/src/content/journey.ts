@@ -28,7 +28,7 @@ export const STOPS: Stop[] = [
   { id: "planner", panel: true, for: ["seller", "brand"], title: { en: "Build your plan", ar: "ابنِ خطتك" }, hint: { en: "Four steps to a setup that fits", ar: "أربع خطوات إلى منظومة تناسبك" } },
   { id: "network", for: ["brand", "enterprise"], title: { en: "The network", ar: "الشبكة" }, hint: { en: "1,000+ couriers, 100+ vehicles", ar: "+1,000 مندوب و+100 مركبة" } },
   { id: "journey", for: ["seller", "brand"], title: { en: "How it works", ar: "كيف نعمل" }, hint: { en: "Our service, mapped step by step", ar: "خدمتنا مرسومة لك خطوة بخطوة" } },
-  { id: "services", for: ["seller", "brand", "enterprise"], title: { en: "Services", ar: "الخدمات" }, hint: { en: "One seamless logistics ecosystem", ar: "منظومة لوجستية واحدة متكاملة" } },
+  { id: "services", for: ["seller", "brand", "enterprise"], title: { en: "Services", ar: "الخدمات" }, hint: { en: "Seven services, one accountable partner", ar: "سبع خدمات وشريك واحد مسؤول" } },
   { id: "fleet", for: ["enterprise"], title: { en: "Fleet & operations", ar: "الأسطول والعمليات" }, hint: { en: "Always ready. Always moving.", ar: "جاهزون دائمًا. في حركة دائمة." } },
   { id: "partners", for: ["seller", "brand", "enterprise"], title: { en: "Partners", ar: "الشركاء" }, hint: { en: "Trusted by the names that move the Kingdom", ar: "موثوقون من الأسماء التي تحرّك المملكة" } },
   { id: "proof", for: ["brand", "enterprise"], title: { en: "Proof", ar: "الإثبات" }, hint: { en: "Scale you can see, standards you can trust", ar: "حجم تراه ومعايير تثق بها" } },

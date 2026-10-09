@@ -228,7 +228,7 @@ export const en = {
       account: { v: "1 team", l: "dedicated to your operation" },
     },
     eyebrow: "One accountable partner",
-    title: "One seamless logistics ecosystem.",
+    title: "Seven services. One partner accountable for all of them.",
     lead: "End-to-end services designed around control, speed and a single accountable partner. Use one, or combine them.",
     explore: "Add to my plan",
     featuredPoints: ["Fast, accurate, reliable delivery to the door", "Real-time tracking on every shipment", "Round-the-clock shipping and distribution", "Backed by 1,000+ couriers"],
@@ -310,7 +310,7 @@ export const en = {
     ],
     partnersTitle: "Valued partners",
     partnersNote: "Strategic alliances with industry leaders to deliver seamless, end-to-end logistics across the Kingdom.",
-    pillarsTitle: "The MSG experience: 10 pillars of excellence",
+    pillarsTitle: "What working with MSG looks like",
     pillars: [
       "Fast & efficient execution",
       "Strict on-time delivery",

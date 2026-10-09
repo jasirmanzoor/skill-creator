@@ -1,5 +1,6 @@
 "use client";
 
+import { EASE_OUT } from "@/lib/motion";
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { LiveCopy } from "@/content/liveTracking";
@@ -84,7 +85,7 @@ export default function TrackerCard({ c, live, reduce }: { c: LiveCopy; live: bo
   }, [live, reduce]);
 
   const state: ("done" | "active" | "todo")[] = live ? ["done", "active", "todo"] : ["done", "todo", "todo"];
-  const swap = reduce ? { duration: 0 } : { duration: 0.5 };
+  const swap = reduce ? { duration: 0 } : { duration: 0.24, ease: EASE_OUT };
 
   return (
     <div role="group" aria-label={tr.label} className="w-full overflow-hidden rounded-[1.75rem] bg-white text-ink shadow-[0_50px_100px_-40px_rgba(0,0,0,0.7)] ring-1 ring-white/20">
