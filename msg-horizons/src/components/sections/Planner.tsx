@@ -1,5 +1,6 @@
 "use client";
 
+import { EASE_OUT } from "@/lib/motion";
 import { AnimatePresence, motion } from "motion/react";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { useEffect, useRef, useState } from "react";
@@ -140,7 +141,7 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
   const onNet = (v: SizerInput) => { setNet(v); setNetTouched(true); };
   const anim = reduce
     ? {}
-    : { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -6 }, transition: { duration: 0.28, ease: [0.16, 1, 0.3, 1] as const } };
+    : { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -6 }, transition: { duration: 0.28, ease: EASE_OUT } };
 
   const k = cockpitCopy[lang];
   const cv = coveredCopy[lang];

@@ -1,5 +1,6 @@
 "use client";
 
+import { SPRING_SMOOTH } from "@/lib/motion";
 import { motion, useMotionValueEvent, useScroll, useSpring, useTransform } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { experience, NEED_STAGES, NEEDS_BY_STAGE, type NeedId, type NeedStage } from "@/content/experience";
@@ -33,7 +34,7 @@ export default function Needs({ lang }: { lang: Locale }) {
   const [active, setActive] = useState(0);
 
   const { scrollYProgress } = useScroll({ target: track, offset: ["start start", "end end"] });
-  const p = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.4 });
+  const p = useSpring(scrollYProgress, { ...SPRING_SMOOTH, mass: 0.4 });
   const fill = useTransform(p, [0.04, 0.96], ["0%", "100%"]);
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     const s = Math.min(NEED_STAGES.length - 1, Math.max(0, Math.floor(v * NEED_STAGES.length)));
@@ -211,7 +212,7 @@ function StageCard({ stage, c, guide }: { stage: NeedStage; c: NeedsCopy; guide:
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-teal rtl:tracking-normal">{c.cards.store}</p>
         <div aria-hidden="true" className="mt-3 grid grid-cols-6 gap-1.5">
           {Array.from({ length: 18 }, (_, i) => (
-            <span key={i} className={`h-4 rounded-[4px] ${[2, 7, 11, 16].includes(i) ? "bg-sea-200" : i % 5 === 3 ? "bg-[#c9962e]/80" : "bg-teal"}`} />
+            <span key={i} className={`h-4 rounded-[4px] ${[2, 7, 11, 16].includes(i) ? "bg-sea-200" : i % 5 === 3 ? "bg-sand-500/80" : "bg-teal"}`} />
           ))}
         </div>
       </div>
@@ -241,7 +242,7 @@ function NeedRow({ id, q, a, owner, i, k, on }: { id: NeedId; q: string; a: stri
   return (
     <li
       className={`need-card flex items-start gap-4 py-4 transition-ui duration-700 ${on ? "" : "lg:translate-y-3"}`}
-      style={{ ["--d" as string]: `${i * 60}ms`, transitionDelay: on ? `${150 + k * 110}ms` : "0ms" }}
+      style={{ ["--d" as string]: `${i * 60}ms`, transitionDelay: on ? `${k * 60}ms` : "0ms" }}
     >
       <span className="need-icon inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-teal to-teal-deep text-white shadow-[0_10px_20px_-10px_rgba(11,58,64,0.8)] [&_svg]:size-7">
         <NeedIcon id={id} />

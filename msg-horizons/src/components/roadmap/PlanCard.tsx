@@ -1,5 +1,6 @@
 "use client";
 
+import { EASE_OUT, EASE_IN_OUT } from "@/lib/motion";
 import { motion } from "motion/react";
 import { roadmapCopy, SEGMENT_PERSONA, type Segment } from "@/content/roadmap";
 import { whatsappLink } from "@/content/facts";
@@ -43,17 +44,19 @@ export default function PlanCard({
   return (
     <motion.div
       layout
-      initial={reduce ? false : { opacity: 0, scale: 0.96, filter: "blur(12px)" }}
-      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-      exit={reduce ? undefined : { opacity: 0, scale: 0.98, filter: "blur(8px)" }}
-      transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+      initial={reduce ? false : { opacity: 0, scale: 0.96 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={reduce ? undefined : { opacity: 0, scale: 0.98, transition: { duration: 0.16, ease: EASE_OUT } }}
+      transition={{ duration: 0.3, ease: EASE_OUT }}
       className="relative"
     >
       {!reduce ? (
-        <motion.span aria-hidden="true" initial={{ left: "-50%", opacity: 0 }}
-              animate={{ left: ["-50%", "110%"], opacity: [0, 1, 1, 0] }}
-              transition={{ duration: 1.3, ease: [0.4, 0, 0.2, 1] }}
-          className="pointer-events-none absolute inset-y-0 z-10 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-[#b5f5cc]/20 to-transparent" />
+        <motion.span aria-hidden="true" initial={{ transform: "translateX(-50%)", opacity: 0 }}
+              animate={{ transform: ["translateX(-50%)", "translateX(110%)"], opacity: [0, 1, 1, 0] }}
+              transition={{ duration: 1.3, ease: EASE_IN_OUT }}
+              className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
+              <span className="absolute inset-y-0 start-0 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-brand-mint/20 to-transparent" />
+            </motion.span>
       ) : null}
 
       <div className="flex flex-wrap items-start justify-between gap-4">

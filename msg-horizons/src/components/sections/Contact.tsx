@@ -23,7 +23,7 @@ export default function Contact({ t, lang }: { t: Dictionary; lang: Locale }) {
           <ul className="mt-10 border-t border-white/15">
             <li>
               <TrackedLink href={whatsappLink(t.wa.general)} target="_blank" rel="noopener noreferrer" event="whatsapp_click" props={{ location: "contact" }} className={`${row} hover:text-white`}>
-                <span className="inline-flex size-10 items-center justify-center rounded-md bg-[#25d366] text-white"><WhatsAppIcon /></span>
+                <span className="inline-flex size-10 items-center justify-center rounded-md bg-whatsapp-bright text-white"><WhatsAppIcon /></span>
                 <span className="flex-1">
                   <span className="block font-semibold">{ch.whatsapp}</span>
                   <span className="text-sm text-white/65">{ch.whatsappD}</span>

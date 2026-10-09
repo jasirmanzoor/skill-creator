@@ -98,7 +98,7 @@ export default function Deck({ lang, live, plan }: Props) {
   const shift = (rtl ? 1 : -1) * idx * 100;
   // on-screen movement: the strong ease-in-out; the height simply follows, it is not animated
   const still = instant || reduce;
-  const glide = still ? "" : "transition-transform duration-[520ms] ease-in-out";
+  const glide = still ? "" : "transition-transform duration-300 ease-in-out";
 
   return (
     <section
@@ -126,6 +126,7 @@ export default function Deck({ lang, live, plan }: Props) {
                 aria-controls={`deck-panel-${id}`}
                 tabIndex={on ? 0 : -1}
                 onClick={() => show(i)}
+                data-press="soft"
                 className={`group relative overflow-hidden rounded-2xl border p-3 text-start transition-colors sm:p-4 ${on ? "border-white/25 bg-white/10" : "border-white/10 bg-white/[0.03] hover:bg-white/[0.07]"}`}
               >
                 <span className="flex items-center gap-3">
@@ -159,7 +160,7 @@ export default function Deck({ lang, live, plan }: Props) {
                 role="tabpanel"
                 aria-labelledby={`deck-tab-${id}`}
                 inert={on ? undefined : true}
-                className={`deck-panel w-full shrink-0 ${still ? "" : "transition-[opacity,scale] duration-[520ms] ease-in-out"} ${on ? "scale-100 opacity-100" : "scale-[0.97] opacity-0"}`}
+                className={`deck-panel w-full shrink-0 ${still ? "" : "transition-[opacity,scale] duration-300 ease-in-out"} ${on ? "scale-100 opacity-100" : "scale-[0.97] opacity-0"}`}
               >
                 {panels[i]}
               </div>

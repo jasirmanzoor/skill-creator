@@ -64,7 +64,7 @@ export default function SiteSearch({
           setOpen(true);
           track("search_open", { location: "header" });
         }}
-        className={`inline-flex items-center gap-2 rounded-md px-2 py-1.5 text-[15px] transition-colors ${triggerCls}`}
+        className={`inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-md px-2 py-1.5 text-[15px] transition-colors ${triggerCls}`}
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-label={t.search.openShortcut}

@@ -1,5 +1,6 @@
 "use client";
 
+import { EASE_OUT } from "@/lib/motion";
 import { AnimatePresence, motion } from "motion/react";
 import { useRef } from "react";
 import { roadmapCopy, SEGMENT_ORDERS, type Segment } from "@/content/roadmap";
@@ -59,11 +60,10 @@ export default function SegmentGateway({
         {value ? (
           <motion.div
             key="profile"
-            initial={reduce ? false : { opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-            className="overflow-hidden"
+            initial={reduce ? false : { opacity: 0, transform: "translateY(8px)" }}
+            animate={{ opacity: 1, transform: "translateY(0px)" }}
+            exit={{ opacity: 0, transition: { duration: 0.12 } }}
+            transition={{ duration: 0.24, ease: EASE_OUT }}
           >
             <div className="mt-4 flex flex-col gap-4 rounded-2xl border border-brand-bright/30 bg-brand/20 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
               <div>
@@ -74,7 +74,7 @@ export default function SegmentGateway({
                 </p>
               </div>
               {onWalk ? (
-                <button type="button" onClick={onWalk} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-semibold text-white shadow-[0_0_30px_-6px_rgba(76,201,122,0.9)] hover:bg-[#12a84b]">
+                <button type="button" onClick={onWalk} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow-glow)] hover:bg-brand-vivid">
                   <svg viewBox="0 0 12 12" className="size-3 rtl:-scale-x-100" aria-hidden="true"><path d="M3 1.8v8.4L10 6z" fill="currentColor" /></svg>
                   {g.walk}
                 </button>

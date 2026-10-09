@@ -1,5 +1,6 @@
 "use client";
 
+import { EASE_OUT } from "@/lib/motion";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { guideCopy, roadmapCopy, type Segment } from "@/content/roadmap";
@@ -49,7 +50,7 @@ function useReveal() {
   return (i: number) =>
     reduce
       ? {}
-      : { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 }, transition: { delay: 0.25 + i * 0.45, duration: 0.45, ease: [0.16, 1, 0.3, 1] as const } };
+      : { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 }, transition: { delay: 0.25 + i * 0.45, duration: 0.45, ease: EASE_OUT } };
 }
 
 function Scene(p: SceneProps) {
@@ -72,7 +73,7 @@ const Check = ({ className = "" }: { className?: string }) => (
 function AppBar({ title, sub }: { title: string; sub?: string }) {
   return (
     <div className="flex items-center gap-2.5 border-b border-line bg-white px-4 pb-3 pt-9">
-      <span className="flex size-8 items-center justify-center rounded-full bg-[#0b3a26]"><Mark inverted className="h-3.5 w-auto" /></span>
+      <span className="flex size-8 items-center justify-center rounded-full bg-brand-deep"><Mark inverted className="h-3.5 w-auto" /></span>
       <div className="min-w-0">
         <p className="truncate text-[13px] font-semibold">{title}</p>
         {sub ? <p className="text-[10px] text-brand">{sub}</p> : null}
@@ -104,9 +105,9 @@ function Chat({ g, net, segment }: SceneProps) {
           </span>
         ) : null}
         {replied ? (
-          <motion.div initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
+          <motion.div initial={reduce ? false : { opacity: 0, transform: "translateY(8px)" }} animate={{ opacity: 1, transform: "translateY(0px)" }} transition={{ duration: 0.24, ease: EASE_OUT }} className="space-y-2">
             <p className="max-w-[85%] rounded-xl rounded-ss-sm bg-white px-3 py-2 shadow-sm">{g.reply}</p>
-            <span className="inline-block rounded-full border border-[#0f9641] bg-white px-3 py-1 text-[11px] font-semibold text-brand">{g.quick}</span>
+            <span className="inline-block rounded-full border border-brand-vivid bg-white px-3 py-1 text-[11px] font-semibold text-brand">{g.quick}</span>
           </motion.div>
         ) : null}
       </div>
@@ -183,7 +184,7 @@ function Plan({ g, net, lang }: SceneProps) {
     <div className="flex h-full flex-col">
       <AppBar title={g.planTitle} />
       <div className="flex-1 space-y-2.5 p-3">
-        <motion.div {...r(0)} className="rounded-xl bg-[#0b3a26] p-3 text-white">
+        <motion.div {...r(0)} className="rounded-xl bg-brand-deep p-3 text-white">
           <p className="text-[10px] text-white/70">{g.perOrder}</p>
           <p className="num font-display text-3xl font-semibold" dir={lang === "ar" ? "rtl" : "ltr"}>
             ≈ {lang === "ar" ? <>{cost.perOrder} <span className="text-base">ريال</span></> : <><span className="text-base">SAR</span> {cost.perOrder}</>}
@@ -253,12 +254,12 @@ function Pilot({ g }: SceneProps) {
               {done > k ? <span className="inline-flex items-center gap-1 font-semibold text-brand"><Check />{g.pod}</span> : <span className="text-muted">…</span>}
             </div>
             <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-subtle">
-              <motion.div className="h-full rounded-full bg-brand" initial={reduce ? false : { width: "0%" }} animate={{ width: done > k ? "100%" : "35%" }} transition={{ duration: 0.8 }} />
+              <motion.div className="h-full origin-left rounded-full bg-brand rtl:origin-right" initial={reduce ? false : { transform: "scaleX(0)" }} animate={{ transform: done > k ? "scaleX(1)" : "scaleX(0.35)" }} transition={{ duration: 0.6, ease: EASE_OUT }} />
             </div>
           </div>
         ))}
         {live ? (
-          <motion.div initial={reduce ? false : { opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-3 rounded-xl bg-[#0b3a26] p-3 text-white">
+          <motion.div initial={reduce ? false : { opacity: 0, transform: "scale(0.95)" }} animate={{ opacity: 1, transform: "scale(1)" }} transition={{ duration: 0.24, ease: EASE_OUT }} className="flex items-center gap-3 rounded-xl bg-brand-deep p-3 text-white">
             <span className="relative flex size-3"><span className="absolute inset-0 animate-ping rounded-full bg-brand-bright motion-reduce:hidden" /><span className="relative size-3 rounded-full bg-brand-bright" /></span>
             <div>
               <p className="text-[13px] font-semibold">{g.live}</p>

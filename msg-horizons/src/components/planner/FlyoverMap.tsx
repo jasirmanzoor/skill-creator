@@ -155,7 +155,7 @@ function pinEl(label: string, color: string) {
   const el = document.createElement("div");
   el.className = "pointer-events-none flex flex-col items-center";
   const pill = document.createElement("span");
-  pill.className = "whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-semibold text-white shadow-[0_8px_18px_-8px_rgba(11,58,64,0.7)] ring-2 ring-white";
+  pill.className = "whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-semibold text-white shadow-[var(--shadow-chip)] ring-2 ring-white";
   pill.style.background = color;
   pill.textContent = label;
   const stem = document.createElement("span");
@@ -194,7 +194,7 @@ export default function FlyoverMap(p: Props) {
     const M = { legs: [] as Leg[], starts: [] as number[], total: 0, shown: -1, orbit: 0, dwellBase: 0, plan: null as RoutePlan | null };
     const markers: Marker[] = [];
     const tag = document.createElement("span");
-    tag.className = "pointer-events-none whitespace-nowrap rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-teal-deep shadow-[0_8px_18px_-8px_rgba(11,58,64,0.7)] ring-1 ring-teal/15";
+    tag.className = "pointer-events-none whitespace-nowrap rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-teal-deep shadow-[var(--shadow-chip)] ring-1 ring-teal/15";
     const tagMarker = new Marker({ element: tag, anchor: "bottom", offset: [0, -24] });
     let loaded = false;
     let disposed = false;

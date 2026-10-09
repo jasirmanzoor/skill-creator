@@ -151,7 +151,7 @@ export default function RouteMap({ stops, active, lang, c, lens, onLens, reduce,
         <div className="relative mx-auto my-auto hidden aspect-[1000/425] w-full max-w-[72rem] md:block">
           <svg viewBox={`0 0 ${route.W} ${route.H}`} className="absolute inset-0 size-full overflow-visible" aria-hidden="true">
             <path d={route.d} fill="none" stroke="rgba(255,255,255,0.22)" strokeWidth="4" strokeLinecap="round" strokeDasharray="2 12" />
-            <path d={route.d} fill="none" stroke="#4cc97a" strokeWidth="5" strokeLinecap="round" strokeDasharray={`${doneLen} ${route.total}`} style={{ filter: "drop-shadow(0 0 6px rgba(76,201,122,0.5))" }} />
+            <path d={route.d} fill="none" stroke="var(--color-brand-bright)" strokeWidth="5" strokeLinecap="round" strokeDasharray={`${doneLen} ${route.total}`} style={{ filter: "drop-shadow(0 0 6px rgba(76,201,122,0.5))" }} />
           </svg>
           <ol aria-label={c.stops}>
             {stops.map((s, i) => (

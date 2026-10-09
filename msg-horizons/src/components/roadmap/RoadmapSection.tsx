@@ -98,7 +98,7 @@ export default function RoadmapSection({ t, lang }: { t: Dictionary; lang: Local
           <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 md:hidden" role="tablist" aria-label={c.stepLabel}>
             {c.steps.map((s, i) => (
               <button key={s.t} type="button" role="tab" aria-selected={i === step} aria-controls="roadmap-stage" onClick={() => go(i)}
-                className={`num shrink-0 rounded-xl border px-3.5 py-2 text-sm font-semibold transition-colors ${i === step ? "border-teal bg-teal text-white" : i < step ? "border-teal/30 bg-sea-100 text-teal-deep" : "border-teal/23 text-teal-deep/75"}`}>
+                className={`num min-h-11 min-w-12 shrink-0 rounded-xl border px-3.5 py-2 text-sm font-semibold transition-colors ${i === step ? "border-teal bg-teal text-white" : i < step ? "border-teal/30 bg-sea-100 text-teal-deep" : "border-teal/23 text-teal-deep/75"}`}>
                 {String(i + 1).padStart(2, "0")}
               </button>
             ))}
@@ -107,11 +107,11 @@ export default function RoadmapSection({ t, lang }: { t: Dictionary; lang: Local
             <StepStage lang={lang} step={step} dir={dir} segment={segment} net={net} touring={touring} onTour={() => { setTouring((t) => !t); track("cta_click", { cta: "tour", location: "roadmap" }); }} />
           </div>
           <div className="mt-5 flex items-center justify-between gap-3">
-            <button type="button" onClick={() => go(Math.max(0, step - 1))} disabled={step === 0} className="rounded-full px-4 py-2 text-sm text-teal-deep/80 transition-opacity hover:text-teal-deep disabled:opacity-30">{c.prev}</button>
+            <button type="button" onClick={() => go(Math.max(0, step - 1))} disabled={step === 0} className="min-h-11 rounded-full px-4 py-2 text-sm text-teal-deep/80 transition-opacity hover:text-teal-deep disabled:opacity-30">{c.prev}</button>
             {step < 5 ? (
-              <button type="button" onClick={() => go(step + 1)} className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-teal-deep ring-1 ring-teal/28 backdrop-blur hover:bg-white">{c.next}</button>
+              <button type="button" onClick={() => go(step + 1)} className="min-h-11 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-teal-deep ring-1 ring-teal/28 hover:bg-white">{c.next}</button>
             ) : (
-              <button type="button" onClick={toEstimator} className="rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-[0_0_30px_-6px_rgba(76,201,122,0.9)] hover:bg-[#12a84b]">{c.toEstimator}</button>
+              <button type="button" onClick={toEstimator} className="min-h-11 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-glow)] hover:bg-brand-strong">{c.toEstimator}</button>
             )}
           </div>
         </div>

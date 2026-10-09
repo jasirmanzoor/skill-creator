@@ -5,7 +5,7 @@ import PartnerLogo from "../partners/PartnerLogo";
 /** Partner and client brand tiles directly under the hero. */
 export default function TrustBar({ t }: { t: Dictionary; lang?: Locale }) {
   return (
-    <section aria-label={t.proof.partnersTitle} className="border-y border-line bg-surface/90 backdrop-blur">
+    <section aria-label={t.proof.partnersTitle} className="border-y border-line bg-surface/[0.94]">
       <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-8 lg:flex-row lg:items-center lg:gap-12 lg:px-8">
         <p className="shrink-0 text-sm text-muted lg:max-w-[12rem]">{t.hero.partnersLead}</p>
         <ul className="flex flex-1 flex-wrap items-center justify-center gap-3 sm:gap-4 lg:justify-between" dir="ltr">

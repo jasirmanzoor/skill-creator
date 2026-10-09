@@ -28,21 +28,21 @@ export default function OpsClock({ now, running, sub, lang }: { now: string; run
   return (
     <div className="flex flex-col items-start gap-8 sm:flex-row sm:items-center">
       <svg viewBox="0 0 200 200" className="size-44 shrink-0" aria-hidden="true">
-        <circle cx="100" cy="100" r="86" fill="none" stroke="#0b7d36" strokeWidth="3" />
+        <circle cx="100" cy="100" r="86" fill="none" stroke="var(--color-brand)" strokeWidth="3" />
         {Array.from({ length: 24 }, (_, i) => {
           const a = ((i / 24) * 360 - 90) * (Math.PI / 180);
           const r1 = i % 6 === 0 ? 72 : 77;
-          return <line key={i} x1={100 + r1 * Math.cos(a)} y1={100 + r1 * Math.sin(a)} x2={100 + 81 * Math.cos(a)} y2={100 + 81 * Math.sin(a)} stroke="#0c0e11" strokeOpacity={i % 6 === 0 ? 0.7 : 0.25} strokeWidth={i % 6 === 0 ? 2 : 1} />;
+          return <line key={i} x1={100 + r1 * Math.cos(a)} y1={100 + r1 * Math.sin(a)} x2={100 + 81 * Math.cos(a)} y2={100 + 81 * Math.sin(a)} stroke="var(--color-ink)" strokeOpacity={i % 6 === 0 ? 0.7 : 0.25} strokeWidth={i % 6 === 0 ? 2 : 1} />;
         })}
         {[0, 6, 12, 18].map((h) => {
           const a = ((h / 24) * 360 - 90) * (Math.PI / 180);
           return <text key={h} x={100 + 58 * Math.cos(a)} y={100 + 58 * Math.sin(a) + 4} textAnchor="middle" fontSize="11" fill="#585e67">{String(h).padStart(2, "0")}</text>;
         })}
         <g style={{ transform: `rotate(${angle}deg)`, transformOrigin: "100px 100px", transition: "transform 1s ease" }} opacity={time ? 1 : 0}>
-          <line x1="100" y1="100" x2="100" y2="24" stroke="#0c0e11" strokeWidth="2" strokeLinecap="round" />
-          <circle cx="100" cy="24" r="4" fill="#0b7d36" />
+          <line x1="100" y1="100" x2="100" y2="24" stroke="var(--color-ink)" strokeWidth="2" strokeLinecap="round" />
+          <circle cx="100" cy="24" r="4" fill="var(--color-brand)" />
         </g>
-        <circle cx="100" cy="100" r="3.5" fill="#0c0e11" />
+        <circle cx="100" cy="100" r="3.5" fill="var(--color-ink)" />
       </svg>
       <div>
         <p className="text-muted">{now}</p>

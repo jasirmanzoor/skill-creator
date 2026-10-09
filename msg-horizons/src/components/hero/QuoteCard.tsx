@@ -1,5 +1,6 @@
 "use client";
 
+import { SPRING_UI } from "@/lib/motion";
 import NumberFlow from "@number-flow/react";
 import { motion } from "motion/react";
 import { useId } from "react";
@@ -41,7 +42,7 @@ export default function QuoteCard({
               <button key={k} type="button" role="radio" aria-checked={lane === k}
                 onClick={() => { onLane(k); track("planner_step", { step: "hero_quote", value: k }); }}
                 className="tap relative rounded-full px-2 py-2 text-[12px] font-semibold leading-tight">
-                {lane === k ? <motion.span layoutId={`${id}-lane`} transition={{ type: "spring", stiffness: 420, damping: 34 }} className="absolute inset-0 rounded-full bg-white shadow-[0_4px_14px_-6px_rgba(11,58,64,0.5)]" /> : null}
+                {lane === k ? <motion.span layoutId={`${id}-lane`} transition={{ type: "spring", ...SPRING_UI }} className="absolute inset-0 rounded-full bg-white shadow-[0_4px_14px_-6px_rgba(11,58,64,0.5)]" /> : null}
                 <span className={`relative ${lane === k ? "text-teal-deep" : "text-teal-deep/70"}`}>{c.quote.lanes[k]}</span>
               </button>
             ))}
@@ -64,7 +65,7 @@ export default function QuoteCard({
             </div>
             <div>
               <p className="text-[11px] text-white/70">{c.quote.monthly}</p>
-              <p className="num mt-1.5 font-display text-xl font-semibold text-[#9be7b8]">
+              <p className="num mt-1.5 font-display text-xl font-semibold text-brand-mint">
                 <Money cur={c.quote.cur} ar={lang === "ar"}>{reduce ? monthly.toLocaleString("en-US") : <NumberFlow value={monthly} locales="en-US" format={{ useGrouping: true }} />}</Money>
               </p>
             </div>

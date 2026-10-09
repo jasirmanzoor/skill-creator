@@ -1,5 +1,6 @@
 "use client";
 
+import { EASE_OUT } from "@/lib/motion";
 import { AnimatePresence, motion } from "motion/react";
 import type { LiveCopy } from "@/content/liveTracking";
 import { BellGlyph, LocateGlyph } from "./glyphs";
@@ -12,7 +13,7 @@ export default function DriverPhone({
   c, live, reduce, onApprove, onReplay,
 }: { c: LiveCopy; live: boolean; reduce: boolean; onApprove: () => void; onReplay: () => void }) {
   const d = c.driver;
-  const ease = [0.16, 1, 0.3, 1] as const;
+  const ease = EASE_OUT;
   const swap = reduce ? { duration: 0 } : { duration: 0.45, ease };
 
   return (
@@ -40,14 +41,14 @@ export default function DriverPhone({
             <motion.div
               key="request"
               className="flex flex-1 flex-col"
-              initial={reduce ? false : { opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={reduce ? { opacity: 0 } : { opacity: 0, y: -14 }}
+              initial={reduce ? false : { opacity: 0, transform: "translateY(14px)" }}
+              animate={{ opacity: 1, transform: "translateY(0px)" }}
+              exit={reduce ? { opacity: 0 } : { opacity: 0, transform: "translateY(-14px)" }}
               transition={swap}
             >
               <div className="mx-4 rounded-2xl bg-white p-3.5 shadow-[0_10px_30px_-18px_rgba(11,58,64,0.45)] ring-1 ring-line">
                 <p className="flex items-center gap-2.5 text-[14px] font-semibold">
-                  <span className="relative grid size-8 place-items-center rounded-full bg-[#e8f5ec] text-brand">
+                  <span className="relative grid size-8 place-items-center rounded-full bg-brand-soft text-brand">
                     <span className="absolute inset-0 animate-ping rounded-full bg-brand/30 motion-reduce:hidden" aria-hidden="true" />
                     <BellGlyph className="relative size-4" />
                   </span>
@@ -87,9 +88,9 @@ export default function DriverPhone({
             <motion.div
               key="live"
               className="flex flex-1 flex-col"
-              initial={reduce ? false : { opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={reduce ? { opacity: 0 } : { opacity: 0, y: -14 }}
+              initial={reduce ? false : { opacity: 0, transform: "translateY(14px)" }}
+              animate={{ opacity: 1, transform: "translateY(0px)" }}
+              exit={reduce ? { opacity: 0 } : { opacity: 0, transform: "translateY(-14px)" }}
               transition={swap}
             >
               <div className="mx-4 rounded-2xl bg-gradient-to-br from-brand to-[#075f29] p-4 text-white shadow-[0_18px_36px_-20px_rgba(11,125,54,0.9)]">

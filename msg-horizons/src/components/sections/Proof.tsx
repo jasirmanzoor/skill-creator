@@ -5,7 +5,7 @@ import type { Dictionary } from "@/content/i18n";
 export default function Proof({ t }: { t: Dictionary }) {
   const p = t.proof;
   return (
-    <section id="proof" aria-labelledby="proof-title" className="scroll-mt-24 border-t border-line bg-surface/92 sec backdrop-blur">
+    <section id="proof" aria-labelledby="proof-title" className="scroll-mt-24 border-t border-line bg-surface/[0.94] sec">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal className="max-w-2xl">
           <span className="label">{p.eyebrow}</span>

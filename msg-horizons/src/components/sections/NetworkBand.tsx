@@ -110,8 +110,8 @@ export default function NetworkBand({ lang, coastPhoto }: { lang: Locale; coastP
                   loading="lazy"
                   decoding="async"
                   style={{ objectPosition: f.pos }}
-                  className={`absolute inset-0 size-full object-cover transition-[opacity,transform,filter] duration-[1100ms] ease-[cubic-bezier(.2,.7,.2,1)] ${
-                    i === active ? "scale-100 opacity-100 blur-0" : "scale-[1.06] opacity-0 blur-[6px]"
+                  className={`absolute inset-0 size-full object-cover transition-[opacity,scale] duration-700 ease-out ${
+                    i === active ? "scale-100 opacity-100" : "scale-[1.04] opacity-0"
                   }`}
                 />
               ))}
@@ -137,23 +137,12 @@ export default function NetworkBand({ lang, coastPhoto }: { lang: Locale; coastP
         {/* partner ribbon */}
         <div className="sea-glass mt-6 flex flex-col gap-3 overflow-hidden rounded-3xl py-5 sm:flex-row sm:items-center sm:gap-0 sm:py-0">
           <p className="shrink-0 px-6 text-sm font-semibold text-teal sm:border-e sm:border-teal-deep/10 sm:py-6">{c.partners}</p>
-          <div dir="ltr" className="relative min-w-0 flex-1 overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]">
-            <ul className="sr-only">
-              {PARTNER_TEXT.map((p) => <li key={p}>{p}</li>)}
-            </ul>
-            <div aria-hidden="true" className="nb-ribbon flex w-max" style={{ animation: "nb-ribbon 32s linear infinite" }}>
-              {[0, 1].map((k) => (
-                <div key={k} className="flex shrink-0 items-center">
-                  {[...PARTNER_TEXT, ...PARTNER_TEXT].map((p, i) => (
-                    <span key={`${k}-${i}`} className="flex items-center font-display text-2xl font-semibold tracking-[-0.01em] text-teal-deep sm:text-3xl">
-                      <span className="px-7">{p}</span>
-                      <span className="size-1.5 rounded-full bg-teal/40" />
-                    </span>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* the confirmed partner names, set once and still */}
+          <ul dir="ltr" className="flex min-w-0 flex-1 flex-wrap items-center gap-x-6 gap-y-2 px-6 sm:py-6">
+            {PARTNER_TEXT.map((p) => (
+              <li key={p} className="font-display text-lg font-semibold tracking-[-0.01em] text-teal-deep sm:text-xl">{p}</li>
+            ))}
+          </ul>
         </div>
 
         {/* the way in: the roadmap turns a visitor's numbers into a plan and an approximate cost per order */}

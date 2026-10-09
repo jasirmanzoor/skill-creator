@@ -1,5 +1,6 @@
 "use client";
 
+import { SPRING_SMOOTH } from "@/lib/motion";
 import Image from "next/image";
 import { MotionConfig, motion, useScroll, useSpring, useTransform } from "motion/react";
 import { useEffect, useRef, useState } from "react";
@@ -44,7 +45,7 @@ export default function Pitch({ t, lang }: { t: Dictionary; lang: Locale }) {
 
   // the hub photo drifts slowly behind the copy
   const { scrollYProgress } = useScroll({ target: sec, offset: ["start end", "end start"] });
-  const sp = useSpring(scrollYProgress, { stiffness: 70, damping: 22 });
+  const sp = useSpring(scrollYProgress, { ...SPRING_SMOOTH });
   const photoScale = useTransform(sp, [0, 1], [1.18, 1.02]);
   const photoY = useTransform(sp, [0, 1], ["-4%", "4%"]);
 
@@ -112,7 +113,7 @@ export default function Pitch({ t, lang }: { t: Dictionary; lang: Locale }) {
             return (
             <li
               key={r.pain}
-              className={`relative overflow-hidden rounded-2xl p-5 ring-1 backdrop-blur-md transition-[background-color,box-shadow] duration-500 ${msg ? "bg-[#0b3a26]/70 ring-brand-bright/40 shadow-[0_20px_50px_-30px_rgba(76,201,122,0.6)]" : "bg-white/[0.05] ring-white/10"}`}
+              className={`relative overflow-hidden rounded-2xl p-5 ring-1 backdrop-blur-md transition-[background-color,box-shadow] duration-500 ${msg ? "bg-brand-deep/70 ring-brand-bright/40 shadow-[0_20px_50px_-30px_rgba(76,201,122,0.6)]" : "bg-white/[0.05] ring-white/10"}`}
               style={{ transitionDelay: `${d}ms` }}
             >
               <div className="flex items-center gap-4">

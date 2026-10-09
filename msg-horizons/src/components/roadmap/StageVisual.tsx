@@ -37,7 +37,7 @@ export function UICard({ id, u }: { id: StageId; u: (typeof experience)["en"]["j
     case "enquiry":
       return (
         <div className="space-y-1.5">
-          <p className="flex items-center gap-1.5 text-[11px] font-semibold text-whatsapp"><span className="size-2 rounded-full bg-[#25d366]" />WhatsApp · {u.chatName}</p>
+          <p className="flex items-center gap-1.5 text-[11px] font-semibold text-whatsapp"><span className="size-2 rounded-full bg-whatsapp-bright" />WhatsApp · {u.chatName}</p>
           <p className="ms-auto w-fit max-w-[90%] rounded-lg rounded-se-sm bg-[#dcf8c6] px-2.5 py-1.5">{u.chatMsg}</p>
           <p className="w-fit max-w-[90%] rounded-lg rounded-ss-sm bg-subtle px-2.5 py-1.5">{u.chatReply}</p>
         </div>
@@ -103,7 +103,7 @@ export function UICard({ id, u }: { id: StageId; u: (typeof experience)["en"]["j
             <p className="font-semibold">{u.liveTitle}</p>
             <p className="text-[12px] text-muted">{u.liveBody}</p>
           </div>
-          <span className="ms-auto inline-flex items-center gap-1 text-[11px] font-semibold text-[#0f9641]"><span className="js-live size-2 rounded-full bg-brand" />LIVE</span>
+          <span className="ms-auto inline-flex items-center gap-1 text-[11px] font-semibold text-brand-vivid"><span className="js-live size-2 rounded-full bg-brand" />LIVE</span>
         </div>
       );
   }

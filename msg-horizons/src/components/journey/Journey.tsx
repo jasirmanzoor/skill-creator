@@ -31,7 +31,25 @@ export default function Journey({ lang }: { lang: Locale }) {
   const [next, setNext] = useState(false);
   const [open, setOpen] = useState(false);
   const [lens, setLens] = useState<Lens>("all");
-  const hud = useRef<HTMLDivElement>(null);
+  // the rail's fill, the courier and the progress rings are moved directly, by transform
+  const fill = useRef<HTMLSpanElement>(null);
+  const courier = useRef<HTMLDivElement>(null);
+  const rings = useRef(new Set<SVGCircleElement>());
+  const at = useRef(0);
+  const paint = useCallback((f: number) => {
+    at.current = f;
+    if (fill.current) fill.current.style.transform = `scaleY(${f})`;
+    if (courier.current) courier.current.style.transform = `translateY(${f * 100}%)`;
+    for (const el of rings.current) {
+      if (!el.isConnected) rings.current.delete(el);
+      else el.style.strokeDashoffset = `${94.25 * (1 - f)}px`;
+    }
+  }, []);
+  const ringRef = useCallback((el: SVGCircleElement | null) => {
+    if (!el) return;
+    rings.current.add(el);
+    el.style.strokeDashoffset = `${94.25 * (1 - at.current)}px`;
+  }, []);
   const opener = useRef<HTMLElement | null>(null);
   const tops = useRef<number[]>([]);
   const ids = useRef<string[]>([]);
@@ -67,9 +85,7 @@ export default function Journey({ lang }: { lang: Locale }) {
         if (shown >= 0) { index = shown; p = shown + (shown === pos.index ? pos.t : 0); }
       }
       cur.current = { index, t: pos.t };
-      const f = routeFraction(p, n).toFixed(4);
-      hud.current?.style.setProperty("--f", f);
-      document.getElementById(ROUTE_SLOT_ID)?.style.setProperty("--f", f);
+      paint(routeFraction(p, n));
       setActive((a) => (a === index ? a : index));
       setNext((v) => (v === (!onDeck && showNext(index, pos.t, n)) ? v : !v));
     };
@@ -106,7 +122,7 @@ export default function Journey({ lang }: { lang: Locale }) {
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", measure);
     };
-  }, []);
+  }, [paint]);
 
   const go = useCallback((i: number, immediate = false) => {
     const id = ids.current[i];
@@ -163,7 +179,7 @@ export default function Journey({ lang }: { lang: Locale }) {
     <span className="relative grid size-12 place-items-center lg:size-11">
       <svg viewBox="0 0 36 36" className="absolute inset-0 size-full -rotate-90 rtl:rotate-90" aria-hidden="true">
         <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="3" />
-        <circle cx="18" cy="18" r="15" fill="none" stroke="var(--color-brand-bright)" strokeWidth="3" strokeLinecap="round" strokeDasharray="94.25" style={{ strokeDashoffset: "calc(94.25px * (1 - var(--f)))" }} />
+        <circle cx="18" cy="18" r="15" fill="none" stroke="var(--color-brand-bright)" strokeWidth="3" strokeLinecap="round" strokeDasharray="94.25" strokeDashoffset="94.25" ref={ringRef} />
       </svg>
       <span className="num relative text-[11px] font-bold" dir="ltr">{active + 1}/{n}</span>
     </span>
@@ -171,7 +187,7 @@ export default function Journey({ lang }: { lang: Locale }) {
 
   return (
     <>
-      <div ref={hud} className="pointer-events-none fixed inset-0 z-30" style={{ ["--f" as string]: 0 }}>
+      <div className="pointer-events-none fixed inset-0 z-30">
         {/* wide screens: the whole route, always in view */}
         <nav aria-label={c.stops} className="pointer-events-auto absolute end-5 top-1/2 hidden -translate-y-1/2 flex-col items-center gap-4 rounded-full bg-ink/80 px-2.5 py-4 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.6)] ring-1 ring-white/10 backdrop-blur-md 2xl:flex">
           <button
@@ -187,7 +203,7 @@ export default function Journey({ lang }: { lang: Locale }) {
           </button>
           <div className="relative h-[min(52vh,23rem)] w-6">
             <span aria-hidden="true" className="absolute inset-y-0 start-1/2 w-px -translate-x-1/2 bg-white/20 rtl:translate-x-1/2" />
-            <span aria-hidden="true" className="absolute start-1/2 top-0 w-0.5 -translate-x-1/2 rounded-full bg-brand-bright rtl:translate-x-1/2" style={{ height: "calc(var(--f) * 100%)" }} />
+            <span ref={fill} aria-hidden="true" className="absolute inset-y-0 start-1/2 w-0.5 origin-top -translate-x-1/2 rounded-full bg-brand-bright rtl:translate-x-1/2" style={{ transform: "scaleY(0)" }} />
             {stops.map((s, i) => (
               <button
                 key={s.id}
@@ -205,13 +221,15 @@ export default function Journey({ lang }: { lang: Locale }) {
               </button>
             ))}
             {/* the courier: moves with the scroll and says where you are */}
-            <div aria-hidden="true" className="pointer-events-none absolute start-1/2 -translate-x-1/2 -translate-y-1/2 rtl:translate-x-1/2" style={{ top: "calc(var(--f) * 100%)" }}>
+            <div ref={courier} aria-hidden="true" className="pointer-events-none absolute inset-0">
+            <div className="absolute start-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rtl:translate-x-1/2">
               <span className="grid size-7 place-items-center rounded-full bg-brand-bright text-ink shadow-[0_0_0_5px_rgba(76,201,122,0.25)]">
                 <VanGlyph className="size-4" />
               </span>
               <span className="absolute end-full top-1/2 me-3 -translate-y-1/2 whitespace-nowrap rounded-full bg-brand-bright px-3 py-1.5 text-xs font-bold text-ink shadow-lg">
                 <span className="num" dir="ltr">{active + 1}/{n}</span> · {label(here)}
               </span>
+            </div>
             </div>
           </div>
         </nav>

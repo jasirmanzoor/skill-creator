@@ -1,5 +1,6 @@
 "use client";
 
+import { SPRING_SMOOTH } from "@/lib/motion";
 import NumberFlow from "@number-flow/react";
 import Image from "next/image";
 import { motion, useMotionValue, useMotionValueEvent, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
@@ -98,7 +99,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
 
   // pointer parallax: the sky moves more than the building
   const mx = useMotionValue(0), my = useMotionValue(0);
-  const sx = useSpring(mx, { stiffness: 60, damping: 18 }), sy = useSpring(my, { stiffness: 60, damping: 18 });
+  const sx = useSpring(mx, { ...SPRING_SMOOTH }), sy = useSpring(my, { ...SPRING_SMOOTH });
   const skyX = useTransform(sx, [-0.5, 0.5], [22, -22]);
   const bldX = useTransform(sx, [-0.5, 0.5], [9, -9]);
   const bldY = useTransform(sy, [-0.5, 0.5], [5, -5]);
@@ -196,7 +197,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
 
   const inside = (
     <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-4 pb-12 text-white sm:px-5 lg:px-8 lg:pb-16">
-      <p className="text-sm font-semibold text-[#9be7b8]">{c.inside.eyebrow}</p>
+      <p className="text-sm font-semibold text-brand-mint">{c.inside.eyebrow}</p>
       <h2 className="h-scene mt-2 max-w-2xl [text-shadow:0_2px_30px_rgba(0,0,0,0.5)]">{c.inside.title}</h2>
       <p className="mt-3 max-w-xl text-white/85 text-pretty sm:text-lg">{c.inside.lead}</p>
     </div>
@@ -317,12 +318,12 @@ function Facade({
           {/* deliveries leaving the door */}
           <svg aria-hidden="true" viewBox="0 0 1448 1086" preserveAspectRatio="none" className="absolute inset-0 size-full">
             <defs>
-              <radialGradient id="hero-threshold"><stop offset="0" stopColor="#4cc97a" stopOpacity="0.55" /><stop offset="1" stopColor="#4cc97a" stopOpacity="0" /></radialGradient>
+              <radialGradient id="hero-threshold"><stop offset="0" stopColor="var(--color-brand-bright)" stopOpacity="0.55" /><stop offset="1" stopColor="var(--color-brand-bright)" stopOpacity="0" /></radialGradient>
             </defs>
             <ellipse cx="630" cy="700" rx="240" ry="34" fill="url(#hero-threshold)" className="motion-safe:animate-[hero-lamp_3.2s_var(--ease-ambient)_infinite]" />
             {ROUTES.map((d, i) => (
               <g key={i}>
-                <path d={d} fill="none" stroke="#4cc97a" strokeOpacity="0.25" strokeWidth="9" strokeLinecap="round" />
+                <path d={d} fill="none" stroke="var(--color-brand-bright)" strokeOpacity="0.25" strokeWidth="9" strokeLinecap="round" />
                 <path d={d} fill="none" stroke="#b8f5cf" strokeWidth="3" strokeLinecap="round" strokeDasharray="3 22" className={staged ? "motion-safe:animate-[hero-flow_1.4s_linear_infinite]" : ""} />
                 {staged ? (
                   <circle r="7" fill="#eafff1" className="motion-reduce:hidden" style={{ filter: "drop-shadow(0 0 8px #4cc97a)" }}>

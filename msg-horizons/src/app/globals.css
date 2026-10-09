@@ -21,6 +21,13 @@
   --color-brand-soft: #e8f5ec;
   --color-brand-bright: #4cc97a; /* on dark backgrounds only */
   --color-brand-mint: #b8f5cf; /* headline accent over photographs */
+  --color-brand-vivid: #0f9641; /* lines and glows drawn on light grounds */
+  --color-brand-deep: #0b3a26; /* a card that MSG has taken over, on the dark pitch */
+  --color-whatsapp-bright: #25d366;
+  /* Sabya sun: the warm tones of the hub card */
+  --color-sand-500: #c9962e;
+  --color-sand-700: #6b4210;
+  --color-sand-900: #3b2408;
   --color-whatsapp: #128c4a;
   /* Red Sea glass: daylight Jeddah water */
   --color-sea-50: #f3fbfb;
@@ -54,6 +61,10 @@
   /* Elevation: a control that floats over the page, and a card lifted off a band. */
   --shadow-float: 0 18px 40px -16px rgba(12, 14, 17, 0.45);
   --shadow-card: 0 1px 2px rgba(12, 14, 17, 0.05), 0 24px 48px -28px rgba(12, 14, 17, 0.3);
+  --shadow-scene: 0 40px 100px -30px rgba(0, 0, 0, 0.6);
+  --shadow-teal: 0 8px 20px -8px rgba(19, 113, 121, 0.9);
+  --shadow-glow: 0 0 30px -6px rgba(76, 201, 122, 0.9);
+  --shadow-chip: 0 8px 18px -8px rgba(11, 58, 64, 0.7);
   --animate-rise: rise 0.8s var(--ease-out-expo) both;
 
   @keyframes rise {
@@ -214,7 +225,7 @@ a { text-underline-offset: 0.2em; }
     0 24px 60px -24px rgba(0, 0, 0, 0.7),
     0 60px 120px -60px rgba(15, 150, 65, 0.35);
 }
-.est-range { -webkit-appearance: none; appearance: none; height: 24px; background: transparent; cursor: pointer; }
+.est-range { -webkit-appearance: none; appearance: none; height: 44px; margin-block: -10px; background: transparent; cursor: pointer; }
 .est-range::-webkit-slider-runnable-track { height: 4px; border-radius: 99px; background: rgba(19, 113, 121, 0.2); }
 .est-range::-moz-range-track { height: 4px; border-radius: 99px; background: rgba(19, 113, 121, 0.2); }
 .est-range::-moz-range-progress { height: 4px; border-radius: 99px; background: #137179; }
@@ -267,16 +278,31 @@ a { text-underline-offset: 0.2em; }
   .feed-in, .route-in, #mobile-nav { animation: fade-in 150ms var(--ease-out) both !important; }
   /* a spinner still has to say "working" */
   .animate-spin { animation-duration: 1.4s !important; animation-iteration-count: infinite !important; }
-  /* ripples would freeze as a faint halo: drop them, the solid dot they sit behind still marks "live" */
-  .animate-ping, .plan-ping { display: none; }
+  /*
+   * Live and typing indicators carry meaning, so they stay: the ripple becomes a still halo that breathes,
+   * the typing dots and carets pulse in place. Opacity only; nothing grows, bounces or travels.
+   */
+  .animate-ping, [class~="motion-safe:animate-ping"], .plan-ping {
+    display: block !important;
+    transform: scale(1.7);
+    animation: live-pulse 1.8s var(--ease-ambient) infinite !important;
+  }
+  .animate-bounce, .animate-pulse, .js-live {
+    animation-name: live-pulse !important;
+    animation-duration: 1.4s !important;
+    animation-timing-function: var(--ease-ambient) !important;
+    animation-iteration-count: infinite !important;
+  }
 }
+@keyframes live-pulse { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.7; } }
 @keyframes fade-in { from { opacity: 0; } }
 
 /* Network sizer range inputs: thin track, filled to the thumb via --fill (set inline where needed). */
 .sizer-range {
   -webkit-appearance: none;
   appearance: none;
-  height: 22px;
+  height: 44px;
+  margin-block: -11px;
   background: transparent;
   cursor: pointer;
   accent-color: var(--color-brand);
@@ -321,7 +347,7 @@ a { text-underline-offset: 0.2em; }
     0 1px 2px rgba(11, 58, 64, 0.06),
     0 24px 48px -28px rgba(19, 113, 121, 0.45);
 }
-.sea-range { accent-color: var(--color-teal); }
+.sea-range { accent-color: var(--color-teal); height: 44px; margin-block: -14px; }
 
 /* Live network console event feed */
 .feed-in { animation: feed-in 0.45s var(--ease-out-expo) both; }
@@ -349,13 +375,10 @@ html.lenis-on, html.lenis-on body { height: auto; }
 @keyframes hero-flow { to { stroke-dashoffset: -25; } }
 @keyframes hero-drip { from { transform: translateY(-100%); } to { transform: translateY(250%); } }
 /* once the walk-in has left the facade behind, its ambient loops stop */
-[data-idle], [data-idle] * { animation-play-state: paused !important; }
+[data-idle], [data-idle] *, [data-offscreen] * { animation-play-state: paused !important; }
 
 /* network band: stat progress and partner ribbon */
 @keyframes nb-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-@keyframes nb-ribbon { to { transform: translateX(-50%); } }
-[dir="rtl"] .nb-ribbon { animation-direction: reverse !important; }
-@media (prefers-reduced-motion: reduce) { .nb-ribbon { animation: none !important; } }
 
 
 /* ---------- Site chrome: one primary button, one nav-link hover ---------- */
@@ -443,6 +466,8 @@ html.lenis-on, html.lenis-on body { height: auto; }
 
 /* Every pressable thing acknowledges the press. */
 @layer base {
-  :where(button, [role="tab"], [role="radio"]):active { scale: 0.97; }
-  :where(button, [role="tab"], [role="radio"]) { transition: scale 120ms var(--ease-out); }
+  /* The press eases in over 120ms whatever else the control transitions; the release is immediate. */
+  :where(button, [role="tab"], [role="radio"]):active { scale: 0.97; transition: scale 120ms var(--ease-out) !important; }
+  /* wide surfaces (a tab card, a full-width row) only need a hint */
+  :where([data-press="soft"]):active { scale: 0.99; }
 }

@@ -91,7 +91,7 @@ export default function TrackerCard({ c, live, reduce }: { c: LiveCopy; live: bo
       <div className="flex items-center justify-between gap-3 px-4 py-3.5 sm:px-5">
         <p className="font-display text-[15px] font-semibold text-teal-deep">{tr.title}</p>
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold transition-colors duration-500 ${live ? "bg-[#e8f5ec] text-brand-strong" : "bg-subtle text-muted"}`}
+          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold transition-colors duration-200 ${live ? "bg-brand-soft text-brand-strong" : "bg-subtle text-muted"}`}
         >
           <span className="relative flex size-2">
             {live ? <span className="plan-ping absolute inset-0 rounded-full bg-brand motion-reduce:hidden" aria-hidden="true" /> : null}
@@ -105,7 +105,7 @@ export default function TrackerCard({ c, live, reduce }: { c: LiveCopy; live: bo
       <div ref={box} className="relative aspect-[16/10] w-full overflow-hidden bg-[#e6f1ef]">
         <svg
           viewBox={`0 0 ${VB.w} ${VB.h}`}
-          className={`absolute inset-0 size-full transition-[filter] duration-700 ${live ? "" : "saturate-[0.55]"}`}
+          className={`absolute inset-0 size-full transition-opacity duration-200 ${live ? "opacity-100" : "opacity-60"}`}
           aria-hidden="true"
         >
           <rect width={VB.w} height={VB.h} fill="#e6f1ef" />
@@ -116,12 +116,12 @@ export default function TrackerCard({ c, live, reduce }: { c: LiveCopy; live: bo
 
           {/* the route: dotted ahead, solid behind the driver */}
           <path d={ROUTE} fill="none" stroke="#fff" strokeWidth="10" strokeLinecap="round" />
-          <path ref={route} d={ROUTE} fill="none" stroke="#137179" strokeOpacity="0.5" strokeWidth="4" strokeLinecap="round" strokeDasharray="0.1 9" />
+          <path ref={route} d={ROUTE} fill="none" stroke="var(--color-teal)" strokeOpacity="0.5" strokeWidth="4" strokeLinecap="round" strokeDasharray="0.1 9" />
           <path
             ref={trail}
             d={ROUTE}
             fill="none"
-            stroke="#0b7d36"
+            stroke="var(--color-brand)"
             strokeWidth="5.5"
             strokeLinecap="round"
             strokeDasharray="0 9999"
@@ -131,22 +131,22 @@ export default function TrackerCard({ c, live, reduce }: { c: LiveCopy; live: bo
           {/* pickup and delivery */}
           <g transform={`translate(${START.x} ${START.y})`}>
             <circle r="13" fill="#fff" />
-            <circle r="9.5" fill="#0b3a40" />
+            <circle r="9.5" fill="var(--color-teal-deep)" />
             <rect x="-3.5" y="-3.5" width="7" height="7" rx="1.4" fill="#fff" />
           </g>
           <g transform={`translate(${END.x} ${END.y})`}>
-            <circle r="15" fill="#0b7d36" opacity="0.18" />
+            <circle r="15" fill="var(--color-brand)" opacity="0.18" />
             <circle r="12" fill="#fff" />
-            <circle r="9" fill="#0b7d36" />
+            <circle r="9" fill="var(--color-brand)" />
             <path d="M-4.2 0.6 0 -3.4l4.2 4v3.6h-8.4z" fill="#fff" />
           </g>
 
           {/* the driver */}
           <g ref={dot} style={{ opacity: 0 }}>
-            <circle r="30" fill="#0b7d36" opacity="0.16" className="plan-ping motion-reduce:hidden" />
-            <circle r="18" fill="#0b7d36" opacity="0.2" />
+            <circle r="30" fill="var(--color-brand)" opacity="0.16" className="plan-ping motion-reduce:hidden" />
+            <circle r="18" fill="var(--color-brand)" opacity="0.2" />
             <circle r="12" fill="#fff" />
-            <circle r="8.4" fill="#0b3a40" />
+            <circle r="8.4" fill="var(--color-teal-deep)" />
             <g ref={arrow}><path d="M0 -4.8 L4 3.4 L0 1.3 L-4 3.4 Z" fill="#fff" /></g>
           </g>
         </svg>
@@ -189,7 +189,7 @@ export default function TrackerCard({ c, live, reduce }: { c: LiveCopy; live: bo
 
       {/* driver */}
       <div className="flex items-center gap-3 border-t border-line px-4 py-3 sm:px-5">
-        <span className={`grid size-10 shrink-0 place-items-center rounded-full text-white transition-colors duration-500 ${live ? "bg-teal-deep" : "bg-faint"}`}>
+        <span className={`grid size-10 shrink-0 place-items-center rounded-full text-white transition-colors duration-200 ${live ? "bg-teal-deep" : "bg-faint"}`}>
           <VanGlyph className="size-5" />
         </span>
         <span className="min-w-0 flex-1">
@@ -202,13 +202,13 @@ export default function TrackerCard({ c, live, reduce }: { c: LiveCopy; live: bo
       <ol className="flex items-start border-t border-line px-3 pb-4 pt-3.5 sm:px-5">
         {tr.rail.map((label, i) => {
           const s = state[i];
-          const bar = (on: boolean) => `h-0.5 flex-1 rounded-full transition-colors duration-500 ${on ? "bg-brand" : "bg-line-strong"}`;
+          const bar = (on: boolean) => `h-0.5 flex-1 rounded-full transition-colors duration-200 ${on ? "bg-brand" : "bg-line-strong"}`;
           return (
             <li key={label} aria-current={s === "active" ? "step" : undefined} className="flex flex-1 flex-col items-center gap-2 text-center">
               <span className="flex w-full items-center">
                 <span className={i === 0 ? "h-0.5 flex-1 opacity-0" : bar(s !== "todo")} />
                 <span
-                  className={`relative grid size-6 shrink-0 place-items-center rounded-full text-white transition-colors duration-500 ${s === "todo" ? "border-2 border-line-strong bg-white" : "bg-brand"}`}
+                  className={`relative grid size-6 shrink-0 place-items-center rounded-full text-white transition-colors duration-200 ${s === "todo" ? "border-2 border-line-strong bg-white" : "bg-brand"}`}
                 >
                   {s === "done" ? <CheckIcon className="size-3.5" /> : null}
                   {s === "active" ? (
@@ -220,7 +220,7 @@ export default function TrackerCard({ c, live, reduce }: { c: LiveCopy; live: bo
                 </span>
                 <span className={i === tr.rail.length - 1 ? "h-0.5 flex-1 opacity-0" : bar(state[i + 1] !== "todo")} />
               </span>
-              <span className={`text-[12px] font-medium leading-tight transition-colors duration-500 ${s === "todo" ? "text-muted" : "text-teal-deep"}`}>{label}</span>
+              <span className={`text-[12px] font-medium leading-tight transition-colors duration-200 ${s === "todo" ? "text-muted" : "text-teal-deep"}`}>{label}</span>
             </li>
           );
         })}

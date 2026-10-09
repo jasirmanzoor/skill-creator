@@ -1,6 +1,7 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element -- the Sabya warehouse slot is MSG's own photo, served locally */
+import { EASE_OUT, SPRING_SMOOTH } from "@/lib/motion";
 import NumberFlow from "@number-flow/react";
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
 import { useId, useRef, useState } from "react";
@@ -69,7 +70,7 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
                   role="radio"
                   aria-checked={lane === l}
                   onClick={() => { setLane(l); track("planner_step", { step: "price", value: l }); }}
-                  className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${lane === l ? "bg-teal text-white shadow-[0_8px_20px_-10px_rgba(19,113,121,0.9)]" : "bg-white/70 text-teal-deep hover:bg-white"}`}
+                  className={`tap rounded-full px-4 py-2 text-sm font-medium transition-colors ${lane === l ? "bg-teal text-white shadow-[var(--shadow-teal)]" : "bg-white/70 text-teal-deep hover:bg-white"}`}
                 >
                   {c.lanes[l]}
                 </button>
@@ -80,17 +81,17 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
               <svg viewBox="0 0 1000 300" preserveAspectRatio="none" className="absolute inset-0 size-full overflow-visible">
                 <defs>
                   <linearGradient id={`${id}-fill`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0" stopColor="#6cc3c3" stopOpacity="0.45" />
-                    <stop offset="1" stopColor="#6cc3c3" stopOpacity="0" />
+                    <stop offset="0" stopColor="var(--color-sea-400)" stopOpacity="0.45" />
+                    <stop offset="1" stopColor="var(--color-sea-400)" stopOpacity="0" />
                   </linearGradient>
                   <clipPath id={`${id}-clip`}>
-                    <motion.rect x="0" y="0" height="300" initial={false} animate={{ width: x }} transition={{ duration: reduce ? 0 : 0.5, ease: [0.16, 1, 0.3, 1] }} />
+                    <motion.rect x="0" y="0" height="300" initial={false} animate={{ width: x }} transition={{ duration: reduce ? 0 : 0.4, ease: EASE_OUT }} />
                   </clipPath>
                 </defs>
-                <path d={`${CURVE} L${X1} 300 L${X0} 300 Z`} fill="#c4e9e7" opacity="0.35" />
+                <path d={`${CURVE} L${X1} 300 L${X0} 300 Z`} fill="var(--color-sea-200)" opacity="0.35" />
                 <path d={`${CURVE} L${X1} 300 L${X0} 300 Z`} fill={`url(#${id}-fill)`} clipPath={`url(#${id}-clip)`} />
                 <path d={CURVE} fill="none" stroke="#c3cdd2" strokeWidth="2" vectorEffect="non-scaling-stroke" />
-                <path d={CURVE} fill="none" stroke="#137179" strokeWidth="3" strokeLinecap="round" vectorEffect="non-scaling-stroke" clipPath={`url(#${id}-clip)`} />
+                <path d={CURVE} fill="none" stroke="var(--color-teal)" strokeWidth="3" strokeLinecap="round" vectorEffect="non-scaling-stroke" clipPath={`url(#${id}-clip)`} />
               </svg>
               <Milestone at={{ x: X0 + 14, y: curveY(X0 + 14) }} label={c.milestones.first} below />
               <Milestone at={{ x: PEAK_X, y: curveY(PEAK_X) }} label={c.milestones.peak} />
@@ -98,7 +99,7 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
                 className="absolute z-10 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-white bg-teal shadow-[0_0_0_6px_rgba(108,195,195,0.35)]"
                 initial={false}
                 animate={pos}
-                transition={{ duration: reduce ? 0 : 0.5, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: reduce ? 0 : 0.5, ease: EASE_OUT }}
               />
             </div>
 
@@ -162,24 +163,24 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
             )}
             <div aria-hidden="true" className={`absolute inset-0 ${warehousePhoto ? "bg-[linear-gradient(0deg,rgba(40,24,6,0.78),rgba(40,24,6,0.15)_65%)]" : "bg-[linear-gradient(0deg,rgba(90,56,14,0.35),transparent_60%)]"}`} />
             <div className="relative flex h-full flex-col justify-end p-6 sm:p-10">
-              <p className={`text-sm font-semibold ${warehousePhoto ? "text-[#ffe3a8]" : "text-[#6b4210]"}`}>{s.eyebrow}</p>
-              <h3 className={`mt-2 max-w-xl font-display text-3xl font-semibold leading-tight tracking-[-0.02em] text-balance sm:text-5xl rtl:tracking-normal ${warehousePhoto ? "text-white" : "text-[#3b2408]"}`}>
+              <p className={`text-sm font-semibold ${warehousePhoto ? "text-[#ffe3a8]" : "text-sand-700"}`}>{s.eyebrow}</p>
+              <h3 className={`mt-2 max-w-xl font-display text-3xl font-semibold leading-tight tracking-[-0.02em] text-balance sm:text-5xl rtl:tracking-normal ${warehousePhoto ? "text-white" : "text-sand-900"}`}>
                 {s.title}
               </h3>
               <p className={`mt-3 max-w-lg ${warehousePhoto ? "text-white/85" : "text-[#4a2e0b]"}`}>{s.sub}</p>
               <ul className="mt-5 flex flex-wrap gap-2">
                 {s.points.map((pt) => (
-                  <li key={pt} className={`rounded-full px-3 py-1.5 text-xs font-semibold ring-1 backdrop-blur ${warehousePhoto ? "bg-black/30 text-white ring-white/25" : "bg-white/60 text-[#3b2408] ring-[#3b2408]/15"}`}>{pt}</li>
+                  <li key={pt} className={`rounded-full px-3 py-1.5 text-xs font-semibold ring-1 backdrop-blur ${warehousePhoto ? "bg-black/30 text-white ring-white/25" : "bg-white/60 text-sand-900 ring-sand-900/15"}`}>{pt}</li>
                 ))}
               </ul>
             </div>
           </div>
-          <aside data-rate-card aria-label={s.eyebrow} className="flex flex-col justify-center bg-[linear-gradient(180deg,#fffaf0,#fbf1dc)] p-6 text-[#3b2408] sm:p-10">
-            <p className="text-sm text-[#6b4210]">{s.approx}</p>
+          <aside data-rate-card aria-label={s.eyebrow} className="flex flex-col justify-center bg-[linear-gradient(180deg,#fffaf0,#fbf1dc)] p-6 text-sand-900 sm:p-10">
+            <p className="text-sm text-sand-700">{s.approx}</p>
             <dl className="mt-4 grid grid-cols-2 gap-4">
               {([["sabyaLocal", s.local], ["sabyaMajor", s.major]] as const).map(([k, label]) => (
                 <div key={k} className="rounded-2xl bg-white/70 p-4">
-                  <dt className="text-sm text-[#6b4210]">{label}</dt>
+                  <dt className="text-sm text-sand-700">{label}</dt>
                   <dd className="num mt-1 font-display text-4xl font-semibold">
                     <Money cur={c.cur} approx ar={lang === "ar"}>{RATE_CARD[k].t299}</Money>
                   </dd>
@@ -192,7 +193,7 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
               rel="noopener noreferrer"
               event="whatsapp_click"
               props={{ location: "sabya" }}
-              className="mt-6 inline-flex items-center justify-center gap-2 rounded-md bg-[#3b2408] px-5 py-3 font-medium text-white transition-colors hover:bg-[#2a1905]"
+              className="mt-6 inline-flex items-center justify-center gap-2 rounded-md bg-sand-900 px-5 py-3 font-medium text-white transition-colors hover:bg-[#2a1905]"
             >
               {s.cta} <ArrowIcon className="size-4 rtl:rotate-180" />
             </TrackedLink>
@@ -263,7 +264,7 @@ export function Money({ cur, approx = false, ar, children }: { cur: string; appr
 function SabyaDoor({ alt, reduce }: { alt: string; reduce: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const p = useSpring(scrollYProgress, { stiffness: 80, damping: 22 });
+  const p = useSpring(scrollYProgress, { ...SPRING_SMOOTH });
   const scale = useTransform(p, [0, 1], [1.18, 1]);
   if (reduce) return <img src="/photos/msg/warehouse-floor.webp" alt={alt} className="absolute inset-0 size-full object-cover" loading="lazy" />;
   return (

@@ -75,7 +75,7 @@ export default function LiveTracking({ lang }: { lang: Locale }) {
                     className="relative flex gap-4 before:absolute before:start-[17px] before:top-11 before:-bottom-5 before:w-px before:bg-white/15 last:before:hidden"
                   >
                     <span
-                      className={`relative z-10 grid size-9 shrink-0 place-items-center rounded-full text-sm font-semibold transition-colors duration-500 ${
+                      className={`relative z-10 grid size-9 shrink-0 place-items-center rounded-full text-sm font-semibold transition-colors duration-200 ${
                         st === "done" ? "bg-brand-bright text-deep" : st === "active" ? "border-2 border-brand-bright bg-deep text-brand-bright" : "border border-white/25 bg-deep text-white/60"
                       }`}
                     >
@@ -83,8 +83,8 @@ export default function LiveTracking({ lang }: { lang: Locale }) {
                       {st === "done" ? <CheckIcon className="relative size-4" /> : <span className="num relative">{i + 1}</span>}
                     </span>
                     <span>
-                      <span className={`block font-display text-lg font-semibold leading-snug transition-colors duration-500 ${st === "todo" ? "text-white/60" : "text-white"}`}>{s.t}</span>
-                      <span className={`mt-0.5 block text-sm leading-relaxed transition-colors duration-500 ${st === "todo" ? "text-white/55" : "text-white/75"}`}>{s.d}</span>
+                      <span className={`block font-display text-lg font-semibold leading-snug transition-colors duration-200 ${st === "todo" ? "text-white/60" : "text-white"}`}>{s.t}</span>
+                      <span className={`mt-0.5 block text-sm leading-relaxed transition-colors duration-200 ${st === "todo" ? "text-white/55" : "text-white/75"}`}>{s.d}</span>
                     </span>
                   </li>
                 );
@@ -103,7 +103,7 @@ export default function LiveTracking({ lang }: { lang: Locale }) {
                 <DriverPhone c={c} live={live} reduce={reduce} onApprove={approve} onReplay={replay} />
                 <p
                   aria-hidden={live}
-                  className={`absolute inset-x-0 top-[calc(100%-1.75rem)] text-center text-[13px] font-semibold text-brand-bright transition-opacity duration-500 ${live ? "opacity-0" : "opacity-100"}`}
+                  className={`absolute inset-x-0 top-[calc(100%-1.75rem)] text-center text-[13px] font-semibold text-brand-bright transition-opacity duration-200 ${live ? "opacity-0" : "opacity-100"}`}
                 >
                   {c.tryIt}
                 </p>
@@ -111,11 +111,11 @@ export default function LiveTracking({ lang }: { lang: Locale }) {
 
               {/* the signal: nothing travels until the driver approves */}
               <div aria-hidden="true" className="relative hidden h-px w-[3.5rem] shrink-0 xl:block">
-                <span className={`absolute inset-0 border-t-2 border-dashed transition-colors duration-700 ${live ? "border-brand-bright" : "border-white/25"}`} />
+                <span className={`absolute inset-0 border-t-2 border-dashed transition-colors duration-200 ${live ? "border-brand-bright" : "border-white/25"}`} />
                 {live ? [0, 1, 2].map((i) => <span key={i} className="sig-x absolute -top-[3px] start-0 size-2 rounded-full bg-brand-bright motion-reduce:hidden" style={{ animationDelay: `${i * 0.5}s` }} />) : null}
               </div>
               <div aria-hidden="true" className="relative h-14 w-px shrink-0 xl:hidden">
-                <span className={`absolute inset-0 border-s-2 border-dashed transition-colors duration-700 ${live ? "border-brand-bright" : "border-white/25"}`} />
+                <span className={`absolute inset-0 border-s-2 border-dashed transition-colors duration-200 ${live ? "border-brand-bright" : "border-white/25"}`} />
                 {live ? [0, 1, 2].map((i) => <span key={i} className="sig-y absolute -start-[3px] top-0 size-2 rounded-full bg-brand-bright motion-reduce:hidden" style={{ animationDelay: `${i * 0.45}s` }} />) : null}
               </div>
 
