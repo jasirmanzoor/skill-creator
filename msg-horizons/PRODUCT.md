@@ -52,7 +52,7 @@ facilities and numbers, not stock imagery.
 
 ## Brand Commitments
 
-- Name: MSG Horizons (Arabic trade name pending confirmation).
+- Name: MSG Horizons. In Arabic the name is written ام اس جي (confirmed 10 Oct 2026).
 - Identity as built: paper and ink neutrals, MSG green as the brand colour, the "Red Sea glass" skin (aqua,
   sea-foam, deep teal) for the network, price and enterprise bands, and a deep-teal primary button.
 - Type: Inter Tight (display), Inter (text), IBM Plex Sans Arabic.
