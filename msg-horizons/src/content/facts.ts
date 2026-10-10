@@ -10,7 +10,7 @@
 export const facts = {
   name: "MSG Horizons",
   legalName: "MSG Horizons Company",
-  nameAr: "مسج هورايزونز",
+  nameAr: "ام اس جي هورايزونز",
   tagline: "Leading Integrated Logistics Solutions in the Kingdom of Saudi Arabia", // 2026 cover
 
   metrics: {

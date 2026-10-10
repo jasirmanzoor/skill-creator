@@ -22,7 +22,7 @@ export type Stop = {
 
 export const STOPS: Stop[] = [
   { id: "hero", for: ["seller", "brand"], title: { en: "Start", ar: "ابدأ" }, hint: { en: "Price a delivery in ten seconds", ar: "سعّر توصيلتك في عشر ثوانٍ" } },
-  { id: "why", for: ["seller", "brand", "enterprise"], title: { en: "Why MSG", ar: "لماذا مسج" }, hint: { en: "Six hard problems, already solved", ar: "ست مشكلات صعبة، محلولة مسبقاً" } },
+  { id: "why", for: ["seller", "brand", "enterprise"], title: { en: "Why MSG", ar: "لماذا ام اس جي" }, hint: { en: "Six hard problems, already solved", ar: "ست مشكلات صعبة، محلولة مسبقاً" } },
   { id: "live-tracking", panel: true, for: ["seller", "brand", "enterprise"], title: { en: "Live tracking", ar: "التتبع المباشر" }, hint: { en: "See your driver live, once they approve", ar: "شاهد المندوب مباشرةً بعد موافقته" } },
   { id: "sellers", for: ["seller"], title: { en: "Your questions", ar: "أسئلتك" }, hint: { en: "One partner for the whole operation", ar: "شريك واحد للعملية كاملة" } },
   { id: "planner", panel: true, for: ["seller", "brand"], title: { en: "Build your plan", ar: "ابنِ خطتك" }, hint: { en: "Four steps to a setup that fits", ar: "أربع خطوات إلى منظومة تناسبك" } },
@@ -33,7 +33,7 @@ export const STOPS: Stop[] = [
   { id: "partners", for: ["seller", "brand", "enterprise"], title: { en: "Partners", ar: "الشركاء" }, hint: { en: "Trusted by the names that move the Kingdom", ar: "موثوقون من الأسماء التي تحرّك المملكة" } },
   { id: "proof", for: ["brand", "enterprise"], title: { en: "Proof", ar: "الإثبات" }, hint: { en: "Scale you can see, standards you can trust", ar: "حجم تراه ومعايير تثق بها" } },
   { id: "enterprise", for: ["enterprise"], title: { en: "For enterprise", ar: "للشركات الكبرى" }, hint: { en: "Capability you can inspect", ar: "قدرات يمكنك فحصها" } },
-  { id: "contact", for: ["seller", "brand", "enterprise"], title: { en: "Talk to MSG", ar: "تحدث مع مسج" }, hint: { en: "Let's move what matters", ar: "لننقل ما يهمك" } },
+  { id: "contact", for: ["seller", "brand", "enterprise"], title: { en: "Talk to MSG", ar: "تحدث مع ام اس جي" }, hint: { en: "Let's move what matters", ar: "لننقل ما يهمك" } },
 ];
 
 /** the planner's personas, folded into the three lenses the route map offers */
