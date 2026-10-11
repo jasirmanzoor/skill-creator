@@ -1,7 +1,7 @@
 "use client";
 
 import { EASE_OUT } from "@/lib/motion";
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -141,7 +141,7 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
   const onNet = (v: SizerInput) => { setNet(v); setNetTouched(true); };
   const anim = reduce
     ? {}
-    : { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -6 }, transition: { duration: 0.28, ease: EASE_OUT } };
+    : { initial: { opacity: 0, transform: "translateY(10px)" }, animate: { opacity: 1, transform: "translateY(0px)" }, transition: { duration: 0.24, ease: EASE_OUT } };
 
   const k = cockpitCopy[lang];
   const cv = coveredCopy[lang];
@@ -194,7 +194,7 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
                     <p className="num hidden text-xs text-muted sm:block" aria-live="polite">{fmt(p.stepOf, { n: step + 1, total: TOTAL })}</p>
                   </div>
 
-                  <AnimatePresence mode="wait" initial={false}>
+                  {/* each step simply arrives: nothing waits on the previous one leaving, so quick clicks can never strand the panel */}
                     <motion.div key={step} {...anim} className="flex-1">
                       <h3 ref={headingRef} tabIndex={-1} className="mt-7 font-display text-2xl font-semibold tracking-[-0.02em] text-ink outline-none sm:text-3xl rtl:tracking-normal">
                         {question.q}
@@ -203,7 +203,7 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
 
                       <div className="mt-6">
                         {step === 0 && (
-                          <div role="radiogroup" aria-label={p.steps.persona.q} className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                          <div role="radiogroup" aria-label={p.steps.persona.q} className="grid grid-cols-1 gap-2.5">
                             {PERSONAS.map((k2) => (
                               <Option key={k2} role="radio" icon={k2} checked={persona === k2}
                                 title={p.steps.persona.options[k2].t} desc={p.steps.persona.options[k2].d}
@@ -216,7 +216,7 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
                           </div>
                         )}
                         {step === 1 && (
-                          <div role="group" aria-label={p.steps.cargo.q} className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                          <div role="group" aria-label={p.steps.cargo.q} className="grid grid-cols-1 gap-2.5">
                             {CARGO.map((k2) => (
                               <Option key={k2} role="checkbox" icon={k2} checked={cargo.includes(k2)}
                                 title={p.steps.cargo.options[k2].t} desc={p.steps.cargo.options[k2].d}
@@ -263,7 +263,6 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
                         )}
                       </div>
                     </motion.div>
-                  </AnimatePresence>
 
                   <div className="mt-8">
                     <PlanModules t={t} input={liveInput} label={k.setup} />
@@ -327,25 +326,27 @@ function Option({
       role={role}
       aria-checked={checked}
       onClick={onClick}
-      className={`group flex items-start gap-3.5 rounded-2xl border p-4 text-start transition-ui duration-200 ${
-        checked ? "border-brand bg-brand-soft shadow-[0_14px_30px_-20px_rgba(19,113,121,0.8)]" : "border-line hover:-translate-y-0.5 hover:border-line-strong hover:bg-paper hover:shadow-[0_14px_30px_-22px_rgba(12,14,17,0.5)]"
+      data-press="soft"
+      className={`group relative flex min-h-[4.75rem] items-center gap-4 rounded-2xl border bg-surface px-4 py-3.5 text-start transition-ui duration-200 ${
+        checked
+          ? "border-brand bg-brand-soft/60 shadow-[0_0_0_1px_var(--color-brand),0_16px_32px_-22px_rgba(11,125,54,0.7)]"
+          : "border-line-strong/70 hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-[var(--shadow-card)]"
       }`}
     >
-      <span className={`mt-0.5 inline-flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors ${
-        checked ? "bg-brand text-white" : "bg-subtle text-ink group-hover:bg-brand-soft group-hover:text-brand"
+      <span className={`inline-flex size-12 shrink-0 items-center justify-center rounded-xl transition-colors ${
+        checked ? "bg-brand text-white" : "bg-subtle text-ink-3 group-hover:bg-ink group-hover:text-white"
       }`}>
-        <OptionIcon id={icon} className="size-5" />
+        <OptionIcon id={icon} className="size-[22px]" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="flex items-start justify-between gap-3">
-          <span className="font-semibold leading-snug text-ink">{title}</span>
-          <span aria-hidden="true" className={`mt-0.5 inline-flex size-[18px] shrink-0 items-center justify-center rounded-full border transition-colors ${
-            checked ? "border-brand bg-brand text-white" : "border-line-strong"
-          }`}>
-            {checked ? <CheckIcon className="size-3" /> : null}
-          </span>
-        </span>
-        {desc ? <span className="mt-1 block text-sm leading-snug text-muted">{desc}</span> : null}
+        <span className="block font-display text-[1.0625rem] font-semibold leading-snug tracking-[-0.01em] text-ink rtl:tracking-normal">{title}</span>
+        {desc ? <span className={`mt-0.5 block text-sm leading-snug ${checked ? "text-ink-3" : "text-muted"}`}>{desc}</span> : null}
+      </span>
+      {/* a square for "pick any", a circle for "pick one" */}
+      <span aria-hidden="true" className={`inline-flex size-6 shrink-0 items-center justify-center border-2 transition-colors ${role === "checkbox" ? "rounded-md" : "rounded-full"} ${
+        checked ? "border-brand bg-brand text-white" : "border-line-strong bg-surface group-hover:border-ink/50"
+      }`}>
+        {checked ? <CheckIcon className="size-3.5" /> : null}
       </span>
     </button>
   );

@@ -292,7 +292,7 @@ export const guideCopy: Record<
   },
   ar: {
     you: "ما تقوم به",
-    msg: "ما تقوم به مسج",
+    msg: "ما تقوم به ام اس جي",
     nextUp: "التالي",
     walk: "خذني في جولة",
     pause: "أوقف الجولة",
@@ -305,8 +305,8 @@ export const guideCopy: Record<
       { you: "سلّم الطرود التجريبية.", msg: "توصلها مع إثبات التسليم وتراجعها معك، ثم تنقلك إلى التشغيل." },
     ],
     demo: {
-      chatHead: "مسج هورايزونز",
-      hello: (who, orders, where) => `مرحباً مسج، نحن ${who} ولدينا نحو ${orders} طلب يومياً ${where}.`,
+      chatHead: "ام اس جي هورايزونز",
+      hello: (who, orders, where) => `مرحباً ام اس جي، نحن ${who} ولدينا نحو ${orders} طلب يومياً ${where}.`,
       who: { offline: "متجر محلي", social: "بائع عبر منصات التواصل", neighborhood: "متجر حي", enterprise: "متاجر بعدة فروع", sme: "علامة إلكترونية متنامية", aggregator: "منصة توصيل" },
       where: { riyadh: "في الرياض", multi: "في الرياض ومدن أخرى", kingdom: "في أنحاء المملكة" },
       reply: "أهلاً بك. لنرسم توصيلاتك معاً.",

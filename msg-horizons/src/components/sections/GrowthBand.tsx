@@ -22,6 +22,8 @@ import { ArrowIcon, WhatsAppIcon } from "../ui/icons";
  */
 
 const MAX = 1000;
+/** the three proofs the section walks through, in order */
+const PROOFS: Record<Locale, [string, string, string]> = { en: ["Volume", "Capacity", "Reach"], ar: ["الحجم", "الطاقة الاستيعابية", "الوصول"] };
 const X0 = 40, X1 = 960, PEAK_X = 640;
 const curveY = (x: number) => {
   const t = (x - X0) / (X1 - X0);
@@ -63,9 +65,19 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
         </h2>
         <p className="mt-5 max-w-2xl text-lg text-teal-deep/75">{c.lead}</p>
 
-        <div className="mt-10 grid gap-5 lg:grid-cols-[1.35fr_1fr]">
+        <ol className="mt-10 overflow-hidden rounded-[2rem] bg-white/85 shadow-[var(--shadow-card)] ring-1 ring-teal/12">
+          {/* 01 Volume: from the first order to peak season, priced live from the rate card */}
+          <li className="grid lg:grid-cols-[10.5rem_1fr]">
+            <div className="relative flex items-center gap-3 px-5 pt-6 sm:px-8 lg:flex-col lg:items-start lg:pb-8 lg:pe-0 lg:pt-8">
+              {/* the line that carries one proof into the next */}
+              
+              <span aria-hidden="true" className="absolute bottom-0 start-[2.5rem] top-[4.75rem] hidden w-px bg-teal/25 sm:start-[3.25rem] lg:block" />
+              <span className="num relative grid size-10 shrink-0 place-items-center rounded-full bg-teal-deep font-display text-sm font-semibold text-white" dir="ltr">01</span>
+              <p className="font-display text-xl font-semibold tracking-[-0.02em] text-teal-deep rtl:tracking-normal">{PROOFS[lang][0]}</p>
+            </div>
+            <div className="grid gap-5 p-5 sm:p-8 lg:grid-cols-[1.35fr_1fr]">
           {/* the growth line + controls */}
-          <div className="sea-glass rounded-3xl p-5 sm:p-8">
+          <div>
             <div role="radiogroup" aria-label={c.lane} className="flex flex-wrap gap-2">
               {LANES.map((l) => (
                 <button
@@ -125,7 +137,7 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
           </div>
 
           {/* the price, straight from the rate card */}
-          <aside data-rate-card aria-label={c.perShipment} className="sea-glass flex flex-col rounded-3xl p-6 sm:p-8" aria-live="polite">
+          <aside data-rate-card aria-label={c.perShipment} className="flex flex-col justify-center rounded-2xl bg-sea-50 p-6 ring-1 ring-teal/12 sm:p-7 lg:col-start-2 lg:row-span-2 lg:row-start-1" aria-live="polite">
             <p className="text-sm font-medium text-teal-deep/70">{c.lanes[lane]}</p>
 
             <div className="mt-4 grid grid-cols-2 gap-4 border-t border-teal/15 pt-6">
@@ -149,16 +161,37 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
               rel="noopener noreferrer"
               event="whatsapp_click"
               props={{ location: "price-band" }}
-              className="mt-6 inline-flex items-center justify-center gap-2 rounded-md bg-brand px-5 py-3 font-medium text-white transition-colors hover:bg-brand-strong"
+              className="mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-brand px-5 py-3 font-semibold text-white shadow-[var(--shadow-cta)] transition-colors hover:bg-brand-strong"
             >
               <WhatsAppIcon className="size-5" /> {c.cta}
             </TrackedLink>
-            <p className="mt-3 text-xs text-teal-deep/65">{c.note}</p>
+            <p className="mt-3 text-xs text-teal-deep/80">{c.note}</p>
           </aside>
-        </div>
+          {/* every lane at this volume, from the same rate card */}
+          <aside data-rate-card aria-label={c.lane} className="lg:col-start-1 lg:row-start-2">
+            <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+              {LANES.map((l) => (
+                <li key={l} className={`rounded-2xl p-3.5 ring-1 ${l === lane ? "bg-teal-deep text-white ring-teal-deep" : "bg-white text-teal-deep ring-teal/15"}`}>
+                  <span className={`block text-xs font-medium ${l === lane ? "text-white/80" : "text-teal-deep/75"}`}>{c.lanes[l]}</span>
+                  <span className="num mt-1 block font-display text-2xl font-semibold"><Money cur={c.cur} approx ar={lang === "ar"}>{rateFor(l, n)}</Money></span>
+                </li>
+              ))}
+            </ul>
+          </aside>
+            </div>
+          </li>
 
-        {/* Sabya: the contrast beat, in dry Jazan sun */}
-        <div className="mt-5 grid overflow-hidden rounded-3xl shadow-[0_30px_60px_-35px_rgba(120,80,20,0.45)] lg:grid-cols-[1.4fr_1fr]">
+          {/* 02 Capacity: the Sabya hub, MSG's own fleet and drivers */}
+          <li className="grid border-t border-teal/12 lg:grid-cols-[10.5rem_1fr]">
+            <div className="relative flex items-center gap-3 px-5 pt-6 sm:px-8 lg:flex-col lg:items-start lg:pb-8 lg:pe-0 lg:pt-8">
+              {/* the line that carries one proof into the next */}
+              <span aria-hidden="true" className="absolute start-[2.5rem] top-0 hidden h-8 w-px bg-teal/25 sm:start-[3.25rem] lg:block" />
+              <span aria-hidden="true" className="absolute bottom-0 start-[2.5rem] top-[4.75rem] hidden w-px bg-teal/25 sm:start-[3.25rem] lg:block" />
+              <span className="num relative grid size-10 shrink-0 place-items-center rounded-full bg-teal-deep font-display text-sm font-semibold text-white" dir="ltr">02</span>
+              <p className="font-display text-xl font-semibold tracking-[-0.02em] text-teal-deep rtl:tracking-normal">{PROOFS[lang][1]}</p>
+            </div>
+            <div className="p-5 sm:p-8">
+        <div className="grid overflow-hidden rounded-2xl ring-1 ring-sand-900/10 lg:grid-cols-[1.4fr_1fr]">
           <div className="relative min-h-[380px] overflow-hidden sm:min-h-[460px]">
             {warehousePhoto ? (
               <SabyaDoor alt={s.title} reduce={reduce} />
@@ -172,14 +205,17 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
                 {s.title}
               </h3>
               <p className={`mt-3 max-w-lg ${warehousePhoto ? "text-white/85" : "text-[#4a2e0b]"}`}>{s.sub}</p>
-              <ul className="mt-5 flex flex-wrap gap-2">
-                {s.points.map((pt) => (
-                  <li key={pt} className={`rounded-full px-3 py-1.5 text-xs font-semibold ring-1 backdrop-blur ${warehousePhoto ? "bg-black/30 text-white ring-white/25" : "bg-white/60 text-sand-900 ring-sand-900/15"}`}>{pt}</li>
-                ))}
-              </ul>
             </div>
           </div>
           <aside data-rate-card aria-label={s.eyebrow} className="flex flex-col justify-center bg-[linear-gradient(180deg,#fffaf0,#fbf1dc)] p-6 text-sand-900 sm:p-10">
+            {/* what the hub is made of */}
+            <ul className="mb-7 border-t border-sand-900/15">
+              {s.points.map((pt) => (
+                <li key={pt} className="flex items-center gap-3 border-b border-sand-900/15 py-3 font-display text-lg font-semibold">
+                  <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-sand-500" />{pt}
+                </li>
+              ))}
+            </ul>
             <p className="text-sm text-sand-700">{s.approx}</p>
             <dl className="mt-4 grid grid-cols-2 gap-4">
               {([["sabyaLocal", s.local], ["sabyaMajor", s.major]] as const).map(([k, label]) => (
@@ -203,9 +239,20 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
             </TrackedLink>
           </aside>
         </div>
+            </div>
+          </li>
 
-        {/* the outlet: an iMile franchise store MSG owns and runs */}
-        <div className="mt-5 grid overflow-hidden rounded-3xl bg-white shadow-[0_30px_60px_-35px_rgba(11,58,64,0.45)] ring-1 ring-teal/10 sm:grid-cols-[0.8fr_1.2fr]">
+          {/* 03 Reach: the iMile outlet MSG owns and runs, and the district around it */}
+          <li className="grid border-t border-teal/12 lg:grid-cols-[10.5rem_1fr]">
+            <div className="relative flex items-center gap-3 px-5 pt-6 sm:px-8 lg:flex-col lg:items-start lg:pb-8 lg:pe-0 lg:pt-8">
+              {/* the line that carries one proof into the next */}
+              <span aria-hidden="true" className="absolute start-[2.5rem] top-0 hidden h-8 w-px bg-teal/25 sm:start-[3.25rem] lg:block" />
+              
+              <span className="num relative grid size-10 shrink-0 place-items-center rounded-full bg-teal-deep font-display text-sm font-semibold text-white" dir="ltr">03</span>
+              <p className="font-display text-xl font-semibold tracking-[-0.02em] text-teal-deep rtl:tracking-normal">{PROOFS[lang][2]}</p>
+            </div>
+            <div className="p-5 sm:p-8">
+        <div className="grid overflow-hidden rounded-2xl bg-white ring-1 ring-teal/12 sm:grid-cols-[0.8fr_1.2fr]">
           <div className="relative min-h-[300px] overflow-hidden">
             <img src="/media/msg/outlet.jpg" alt={o.alt} loading="lazy" className="absolute inset-0 size-full object-cover [object-position:50%_42%]" />
           </div>
@@ -218,6 +265,9 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
             <RadiusRings label={o.radius} reduce={reduce} />
           </div>
         </div>
+            </div>
+          </li>
+        </ol>
       </div>
     </section>
   );

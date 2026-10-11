@@ -9,9 +9,10 @@ and what needs **confirmation** before it can be used.
 |---|---|---|
 | Lead delivery destination | The form needs `LEAD_WEBHOOK_URL` and/or `RESEND_API_KEY` set in Vercel. Until then it hands leads off to WhatsApp or email (no lead is lost). | Contact form |
 | Partner display | AJEX, Keeta, iMile, Logistiqa and J&T Express are shown as **text** under "Valued partners", exactly as the 2026 profile lists them. Logos need each partner's permission. | Proof section |
-| Arabic company name | The source spells it "مسج هورايزونز". Please confirm that is the official Arabic trade name. | Footer, JSON-LD |
 
 ## Confirmed by MSG
+- **Arabic company name (10 Oct 2026):** the name is written ام اس جي (three spelled letters), not as a single word. Every Arabic string, the footer and the JSON-LD use it. The second word keeps the spelling already in use; the hub sign writes it without the alef, which MSG has not asked to change.
+
 - **Enquiry and WhatsApp number: 057 806 1556** (`+966578061556`, `wa.me/966578061556`). It replaces the profile's
   +966 55 895 1422 on every call, WhatsApp and structured-data touchpoint.
 

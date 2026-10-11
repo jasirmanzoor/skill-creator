@@ -5,8 +5,7 @@ import type { Locale } from "@/content/i18n";
 import { liveCopy } from "@/content/liveTracking";
 import { track } from "@/lib/analytics";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
-import TrackedLink from "../ui/TrackedLink";
-import { ArrowIcon, CheckIcon } from "../ui/icons";
+import { CheckIcon } from "../ui/icons";
 import DriverPhone from "./DriverPhone";
 import ScanVsLive from "./ScanVsLive";
 import TrackerCard from "./TrackerCard";
@@ -90,10 +89,6 @@ export default function LiveTracking({ lang }: { lang: Locale }) {
               })}
             </ol>
 
-            <TrackedLink href="#planner" event="cta_click" props={{ cta: "plan", location: "live_tracking" }} className="btn-primary on-dark group mt-8 inline-flex px-6 py-3.5">
-              {c.cta}
-              <ArrowIcon className="size-4" />
-            </TrackedLink>
           </div>
 
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm sm:p-8">

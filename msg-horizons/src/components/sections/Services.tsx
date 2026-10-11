@@ -3,8 +3,7 @@
 import { EASE_OUT } from "@/lib/motion";
 import { AnimatePresence, MotionConfig, motion } from "motion/react";
 import { useState } from "react";
-import TrackedLink from "../ui/TrackedLink";
-import { ArrowIcon, ServiceIcon } from "../ui/icons";
+import { ServiceIcon } from "../ui/icons";
 import { facts, type ServiceId } from "@/content/facts";
 import ServiceScene from "../scenes/ServiceScene";
 import { SLUG_FOR } from "@/content/servicePages";
@@ -83,14 +82,6 @@ export default function Services({ t, lang }: { t: Dictionary; lang: Locale }) {
                 <p className="text-sm font-semibold text-muted">{t.planner.services[open].name}</p>
                 <p className="num mt-6 font-display text-6xl font-semibold tracking-[-0.03em] text-ink rtl:tracking-normal">{fact.v}</p>
                 <p className="mt-3 text-lg text-muted">{fact.l}</p>
-                <TrackedLink
-                  href="#planner"
-                  event="cta_click"
-                  props={{ cta: "plan", location: `services_${open}` }}
-                  className="mt-6 inline-flex min-h-11 items-center gap-2 font-medium text-brand hover:text-brand-strong"
-                >
-                  {s.explore} <ArrowIcon />
-                </TrackedLink>
                 </div>
               </motion.div>
             </AnimatePresence>

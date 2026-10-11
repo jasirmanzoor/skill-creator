@@ -14,7 +14,7 @@ import type { Dictionary, Locale } from "@/content/i18n";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { usePlan } from "../PlanContext";
 import TrackedLink from "../ui/TrackedLink";
-import { ArrowIcon, WhatsAppIcon } from "../ui/icons";
+import { WhatsAppIcon } from "../ui/icons";
 import Dust from "./Dust";
 import HeroMap, { STAGE_COUNT } from "./HeroMap";
 import { NeedIcon, StageCard } from "../operation/StageParts";
@@ -57,13 +57,16 @@ const INSIDE_TALL: Inside = {
   spots: { storage: { x: 0.3, y: 0.32 }, sorting: { x: 0.505, y: 0.4 }, dispatch: { x: 0.7, y: 0.36 } },
 };
 
-/** a box with the photo's proportions that always covers the frame, keeping (ax, ay) as central as it can */
-const cover = (ar: number, ax: number, ay: number): React.CSSProperties => ({
+/** how far the facade is set down in the frame to leave room for sky above the roof, as a share of the frame's height */
+const SKY = 0.14;
+
+/** a box with the photo's proportions that always covers the frame, keeping (ax, ay) as central as it can; `drop` sets it lower */
+const cover = (ar: number, ax: number, ay: number, drop = 0): React.CSSProperties => ({
   ["--W" as string]: `max(100cqw, calc(100cqh * ${ar}))`,
   width: "var(--W)",
   height: `calc(var(--W) / ${ar})`,
   left: `clamp(calc(100cqw - var(--W)), calc(50cqw - ${ax} * var(--W)), 0px)`,
-  top: `clamp(calc(100cqh - var(--W) / ${ar}), calc(50cqh - ${ay} * var(--W) / ${ar}), 0px)`,
+  top: `calc(clamp(calc(100cqh - var(--W) / ${ar}), calc(50cqh - ${ay} * var(--W) / ${ar}), 0px) + ${drop * 100}cqh)`,
 });
 const at = (p: Pt) => ({ left: `${p.x * 100}%`, top: `${p.y * 100}%` });
 
@@ -71,7 +74,7 @@ const at = (p: Pt) => ({ left: `${p.x * 100}%`, top: `${p.y * 100}%` });
 function doorZoom(fw: number, fh: number) {
   const W = Math.max(fw, fh * FACADE.ar), H = W / FACADE.ar;
   const left = Math.min(0, Math.max(fw - W, fw / 2 - FACADE.door.x * W));
-  const top = Math.min(0, Math.max(fh - H, fh / 2 - FACADE.anchorY * H));
+  const top = Math.min(0, Math.max(fh - H, fh / 2 - FACADE.anchorY * H)) + SKY * fh;
   const cx = left + FACADE.door.x * W, cy = top + FACADE.door.y * H;
   const zx = (2 * Math.max(cx, fw - cx)) / (FACADE.door.w * W);
   const zy = (2 * Math.max(cy, fh - cy)) / (FACADE.door.h * H);
@@ -104,6 +107,8 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   const { scrollYProgress } = useScroll({ target: section, offset: ["start start", "end end"] });
   // copied into a plain motion value so every layer reads the same progress (no per-layer native scroll timelines)
   const p = useMotionValue(0);
+  // how far through the four stages the scroll is (0 → 1), for the stage rail's fill
+  const sp = useMotionValue(0);
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     const w = Math.min(1, v / WALK);
     p.set(w);
@@ -111,6 +116,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
     setBeat((x) => (x === b ? x : b));
     const s = stageAt(v);
     setStage((x) => (x === s ? x : s));
+    sp.set(Math.max(0, (v - WALK - HOLD) / (1 - WALK - HOLD)));
   });
   // the stage rail jumps to the middle of a stage's stretch of scroll
   const goStage = (i: number) => {
@@ -227,9 +233,6 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
           </a>
         </aside>
         <div className="hi hi-rise mt-6 flex flex-wrap items-center gap-3" style={{ ["--hi" as string]: "2.05s" }}>
-          <TrackedLink href="#planner" event="cta_click" props={{ cta: "plan", location: "hero" }} className="btn-primary on-dark group px-6 py-3.5">
-            {c.ctaPlan} <ArrowIcon className="size-4 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
-          </TrackedLink>
           <TrackedLink href={whatsappLink(t.wa.general)} target="_blank" rel="noopener noreferrer" event="whatsapp_click" props={{ location: "hero" }}
             className="inline-flex items-center gap-2 rounded-full bg-white/10 px-5 py-3.5 font-semibold text-white ring-1 ring-white/30 backdrop-blur transition-colors hover:bg-white/20">
             <WhatsAppIcon className="size-5 text-brand-bright" /> {c.ctaTalk}
@@ -251,7 +254,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   );
 
   const kingdom = (
-    <Kingdom c={c} lang={L} lane={lane} go={!staged || beat === 3} map={!staged || beat >= 2} reduce={reduce} stage={staged && beat === 3 ? stage : -1} onStage={staged ? goStage : undefined} />
+    <Kingdom c={c} lang={L} lane={lane} go={!staged || beat === 3} map={!staged || beat >= 2} reduce={reduce} stage={staged && beat === 3 ? stage : -1} onStage={staged ? goStage : undefined} progress={sp} />
   );
 
   if (!staged) {
@@ -344,14 +347,19 @@ function Facade({
     <motion.div
       className="absolute"
       data-idle={idle || undefined}
-      style={{ ...cover(FACADE.ar, d.x, FACADE.anchorY), scale: zoom, filter: fx, transformOrigin: `${d.x * 100}% ${d.y * 100}%` }}
+      style={{ ...cover(FACADE.ar, d.x, FACADE.anchorY, SKY), scale: zoom, filter: fx, transformOrigin: `${d.x * 100}% ${d.y * 100}%` }}
     >
       <div className={staged ? "hi hi-push absolute inset-0" : "absolute inset-0"} style={{ transformOrigin: `${d.x * 100}% ${d.y * 100}%` }}>
       <div className={`absolute inset-0 ${staged ? "motion-safe:animate-[hero-breathe_22s_var(--ease-ambient)_infinite_alternate]" : ""}`} style={{ transformOrigin: `${d.x * 100}% ${d.y * 100}%` }}>
         {/* the sky, on its own layer behind the roof */}
-        <motion.div aria-hidden="true" className="absolute inset-x-0 top-0 h-[30.39%] scale-[1.06]" style={{ x: skyX }}>
-          <div className="absolute inset-0 motion-safe:animate-[hero-sky_46s_var(--ease-ambient)_infinite_alternate]">
-            <Image src="/media/msg/facade-sky.jpg" alt="" fill sizes="100vw" className="object-cover object-top" />
+        {/* it reaches above the photograph, so the frame holds more sky than the camera did */}
+        <motion.div aria-hidden="true" className="absolute inset-x-0 scale-[1.12]" style={{ x: skyX, top: `-${SKY * 100}cqh`, height: `calc(30.39% + ${SKY * 100}cqh)` }}>
+          <div className="absolute inset-0 motion-safe:animate-[hero-sky_70s_var(--ease-ambient)_infinite_alternate]">
+            <Image src="/media/msg/facade-sky.jpg" alt="" fill sizes="100vw" className="object-cover object-bottom" />
+          </div>
+          {/* a second pass of the same clouds, mirrored and brighter, crossing the other way */}
+          <div className="absolute inset-0 opacity-50 mix-blend-screen motion-safe:animate-[hero-clouds_95s_linear_infinite_alternate]">
+            <Image src="/media/msg/facade-sky.jpg" alt="" fill sizes="100vw" className="-scale-x-100 object-cover object-bottom" />
           </div>
           {staged ? <div className="hi hi-night absolute inset-0 bg-[#02070a]" /> : null}
         </motion.div>
@@ -463,8 +471,8 @@ function Interior({
  * between stages. Without `onStage` (reduced motion) the map shows the network and the stages stack below.
  */
 function Kingdom({
-  c, lang, lane, go, map, reduce, stage = -1, onStage,
-}: { c: C; lang: Locale; lane: HeroLane; go: boolean; map: boolean; reduce: boolean; stage?: number; onStage?: (i: number) => void }) {
+  c, lang, lane, go, map, reduce, stage = -1, onStage, progress,
+}: { c: C; lang: Locale; lane: HeroLane; go: boolean; map: boolean; reduce: boolean; stage?: number; onStage?: (i: number) => void; progress?: MotionValue<number> }) {
   const n = experience[lang].needs;
   const guide = experience[lang].journey.ui.guideItems;
   const inStage = stage >= 0;
@@ -490,9 +498,6 @@ function Kingdom({
               ))}
             </dl>
             <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
-              <TrackedLink href="#planner" event="cta_click" props={{ cta: "plan", location: "hero_kingdom" }} className="btn-primary group inline-flex px-6 py-3.5">
-                {c.ctaPlan} <ArrowIcon className="size-4 rtl:rotate-180" />
-              </TrackedLink>
               {onStage ? (
                 <span className="hidden items-center gap-2 text-sm text-teal-deep/70 lg:inline-flex">
                   <span aria-hidden="true" className="block h-5 w-px overflow-hidden bg-teal/20"><span className="block h-2 w-px animate-[hero-drip_1.6s_var(--ease-ambient)_infinite] bg-teal" /></span>
@@ -520,7 +525,7 @@ function Kingdom({
           </div>
           {/* the stage's card, floating over the map */}
           {onStage ? (
-            <div aria-hidden={!inStage || undefined} className="pointer-events-none absolute -end-2 bottom-[30%] hidden w-[15.5rem] lg:block xl:-end-12">
+            <div aria-hidden={!inStage || undefined} className="pointer-events-none absolute -end-2 bottom-[30%] hidden w-[15.5rem] lg:block xl:-end-5">
               {NEED_STAGES.map((st, i) => (
                 <div
                   key={st}
@@ -535,7 +540,7 @@ function Kingdom({
           ) : null}
           <p className="absolute start-2 top-0 text-[11px] text-teal-deep/60 lg:bottom-1 lg:top-auto">{c.map.caption}</p>
         </div>
-        {onStage ? <StageRail n={n} label={c.kingdom.rail} stage={stage} onStage={onStage} /> : null}
+        {onStage && progress ? <StageRail n={n} label={c.kingdom.rail} stage={stage} onStage={onStage} progress={progress} /> : null}
       </div>
     </div>
   );
@@ -593,7 +598,7 @@ function StageCopy({ n, st, i, on }: { n: NeedsC; st: Stage; i: number; on: bool
 }
 
 /** the four stages under the map: where the order is now, and a way to jump to any stage */
-function StageRail({ n, label, stage, onStage }: { n: NeedsC; label: string; stage: number; onStage: (i: number) => void }) {
+function StageRail({ n, label, stage, onStage, progress }: { n: NeedsC; label: string; stage: number; onStage: (i: number) => void; progress: MotionValue<number> }) {
   return (
     <nav aria-label={label} className="mt-3 lg:mt-4">
       <ol className="grid grid-cols-4 gap-2">
@@ -601,7 +606,7 @@ function StageRail({ n, label, stage, onStage }: { n: NeedsC; label: string; sta
           <li key={st}>
             <button type="button" onClick={() => onStage(i)} aria-current={i === stage ? "step" : undefined} className="group tap block w-full text-start">
               <span className="block h-1 overflow-hidden rounded-full bg-teal/15">
-                <span className={`block h-full rounded-full bg-teal transition-[width] duration-700 ease-[cubic-bezier(.2,.7,.2,1)] ${i <= stage ? "w-full" : "w-0"}`} />
+                <StageFill p={progress} i={i} />
               </span>
               <span className={`mt-2 flex items-baseline gap-1.5 text-xs font-semibold transition-colors sm:text-sm ${i === stage ? "text-teal-deep" : "text-teal-deep/60 group-hover:text-teal-deep"}`}>
                 <span className="num text-[11px] text-teal" dir="ltr">0{i + 1}</span>
@@ -613,6 +618,12 @@ function StageRail({ n, label, stage, onStage }: { n: NeedsC; label: string; sta
       </ol>
     </nav>
   );
+}
+
+/** one quarter of the stages' scroll: empty before its stage, filling during it, full after */
+function StageFill({ p, i }: { p: MotionValue<number>; i: number }) {
+  const transform = useTransform(p, (v) => `scaleX(${Math.min(1, Math.max(0, v * NEED_STAGES.length - i)).toFixed(4)})`);
+  return <motion.span className="block h-full origin-left rounded-full bg-teal rtl:origin-right" style={{ transform }} />;
 }
 
 /** reduced motion: the same four stages, one after another */

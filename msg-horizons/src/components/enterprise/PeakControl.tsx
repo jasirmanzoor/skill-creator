@@ -1,10 +1,6 @@
 "use client";
 
-import { EASE_OUT, SPRING_SMOOTH } from "@/lib/motion";
-import { motion, useMotionValueEvent, useScroll, useSpring, useTransform } from "motion/react";
-import { useRef, useState } from "react";
-import { useReducedMotion } from "@/lib/use-reduced-motion";
-import EmbeddedPhoto from "../ui/EmbeddedPhoto";
+import { useState } from "react";
 
 type Stage = { t: string; d: string };
 type Labels = { demand: string; capacity: string; standby: string; illustrative: string };
@@ -20,160 +16,98 @@ const Y = (v: number) => BOT - v * (BOT - TOP);
 const line = (f: (t: number) => number) => Array.from({ length: 121 }, (_, i) => { const t = i / 120; return `${i ? "L" : "M"}${X(t).toFixed(1)} ${Y(f(t)).toFixed(1)}`; }).join(" ");
 const area = (f: (t: number) => number) => `${line(f)} L${X(1)} ${BOT} L${X(0)} ${BOT} Z`;
 const STARTS = [0, 0.2, 0.4, 0.6, 0.8];
-const PHOTOS = ["/photos/clean/business.webp", "/photos/clean/team.webp", "/photos/clean/courier-mall.webp", "/photos/clean/fleet-car.webp", "/photos/msg/warehouse-floor.webp"];
-const POS = ["50% 40%", "50% 100%", "55% 50%", "50% 65%", "50% 50%"];
+/** how much of the standby pool is on shift in each stage */
+const CALLED = [0, 0, 14, 18, 0];
 
 /**
- * Peak control: one season, played by the scroll. A playhead sweeps a demand wave; capacity is built
- * ahead of it, the standby pool is called in at Mobilise, held under Control and released at
- * Demobilise. Each stage takes the panel with MSG photography dissolved into the glass behind it.
+ * Peak control, the closing argument: one season laid out whole, from the first demand signal to the closeout.
+ * The chart shows demand against the capacity MSG deploys; the five stages sit directly under the part of the
+ * season they govern, so the page reads left to right as one controlled path. Choosing a stage marks its span
+ * on the chart, moves the marker there and shows how much of the standby pool is on shift.
  */
 export default function PeakControl({ stages, labels }: { stages: Stage[]; labels: Labels }) {
-  const reduce = useReducedMotion();
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-  const p = useSpring(scrollYProgress, { ...SPRING_SMOOTH, mass: 0.4 });
-  const head = useTransform(p, [0.04, 0.96], [0, 1], { clamp: true });
-  const headX = useTransform(head, (t) => X(t));
-  const headY = useTransform(head, (t) => Y(capacity(t)));
-  const reveal = useTransform(head, (t) => X(t) - 20);
-  const [stage, setStage] = useState(0);
-  useMotionValueEvent(head, "change", (t) => {
-    const s = STARTS.filter((x) => t >= x).length - 1;
-    if (s !== stage) setStage(Math.max(0, s));
-  });
-
-  const jump = (i: number) => {
-    const el = ref.current;
-    if (!el) return;
-    const top = el.getBoundingClientRect().top + window.scrollY;
-    const span = el.offsetHeight - window.innerHeight;
-    window.scrollTo({ top: top + span * (0.04 + (STARTS[i] + 0.1) * 0.92), behavior: reduce ? "auto" : "smooth" });
-  };
-
-  const active = reduce ? 4 : stage;
+  const [active, setActive] = useState(0);
   const pool = Array.from({ length: 24 }, (_, k) => k);
-  const called = active >= 2 && active < 4 ? (active === 2 ? 14 : 18) : 0;
+  const called = CALLED[active];
+  const at = STARTS[active] + 0.1;
 
   return (
-    <div ref={ref} className={reduce ? "" : "relative h-[380vh]"}>
-      <div className={reduce ? "" : "sticky top-16 flex h-[calc(100svh-4rem)] items-center"}>
-        <div className="relative w-full overflow-hidden rounded-[28px] border border-white bg-white/85 shadow-[0_40px_80px_-40px_rgba(11,58,64,0.55)] backdrop-blur">
-          {/* the stage's photo, dissolved behind the words and fading toward the chart */}
-          <motion.div key={`ph-${active}`} initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }} className="pointer-events-none absolute inset-0" aria-hidden="true">
-            <EmbeddedPhoto src={PHOTOS[active]} position={POS[active]} tone="teal" fade="bottom" strength={0.4} className="absolute inset-x-0 top-0 h-1/2 opacity-30 lg:hidden" />
-            <EmbeddedPhoto src={PHOTOS[active]} position={POS[active]} tone="teal" fade="end" strength={0.4} className="absolute inset-y-0 start-0 hidden w-3/5 opacity-30 lg:block" />
-          </motion.div>
-          <div className="relative grid gap-4 p-5 sm:p-8 lg:grid-cols-[0.9fr_1.6fr] lg:gap-10">
-            {/* the stage */}
-            <div className="flex flex-col">
-              <div role="tablist" aria-label={labels.capacity} className="flex gap-1.5">
-                {stages.map((s, i) => (
-                  <button
-                    key={s.t}
-                    type="button"
-                    role="tab"
-                    aria-selected={i === active}
-                    onClick={() => jump(i)}
-                    className={`tap num h-8 min-w-8 rounded-full px-2.5 text-xs font-semibold transition-colors duration-300 ${i === active ? "bg-teal-deep text-white shadow-[var(--shadow-teal)]" : i < active ? "bg-sea-200 text-teal-deep" : "bg-white text-teal-deep/75 ring-1 ring-teal/15"}`}
-                  >
-                    0{i + 1}
-                  </button>
-                ))}
-              </div>
-              <div className="relative mt-6 min-h-[150px] sm:min-h-[170px]">
-                <motion.div
-                  key={active}
-                  initial={reduce ? false : { opacity: 0, transform: "translateY(8px)" }}
-                  animate={{ opacity: 1, transform: "translateY(0px)" }}
-                  transition={{ duration: 0.3, ease: EASE_OUT }}
-                >
-                  <p className="num text-sm font-semibold text-teal">0{active + 1} / 05</p>
-                  <h4 className="mt-1 font-display text-4xl font-semibold tracking-[-0.02em] text-teal-deep sm:text-5xl rtl:tracking-normal">{stages[active].t}</h4>
-                  <p className="mt-3 max-w-sm text-lg text-teal-deep/80">{stages[active].d}</p>
-                </motion.div>
-              </div>
-              <div className="mt-auto hidden flex-wrap gap-x-5 gap-y-2 pt-6 text-xs text-teal-deep/75 lg:flex">
-                <Legend swatch="h-0.5 w-5 bg-teal-deep" label={labels.demand} />
-                <Legend swatch="h-3 w-3 rounded-sm bg-teal" label={labels.capacity} />
-                <Legend swatch="size-2 rounded-full bg-sea-400" label={labels.standby} />
-              </div>
-            </div>
-
-            {/* the season */}
-            <div>
-              <div className="relative aspect-[1000/340] w-full rtl:-scale-x-100" dir="ltr">
-                <svg viewBox={`0 0 ${VW} ${VH}`} className="absolute inset-0 size-full overflow-visible" role="img" aria-label={`${stages[active].t}: ${stages[active].d}. ${labels.illustrative}`}>
-                  <defs>
-                    <linearGradient id="pk-cap" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0" stopColor="var(--color-teal)" stopOpacity="0.95" />
-                      <stop offset="1" stopColor="var(--color-teal)" stopOpacity="0.55" />
-                    </linearGradient>
-                    <linearGradient id="pk-dem" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0" stopColor="var(--color-sea-400)" stopOpacity="0.35" />
-                      <stop offset="1" stopColor="var(--color-sea-400)" stopOpacity="0" />
-                    </linearGradient>
-                    <clipPath id="pk-past">
-                      {reduce ? <rect x="0" y="0" width={VW} height={VH} /> : <motion.rect x="0" y="0" height={VH} width={reveal} />}
-                    </clipPath>
-                  </defs>
-                  {/* stage bands */}
-                  {STARTS.map((s, i) => (
-                    <g key={i}>
-                      <rect x={X(s)} y={TOP - 10} width={X(s + 0.2) - X(s)} height={BOT - TOP + 10} fill={i === active ? "rgba(108,195,195,0.12)" : "transparent"} style={{ transition: "fill .5s" }} />
-                      {i ? <line x1={X(s)} x2={X(s)} y1={TOP - 10} y2={BOT} stroke="rgba(19,113,121,0.14)" strokeDasharray="3 5" /> : null}
-                    </g>
-                  ))}
-                  <line x1={X(0)} x2={X(1)} y1={BOT} y2={BOT} stroke="rgba(11,58,64,0.25)" />
-                  {/* the future, faint */}
-                  <path d={area(capacity)} fill="rgba(19,113,121,0.08)" />
-                  <path d={line(forecast)} fill="none" stroke="rgba(11,58,64,0.35)" strokeWidth="2" strokeDasharray="5 7" />
-                  {/* the past, solid */}
-                  <g clipPath="url(#pk-past)">
-                    <path d={area(demand)} fill="url(#pk-dem)" />
-                    <path d={area(capacity)} fill="url(#pk-cap)" />
-                    <path d={line(demand)} fill="none" stroke="var(--color-teal-deep)" strokeWidth="2.6" />
-                  </g>
-                  {/* standby pool */}
-                  <g style={{ opacity: active >= 1 ? 1 : 0.25, transition: "opacity .6s" }}>
-                    {pool.map((k) => {
-                      const on = k < called;
-                      return (
-                        <circle
-                          key={k}
-                          cx={VW - 150 + (k % 8) * 17}
-                          cy={TOP - 22 + Math.floor(k / 8) * 15}
-                          r="4.6"
-                          fill={on ? "#137179" : "#6cc3c3"}
-                          style={{ opacity: on ? 0.35 : 1, transition: `opacity .5s ${k * 25}ms, fill .5s ${k * 25}ms` }}
-                        />
-                      );
-                    })}
-                  </g>
-                  {/* review tick */}
-                  <g style={{ opacity: active === 4 ? 1 : 0, transition: "opacity .6s" }}>
-                    <circle cx={X(0.9)} cy={Y(capacity(0.9)) - 26} r="13" fill="var(--color-brand)" />
-                    <path d={`M${X(0.9) - 5} ${Y(capacity(0.9)) - 26} l3.5 3.5 l6.5 -7`} stroke="#fff" strokeWidth="2.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                  </g>
-                  {/* playhead */}
-                  {!reduce ? (
-                    <g>
-                      <motion.line y1={TOP - 16} y2={BOT} stroke="var(--color-teal-deep)" strokeWidth="1.5" x1={headX} x2={headX} />
-                      <motion.circle r="9" fill="#fff" stroke="var(--color-teal)" strokeWidth="3" cx={headX} cy={headY} />
-                      <motion.circle r="20" fill="rgba(19,113,121,0.18)" cx={headX} cy={headY} />
-                    </g>
-                  ) : null}
-                </svg>
-              </div>
-              <div className="mt-3 grid grid-cols-5 text-center text-[11px] font-medium text-teal-deep/70 sm:text-xs">
-                {stages.map((s, i) => <span key={s.t} className={i === active ? "font-semibold text-teal-deep" : ""}>{s.t}</span>)}
-              </div>
-              <p className="mt-3 text-xs text-teal-deep/70">{labels.illustrative}</p>
-            </div>
-          </div>
-          {/* season progress */}
-          {!reduce ? <motion.div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1 origin-left bg-teal rtl:origin-right" style={{ scaleX: head }} /> : null}
+    <div className="overflow-hidden rounded-[28px] bg-teal-deep text-white shadow-[var(--shadow-scene)]">
+      <div className="p-5 sm:p-8 lg:p-10">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-xs text-white/75">
+          <p className="flex flex-wrap gap-x-5 gap-y-2">
+            <Legend swatch="h-0.5 w-5 bg-white" label={labels.demand} />
+            <Legend swatch="size-3 rounded-sm bg-brand-bright" label={labels.capacity} />
+            <Legend swatch="size-2 rounded-full bg-sea-400" label={labels.standby} />
+          </p>
+          <p className="max-w-md text-white/60">{labels.illustrative}</p>
         </div>
+
+        {/* the season */}
+        <div className="relative mt-5 aspect-[1000/340] w-full rtl:-scale-x-100" dir="ltr">
+          <svg viewBox={`0 0 ${VW} ${VH}`} className="absolute inset-0 size-full overflow-visible" role="img" aria-label={`${stages[active].t}: ${stages[active].d}. ${labels.illustrative}`}>
+            <defs>
+              <linearGradient id="pk-cap" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stopColor="var(--color-brand-bright)" stopOpacity="0.85" />
+                <stop offset="1" stopColor="var(--color-brand-bright)" stopOpacity="0.25" />
+              </linearGradient>
+            </defs>
+            {/* the span each stage governs */}
+            {STARTS.map((s, i) => (
+              <g key={i}>
+                <rect x={X(s)} y={TOP - 14} width={X(s + 0.2) - X(s)} height={BOT - TOP + 14} fill={i === active ? "rgba(255,255,255,0.09)" : "transparent"} />
+                {i ? <line x1={X(s)} x2={X(s)} y1={TOP - 14} y2={BOT} stroke="rgba(255,255,255,0.16)" strokeDasharray="3 5" /> : null}
+              </g>
+            ))}
+            <line x1={X(0)} x2={X(1)} y1={BOT} y2={BOT} stroke="rgba(255,255,255,0.3)" />
+            <path d={area(capacity)} fill="url(#pk-cap)" />
+            <path d={line(forecast)} fill="none" stroke="rgba(255,255,255,0.45)" strokeWidth="2" strokeDasharray="5 7" />
+            <path d={line(demand)} fill="none" stroke="#fff" strokeWidth="2.6" />
+            {/* standby pool: dimmed dots are on shift */}
+            {pool.map((k) => (
+              <circle key={k} cx={VW - 150 + (k % 8) * 17} cy={TOP - 22 + Math.floor(k / 8) * 15} r="4.6" fill="var(--color-sea-400)" opacity={k < called ? 0.28 : active === 0 ? 0.5 : 1} />
+            ))}
+            {/* closeout reviewed */}
+            {active === 4 ? (
+              <g>
+                <circle cx={X(0.9)} cy={Y(capacity(0.9)) - 26} r="13" fill="#fff" />
+                <path d={`M${X(0.9) - 5} ${Y(capacity(0.9)) - 26} l3.5 3.5 l6.5 -7`} stroke="var(--color-teal-deep)" strokeWidth="2.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+              </g>
+            ) : null}
+            {/* where the chosen stage sits in the season */}
+            <line x1={X(at)} x2={X(at)} y1={TOP - 16} y2={BOT} stroke="#fff" strokeWidth="1.5" />
+            <circle r="18" fill="rgba(255,255,255,0.16)" cx={X(at)} cy={Y(capacity(at))} />
+            <circle r="8" fill="var(--color-teal-deep)" stroke="#fff" strokeWidth="3" cx={X(at)} cy={Y(capacity(at))} />
+          </svg>
+        </div>
+
+        {/* the path: five stages, each under the part of the season it governs */}
+        <ol role="tablist" aria-label={labels.capacity} className="mt-2 grid lg:grid-cols-5 lg:px-[2%]">
+          {stages.map((s, i) => {
+            const on = i === active;
+            return (
+              <li key={s.t} role="presentation">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={on}
+                  onClick={() => setActive(i)}
+                  onMouseEnter={() => setActive(i)}
+                  onFocus={() => setActive(i)}
+                  data-press="soft"
+                  className="group flex w-full items-start gap-4 border-t border-white/15 py-4 text-start lg:block lg:border-t-0 lg:py-0 lg:pe-4"
+                >
+                  <span aria-hidden="true" className={`hidden h-1 transition-colors lg:block ${on ? "bg-brand-bright" : i < active ? "bg-white/45" : "bg-white/15"}`} />
+                  <span className={`num grid size-9 shrink-0 place-items-center rounded-full text-sm font-semibold transition-colors lg:mt-5 lg:size-auto lg:place-items-start lg:rounded-none lg:bg-transparent ${on ? "bg-brand-bright text-teal-deep lg:text-brand-bright" : "bg-white/10 text-white/70 lg:text-white/55"}`} dir="ltr">0{i + 1}</span>
+                  <span className="min-w-0">
+                    <span className={`block font-display text-2xl font-semibold tracking-[-0.02em] transition-colors lg:mt-1 rtl:tracking-normal ${on ? "text-white" : "text-white/70 group-hover:text-white"}`}>{s.t}</span>
+                    <span className={`mt-1 block text-sm leading-relaxed transition-colors ${on ? "text-white/85" : "text-white/60"}`}>{s.d}</span>
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ol>
       </div>
     </div>
   );
