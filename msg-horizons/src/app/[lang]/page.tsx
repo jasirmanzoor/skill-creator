@@ -49,10 +49,10 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         <Depth><RoadmapSection t={t} lang={lang} /></Depth>
         <Depth><Services t={t} lang={lang} /></Depth>
         <Depth><Fleet t={t} lang={lang} /></Depth>
+        <Depth><GrowthBand lang={lang} warehousePhoto={hasPublicFile("warehouse.jpg")} /></Depth>
         <Depth><Partners lang={lang} /></Depth>
         <Depth><Proof t={t} /></Depth>
         <Depth><Gallery t={t} lang={lang} /></Depth>
-        <Depth><GrowthBand lang={lang} warehousePhoto={hasPublicFile("warehouse.jpg")} /></Depth>
         <Depth><Enterprise t={t} /></Depth>
         <Depth><Contact t={t} lang={lang} /></Depth>
       </main>

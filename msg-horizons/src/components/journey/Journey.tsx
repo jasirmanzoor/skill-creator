@@ -191,19 +191,20 @@ export default function Journey({ lang }: { lang: Locale }) {
     <>
       <div className="pointer-events-none fixed inset-0 z-30">
         {/* wide screens: the whole route, always in view */}
-        <nav aria-label={c.stops} className="pointer-events-auto absolute end-5 top-1/2 hidden -translate-y-1/2 flex-col items-center gap-4 rounded-full bg-ink/80 px-2.5 py-4 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.6)] ring-1 ring-white/10 backdrop-blur-md 2xl:flex">
+        <nav aria-label={c.stops} className="group/rail pointer-events-auto absolute end-3 top-1/2 hidden -translate-y-1/2 flex-col items-center gap-3 rounded-[1.75rem] bg-ink/90 px-2 pb-5 pt-3 shadow-[var(--shadow-scene)] ring-1 ring-white/15 backdrop-blur-md min-[1400px]:flex">
           <button
             type="button"
             onClick={openMap}
             aria-label={c.openMap}
             aria-haspopup="dialog"
-            className="grid size-8 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+            className="grid size-10 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
           >
-            <svg viewBox="0 0 24 24" className="size-4" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <svg viewBox="0 0 24 24" className="size-[18px]" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20V6.5ZM9 4v13.5M15 6.5V20" />
             </svg>
           </button>
-          <div className="relative h-[min(52vh,23rem)] w-6">
+          <p aria-hidden="true" className="-mt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/70 rtl:tracking-normal">{c.route}</p>
+          <div className="relative mt-2 h-[min(60vh,29rem)] w-10">
             <span aria-hidden="true" className="absolute inset-y-0 start-1/2 w-px -translate-x-1/2 bg-white/20 rtl:translate-x-1/2" />
             <span ref={fill} aria-hidden="true" className="absolute inset-y-0 start-1/2 w-0.5 origin-top -translate-x-1/2 rounded-full bg-brand-bright rtl:translate-x-1/2" style={{ transform: "scaleY(0)" }} />
             {stops.map((s, i) => (
@@ -213,11 +214,11 @@ export default function Journey({ lang }: { lang: Locale }) {
                 onClick={() => go(i)}
                 aria-label={fmt(c.goTo, { title: label(s) })}
                 aria-current={i === active ? "location" : undefined}
-                className="group absolute start-1/2 grid size-5 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full rtl:translate-x-1/2"
+                className="group absolute start-1/2 grid size-7 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full rtl:translate-x-1/2"
                 style={{ top: `${(i / (n - 1)) * 100}%` }}
               >
-                <span className={`block size-2.5 rounded-full transition-ui ${i < active ? "bg-brand-bright" : i === active ? "bg-white" : "scale-[0.8] bg-white/35 group-hover:bg-white/80"}`} />
-                <span className="pointer-events-none absolute end-full top-1/2 me-4 hidden -translate-y-1/2 whitespace-nowrap rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-ink shadow-lg group-hover:block group-focus-visible:block">
+                <span className={`num grid size-6 place-items-center rounded-full text-[10px] font-bold transition-colors ${i < active ? "bg-brand-bright text-ink" : i === active ? "bg-white text-ink" : "bg-ink text-white/75 ring-1 ring-white/30 group-hover:bg-white group-hover:text-ink"}`} dir="ltr">{i + 1}</span>
+                <span className={`pointer-events-none absolute end-full top-1/2 me-3 hidden -translate-y-1/2 whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold shadow-lg group-hover/rail:block group-focus-within/rail:block ${i === active ? "invisible" : "bg-ink/90 text-white ring-1 ring-white/15 group-hover:bg-white group-hover:text-ink"}`}>
                   {label(s)}
                 </span>
               </button>
@@ -228,7 +229,7 @@ export default function Journey({ lang }: { lang: Locale }) {
               <span className="grid size-7 place-items-center rounded-full bg-brand-bright text-ink shadow-[0_0_0_5px_rgba(76,201,122,0.25)]">
                 <VanGlyph className="size-4" />
               </span>
-              <span className="absolute end-full top-1/2 me-3 -translate-y-1/2 whitespace-nowrap rounded-full bg-brand-bright px-3 py-1.5 text-xs font-bold text-ink shadow-lg">
+              <span className="absolute end-full top-1/2 me-3 hidden -translate-y-1/2 whitespace-nowrap rounded-full bg-brand-bright px-3 py-1.5 text-xs font-bold text-ink shadow-lg group-hover/rail:block group-focus-within/rail:block min-[1680px]:block">
                 <span className="num" dir="ltr">{active + 1}/{n}</span> · {label(here)}
               </span>
             </div>
@@ -242,10 +243,13 @@ export default function Journey({ lang }: { lang: Locale }) {
           onClick={openMap}
           aria-label={`${c.openMap}. ${ofTotal}: ${label(here)}`}
           aria-haspopup="dialog"
-          className={`pointer-events-auto absolute bottom-3 end-3 flex items-center gap-2.5 rounded-full bg-ink/85 p-1.5 text-white shadow-[var(--shadow-float)] ring-1 ring-white/10 backdrop-blur-md lg:bottom-6 lg:end-6 lg:pe-4 2xl:hidden ${docked || active === n - 1 ? "max-lg:hidden" : ""}`}
+          className={`pointer-events-auto absolute bottom-3 end-3 flex items-center gap-2.5 rounded-full bg-ink/85 p-1.5 text-white shadow-[var(--shadow-float)] ring-1 ring-white/10 backdrop-blur-md lg:bottom-6 lg:end-6 lg:pe-5 min-[1400px]:hidden ${docked || active === n - 1 ? "max-lg:hidden" : ""}`}
         >
           {ring}
-          <span className="hidden max-w-[11rem] truncate text-sm font-semibold lg:block">{label(here)}</span>
+          <span className="hidden text-start lg:block">
+            <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-white/65 rtl:tracking-normal">{c.route}</span>
+            <span className="block max-w-[11rem] truncate text-sm font-semibold">{label(here)}</span>
+          </span>
         </button>
 
         {/* near the end of a stop: invite the visitor onward instead of letting them drift */}

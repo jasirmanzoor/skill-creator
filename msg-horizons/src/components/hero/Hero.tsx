@@ -12,7 +12,7 @@ import type { Dictionary, Locale } from "@/content/i18n";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { usePlan } from "../PlanContext";
 import TrackedLink from "../ui/TrackedLink";
-import { ArrowIcon, WhatsAppIcon } from "../ui/icons";
+import { WhatsAppIcon } from "../ui/icons";
 import Dust from "./Dust";
 import HeroMap from "./HeroMap";
 import QuoteCard from "./QuoteCard";
@@ -47,13 +47,16 @@ const INSIDE_TALL: Inside = {
   spots: { storage: { x: 0.3, y: 0.32 }, sorting: { x: 0.505, y: 0.4 }, dispatch: { x: 0.7, y: 0.36 } },
 };
 
-/** a box with the photo's proportions that always covers the frame, keeping (ax, ay) as central as it can */
-const cover = (ar: number, ax: number, ay: number): React.CSSProperties => ({
+/** how far the facade is set down in the frame to leave room for sky above the roof, as a share of the frame's height */
+const SKY = 0.14;
+
+/** a box with the photo's proportions that always covers the frame, keeping (ax, ay) as central as it can; `drop` sets it lower */
+const cover = (ar: number, ax: number, ay: number, drop = 0): React.CSSProperties => ({
   ["--W" as string]: `max(100cqw, calc(100cqh * ${ar}))`,
   width: "var(--W)",
   height: `calc(var(--W) / ${ar})`,
   left: `clamp(calc(100cqw - var(--W)), calc(50cqw - ${ax} * var(--W)), 0px)`,
-  top: `clamp(calc(100cqh - var(--W) / ${ar}), calc(50cqh - ${ay} * var(--W) / ${ar}), 0px)`,
+  top: `calc(clamp(calc(100cqh - var(--W) / ${ar}), calc(50cqh - ${ay} * var(--W) / ${ar}), 0px) + ${drop * 100}cqh)`,
 });
 const at = (p: Pt) => ({ left: `${p.x * 100}%`, top: `${p.y * 100}%` });
 
@@ -61,7 +64,7 @@ const at = (p: Pt) => ({ left: `${p.x * 100}%`, top: `${p.y * 100}%` });
 function doorZoom(fw: number, fh: number) {
   const W = Math.max(fw, fh * FACADE.ar), H = W / FACADE.ar;
   const left = Math.min(0, Math.max(fw - W, fw / 2 - FACADE.door.x * W));
-  const top = Math.min(0, Math.max(fh - H, fh / 2 - FACADE.anchorY * H));
+  const top = Math.min(0, Math.max(fh - H, fh / 2 - FACADE.anchorY * H)) + SKY * fh;
   const cx = left + FACADE.door.x * W, cy = top + FACADE.door.y * H;
   const zx = (2 * Math.max(cx, fw - cx)) / (FACADE.door.w * W);
   const zy = (2 * Math.max(cy, fh - cy)) / (FACADE.door.h * H);
@@ -206,9 +209,6 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
           </a>
         </aside>
         <div className="hi hi-rise mt-6 flex flex-wrap items-center gap-3" style={{ ["--hi" as string]: "2.05s" }}>
-          <TrackedLink href="#planner" event="cta_click" props={{ cta: "plan", location: "hero" }} className="btn-primary on-dark group px-6 py-3.5">
-            {c.ctaPlan} <ArrowIcon className="size-4 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
-          </TrackedLink>
           <TrackedLink href={whatsappLink(t.wa.general)} target="_blank" rel="noopener noreferrer" event="whatsapp_click" props={{ location: "hero" }}
             className="inline-flex items-center gap-2 rounded-full bg-white/10 px-5 py-3.5 font-semibold text-white ring-1 ring-white/30 backdrop-blur transition-colors hover:bg-white/20">
             <WhatsAppIcon className="size-5 text-brand-bright" /> {c.ctaTalk}
@@ -318,14 +318,19 @@ function Facade({
     <motion.div
       className="absolute"
       data-idle={idle || undefined}
-      style={{ ...cover(FACADE.ar, d.x, FACADE.anchorY), scale: zoom, filter: fx, transformOrigin: `${d.x * 100}% ${d.y * 100}%` }}
+      style={{ ...cover(FACADE.ar, d.x, FACADE.anchorY, SKY), scale: zoom, filter: fx, transformOrigin: `${d.x * 100}% ${d.y * 100}%` }}
     >
       <div className={staged ? "hi hi-push absolute inset-0" : "absolute inset-0"} style={{ transformOrigin: `${d.x * 100}% ${d.y * 100}%` }}>
       <div className={`absolute inset-0 ${staged ? "motion-safe:animate-[hero-breathe_22s_var(--ease-ambient)_infinite_alternate]" : ""}`} style={{ transformOrigin: `${d.x * 100}% ${d.y * 100}%` }}>
         {/* the sky, on its own layer behind the roof */}
-        <motion.div aria-hidden="true" className="absolute inset-x-0 top-0 h-[30.39%] scale-[1.06]" style={{ x: skyX }}>
-          <div className="absolute inset-0 motion-safe:animate-[hero-sky_46s_var(--ease-ambient)_infinite_alternate]">
-            <Image src="/media/msg/facade-sky.jpg" alt="" fill sizes="100vw" className="object-cover object-top" />
+        {/* it reaches above the photograph, so the frame holds more sky than the camera did */}
+        <motion.div aria-hidden="true" className="absolute inset-x-0 scale-[1.12]" style={{ x: skyX, top: `-${SKY * 100}cqh`, height: `calc(30.39% + ${SKY * 100}cqh)` }}>
+          <div className="absolute inset-0 motion-safe:animate-[hero-sky_70s_var(--ease-ambient)_infinite_alternate]">
+            <Image src="/media/msg/facade-sky.jpg" alt="" fill sizes="100vw" className="object-cover object-bottom" />
+          </div>
+          {/* a second pass of the same clouds, mirrored and brighter, crossing the other way */}
+          <div className="absolute inset-0 opacity-50 mix-blend-screen motion-safe:animate-[hero-clouds_95s_linear_infinite_alternate]">
+            <Image src="/media/msg/facade-sky.jpg" alt="" fill sizes="100vw" className="-scale-x-100 object-cover object-bottom" />
           </div>
           {staged ? <div className="hi hi-night absolute inset-0 bg-[#02070a]" /> : null}
         </motion.div>
@@ -447,9 +452,6 @@ function Kingdom({ c, lang, lane, go, map, reduce }: { c: C; lang: Locale; lane:
             </div>
           ))}
         </dl>
-        <TrackedLink href="#planner" event="cta_click" props={{ cta: "plan", location: "hero_kingdom" }} className="btn-primary group mt-7 inline-flex px-6 py-3.5">
-          {c.ctaPlan} <ArrowIcon className="size-4 rtl:rotate-180" />
-        </TrackedLink>
       </div>
       <div className="relative order-1 mx-auto aspect-[1100/850] w-full max-w-[640px] lg:order-2 lg:w-[min(100%,calc(62svh*1100/850))]">
         <div aria-hidden="true" className="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(108,195,195,0.35),transparent_70%)] blur-2xl" />

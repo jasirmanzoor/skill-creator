@@ -368,7 +368,8 @@ html.lenis-on, html.lenis-on body { height: auto; }
 
 /* the warehouse hero (src/components/hero/Hero.tsx) */
 @keyframes hero-breathe { from { transform: scale(1); } to { transform: scale(1.045); } }
-@keyframes hero-sky { from { transform: translateX(-1.6%); } to { transform: translateX(1.6%); } }
+@keyframes hero-sky { from { transform: translateX(-3.5%); } to { transform: translateX(3.5%); } }
+@keyframes hero-clouds { from { transform: translateX(7%) scale(1.3); } to { transform: translateX(-7%) scale(1.3); } }
 @keyframes hero-sweep { 0% { transform: translateX(0); opacity: 0; } 8% { opacity: 1; } 55% { transform: translateX(300%); opacity: 1; } 56%, 100% { transform: translateX(300%); opacity: 0; } }
 @keyframes hero-sign { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 @keyframes hero-lamp { 0%, 100% { opacity: 0.6; } 45% { opacity: 1; } 55% { opacity: 0.75; } }

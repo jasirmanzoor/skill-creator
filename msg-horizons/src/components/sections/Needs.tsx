@@ -1,14 +1,11 @@
 "use client";
 
 import { SPRING_SMOOTH } from "@/lib/motion";
-import { motion, useMotionValueEvent, useScroll, useSpring, useTransform } from "motion/react";
+import { motion, useMotionValueEvent, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { experience, NEED_STAGES, NEEDS_BY_STAGE, type NeedId, type NeedStage } from "@/content/experience";
 import type { Locale } from "@/content/i18n";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
-import EmbeddedPhoto from "../ui/EmbeddedPhoto";
-import TrackedLink from "../ui/TrackedLink";
-import { ArrowIcon } from "../ui/icons";
 
 const PHOTO: Record<NeedStage, [string, string]> = {
   setup: ["/photos/clean/team.webp", "50% 40%"],
@@ -35,7 +32,6 @@ export default function Needs({ lang }: { lang: Locale }) {
 
   const { scrollYProgress } = useScroll({ target: track, offset: ["start start", "end end"] });
   const p = useSpring(scrollYProgress, { ...SPRING_SMOOTH, mass: 0.4 });
-  const fill = useTransform(p, [0.04, 0.96], ["0%", "100%"]);
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     const s = Math.min(NEED_STAGES.length - 1, Math.max(0, Math.floor(v * NEED_STAGES.length)));
     if (s !== active) setActive(s);
@@ -73,14 +69,34 @@ export default function Needs({ lang }: { lang: Locale }) {
 
       <div ref={track} className={scrub ? "relative lg:h-[280vh]" : "relative"}>
         <div className={`mx-auto max-w-7xl px-4 sm:px-5 lg:px-8 ${scrub ? "lg:sticky lg:top-16 lg:flex lg:h-[calc(100svh-4rem)] lg:flex-col lg:justify-center" : ""}`}>
-          <div data-inview={inView || undefined} className={`needs-grid mt-12 grid gap-6 ${scrub ? "lg:mt-0 lg:[grid-template-areas:'stage']" : ""}`}>
+          {/* where the order is: four parts, the current one filling as you scroll */}
+          {(
+            <div className={`sticky top-16 z-10 -mx-4 mt-8 border-y border-teal/12 bg-sea-50/95 px-4 py-3 backdrop-blur sm:-mx-5 sm:px-5 ${scrub ? "lg:static lg:mx-0 lg:mb-7 lg:mt-0 lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none" : "lg:-mx-8 lg:px-8"}`}>
+              <ol className="grid grid-cols-4 gap-2 sm:gap-3">
+                {NEED_STAGES.map((st, i) => (
+                  <li key={st}>
+                    <button type="button" onClick={() => goTo(i)} aria-current={i === active ? "step" : undefined} data-press="soft" className="group block w-full text-start">
+                      <span className="block h-1.5 overflow-hidden rounded-full bg-teal/15">
+                        <StageFill p={p} i={i} />
+                      </span>
+                      <span className="mt-2 flex items-baseline gap-1.5 sm:gap-3 lg:mt-3">
+                        <span className={`num font-display text-xs font-semibold transition-colors sm:text-sm ${i <= active ? "text-teal" : "text-teal-deep/60"}`} dir="ltr">0{i + 1}</span>
+                        <span className={`truncate font-display text-sm font-semibold tracking-[-0.02em] transition-colors sm:text-base lg:text-xl rtl:tracking-normal ${i === active ? "text-teal-deep" : "text-teal-deep/60 group-hover:text-teal-deep"}`}>{c.stages[st].t}</span>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+          <div data-inview={inView || undefined} className={`needs-grid mt-8 grid gap-6 ${scrub ? "lg:mt-0 lg:[grid-template-areas:'stage']" : ""}`}>
             {NEED_STAGES.map((st, si) => {
               const on = !scrub || si === active;
               return (
                 <article
                   key={st}
                   aria-hidden={scrub && !on ? true : undefined}
-                  className={`grid gap-6 lg:grid-cols-[1.05fr_1fr] lg:gap-10 ${scrub ? "lg:[grid-area:stage] lg:h-[min(600px,calc(100svh-13rem))] lg:transition-[opacity,transform] lg:duration-700 lg:ease-[cubic-bezier(.2,.7,.2,1)]" : ""} ${scrub && !on ? "lg:pointer-events-none lg:translate-y-6 lg:opacity-0" : "lg:opacity-100"}`}
+                  className={`grid gap-6 lg:grid-cols-[1.05fr_1fr] lg:gap-10 ${scrub ? "lg:[grid-area:stage] lg:h-[min(560px,calc(100svh-15rem))] lg:transition-[opacity,translate] lg:duration-[450ms] lg:ease-out" : ""} ${scrub && !on ? "lg:pointer-events-none lg:translate-y-10 lg:opacity-0" : "lg:opacity-100"}`}
                 >
                   {/* the words */}
                   <div className="flex flex-col justify-center">
@@ -99,16 +115,21 @@ export default function Needs({ lang }: { lang: Locale }) {
 
                   {/* the picture, with a live card */}
                   <div className="relative min-h-[340px] overflow-hidden rounded-[2rem] shadow-[0_40px_80px_-46px_rgba(11,58,64,0.75)] lg:min-h-0">
-                    <EmbeddedPhoto
+                    {/* eslint-disable-next-line @next/next/no-img-element -- local, pre-optimised photography */}
+                    <img
                       src={PHOTO[st][0]}
-                      position={PHOTO[st][1]}
-                      tone="teal"
-                      fade="none"
-                      strength={1.6}
-                      className={`absolute inset-0 transition-transform duration-[1400ms] ease-out ${on ? "scale-100" : "scale-110"}`}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      style={{ objectPosition: PHOTO[st][1] }}
+                      className={`absolute inset-0 size-full object-cover transition-[scale] duration-700 ease-out ${on ? "scale-100" : "scale-[1.08]"}`}
                     />
-                    <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-teal-deep/55 via-transparent to-transparent" />
-                    <div className={`absolute inset-x-4 bottom-4 transition-ui delay-200 duration-700 sm:inset-x-6 sm:bottom-6 ${on ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}>
+                    <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,58,64,0.55)_0%,rgba(11,58,64,0)_32%,rgba(11,58,64,0)_45%,rgba(11,58,64,0.7)_100%)]" />
+                    <p aria-hidden="true" className="absolute start-5 top-4 flex items-baseline gap-3 text-white sm:start-7 sm:top-6">
+                      <span className="num font-display text-6xl font-semibold tracking-[-0.04em] sm:text-7xl" dir="ltr">0{si + 1}</span>
+                      <span className="font-display text-xl font-semibold">{c.stages[st].t}</span>
+                    </p>
+                    <div className={`absolute inset-x-4 bottom-4 transition-ui delay-150 duration-[450ms] ease-out sm:inset-x-6 sm:bottom-6 ${on ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
                       <StageCard stage={st} c={c} guide={guide} />
                     </div>
                   </div>
@@ -117,34 +138,6 @@ export default function Needs({ lang }: { lang: Locale }) {
             })}
           </div>
 
-          {/* the rail one order travels along */}
-          {scrub ? (
-            <div className="relative mt-8 hidden lg:block">
-              <div className="absolute inset-x-[12.5%] top-[15px] h-0.5 rounded-full bg-teal/15">
-                <motion.div className="absolute inset-y-0 start-0 rounded-full bg-teal" style={{ width: fill }} />
-                <motion.span
-                  aria-hidden="true"
-                  className="absolute top-1/2 grid size-7 -translate-y-1/2 place-items-center rounded-lg bg-teal-deep text-white shadow-[0_8px_18px_-8px_rgba(11,58,64,0.9)] rtl:translate-x-1/2 ltr:-translate-x-1/2"
-                  style={{ insetInlineStart: fill }}
-                >
-                  <svg viewBox="0 0 16 16" className="size-4"><path d="M2.5 5.5L8 3l5.5 2.5v6L8 14l-5.5-2.5z M2.5 5.5L8 8l5.5-2.5M8 8v6" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" /></svg>
-                </motion.span>
-              </div>
-              <ol className="relative grid grid-cols-4">
-                {NEED_STAGES.map((st, i) => (
-                  <li key={st} className="flex justify-center">
-                    <button type="button" onClick={() => goTo(i)} aria-current={i === active ? "step" : undefined} className="group flex flex-col items-center gap-2">
-                      <span className={`grid size-8 place-items-center rounded-full text-xs font-semibold transition-colors duration-500 ${i <= active ? "bg-teal text-white" : "bg-white text-teal-deep/75 ring-1 ring-teal/20"}`}>
-                        <span className="num" dir="ltr">0{i + 1}</span>
-                      </span>
-                      <span className={`text-sm font-semibold transition-colors ${i === active ? "text-teal-deep" : "text-teal-deep/75 group-hover:text-teal-deep"}`}>{c.stages[st].t}</span>
-                    </button>
-                  </li>
-                ))}
-              </ol>
-              <p className="mt-3 text-center text-xs text-teal-deep/75">{c.scroll}</p>
-            </div>
-          ) : null}
         </div>
       </div>
 
@@ -154,16 +147,6 @@ export default function Needs({ lang }: { lang: Locale }) {
           <div className="flex flex-col">
             <p className="font-display text-2xl font-semibold text-balance sm:text-3xl">{c.support.title}</p>
             <p className="mt-3 max-w-md text-white/75">{c.support.body}</p>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center lg:mt-auto lg:pt-8">
-              <TrackedLink
-                href="#planner"
-                event="cta_click"
-                props={{ cta: "plan", location: "needs" }}
-                className="inline-flex items-center justify-center gap-2 rounded-md bg-white px-5 py-3 font-medium text-teal-deep transition-colors hover:bg-sea-100"
-              >
-                {c.cta} <ArrowIcon className="size-4 rtl:rotate-180" />
-              </TrackedLink>
-            </div>
           </div>
           <div>
             <ul className="grid gap-2.5 sm:grid-cols-2">
@@ -235,6 +218,12 @@ function StageCard({ stage, c, guide }: { stage: NeedStage; c: NeedsCopy; guide:
       </ol>
     </div>
   );
+}
+
+/** one quarter of the scroll: empty before its stage, filling during it, full after */
+function StageFill({ p, i }: { p: MotionValue<number>; i: number }) {
+  const transform = useTransform(p, (v) => `scaleX(${Math.min(1, Math.max(0, v * NEED_STAGES.length - i)).toFixed(4)})`);
+  return <motion.span className="block h-full origin-left rounded-full bg-teal rtl:origin-right" style={{ transform }} />;
 }
 
 function NeedRow({ id, q, a, owner, i, k, on }: { id: NeedId; q: string; a: string; owner: string; i: number; k: number; on: boolean }) {
