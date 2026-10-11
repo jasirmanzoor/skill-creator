@@ -63,7 +63,11 @@ type Copy = {
     cards: { setup: string; store: string; settle: string; settleRows: string[] };
     scroll: string;
   };
-  journey: { eyebrow: string; title: string; lead: string; stages: Record<StageId, { t: string; d: string; tag: string }>; cta: string; ui: JourneyUI };
+  journey: {
+    eyebrow: string; title: string; lead: string; stages: Record<StageId, { t: string; d: string; tag: string }>; cta: string; ui: JourneyUI;
+    /** the launch sequence's console (components/launch) */
+    console: { title: string; stepOf: string; play: string; pause: string; plan: string; example: string };
+  };
   partners: { eyebrow: string; title: string; lead: string; hub: string; note: string };
 };
 
@@ -117,6 +121,7 @@ export const experience: Record<Locale, Copy> = {
         live: { tag: "Go", t: "Go live", d: "Deliveries start. Tracked 24/7, one team accountable." },
       },
       cta: "Start with step one",
+      console: { title: "Your launch with MSG", stepOf: "Step {n} of {total}", play: "Play the steps", pause: "Pause the steps", plan: "Or build your plan first", example: "Illustrative example" },
       ui: {
         chatName: "MSG Horizons", chatMsg: "Hi, we ship about 300 orders a day across Riyadh.", chatReply: "Great, let's size your setup.",
         reqTitle: "Your requirements", reqChips: ["300 orders/day", "Peak 2.5×", "Cash on delivery", "Returns"],
@@ -184,6 +189,7 @@ export const experience: Record<Locale, Copy> = {
         live: { tag: "انطلق", t: "الإطلاق", d: "يبدأ التوصيل. تتبع على مدار الساعة وفريق واحد مسؤول." },
       },
       cta: "ابدأ بالخطوة الأولى",
+      console: { title: "انطلاقك مع ام اس جي", stepOf: "الخطوة {n} من {total}", play: "تشغيل الخطوات", pause: "إيقاف الخطوات مؤقتاً", plan: "أو ابنِ خطتك أولاً", example: "مثال توضيحي" },
       ui: {
         chatName: "MSG Horizons", chatMsg: "مرحباً، نشحن نحو 300 طلب يومياً في الرياض.", chatReply: "ممتاز، لنحدد إعدادك.",
         reqTitle: "متطلباتك", reqChips: ["300 طلب/يوم", "ذروة 2.5×", "الدفع عند الاستلام", "مرتجعات"],

@@ -29,7 +29,13 @@ type Copy = {
   /** the warehouse walk-in: real MSG photos (public/media/msg, see docs/CONTENT-NOTES.md) */
   facade: { alt: string; caption: string; hint: string };
   inside: { eyebrow: string; title: string; lead: string; alt: string; spots: { storage: string; sorting: string; dispatch: string } };
-  kingdom: { eyebrow: string; title: string; lead: string };
+  kingdom: {
+    eyebrow: string; title: string; lead: string;
+    /** the four-stage operation layered on the map: rail label and hint */
+    rail: string; hint: string;
+    /** short labels drawn on the map beside each stage's action (illustrative, captioned as such) */
+    callouts: { pickups: string; abroad: string; packed: string; shelf: string; haul: string; pod: string; cash: string; returns: string; you: string };
+  };
 };
 
 export const heroCopy: Record<Locale, Copy> = {
@@ -80,7 +86,20 @@ export const heroCopy: Record<Locale, Copy> = {
     kingdom: {
       eyebrow: "Then out across the Kingdom",
       title: "From this floor to your customer's door.",
-      lead: "Line-haul between cities, then couriers to the door, every day of the week.",
+      lead: "Line-haul between cities, then couriers to the door, every day of the week. One MSG team accountable at every step.",
+      rail: "One order through MSG",
+      hint: "Keep scrolling to follow one order",
+      callouts: {
+        pickups: "Collection points, one pickup schedule",
+        abroad: "Stock arriving from abroad",
+        packed: "Packed and labelled",
+        shelf: "Stock on the shelf",
+        haul: "Line-haul between cities",
+        pod: "Proof of delivery",
+        cash: "Cash reconciled",
+        returns: "Return tracked",
+        you: "Your account",
+      },
     },
     cities: { riyadh: "Riyadh", jeddah: "Jeddah", makkah: "Makkah", madinah: "Madinah", dammam: "Dammam", abha: "Abha", tabuk: "Tabuk", hail: "Hail", buraidah: "Buraidah", sabya: "Sabya", najran: "Najran", ahsa: "Al Ahsa", taif: "Taif" },
   },
@@ -131,7 +150,20 @@ export const heroCopy: Record<Locale, Copy> = {
     kingdom: {
       eyebrow: "ثم إلى أنحاء المملكة",
       title: "من هذه الأرضية إلى باب عميلك.",
-      lead: "نقل بين المدن، ثم مناديب حتى الباب، كل أيام الأسبوع.",
+      lead: "نقل بين المدن، ثم مناديب حتى الباب، كل أيام الأسبوع. فريق واحد من ام اس جي مسؤول عن كل خطوة.",
+      rail: "طلب واحد عبر ام اس جي",
+      hint: "واصل التمرير لتتبع طلباً واحداً",
+      callouts: {
+        pickups: "نقاط استلام، وجدول استلام واحد",
+        abroad: "مخزون قادم من الخارج",
+        packed: "مغلّف وملصق",
+        shelf: "المخزون على الرف",
+        haul: "نقل بين المدن",
+        pod: "إثبات التسليم",
+        cash: "مطابقة النقد",
+        returns: "مرتجع متتبع",
+        you: "حسابك",
+      },
     },
     cities: { riyadh: "الرياض", jeddah: "جدة", makkah: "مكة", madinah: "المدينة", dammam: "الدمام", abha: "أبها", tabuk: "تبوك", hail: "حائل", buraidah: "بريدة", sabya: "صبيا", najran: "نجران", ahsa: "الأحساء", taif: "الطائف" },
   },

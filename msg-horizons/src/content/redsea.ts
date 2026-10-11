@@ -77,7 +77,7 @@ export const redSea: Record<Locale, Copy> = {
       ],
       partners: "Working alongside",
       ctaTitle: "Your approximate cost per order, in two minutes.",
-      ctaBody: "Tell the MSG roadmap who you are and how many orders you ship. It returns your delivery plan with an approximate cost per order.",
+      ctaBody: "Tell the MSG plan builder who you are and how many orders you ship. It returns your delivery plan with an approximate cost per order.",
       cta: "Map my delivery plan",
     },
     growth: {
@@ -127,7 +127,7 @@ export const redSea: Record<Locale, Copy> = {
       ],
       partners: "نعمل جنباً إلى جنب مع",
       ctaTitle: "التكلفة التقريبية لطلبك، في دقيقتين.",
-      ctaBody: "أخبر خارطة MSG من أنت وكم طلباً تشحن، وستحصل على خطة التوصيل مع التكلفة التقريبية لكل طلب.",
+      ctaBody: "أخبر منشئ خطط MSG من أنت وكم طلباً تشحن، وستحصل على خطة التوصيل مع التكلفة التقريبية لكل طلب.",
       cta: "ارسم خطة التوصيل",
     },
     growth: {

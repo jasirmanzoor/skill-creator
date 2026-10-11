@@ -6,6 +6,8 @@ import Image from "next/image";
 import { motion, useMotionValue, useMotionValueEvent, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { heroCopy, type HeroLane } from "@/content/hero";
+import { experience, NEED_STAGES, NEEDS_BY_STAGE } from "@/content/experience";
+import { scrollToY } from "@/lib/scroller";
 import { whatsappLink } from "@/content/facts";
 import { rateFor, type Lane } from "@/content/redsea";
 import type { Dictionary, Locale } from "@/content/i18n";
@@ -14,7 +16,8 @@ import { usePlan } from "../PlanContext";
 import TrackedLink from "../ui/TrackedLink";
 import { WhatsAppIcon } from "../ui/icons";
 import Dust from "./Dust";
-import HeroMap from "./HeroMap";
+import HeroMap, { STAGE_COUNT } from "./HeroMap";
+import { NeedIcon, StageCard } from "../operation/StageParts";
 import QuoteCard from "./QuoteCard";
 
 /*
@@ -31,6 +34,13 @@ const FACADE = {
   sign: { x: 469 / 1448, y: 153 / 1086, w: 283 / 1448, h: 101 / 1086 },
   lamp: { x: 0.4365, y: 0.399 },
 };
+/*
+ * The scroll through the hero: the walk-in (facade, inside, out to the Kingdom) takes the first WALK of it, the
+ * network holds for HOLD, then one order's four stages (set up, store, deliver, settle) share the rest.
+ * The section's height is chosen so the walk-in runs over the same distance it always has.
+ */
+const WALK = 0.4, HOLD = 0.06, STEP = (1 - WALK - HOLD) / STAGE_COUNT;
+const stageAt = (v: number) => (v < WALK + HOLD ? -1 : Math.min(STAGE_COUNT - 1, Math.floor((v - WALK - HOLD) / STEP)));
 const RATE_LANE: Record<HeroLane, Lane> = { intra: "intra", inter: "inter", sabya: "sabyaMajor" };
 type Pt = { x: number; y: number };
 type Inside = { src: string; ar: number; lamps: Pt[]; spots: Record<"storage" | "sorting" | "dispatch", Pt> };
@@ -91,16 +101,30 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   const setLane = (l: HeroLane) => setQuote({ lane: RATE_LANE[l] });
   const setOrders = (n: number) => setQuote({ orders: n });
   const [beat, setBeat] = useState(1);
+  const [stage, setStage] = useState(-1);
 
   // the walk-in is driven by scroll through the (tall) section
   const { scrollYProgress } = useScroll({ target: section, offset: ["start start", "end end"] });
   // copied into a plain motion value so every layer reads the same progress (no per-layer native scroll timelines)
   const p = useMotionValue(0);
+  // how far through the four stages the scroll is (0 → 1), for the stage rail's fill
+  const sp = useMotionValue(0);
   useMotionValueEvent(scrollYProgress, "change", (v) => {
-    p.set(v);
-    const b = v < 0.2 ? 1 : v < 0.8 ? 2 : 3;
+    const w = Math.min(1, v / WALK);
+    p.set(w);
+    const b = w < 0.2 ? 1 : w < 0.8 ? 2 : 3;
     setBeat((x) => (x === b ? x : b));
+    const s = stageAt(v);
+    setStage((x) => (x === s ? x : s));
+    sp.set(Math.max(0, (v - WALK - HOLD) / (1 - WALK - HOLD)));
   });
+  // the stage rail jumps to the middle of a stage's stretch of scroll
+  const goStage = (i: number) => {
+    const el = section.current;
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY;
+    scrollToY(top + (el.offsetHeight - window.innerHeight) * (WALK + HOLD + (i + 0.5) * STEP));
+  };
 
   // the opening (see "Hero opening" in globals.css) yields to the first scroll, touch or key press
   useEffect(() => {
@@ -229,7 +253,9 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
     </div>
   );
 
-  const kingdom = <Kingdom c={c} lang={L} lane={lane} go={!staged || beat === 3} map={!staged || beat >= 2} reduce={reduce} />;
+  const kingdom = (
+    <Kingdom c={c} lang={L} lane={lane} go={!staged || beat === 3} map={!staged || beat >= 2} reduce={reduce} stage={staged && beat === 3 ? stage : -1} onStage={staged ? goStage : undefined} progress={sp} />
+  );
 
   if (!staged) {
     return (
@@ -245,6 +271,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
           <div className="absolute inset-0">{inside}</div>
         </div>
         <div className="relative bg-[linear-gradient(180deg,#f3fbfb,#ffffff)] py-16">{kingdom}</div>
+        <div id="sellers" className="relative scroll-mt-16 bg-white pb-16"><StagesStacked lang={L} /></div>
         <div id="hero-quote" className="scroll-mt-20 px-4 pb-12 pt-2 lg:hidden"><QuoteCard lang={L} reduce={reduce} lane={lane} onLane={setLane} orders={orders} onOrders={setOrders} /></div>
       </section>
     );
@@ -252,9 +279,11 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
 
   return (
     <>
-    <section id="hero" ref={section} suppressHydrationWarning aria-labelledby="hero-title" className="relative h-[230svh] bg-deep lg:h-[290svh]">
+    <section id="hero" ref={section} suppressHydrationWarning aria-labelledby="hero-title" className="relative h-[425svh] bg-deep lg:h-[575svh]">
       {/* runs before first paint: a returning visitor, or a page restored part-way down, skips the opening */}
       <script dangerouslySetInnerHTML={{ __html: INTRO_GATE }} />
+      {/* where "one partner for the whole operation" begins: the first of the four stages, to the end of the hero */}
+      <div id="sellers" aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 top-[169svh] lg:top-[247svh]" />
       <div
         ref={frame}
         data-theme={beat < 3 ? "dark" : undefined}
@@ -281,7 +310,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
           <Scrim />
           {inside}
         </motion.div>
-        <motion.div style={{ opacity: kCopy }} inert={beat !== 3} className="absolute inset-0 z-[6] flex items-center pt-16">
+        <motion.div style={{ opacity: kCopy }} inert={beat !== 3} className="absolute inset-0 z-[6] flex items-center pt-14 lg:pt-16">
           <motion.div style={{ scale: kMap }} className="w-full">{kingdom}</motion.div>
         </motion.div>
 
@@ -435,28 +464,183 @@ function Interior({
   );
 }
 
-function Kingdom({ c, lang, lane, go, map, reduce }: { c: C; lang: Locale; lane: HeroLane; go: boolean; map: boolean; reduce: boolean }) {
+/**
+ * Out across the Kingdom, then one order through MSG. The network map carries the four stages of the operation
+ * (set up, store, deliver, settle): the camera moves to where each one happens and draws it there, the stage's
+ * answers take over the copy column, and the stage's card floats over the map. A rail under the map jumps
+ * between stages. Without `onStage` (reduced motion) the map shows the network and the stages stack below.
+ */
+function Kingdom({
+  c, lang, lane, go, map, reduce, stage = -1, onStage, progress,
+}: { c: C; lang: Locale; lane: HeroLane; go: boolean; map: boolean; reduce: boolean; stage?: number; onStage?: (i: number) => void; progress?: MotionValue<number> }) {
+  const n = experience[lang].needs;
+  const guide = experience[lang].journey.ui.guideItems;
+  const inStage = stage >= 0;
   return (
-    <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 text-teal-deep sm:px-5 lg:grid-cols-[0.9fr_1.1fr] lg:gap-10 lg:px-8">
+    <div className="mx-auto grid max-w-7xl items-center gap-4 px-4 text-teal-deep sm:px-5 lg:grid-cols-[0.82fr_1.18fr] lg:gap-10 lg:px-8">
       <div className="order-2 lg:order-1">
-        <p className="text-sm font-semibold text-teal">{c.kingdom.eyebrow}</p>
-        <h2 className="h-scene mt-2">{c.kingdom.title}</h2>
-        <p className="mt-3 max-w-lg text-teal-deep/80 text-pretty sm:text-lg">{c.kingdom.lead}</p>
-        <dl className="mt-6 grid max-w-md grid-cols-3 divide-x divide-teal/15 rtl:divide-x-reverse">
-          {c.stats.map((s, i) => (
-            <div key={s.l} className={i ? "ps-5" : "pe-5"}>
-              <dd className="num font-display text-3xl font-semibold tracking-[-0.02em] sm:text-4xl">
-                {reduce ? `${s.v.toLocaleString("en-US")}${s.suffix}` : <Counter v={s.v} suffix={s.suffix} go={go} delay={i * 0.15} />}
-              </dd>
-              <dt className="mt-1 text-sm text-teal-deep/70">{s.l}</dt>
+        <div className={inStage ? "max-lg:hidden" : undefined}>
+          <p className="text-sm font-semibold text-teal">{c.kingdom.eyebrow}</p>
+          <h2 className="h-scene mt-2">{c.kingdom.title}</h2>
+          <p className={`mt-3 max-w-lg text-teal-deep/80 text-pretty sm:text-lg ${inStage ? "hidden" : onStage ? "max-lg:hidden" : ""}`}>{c.kingdom.lead}</p>
+        </div>
+        <div className="relative mt-4 grid [grid-template-areas:'s'] lg:mt-7">
+          {/* the network in numbers */}
+          <Panel on={!inStage}>
+            <dl className="grid max-w-md grid-cols-3 divide-x divide-teal/15 rtl:divide-x-reverse">
+              {c.stats.map((s, i) => (
+                <div key={s.l} className={i ? "ps-5" : "pe-5"}>
+                  <dd className="num font-display text-3xl font-semibold tracking-[-0.02em] sm:text-4xl">
+                    {reduce ? `${s.v.toLocaleString("en-US")}${s.suffix}` : <Counter v={s.v} suffix={s.suffix} go={go} delay={i * 0.15} />}
+                  </dd>
+                  <dt className="mt-1 text-sm text-teal-deep/70">{s.l}</dt>
+                </div>
+              ))}
+            </dl>
+            <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
+              {onStage ? (
+                <span className="hidden items-center gap-2 text-sm text-teal-deep/70 lg:inline-flex">
+                  <span aria-hidden="true" className="block h-5 w-px overflow-hidden bg-teal/20"><span className="block h-2 w-px animate-[hero-drip_1.6s_var(--ease-ambient)_infinite] bg-teal" /></span>
+                  {c.kingdom.hint}
+                </span>
+              ) : null}
             </div>
-          ))}
-        </dl>
+          </Panel>
+          {/* one order, stage by stage */}
+          {onStage
+            ? NEED_STAGES.map((st, i) => (
+                <Panel key={st} on={stage === i}>
+                  <StageCopy n={n} st={st} i={i} on={stage === i} />
+                </Panel>
+              ))
+            : null}
+        </div>
       </div>
-      <div className="relative order-1 mx-auto aspect-[1100/850] w-full max-w-[640px] lg:order-2 lg:w-[min(100%,calc(62svh*1100/850))]">
-        <div aria-hidden="true" className="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(108,195,195,0.35),transparent_70%)] blur-2xl" />
-        {map ? <HeroMap lang={lang} lane={lane} /> : null}
-        <p className="absolute bottom-1 start-2 text-[11px] text-teal-deep/60">{c.map.caption}</p>
+
+      <div className="relative order-1 mx-auto w-full max-w-[640px] max-lg:w-[min(100%,calc(38svh*1100/850))] lg:order-2 lg:w-[min(100%,calc(58svh*1100/850))]">
+        <div className="relative aspect-[1100/850]">
+          <div aria-hidden="true" className="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(108,195,195,0.35),transparent_70%)] blur-2xl" />
+          <div className="absolute inset-0 [mask-composite:intersect] [mask-image:linear-gradient(90deg,transparent,#000_7%,#000_93%,transparent),linear-gradient(180deg,transparent,#000_7%,#000_93%,transparent)]">
+            {map ? <HeroMap lang={lang} lane={lane} stage={stage} /> : null}
+          </div>
+          {/* the stage's card, floating over the map */}
+          {onStage ? (
+            <div aria-hidden={!inStage || undefined} className="pointer-events-none absolute -end-2 bottom-[30%] hidden w-[15.5rem] lg:block xl:-end-5">
+              {NEED_STAGES.map((st, i) => (
+                <div
+                  key={st}
+                  className={`absolute inset-x-0 bottom-0 transition-[opacity,translate,rotate] duration-700 ease-[cubic-bezier(.2,.7,.2,1)] ${stage === i ? "translate-y-0 rotate-0 opacity-100" : "translate-y-5 rotate-[-2deg] opacity-0"}`}
+                >
+                  <div className="motion-safe:animate-[op-float_6s_var(--ease-ambient)_infinite_alternate] [&>div]:p-3.5 [&>div]:text-[13px]">
+                    <StageCard stage={st} c={n} guide={guide} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : null}
+          <p className="absolute start-2 top-0 text-[11px] text-teal-deep/60 lg:bottom-1 lg:top-auto">{c.map.caption}</p>
+        </div>
+        {onStage && progress ? <StageRail n={n} label={c.kingdom.rail} stage={stage} onStage={onStage} progress={progress} /> : null}
+      </div>
+    </div>
+  );
+}
+
+/** one layer of the copy column; the others wait, hidden and inert, in the same grid cell */
+function Panel({ on, children }: { on: boolean; children: React.ReactNode }) {
+  return (
+    <div
+      aria-hidden={on ? undefined : true}
+      inert={!on}
+      className={`[grid-area:s] transition-[opacity,translate] duration-700 ease-[cubic-bezier(.2,.7,.2,1)] ${on ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+type NeedsC = (typeof experience)["en"]["needs"];
+type Stage = (typeof NEED_STAGES)[number];
+
+function StageCopy({ n, st, i, on }: { n: NeedsC; st: Stage; i: number; on: boolean }) {
+  return (
+    <div>
+      <p className="flex items-baseline gap-3 text-teal">
+        <span className="num font-display text-sm font-semibold" dir="ltr">0{i + 1} / 0{NEED_STAGES.length}</span>
+        <span className="h-px flex-1 bg-teal/20" />
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-sea-100 px-2.5 py-1 text-[11px] font-semibold">
+          <span className="size-1.5 rounded-full bg-teal" />
+          {n.owner}
+        </span>
+      </p>
+      <h3 className="mt-2 font-display text-4xl font-semibold tracking-[-0.035em] sm:text-5xl rtl:tracking-normal">{n.stages[st].t}</h3>
+      <p className="mt-1 text-teal-deep/70 sm:text-lg">{n.stages[st].d}</p>
+      <ul data-stage-answers data-inview={on || undefined} className="needs-grid mt-3 divide-y divide-teal/10 border-y border-teal/10 lg:mt-5">
+        {NEEDS_BY_STAGE[st].map((id, k) => (
+          <li
+            key={id}
+            className={`flex items-start gap-3 py-2.5 transition-[opacity,translate] duration-700 lg:gap-4 lg:py-3.5 ${on ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"}`}
+            style={{ transitionDelay: on ? `${150 + k * 90}ms` : "0ms" }}
+          >
+            <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-teal to-teal-deep text-white shadow-[0_10px_20px_-10px_rgba(11,58,64,0.8)] lg:size-11 [&_svg]:size-6 lg:[&_svg]:size-7">
+              <NeedIcon id={id} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h4 className="text-sm text-teal-deep/70 max-lg:hidden">{n.items[id].q}</h4>
+              <p className="font-display text-[15px] font-semibold leading-snug text-pretty sm:text-lg lg:mt-0.5 xl:text-xl">{n.items[id].a}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+      {st === "settle" ? <p className="mt-3 text-xs text-teal-deep/75 max-lg:hidden">{n.note}</p> : null}
+    </div>
+  );
+}
+
+/** the four stages under the map: where the order is now, and a way to jump to any stage */
+function StageRail({ n, label, stage, onStage, progress }: { n: NeedsC; label: string; stage: number; onStage: (i: number) => void; progress: MotionValue<number> }) {
+  return (
+    <nav aria-label={label} className="mt-3 lg:mt-4">
+      <ol className="grid grid-cols-4 gap-2">
+        {NEED_STAGES.map((st, i) => (
+          <li key={st}>
+            <button type="button" onClick={() => onStage(i)} aria-current={i === stage ? "step" : undefined} className="group tap block w-full text-start">
+              <span className="block h-1 overflow-hidden rounded-full bg-teal/15">
+                <StageFill p={progress} i={i} />
+              </span>
+              <span className={`mt-2 flex items-baseline gap-1.5 text-xs font-semibold transition-colors sm:text-sm ${i === stage ? "text-teal-deep" : "text-teal-deep/60 group-hover:text-teal-deep"}`}>
+                <span className="num text-[11px] text-teal" dir="ltr">0{i + 1}</span>
+                {n.stages[st].t}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  );
+}
+
+/** one quarter of the stages' scroll: empty before its stage, filling during it, full after */
+function StageFill({ p, i }: { p: MotionValue<number>; i: number }) {
+  const transform = useTransform(p, (v) => `scaleX(${Math.min(1, Math.max(0, v * NEED_STAGES.length - i)).toFixed(4)})`);
+  return <motion.span className="block h-full origin-left rounded-full bg-teal rtl:origin-right" style={{ transform }} />;
+}
+
+/** reduced motion: the same four stages, one after another */
+function StagesStacked({ lang }: { lang: Locale }) {
+  const n = experience[lang].needs;
+  const guide = experience[lang].journey.ui.guideItems;
+  return (
+    <div className="mx-auto max-w-7xl px-4 text-teal-deep sm:px-5 lg:px-8">
+      <h2 className="h-section">{n.title}</h2>
+      <p className="mt-3 max-w-2xl text-lg text-teal-deep/75 text-pretty">{n.lead}</p>
+      <div className="mt-10 grid gap-10 md:grid-cols-2">
+        {NEED_STAGES.map((st, i) => (
+          <article key={st} className="flex flex-col gap-5">
+            <StageCopy n={n} st={st} i={i} on />
+            <StageCard stage={st} c={n} guide={guide} />
+          </article>
+        ))}
       </div>
     </div>
   );

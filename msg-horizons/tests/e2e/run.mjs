@@ -214,11 +214,11 @@ await test("red sea bands: no walk-in table, live approx cost per order, Sabya s
   }
 });
 
-await test("experience: seller questions, 6-step roadmap, partner logos load", async () => {
+await test("experience: seller answers on the map, 7-step launch sequence, partner logos load", async () => {
   for (const lang of ["en", "ar"]) {
     const { page, ctx, errors } = await open(`/${lang}`);
-    assert.equal(await page.locator("#sellers .need-card").count(), 9, `${lang}: nine seller questions`);
-    assert.ok(await page.locator("#journey [role=tab]").count() >= 6, `${lang}: roadmap steps`);
+    assert.equal(await page.locator("#hero [data-stage-answers] li").count(), 9, `${lang}: nine seller answers across the four stages`);
+    assert.equal(await page.locator("#journey [role=tab]").count(), 7, `${lang}: seven launch steps`);
     await page.locator("#partners").scrollIntoViewIfNeeded();
     await page.waitForTimeout(600);
     const logos = await page.locator("#partners img").evaluateAll((els) => els.map((e) => [e.getAttribute("alt"), e.complete && e.naturalWidth > 0]));
@@ -229,30 +229,32 @@ await test("experience: seller questions, 6-step roadmap, partner logos load", a
   }
 });
 
-await test("roadmap: segment → steps → estimator → curated plan with approx cost per order", async () => {
+await test("one order on the map: the stage rail moves the hero through set up → settle", async () => {
+  const { page, ctx, errors } = await open("/en");
+  await page.evaluate(() => sessionStorage.setItem("msg-intro", "1"));
+  await page.goto(`${BASE}/en#sellers`);
+  const rail = page.getByRole("navigation", { name: "One order through MSG" });
+  await rail.waitFor();
+  await page.locator('#hero [aria-current="step"]').waitFor({ timeout: 5000 });
+  assert.match(await page.locator('#hero [aria-current="step"]').innerText(), /Set up/);
+  await rail.getByRole("button", { name: /Settle/ }).click();
+  await page.waitForFunction(() => document.querySelector('#hero [aria-current="step"]')?.textContent?.includes("Settle"), null, { timeout: 5000 });
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+await test("launch sequence: seven steps, keyboard, WhatsApp start", async () => {
   const { page, ctx, errors } = await open("/en");
   const sec = page.locator("#journey");
   await sec.scrollIntoViewIfNeeded();
-  await sec.getByRole("radio", { name: /Scaling SMEs/ }).first().click();
-  const stage = page.locator("#roadmap-stage");
-  await page.locator("#journey").getByRole("button", { name: "Next step" }).click();
-  await stage.getByText("We map your requirements").waitFor();
-  for (let k = 0; k < 4; k++) await page.locator("#journey").getByRole("button", { name: "Next step" }).click();
-  await stage.getByText("Testing & go-live").waitFor();
-  const est = page.locator("#estimator");
-  await est.locator("input[type=range]").nth(1).fill("40");
-  await est.getByRole("button", { name: "Generate my plan" }).click();
-  await est.getByText("Curated recommendation plan").waitFor();
-  const txt = await est.innerText();
-  // SME opens at 400 a day in Riyadh = 12,000 a month → intra-city card rate 21
-  assert.match(txt, /≈\s*SAR\s*21\b/, "approx cost per order from MSG's rate card");
-  assert.match(txt, /252,000 a month for 12,000 orders/);
-  assert.ok(!/Daily routes|Couriers, (normal|peak)|Operational assets/i.test(txt), "no operating matrix in the roadmap plan");
-  for (const s of ["Proof of delivery", "Live tracking", "Cash on delivery, on time"]) assert.ok(txt.includes(s), `plan covers ${s}`);
-  const wa = await est.getByRole("link", { name: /Get my quote on WhatsApp/ }).getAttribute("href");
+  await sec.getByRole("tab", { name: /Project agreement/ }).click();
+  const panel = page.locator("#launch-panel");
+  await panel.getByText("Signed").waitFor();
+  await page.keyboard.press("ArrowDown");
+  await panel.getByText("3 of 3 delivered").waitFor();
+  assert.equal(await sec.getByRole("tab", { selected: true }).getAttribute("id"), "launch-tab-5");
+  const wa = await sec.getByRole("link", { name: /Start with step one/ }).getAttribute("href");
   assert.match(wa, /^https:\/\/wa\.me\/966578061556\?text=/);
-  await est.getByRole("button", { name: "Send plan to MSG" }).click();
-  await page.getByText("Your logistics plan is attached").waitFor();
   assert.deepEqual(errors, []);
   await ctx.close();
 });
@@ -423,7 +425,7 @@ await test("route: the rail follows the scroll, stops jump, ] and [ hop, the map
     assert.ok((await page.evaluate(() => scrollY)) <= 1, `${lang}: first stop is the top`);
     await page.keyboard.press("]");
     await page.waitForTimeout(300);
-    const live = await topOf("why"); // the stop after the start: why MSG
+    const live = await topOf("sellers"); // the stop after the start: one order through MSG, at the end of the hero
     assert.ok(Math.abs((await page.evaluate(() => scrollY)) - (live - 64)) < 80, `${lang}: ] hops to the next stop`);
     await page.keyboard.press("[");
     await page.waitForTimeout(300);

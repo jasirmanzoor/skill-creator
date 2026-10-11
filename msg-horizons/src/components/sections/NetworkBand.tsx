@@ -15,7 +15,7 @@ const HOLD_MS = 5200;
  * "1,000+ couriers. 100+ vehicles." in Red Sea daylight.
  * A stat rail beside one photo stage: each network fact owns a photo (a courier handing over an
  * order, the fleet, MSG's own warehouse floor) and the stage dissolves between them, advancing on
- * its own while in view or on hover/focus. A partner ribbon and the way into the roadmap follow.
+ * its own while in view or on hover/focus. A partner ribbon and the way into the plan builder follow.
  * `/public/coast.jpg`, once MSG supplies it, becomes the fleet photo.
  */
 export default function NetworkBand({ lang, coastPhoto }: { lang: Locale; coastPhoto: boolean }) {
@@ -144,16 +144,16 @@ export default function NetworkBand({ lang, coastPhoto }: { lang: Locale; coastP
           </ul>
         </div>
 
-        {/* the way in: the roadmap turns a visitor's numbers into a plan and an approximate cost per order */}
+        {/* the way in: the plan builder turns a visitor's numbers into a plan and an approximate cost per order */}
         <div className="mt-4 flex flex-col gap-5 rounded-3xl bg-teal-deep p-6 text-white sm:p-8 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="font-display text-2xl font-semibold text-balance">{c.ctaTitle}</p>
             <p className="mt-2 max-w-2xl text-white/75">{c.ctaBody}</p>
           </div>
           <TrackedLink
-            href="#journey"
+            href="#planner"
             event="cta_click"
-            props={{ cta: "journey", location: "network" }}
+            props={{ cta: "plan", location: "network" }}
             className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-white px-5 py-3 font-medium text-teal-deep transition-colors hover:bg-sea-100"
           >
             {c.cta} <ArrowIcon className="size-4 rtl:rotate-180" />

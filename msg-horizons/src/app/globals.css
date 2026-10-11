@@ -375,6 +375,12 @@ html.lenis-on, html.lenis-on body { height: auto; }
 @keyframes hero-lamp { 0%, 100% { opacity: 0.6; } 45% { opacity: 1; } 55% { opacity: 0.75; } }
 @keyframes hero-flow { to { stroke-dashoffset: -25; } }
 @keyframes hero-drip { from { transform: translateY(-100%); } to { transform: translateY(250%); } }
+@keyframes op-float { from { transform: translateY(0); } to { transform: translateY(-8px); } }
+/* Launch sequence (components/launch/LaunchSequence.tsx) */
+@keyframes launch-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes launch-dot { 0%, 100% { transform: translateY(0); opacity: 0.45; } 50% { transform: translateY(-3px); opacity: 1; } }
+@keyframes launch-wave { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
+@keyframes launch-ring { from { transform: scale(0.6); opacity: 0.9; } to { transform: scale(2.2); opacity: 0; } }
 /*
  * Hero opening. Plays once per visit, about three seconds, then never again: before dawn at the hub, the sign
  * comes on, the shutter rolls up, light and the delivery routes spill out, day arrives, and the promise is set
