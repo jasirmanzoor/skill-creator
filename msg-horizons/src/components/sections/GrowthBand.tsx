@@ -253,8 +253,8 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
             </div>
             <div className="p-5 sm:p-8">
         <div className="grid overflow-hidden rounded-2xl bg-white ring-1 ring-teal/12 sm:grid-cols-[0.8fr_1.2fr]">
-          <div className="relative min-h-[420px] overflow-hidden sm:min-h-[460px]">
-            <img src="/media/msg/outlet-front.jpg" alt={o.alt} loading="lazy" className="absolute inset-0 size-full object-cover [object-position:50%_38%]" />
+          <div className="relative min-h-[300px] overflow-hidden">
+            <img src="/media/msg/outlet.jpg" alt={o.alt} loading="lazy" className="absolute inset-0 size-full object-cover [object-position:50%_42%]" />
           </div>
           <div className="flex flex-col justify-center gap-5 p-6 sm:p-10 lg:flex-row lg:items-center lg:gap-10">
             <div className="flex-1">
