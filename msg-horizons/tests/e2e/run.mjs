@@ -259,6 +259,48 @@ await test("launch sequence: seven steps, keyboard, WhatsApp start", async () =>
   await ctx.close();
 });
 
+await test("estimator: locked until sign-in, then welcomes and asks to help (answer reaches MSG)", async () => {
+  const { page, ctx, errors } = await open("/en");
+  const posts = [];
+  page.on("request", (r) => { if (r.url().endsWith("/api/lead") && r.method() === "POST") posts.push(JSON.parse(r.postData() || "{}")); });
+  const sec = page.locator("#estimate");
+  await sec.scrollIntoViewIfNeeded();
+  assert.ok(await sec.locator("#estimator").evaluate((el) => !!el.closest("[inert]")), "estimator is out of reach before sign-in");
+  await sec.getByRole("button", { name: "Open the estimator" }).click();
+  assert.ok(await sec.getByText("This field is required").first().isVisible(), "validation");
+  await page.fill("#est-name", "Test Seller");
+  await page.fill("#est-phone", "0551234567");
+  await page.check("#est-consent");
+  await sec.getByRole("button", { name: "Open the estimator" }).click();
+  await sec.getByText("Welcome, Test. We're happy to see you here.").waitFor();
+  assert.equal(await sec.locator("#estimator").evaluate((el) => !!el.closest("[inert]")), false, "estimator opens");
+  assert.equal(posts[0]?.interest, "estimator_signin");
+  assert.equal(posts[0]?.phone, "+966551234567");
+  await sec.getByRole("button", { name: "No thanks, I'll browse" }).click();
+  await sec.getByText("Need help later? Chat with MSG on WhatsApp.").waitFor();
+  await page.waitForTimeout(300);
+  assert.equal(posts[1]?.interest, "estimator_help_no");
+  // the same device goes straight in next time
+  await page.reload();
+  await page.locator("#estimate").scrollIntoViewIfNeeded();
+  await page.locator("#estimate").getByText("Welcome, Test.", { exact: false }).waitFor();
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+await test("peak control: the season ends on the record (outro), and hands back", async () => {
+  const { page, ctx, errors } = await open("/en");
+  const sec = page.locator("#enterprise");
+  await sec.scrollIntoViewIfNeeded();
+  await sec.getByRole("button", { name: "Behind every peak" }).click();
+  await sec.getByText(/^The record (behind every peak|, and the people who keep it)\./).waitFor();
+  assert.ok(await sec.getByText("couriers on the network").isVisible());
+  await sec.getByRole("button", { name: "Replay the season" }).click();
+  await sec.getByText(/^The record (behind every peak|, and the people who keep it)\./).waitFor({ state: "detached" });
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
 await test("shared plan link opens directly on the result", async () => {
   const { page, ctx } = await open("/ar?plan=platform~people~high~peaks#planner");
   await page.getByRole("heading", { name: "شريك الطاقة الاستيعابية" }).waitFor({ timeout: 5000 });
@@ -321,7 +363,9 @@ await test("mobile: no horizontal overflow, CTA bar appears after the hero", asy
     const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     assert.ok(over <= 0, `${lang}: horizontal overflow ${over}px`);
     await page.evaluate(() => window.scrollTo(0, window.innerHeight * 2));
-    await page.waitForTimeout(700);
+    // smooth scrolling eases toward the target: wait until the page is past the hero rather than a fixed time
+    await page.waitForFunction(() => window.scrollY > window.innerHeight * 0.8, null, { timeout: 5000 });
+    await page.waitForTimeout(400);
     assert.ok(await page.getByRole("link", { name: lang === "en" ? "Build my plan" : "ابنِ خطتك" }).last().isVisible());
     await ctx.close();
   }

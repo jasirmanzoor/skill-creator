@@ -648,36 +648,35 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
         })}
       </div>
 
-      {/* the route, step by step: sits directly on top of the map it describes; the playing step points down into it */}
-      <div className="relative z-10 border-b border-teal/15 bg-white px-3 pb-3 pt-3 shadow-[0_10px_24px_-18px_rgba(11,58,64,0.55)] sm:px-5">
-        <p className="mb-2.5 flex items-baseline justify-between gap-3 text-xs font-semibold text-teal-deep">
-          <span className="uppercase tracking-[0.12em] rtl:tracking-normal">{c.route}</span>
-          <span className="num font-medium text-teal-deep/75" dir="ltr">{active + 1}/{plan.beats.length}</span>
+      {/* the route, compact: one row of numbered stops over the map, the playing step's words on one line above it */}
+      <div className="relative z-10 border-b border-teal/15 bg-white px-3 pb-2.5 pt-2.5 shadow-[0_10px_24px_-18px_rgba(11,58,64,0.55)] sm:px-5">
+        <p className="flex items-baseline gap-2 text-xs text-teal-deep" aria-live="polite">
+          <span className="shrink-0 font-semibold uppercase tracking-[0.12em] text-teal rtl:tracking-normal">{c.route}</span>
+          <span className="min-w-0 flex-1 truncate">
+            <span className="font-semibold">{c.who[plan.beats[active].who]}</span>
+            <span className="text-teal-deep/80"> · {fmt(plan.beats[active])}</span>
+          </span>
+          <span className="num shrink-0 font-medium text-teal-deep/75" dir="ltr">{active + 1}/{plan.beats.length}</span>
         </p>
-        <ol ref={strip} data-beats className="grid snap-x grid-flow-col auto-cols-[minmax(9.25rem,1fr)] overflow-x-auto pb-3">
+        <ol ref={strip} data-beats className="mt-2 flex items-center overflow-x-auto py-1">
           {plan.beats.map((b, i) => {
             const now = i === active;
             const done = i < active;
             const last = i === plan.beats.length - 1;
             const tone = b.flow === "cash" ? "bg-[#a87a1f]" : b.flow === "return" ? "bg-[#b9472f]" : b.who === "you" ? "bg-teal-deep" : "bg-teal";
             return (
-              <li key={`${b.step}-${i}`} className="relative snap-start">
-                {/* the line that joins this step to the next */}
-                {last ? null : <span aria-hidden="true" className={`absolute start-[1.375rem] top-[1.375rem] h-0.5 w-full -translate-y-1/2 ${done ? "bg-teal" : "bg-teal/20"}`} />}
+              <li key={`${b.step}-${i}`} className={`flex items-center ${last ? "" : "flex-1"}`}>
                 <button
                   type="button"
                   onClick={() => jump(i)}
                   aria-current={now ? "step" : undefined}
-                  className={`group relative flex h-full w-full flex-col items-start gap-1.5 rounded-xl p-1.5 pe-3 text-start transition-colors ${now ? "bg-sea-100" : "hover:bg-sea-50"}`}
+                  aria-label={`${i + 1}. ${c.who[b.who]}: ${fmt(b)}`}
+                  title={fmt(b)}
+                  className={`relative grid shrink-0 place-items-center rounded-full text-[11px] font-bold text-white transition-[width,height,box-shadow] duration-300 ${now ? "size-7 bg-teal-deep ring-4 ring-sea-200" : `size-6 ${tone} ${done ? "" : "opacity-60 hover:opacity-100"}`}`}
                 >
-                  <span className={`relative grid size-8 place-items-center rounded-full text-xs font-bold text-white ring-4 ${now ? "bg-teal-deep ring-sea-200" : `${tone} ring-white`} ${done || now ? "" : "opacity-70"}`}>
-                    {done ? "✓" : <span className="num">{i + 1}</span>}
-                  </span>
-                  <span className={`text-[10px] font-semibold uppercase tracking-[0.12em] rtl:tracking-normal ${now ? "text-teal" : "text-teal-deep/70"}`}>{c.who[b.who]}</span>
-                  <span className={`text-[13px] leading-snug ${now ? "font-semibold text-teal-deep" : "font-medium text-teal-deep/85"}`}>{fmt(b)}</span>
-                  {/* the playing step points into the map */}
-                  {now ? <span aria-hidden="true" className="absolute inset-x-1.5 -bottom-2.5 h-1 rounded-full bg-teal-deep" /> : null}
+                  {done ? "✓" : <span className="num">{i + 1}</span>}
                 </button>
+                {last ? null : <span aria-hidden="true" className={`mx-1 h-0.5 min-w-3 flex-1 rounded-full ${done ? "bg-teal" : "bg-teal/20"}`} />}
               </li>
             );
           })}

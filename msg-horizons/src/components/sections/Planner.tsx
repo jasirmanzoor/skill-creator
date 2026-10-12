@@ -203,7 +203,7 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
 
                       <div className="mt-6">
                         {step === 0 && (
-                          <div role="radiogroup" aria-label={p.steps.persona.q} className="grid grid-cols-1 gap-2.5">
+                          <div role="radiogroup" aria-label={p.steps.persona.q} className="grid grid-cols-2 gap-2">
                             {PERSONAS.map((k2) => (
                               <Option key={k2} role="radio" icon={k2} checked={persona === k2}
                                 title={p.steps.persona.options[k2].t} desc={p.steps.persona.options[k2].d}
@@ -216,7 +216,7 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
                           </div>
                         )}
                         {step === 1 && (
-                          <div role="group" aria-label={p.steps.cargo.q} className="grid grid-cols-1 gap-2.5">
+                          <div role="group" aria-label={p.steps.cargo.q} className="grid grid-cols-2 gap-2">
                             {CARGO.map((k2) => (
                               <Option key={k2} role="checkbox" icon={k2} checked={cargo.includes(k2)}
                                 title={p.steps.cargo.options[k2].t} desc={p.steps.cargo.options[k2].d}
@@ -327,23 +327,25 @@ function Option({
       aria-checked={checked}
       onClick={onClick}
       data-press="soft"
-      className={`group relative flex min-h-[4.75rem] items-center gap-4 rounded-2xl border bg-surface px-4 py-3.5 text-start transition-ui duration-200 ${
+      title={desc || undefined}
+      className={`group relative flex min-h-[3.5rem] items-center gap-2.5 rounded-xl border bg-surface px-2.5 py-2 text-start transition-ui duration-200 sm:gap-3 sm:px-3 ${
         checked
           ? "border-brand bg-brand-soft/60 shadow-[0_0_0_1px_var(--color-brand),0_16px_32px_-22px_rgba(11,125,54,0.7)]"
           : "border-line-strong/70 hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-[var(--shadow-card)]"
       }`}
     >
-      <span className={`inline-flex size-12 shrink-0 items-center justify-center rounded-xl transition-colors ${
+      <span className={`inline-flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors ${
         checked ? "bg-brand text-white" : "bg-subtle text-ink-3 group-hover:bg-ink group-hover:text-white"
       }`}>
-        <OptionIcon id={icon} className="size-[22px]" />
+        <OptionIcon id={icon} className="size-[18px]" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block font-display text-[1.0625rem] font-semibold leading-snug tracking-[-0.01em] text-ink rtl:tracking-normal">{title}</span>
-        {desc ? <span className={`mt-0.5 block text-sm leading-snug ${checked ? "text-ink-3" : "text-muted"}`}>{desc}</span> : null}
+        <span className="block font-display text-sm font-semibold leading-tight tracking-[-0.01em] text-ink sm:text-[15px] rtl:tracking-normal">{title}</span>
+        {/* compact: the description stays for screen readers and as a tooltip */}
+        {desc ? <span className="sr-only">{desc}</span> : null}
       </span>
       {/* a square for "pick any", a circle for "pick one" */}
-      <span aria-hidden="true" className={`inline-flex size-6 shrink-0 items-center justify-center border-2 transition-colors ${role === "checkbox" ? "rounded-md" : "rounded-full"} ${
+      <span aria-hidden="true" className={`inline-flex size-5 shrink-0 items-center justify-center border-2 transition-colors ${role === "checkbox" ? "rounded-md" : "rounded-full"} ${
         checked ? "border-brand bg-brand text-white" : "border-line-strong bg-surface group-hover:border-ink/50"
       }`}>
         {checked ? <CheckIcon className="size-3.5" /> : null}

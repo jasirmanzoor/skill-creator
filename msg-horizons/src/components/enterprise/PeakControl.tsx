@@ -1,6 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import Image from "next/image";
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import type { Locale } from "@/content/i18n";
+import { leadershipCopy, type LeaderId } from "@/content/leadership";
+import { EASE_OUT } from "@/lib/motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 type Stage = { t: string; d: string };
 type Labels = { demand: string; capacity: string; standby: string; illustrative: string };
@@ -18,21 +24,56 @@ const area = (f: (t: number) => number) => `${line(f)} L${X(1)} ${BOT} L${X(0)} 
 const STARTS = [0, 0.2, 0.4, 0.6, 0.8];
 /** how much of the standby pool is on shift in each stage */
 const CALLED = [0, 0, 14, 18, 0];
+/** while it plays by itself: each stage holds this long, then the outro holds for OUTRO_MS */
+const STAGE_MS = 2600, OUTRO_MS = 11000;
+
+export type Leader = { id: LeaderId; photo: string; name: string | null };
 
 /**
  * Peak control, the closing argument: one season laid out whole, from the first demand signal to the closeout.
  * The chart shows demand against the capacity MSG deploys; the five stages sit directly under the part of the
  * season they govern, so the page reads left to right as one controlled path. Choosing a stage marks its span
  * on the chart, moves the marker there and shows how much of the standby pool is on shift.
+ *
+ * While in view the season plays itself, stage by stage, and ends on an outro: the graph steps back and MSG's
+ * record (verified figures) rises in its place, followed by its leadership, portrait and a line each. A leader
+ * appears only once their portrait has been supplied. Touching any stage hands control to the visitor.
  */
-export default function PeakControl({ stages, labels }: { stages: Stage[]; labels: Labels }) {
-  const [active, setActive] = useState(0);
+export default function PeakControl({ stages, labels, lang, leaders = [] }: { stages: Stage[]; labels: Labels; lang: Locale; leaders?: Leader[] }) {
+  const o = leadershipCopy[lang];
+  const reduce = useReducedMotion();
+  const box = useRef<HTMLDivElement>(null);
+  const [active, setActiveRaw] = useState(0);
+  const [outro, setOutro] = useState(false);
+  const [inView, setInView] = useState(false);
+  const [taken, setTaken] = useState(false); // the visitor has taken over: no more autoplay
+  const setActive = (i: number) => { setTaken(true); setOutro(false); setActiveRaw(i); };
+
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.4 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  // the season plays through, then the outro, then it starts again
+  useEffect(() => {
+    if (reduce || taken || !inView) return;
+    const id = window.setTimeout(() => {
+      if (outro) { setOutro(false); setActiveRaw(0); }
+      else if (active < stages.length - 1) setActiveRaw(active + 1);
+      else setOutro(true);
+    }, outro ? OUTRO_MS : STAGE_MS);
+    return () => window.clearTimeout(id);
+  }, [reduce, taken, inView, outro, active, stages.length]);
+
   const pool = Array.from({ length: 24 }, (_, k) => k);
   const called = CALLED[active];
   const at = STARTS[active] + 0.1;
 
   return (
-    <div className="overflow-hidden rounded-[28px] bg-teal-deep text-white shadow-[var(--shadow-scene)]">
+    <div ref={box} className="overflow-hidden rounded-[28px] bg-teal-deep text-white shadow-[var(--shadow-scene)]">
       <div className="p-5 sm:p-8 lg:p-10">
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-xs text-white/75">
           <p className="flex flex-wrap gap-x-5 gap-y-2">
@@ -40,8 +81,22 @@ export default function PeakControl({ stages, labels }: { stages: Stage[]; label
             <Legend swatch="size-3 rounded-sm bg-brand-bright" label={labels.capacity} />
             <Legend swatch="size-2 rounded-full bg-sea-400" label={labels.standby} />
           </p>
-          <p className="max-w-md text-white/60">{labels.illustrative}</p>
+          <p className="flex items-center gap-4">
+            <span className="max-w-md text-white/60">{labels.illustrative}</span>
+            <button
+              type="button"
+              aria-pressed={outro}
+              onClick={() => { setTaken(true); setOutro((x) => !x); }}
+              className="shrink-0 rounded-full bg-white/10 px-3.5 py-2 font-semibold text-white ring-1 ring-white/20 transition-colors hover:bg-white/20"
+            >
+              {outro ? o.replay : o.open}
+            </button>
+          </p>
         </div>
+
+        <div className="relative">
+        {/* the season steps back while the outro plays */}
+        <div aria-hidden={outro || undefined} inert={outro} className={`transition-[opacity,filter,transform] duration-700 ease-out ${outro ? "scale-[0.97] opacity-[0.12] blur-[3px]" : ""}`}>
 
         {/* the season */}
         <div className="relative mt-5 aspect-[1000/340] w-full rtl:-scale-x-100" dir="ltr">
@@ -108,8 +163,63 @@ export default function PeakControl({ stages, labels }: { stages: Stage[]; label
             );
           })}
         </ol>
+        </div>
+
+        <AnimatePresence>
+          {outro ? <Outro key="outro" lang={lang} leaders={leaders} reduce={reduce} /> : null}
+        </AnimatePresence>
+        </div>
       </div>
     </div>
+  );
+}
+
+/** the record, then the people: rises out of the graph once the season is done */
+function Outro({ lang, leaders, reduce }: { lang: Locale; leaders: Leader[]; reduce: boolean }) {
+  const o = leadershipCopy[lang];
+  const rise = (delay: number) => (reduce ? {} : { initial: { opacity: 0, y: 24 }, animate: { opacity: 1, y: 0 }, transition: { delay, duration: 0.6, ease: EASE_OUT } });
+  const people = leaders.length > 0;
+  return (
+    <motion.div
+      initial={reduce ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, transition: { duration: 0.3 } }}
+      className={`absolute inset-0 grid content-center gap-6 overflow-y-auto py-2 ${people ? "lg:grid-cols-[1fr_1.25fr] lg:gap-10" : ""}`}
+    >
+      <div>
+        <motion.p {...rise(0.1)} className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-bright rtl:tracking-normal">{o.eyebrow}</motion.p>
+        <motion.h3 {...rise(0.2)} className="mt-2 font-display text-2xl font-semibold tracking-[-0.02em] text-balance sm:text-3xl rtl:tracking-normal">{people ? o.title : o.titleRecord}</motion.h3>
+        <dl className={`mt-5 grid gap-2.5 ${people ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-2" : "grid-cols-2 sm:grid-cols-3"}`}>
+          {o.achievements.map((a, i) => (
+            <motion.div key={a.l} {...rise(0.35 + i * 0.12)} className="rounded-2xl bg-white/[0.07] px-4 py-3 ring-1 ring-white/10">
+              <dd className="num font-display text-2xl font-semibold tracking-[-0.02em] sm:text-3xl" dir="ltr">{a.v}</dd>
+              <dt className="mt-0.5 text-sm text-white/70">{a.l}</dt>
+            </motion.div>
+          ))}
+        </dl>
+      </div>
+      {people ? (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {leaders.map((l, i) => (
+            <motion.figure
+              key={l.id}
+              {...(reduce ? {} : { initial: { opacity: 0, y: 40, scale: 0.96 }, animate: { opacity: 1, y: 0, scale: 1 }, transition: { delay: 1.2 + i * 0.35, duration: 0.8, ease: EASE_OUT } })}
+              className="flex flex-col overflow-hidden rounded-2xl bg-white text-teal-deep shadow-[0_30px_60px_-30px_rgba(0,0,0,0.6)]"
+            >
+              <div className="relative aspect-[4/3] overflow-hidden bg-sea-100">
+                <Image src={`/${l.photo}`} alt={l.name ? `${l.name}, ${o.roles[l.id]}` : o.roles[l.id]} fill sizes="(min-width: 1024px) 22vw, 90vw" className="object-cover object-top" />
+                <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-teal-deep/50 via-transparent to-transparent" />
+              </div>
+              <blockquote className="flex-1 px-4 pt-4 text-[15px] leading-snug text-pretty">“{o.quotes[l.id]}”</blockquote>
+              <figcaption className="px-4 pb-4 pt-3 text-sm">
+                {l.name ? <span className="block font-semibold">{l.name}</span> : null}
+                <span className="block text-teal-deep/70">{o.roles[l.id]}</span>
+              </figcaption>
+            </motion.figure>
+          ))}
+        </div>
+      ) : null}
+    </motion.div>
   );
 }
 
