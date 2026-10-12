@@ -6,8 +6,8 @@ import { facts } from "@/content/facts";
  *
  * Achievements come only from facts.ts (verified). A leader appears only once their portrait is in
  * public/leadership/ (see `photo`); until then the outro shows the achievements alone.
- * Names are left empty until MSG confirms them. The quotes are DRAFTS written for the CEO and COO to approve
- * or rewrite before their portraits go in.
+ * Names are left empty until MSG confirms them. Portraits and quotes were supplied by MSG (12 Oct 2026); the
+ * portraits are cropped from MSG's quote cards so the baked-in text does not show twice.
  */
 
 export type LeaderId = "ceo" | "coo";
@@ -48,8 +48,8 @@ export const leadershipCopy: Record<Locale, Copy> = {
     ],
     roles: { ceo: "Chief Executive Officer", coo: "Chief Operating Officer" },
     quotes: {
-      ceo: "Every order a seller hands us is a promise to their customer. We built MSG to keep that promise at every door, in every city, every day.",
-      coo: "Peaks are planned, not survived. We forecast, ready the people and vehicles, and stand them down cleanly, so service holds when it matters most.",
+      ceo: "Turn vision into meaningful progress.",
+      coo: "Build with purpose, create lasting impact.",
     },
   },
   ar: {
@@ -68,8 +68,8 @@ export const leadershipCopy: Record<Locale, Copy> = {
     ],
     roles: { ceo: "الرئيس التنفيذي", coo: "الرئيس التنفيذي للعمليات" },
     quotes: {
-      ceo: "كل طلب يسلّمنا إياه البائع وعدٌ لعميله. بنينا ام اس جي لنفي بهذا الوعد عند كل باب، في كل مدينة، كل يوم.",
-      coo: "الذروات تُخطَّط ولا تُترك للصدفة. نتوقّع الطلب، ونجهّز الفرق والمركبات، ثم نعيدها بانضباط، ليبقى مستوى الخدمة ثابتاً حين يكون أهم.",
+      ceo: "حوّل الرؤية إلى تقدّمٍ ذي معنى.",
+      coo: "ابنِ بهدف، واصنع أثراً يدوم.",
     },
   },
 };

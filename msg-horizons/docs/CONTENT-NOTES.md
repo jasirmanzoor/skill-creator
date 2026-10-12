@@ -145,5 +145,7 @@ Domain: the website goes on www.msg-horizons.com only. msg-horizons.com (apex) s
 
 ## Leadership outro (12 Oct 2026)
 - Portraits go in `public/leadership/ceo.jpg` and `coo.jpg`; each leader appears only once their file exists.
-- Names are not yet supplied. The two quotes in `src/content/leadership.ts` are drafts for the CEO and COO to approve.
+- Portraits and quotes supplied by MSG (12 Oct 2026). CEO: "Turn vision into meaningful progress." COO: "Build with
+  purpose, create lasting impact." The portraits are cropped from MSG's quote cards so the text is not shown twice.
+  The Arabic quotes are our translation. Names are not yet supplied; the cards show the role only.
 

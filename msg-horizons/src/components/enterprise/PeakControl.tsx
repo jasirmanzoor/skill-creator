@@ -207,10 +207,12 @@ function Outro({ lang, leaders, reduce }: { lang: Locale; leaders: Leader[]; red
               className="flex flex-col overflow-hidden rounded-2xl bg-white text-teal-deep shadow-[0_30px_60px_-30px_rgba(0,0,0,0.6)]"
             >
               <div className="relative aspect-[4/3] overflow-hidden bg-sea-100">
-                <Image src={`/${l.photo}`} alt={l.name ? `${l.name}, ${o.roles[l.id]}` : o.roles[l.id]} fill sizes="(min-width: 1024px) 22vw, 90vw" className="object-cover object-top" />
+                <Image src={`/${l.photo}`} alt={l.name ? `${l.name}, ${o.roles[l.id]}` : o.roles[l.id]} fill sizes="(min-width: 1024px) 22vw, 90vw" className="object-cover [object-position:50%_18%]" />
                 <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-teal-deep/50 via-transparent to-transparent" />
               </div>
-              <blockquote className="flex-1 px-4 pt-4 text-[15px] leading-snug text-pretty">“{o.quotes[l.id]}”</blockquote>
+              <blockquote className="flex-1 px-4 pt-4 font-display text-lg font-semibold leading-snug tracking-[-0.01em] text-pretty sm:text-xl rtl:tracking-normal">
+                <span aria-hidden="true" className="me-1 text-sand-500">“</span>{o.quotes[l.id]}<span aria-hidden="true" className="text-sand-500">”</span>
+              </blockquote>
               <figcaption className="px-4 pb-4 pt-3 text-sm">
                 {l.name ? <span className="block font-semibold">{l.name}</span> : null}
                 <span className="block text-teal-deep/70">{o.roles[l.id]}</span>
