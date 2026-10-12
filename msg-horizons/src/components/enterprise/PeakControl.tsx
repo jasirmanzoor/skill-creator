@@ -73,8 +73,25 @@ export default function PeakControl({ stages, labels, lang, leaders = [] }: { st
   const at = STARTS[active] + 0.1;
 
   return (
-    <div ref={box} className="overflow-hidden rounded-[28px] bg-teal-deep text-white shadow-[var(--shadow-scene)]">
-      <div className="p-5 sm:p-8 lg:p-10">
+    <div ref={box} className="relative overflow-hidden rounded-[28px] bg-teal-deep text-white shadow-[var(--shadow-scene)]">
+      {/* the outro's backdrop: the hub floor, softened (pre-blurred file, so nothing blurs live), under a teal wash */}
+      <AnimatePresence>
+        {outro ? (
+          <motion.div key="bg" aria-hidden="true" className="pointer-events-none absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.8, ease: EASE_OUT }}>
+            <motion.img
+              src="/media/msg/hub-floor-soft.webp"
+              alt=""
+              className="absolute inset-0 size-full object-cover"
+              initial={reduce ? false : { scale: 1.12 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 8, ease: EASE_OUT }}
+            />
+            <span className="absolute inset-0 bg-[linear-gradient(115deg,rgba(8,38,43,0.9)_0%,rgba(8,38,43,0.62)_50%,rgba(26,18,10,0.55)_100%)]" />
+            <span className="absolute -start-24 -top-24 size-96 rounded-full bg-[radial-gradient(closest-side,rgba(230,196,140,0.18),transparent)]" />
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+      <div className="relative p-5 sm:p-8 lg:p-10">
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-xs text-white/75">
           <p className={`flex flex-wrap gap-x-5 gap-y-2 transition-opacity duration-500 ${outro ? "opacity-0" : ""}`}>
             <Legend swatch="h-0.5 w-5 bg-white" label={labels.demand} />
@@ -180,6 +197,8 @@ export default function PeakControl({ stages, labels, lang, leaders = [] }: { st
  * MSG's own quote cards (gold accent on the second half of each line, role in spaced capitals under a gold rule).
  */
 const GOLD = "#e6c48c";
+/** translucent glass over the softened hub: a light fill, a frosted backdrop, a hairline and a lit top edge */
+const GLASS = "bg-white/[0.07] ring-1 ring-white/15 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_30px_60px_-34px_rgba(0,0,0,0.7)]";
 function Outro({ lang, leaders, reduce }: { lang: Locale; leaders: Leader[]; reduce: boolean }) {
   const o = leadershipCopy[lang];
   const rise = (delay: number, y = 18) => (reduce ? {} : { initial: { opacity: 0, y }, animate: { opacity: 1, y: 0 }, transition: { delay, duration: 0.7, ease: EASE_OUT } });
@@ -191,8 +210,8 @@ function Outro({ lang, leaders, reduce }: { lang: Locale; leaders: Leader[]; red
       exit={{ opacity: 0, transition: { duration: 0.3 } }}
       className={`absolute inset-0 grid gap-6 overflow-y-auto ${people ? "lg:grid-cols-[0.8fr_1.2fr] lg:gap-8" : "content-center"}`}
     >
-      {/* the record */}
-      <div className="flex flex-col justify-center">
+      {/* the record, on a pane of glass */}
+      <div className={`flex flex-col justify-center rounded-2xl p-6 sm:p-7 ${GLASS}`}>
         <motion.p {...rise(0.1)} className="text-[11px] font-semibold uppercase tracking-[0.22em] rtl:tracking-normal" style={{ color: GOLD }}>{o.eyebrow}</motion.p>
         <motion.h3 {...rise(0.2)} className="mt-3 font-display text-3xl font-semibold leading-[1.1] tracking-[-0.025em] text-balance sm:text-4xl rtl:leading-snug rtl:tracking-normal">
           {people ? o.title : o.titleRecord}
@@ -215,7 +234,7 @@ function Outro({ lang, leaders, reduce }: { lang: Locale; leaders: Leader[]; red
             <motion.figure
               key={l.id}
               {...(reduce ? {} : { initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 }, transition: { delay: 0.9 + i * 0.3, duration: 0.9, ease: EASE_OUT } })}
-              className="relative min-h-[360px] overflow-hidden rounded-2xl bg-[#14110d] ring-1 ring-white/10 lg:min-h-0"
+              className="relative min-h-[380px] overflow-hidden rounded-2xl bg-[#14110d] ring-1 ring-white/20 shadow-[0_40px_80px_-40px_rgba(0,0,0,0.8)] lg:min-h-0"
             >
               <motion.div
                 className="absolute inset-0"
@@ -223,13 +242,14 @@ function Outro({ lang, leaders, reduce }: { lang: Locale; leaders: Leader[]; red
               >
                 <Image src={`/${l.photo}`} alt={l.name ? `${l.name}, ${o.roles[l.id]}` : o.roles[l.id]} fill sizes="(min-width: 1024px) 26vw, 90vw" className="object-cover [object-position:50%_20%]" />
               </motion.div>
-              <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,8,6,0)_30%,rgba(10,8,6,0.55)_58%,rgba(10,8,6,0.94)_100%)]" />
-              <figcaption className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
-                <blockquote className="font-display text-xl leading-snug tracking-[-0.01em] text-white text-pretty sm:text-2xl rtl:tracking-normal">
-                  <span aria-hidden="true" className="-mb-2 block h-10 font-serif text-7xl leading-none" style={{ color: GOLD }}>“</span>
+              <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,8,6,0)_45%,rgba(10,8,6,0.45)_100%)]" />
+              {/* the words on a frosted pane over the portrait */}
+              <figcaption className="absolute inset-x-3 bottom-3 rounded-xl bg-black/25 p-4 ring-1 ring-white/15 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] sm:p-5">
+                <blockquote className="font-display text-lg leading-snug tracking-[-0.01em] text-white text-pretty sm:text-xl rtl:tracking-normal">
+                  <span aria-hidden="true" className="-mb-3 block h-9 font-serif text-6xl leading-none" style={{ color: GOLD }}>“</span>
                   {o.quotes[l.id][0]} <span style={{ color: GOLD }}>{o.quotes[l.id][1]}</span>
                 </blockquote>
-                <span aria-hidden="true" className="mt-4 block h-px w-10" style={{ background: GOLD }} />
+                <span aria-hidden="true" className="mt-3 block h-px w-10" style={{ background: GOLD }} />
                 {l.name ? <span className="mt-3 block text-sm font-semibold text-white">{l.name}</span> : null}
                 <span className="mt-2 block text-[11px] font-medium uppercase tracking-[0.24em] text-white/75 rtl:tracking-normal">{o.roles[l.id]}</span>
               </figcaption>
