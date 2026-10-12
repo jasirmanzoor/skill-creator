@@ -293,10 +293,10 @@ await test("peak control: the season ends on the record (outro), and hands back"
   const sec = page.locator("#enterprise");
   await sec.scrollIntoViewIfNeeded();
   await sec.getByRole("button", { name: "Behind every peak" }).click();
-  await sec.getByText(/^The record (behind every peak|, and the people who keep it)\./).waitFor();
+  await sec.getByText(/^The record(?: behind every peak|, and the people who keep it)\./).waitFor();
   assert.ok(await sec.getByText("couriers on the network").isVisible());
   await sec.getByRole("button", { name: "Replay the season" }).click();
-  await sec.getByText(/^The record (behind every peak|, and the people who keep it)\./).waitFor({ state: "detached" });
+  await sec.getByText(/^The record(?: behind every peak|, and the people who keep it)\./).waitFor({ state: "detached" });
   assert.deepEqual(errors, []);
   await ctx.close();
 });

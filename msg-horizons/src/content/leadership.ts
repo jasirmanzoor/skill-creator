@@ -26,7 +26,8 @@ type Copy = {
   titleRecord: string;
   achievements: { v: string; l: string }[];
   roles: Record<LeaderId, string>;
-  quotes: Record<LeaderId, string>;
+  /** each quote in two parts: the second is set in the accent, as on MSG's own quote cards */
+  quotes: Record<LeaderId, [string, string]>;
 };
 
 const m = facts.metrics;
@@ -48,8 +49,8 @@ export const leadershipCopy: Record<Locale, Copy> = {
     ],
     roles: { ceo: "Chief Executive Officer", coo: "Chief Operating Officer" },
     quotes: {
-      ceo: "Turn vision into meaningful progress.",
-      coo: "Build with purpose, create lasting impact.",
+      ceo: ["Turn vision into", "meaningful progress."],
+      coo: ["Build with purpose,", "create lasting impact."],
     },
   },
   ar: {
@@ -59,17 +60,18 @@ export const leadershipCopy: Record<Locale, Copy> = {
     title: "السجل، والفريق الذي يحافظ عليه.",
     titleRecord: "السجل خلف كل ذروة.",
     achievements: [
-      { v: m.couriers.display, l: "مندوب في الشبكة" },
-      { v: m.vehicles.display, l: "مركبة في الأسطول" },
-      { v: m.revenueSAR.display.replace("SAR", "ريال"), l: "إيرادات سنوية" },
+      // written for right-to-left: the plus leads, the unit follows the number in Arabic
+      { v: `+${m.couriers.value.toLocaleString("en-US")}`, l: "مندوب في الشبكة" },
+      { v: `+${m.vehicles.value}`, l: "مركبة في الأسطول" },
+      { v: `+${m.revenueSAR.value / 1_000_000} مليون ريال`, l: "إيرادات سنوية" },
       { v: String(facts.partners.length), l: "شبكات شريكة" },
       { v: `${facts.sabyaHub.areaM2.toLocaleString("en-US")} م²`, l: "مركز صبيا" },
       { v: m.operations.display, l: "تشغيل" },
     ],
     roles: { ceo: "الرئيس التنفيذي", coo: "الرئيس التنفيذي للعمليات" },
     quotes: {
-      ceo: "حوّل الرؤية إلى تقدّمٍ ذي معنى.",
-      coo: "ابنِ بهدف، واصنع أثراً يدوم.",
+      ceo: ["حوّل الرؤية إلى", "تقدّمٍ ذي معنى."],
+      coo: ["ابنِ بهدف،", "واصنع أثراً يدوم."],
     },
   },
 };
