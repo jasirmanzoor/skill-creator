@@ -525,7 +525,7 @@ function Kingdom({
           </div>
           {/* the stage's card, floating over the map */}
           {onStage ? (
-            <div aria-hidden={!inStage || undefined} className="pointer-events-none absolute -end-2 bottom-[30%] hidden w-[15.5rem] lg:block xl:-end-5">
+            <div aria-hidden={!inStage || undefined} className="pointer-events-none absolute -end-2 bottom-[10%] hidden w-[15.5rem] lg:block xl:-end-5">
               {NEED_STAGES.map((st, i) => (
                 <div
                   key={st}

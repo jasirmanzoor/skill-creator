@@ -29,6 +29,9 @@ export function StageCard({ stage, c, guide }: { stage: NeedStage; c: NeedsCopy;
   if (stage === "store") {
     return (
       <div className={shell}>
+        {/* the shelves themselves: inside MSG's Sabya hub (own photo) */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- local, pre-optimised photography */}
+        <img src="/media/msg/hub-floor.webp" alt="" loading="lazy" decoding="async" className="-mx-1 -mt-1 mb-3 block h-24 w-[calc(100%+0.5rem)] max-w-none rounded-xl object-cover [object-position:40%_45%]" />
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-teal rtl:tracking-normal">{c.cards.store}</p>
         <div aria-hidden="true" className="mt-3 grid grid-cols-6 gap-1.5">
           {Array.from({ length: 18 }, (_, i) => (

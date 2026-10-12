@@ -188,6 +188,23 @@ export default function LaunchSequence({ t, lang }: { t: Dictionary; lang: Local
 
                 {/* the stage */}
                 <div id="launch-panel" role="tabpanel" aria-labelledby={`launch-tab-${step}`} className="relative grid h-[390px] place-items-center overflow-hidden px-5 sm:h-[420px] sm:px-10">
+                  {/* go live: MSG's hub with its doors open (own photo), the camera easing toward the door */}
+                  <AnimatePresence>
+                    {id === "live" ? (
+                      <motion.div key="hub" aria-hidden="true" className="pointer-events-none absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.6, ease: EASE_OUT }}>
+                        <motion.img
+                          src="/media/msg/hub-open.webp"
+                          alt=""
+                          className="absolute inset-0 size-full object-cover"
+                          style={{ transformOrigin: "55% 52%", objectPosition: "55% 52%" }}
+                          initial={reduce ? false : { scale: 1 }}
+                          animate={{ scale: reduce ? 1 : 1.18 }}
+                          transition={{ duration: 6, ease: "linear" }}
+                        />
+                        <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,28,32,0.55),rgba(6,28,32,0.35)_45%,rgba(6,28,32,0.85))]" />
+                      </motion.div>
+                    ) : null}
+                  </AnimatePresence>
                   <span aria-hidden="true" className="num pointer-events-none absolute -bottom-10 end-4 select-none font-display text-[13rem] font-semibold leading-none text-white/[0.045]" dir="ltr">
                     {String(step + 1).padStart(2, "0")}
                   </span>

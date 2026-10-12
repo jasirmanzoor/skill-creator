@@ -188,7 +188,7 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
         <div className="grid overflow-hidden rounded-2xl ring-1 ring-sand-900/10 lg:grid-cols-[1.4fr_1fr]">
           <div className="relative min-h-[380px] overflow-hidden sm:min-h-[460px]">
             {warehousePhoto ? (
-              <SabyaDoor alt={s.title} reduce={reduce} />
+              <SabyaDoor alt={lang === "ar" ? "مركز ام اس جي هورايزونز في صبيا من الجو، بين المستودعات المجاورة" : "The MSG Horizons Sabya hub from the air, among the neighbouring warehouses"} reduce={reduce} />
             ) : (
               <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(80%_90%_at_85%_0%,#fff6dc,rgba(255,246,220,0)_60%),linear-gradient(160deg,#f3dfb6,#e6c48b_55%,#d9ae6c)]" />
             )}
@@ -304,18 +304,21 @@ export function Money({ cur, approx = false, ar, children }: { cur: string; appr
 }
 
 /**
- * Inside MSG's Sabya hub. The hero already walks through the front door, so here the floor simply settles into
- * place as the card scrolls in.
+ * MSG's Sabya hub from the air (MSG's own photo, retouched). As the card scrolls in, the camera comes down out of
+ * the estate onto MSG's open door: first the neighbourhood of warehouses, then the one that is MSG's.
  */
+const HUB_DOOR = "50% 47%"; // the open door in hub-aerial.webp, as a share of the photo
 function SabyaDoor({ alt, reduce }: { alt: string; reduce: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "center center"] });
   const p = useSpring(scrollYProgress, { ...SPRING_SMOOTH });
-  const scale = useTransform(p, [0, 1], [1.18, 1]);
-  if (reduce) return <img src="/photos/msg/warehouse-floor.webp" alt={alt} className="absolute inset-0 size-full object-cover" loading="lazy" />;
+  const scale = useTransform(p, [0, 1], [1, 1.32]);
+  const y = useTransform(p, [0, 1], ["-4%", "0%"]);
+  const src = "/media/msg/hub-aerial.webp";
+  if (reduce) return <img src={src} alt={alt} className="absolute inset-0 size-full object-cover" style={{ objectPosition: HUB_DOOR }} loading="lazy" />;
   return (
-    <div ref={ref} className="absolute inset-0">
-      <motion.img src="/photos/msg/warehouse-floor.webp" alt={alt} loading="lazy" style={{ scale }} className="absolute inset-0 size-full object-cover" />
+    <div ref={ref} className="absolute inset-0 overflow-hidden">
+      <motion.img src={src} alt={alt} loading="lazy" style={{ scale, y, transformOrigin: HUB_DOOR, objectPosition: HUB_DOOR }} className="absolute inset-0 size-full object-cover" />
     </div>
   );
 }
