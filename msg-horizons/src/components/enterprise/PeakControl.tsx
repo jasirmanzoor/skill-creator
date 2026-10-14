@@ -208,7 +208,7 @@ function Outro({ lang, leaders, reduce }: { lang: Locale; leaders: Leader[]; red
       initial={reduce ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, transition: { duration: 0.3 } }}
-      className={`absolute inset-0 grid gap-6 overflow-y-auto ${people ? "lg:grid-cols-[0.8fr_1.2fr] lg:gap-8" : "content-center"}`}
+      className={`absolute inset-0 grid gap-6 overflow-y-auto ${people ? (leaders.length > 1 ? "lg:grid-cols-[0.8fr_1.2fr] lg:gap-8" : "lg:grid-cols-[1.15fr_0.85fr] lg:gap-8") : "content-center"}`}
     >
       {/* the record, on a pane of glass */}
       <div className={`flex flex-col justify-center rounded-2xl p-6 sm:p-7 ${GLASS}`}>
@@ -229,7 +229,7 @@ function Outro({ lang, leaders, reduce }: { lang: Locale; leaders: Leader[]; red
 
       {/* the people */}
       {people ? (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className={`grid gap-3 ${leaders.length > 1 ? "sm:grid-cols-2" : ""}`}>
           {leaders.map((l, i) => (
             <motion.figure
               key={l.id}
@@ -240,7 +240,7 @@ function Outro({ lang, leaders, reduce }: { lang: Locale; leaders: Leader[]; red
                 className="absolute inset-0"
                 {...(reduce ? {} : { initial: { scale: 1.08 }, animate: { scale: 1 }, transition: { delay: 0.9 + i * 0.3, duration: 2.4, ease: EASE_OUT } })}
               >
-                <Image src={`/${l.photo}`} alt={l.name ? `${l.name}, ${o.roles[l.id]}` : o.roles[l.id]} fill sizes="(min-width: 1024px) 26vw, 90vw" className="object-cover [object-position:50%_20%]" />
+                <Image src={`/${l.photo}`} alt={l.name ? `${l.name}, ${o.roles[l.id]}` : o.roles[l.id]} fill sizes="(min-width: 1024px) 34vw, 90vw" className="object-cover [object-position:50%_20%]" />
               </motion.div>
               <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,8,6,0)_45%,rgba(10,8,6,0.45)_100%)]" />
               {/* the words on a frosted pane over the portrait */}

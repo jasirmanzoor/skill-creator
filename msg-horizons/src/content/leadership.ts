@@ -13,7 +13,7 @@ import { facts } from "@/content/facts";
 export type LeaderId = "ceo" | "coo";
 
 export const LEADERS: { id: LeaderId; photo: string; name: Record<Locale, string> | null }[] = [
-  { id: "ceo", photo: "leadership/ceo.jpg", name: null },
+  // only the COO is shown for now; the CEO's portrait and quote are kept for when MSG wants both
   { id: "coo", photo: "leadership/coo.jpg", name: null },
 ];
 
