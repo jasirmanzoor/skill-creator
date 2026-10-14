@@ -4,10 +4,14 @@ import WorkforcePipeline from "../enterprise/WorkforcePipeline";
 import PeakControl from "../enterprise/PeakControl";
 import { ArrowIcon } from "../ui/icons";
 import { facts } from "@/content/facts";
-import type { Dictionary } from "@/content/i18n";
+import type { Dictionary, Locale } from "@/content/i18n";
+import { LEADERS } from "@/content/leadership";
+import { hasPublicFile } from "@/lib/photo-slot";
 
 /** Enterprise evaluators, in Red Sea daylight glass. */
-export default function Enterprise({ t }: { t: Dictionary }) {
+export default function Enterprise({ t, lang }: { t: Dictionary; lang: Locale }) {
+  // a leader joins the outro once their portrait is in public/leadership/
+  const leaders = LEADERS.filter((l) => hasPublicFile(l.photo)).map((l) => ({ id: l.id, photo: l.photo, name: l.name?.[lang] ?? null }));
   const e = t.enterprise;
   const wf = e.workforce;
   return (
@@ -56,6 +60,8 @@ export default function Enterprise({ t }: { t: Dictionary }) {
             <PeakControl
               stages={facts.peakStages.map((k) => e.peak.stages[k])}
               labels={{ demand: e.peak.demand, capacity: e.peak.capacity, standby: e.peak.standby, illustrative: e.peak.illustrative }}
+              lang={lang}
+              leaders={leaders}
             />
           </div>
         </div>

@@ -22,6 +22,13 @@ function rateLimited(ip: string) {
 
 type LeadRecord = Lead & { planModules?: string[]; network?: object; receivedAt: string };
 
+/** the live estimator's events get their own subject lines, so the team can act on them at a glance */
+const SUBJECT: Record<string, string> = {
+  estimator_signin: "Estimator sign-in",
+  estimator_help_yes: "Wants help now (estimator)",
+  estimator_help_no: "Browsing on their own (estimator)",
+};
+
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
 async function toWebhook(url: string, lead: LeadRecord) {
@@ -46,7 +53,7 @@ async function toEmail(key: string, lead: LeadRecord) {
       from: process.env.LEAD_EMAIL_FROM || "MSG Horizons Website <onboarding@resend.dev>",
       to: [process.env.LEAD_EMAIL_TO || "info@msg-horizons.com"],
       reply_to: lead.email || undefined,
-      subject: `New website enquiry — ${lead.name} (${lead.interest})`,
+      subject: SUBJECT[lead.interest] ? `${SUBJECT[lead.interest]} — ${lead.name} (${lead.phone})` : `New website enquiry — ${lead.name} (${lead.interest})`,
       html: `<h2>New enquiry from msg-horizons website</h2><table>${rows}</table>`,
     }),
     signal: AbortSignal.timeout(8000),

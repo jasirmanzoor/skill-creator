@@ -135,3 +135,17 @@ Domain: the website goes on www.msg-horizons.com only. msg-horizons.com (apex) s
 - `src/content/pitch.ts`: the problem (products and ideas stall at getting to the customer; hardest part is licences,
   compliance, paperwork, warehousing and labour rules) and MSG's answer, row by row. Wording follows MSG's message of
   6 Oct. "100% compliant" and "6 years" are still not used.
+
+## More Sabya hub photos (12 Oct 2026, supplied by MSG in chat)
+- Used: `public/media/msg/hub-aerial.webp` (the hub from the air, Capacity card), `hub-floor.webp` (inside, on the
+  map's Store card), `hub-open.webp` (facade with the doors open and the floor lit, the launch sequence's Go live
+  step). All three are the Sabya hub, retouched by MSG; their signs read ام اس جي هوريزونز correctly.
+- Held back: the wide aerial and the sunset facade. Their retouching garbled the sign ("هوررزونز", "فوريزونز").
+  They can be used once the sign is corrected, as was done for the hero facade.
+
+## Leadership outro (12 Oct 2026)
+- Portraits go in `public/leadership/ceo.jpg` and `coo.jpg`; each leader appears only once their file exists.
+- Portraits and quotes supplied by MSG (12 Oct 2026). CEO: "Turn vision into meaningful progress." COO: "Build with
+  purpose, create lasting impact." The portraits are cropped from MSG's quote cards so the text is not shown twice.
+  The Arabic quotes are our translation. Names are not yet supplied; the cards show the role only.
+

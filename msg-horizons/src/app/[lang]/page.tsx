@@ -14,6 +14,7 @@ import NetworkBand from "@/components/sections/NetworkBand";
 import GrowthBand from "@/components/sections/GrowthBand";
 import { hasPublicFile } from "@/lib/photo-slot";
 import LaunchSequence from "@/components/launch/LaunchSequence";
+import EstimatorSection from "@/components/estimator/EstimatorSection";
 import Partners from "@/components/sections/Partners";
 import Services from "@/components/sections/Services";
 import Fleet from "@/components/sections/Fleet";
@@ -45,13 +46,14 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         <Deck lang={lang} live={<LiveTracking lang={lang} />} plan={<Planner t={t} lang={lang} />} />
         <Depth><NetworkBand lang={lang} coastPhoto={hasPublicFile("coast.jpg")} /></Depth>
         <Depth><LaunchSequence t={t} lang={lang} /></Depth>
+        <Depth><EstimatorSection t={t} lang={lang} /></Depth>
         <Depth><Services t={t} lang={lang} /></Depth>
         <Depth><Fleet t={t} lang={lang} /></Depth>
         <Depth><GrowthBand lang={lang} warehousePhoto={hasPublicFile("warehouse.jpg")} /></Depth>
         <Depth><Partners lang={lang} /></Depth>
         <Depth><Proof t={t} /></Depth>
         <Depth><Gallery t={t} lang={lang} /></Depth>
-        <Depth><Enterprise t={t} /></Depth>
+        <Depth><Enterprise t={t} lang={lang} /></Depth>
         <Depth><Contact t={t} lang={lang} /></Depth>
       </main>
       <Footer t={t} lang={lang} />

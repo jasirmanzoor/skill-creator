@@ -67,15 +67,12 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
 
         <ol className="mt-10 overflow-hidden rounded-[2rem] bg-white/85 shadow-[var(--shadow-card)] ring-1 ring-teal/12">
           {/* 01 Volume: from the first order to peak season, priced live from the rate card */}
-          <li className="grid lg:grid-cols-[10.5rem_1fr]">
-            <div className="relative flex items-center gap-3 px-5 pt-6 sm:px-8 lg:flex-col lg:items-start lg:pb-8 lg:pe-0 lg:pt-8">
-              {/* the line that carries one proof into the next */}
-              
-              <span aria-hidden="true" className="absolute bottom-0 start-[2.5rem] top-[4.75rem] hidden w-px bg-teal/25 sm:start-[3.25rem] lg:block" />
-              <span className="num relative grid size-10 shrink-0 place-items-center rounded-full bg-teal-deep font-display text-sm font-semibold text-white" dir="ltr">01</span>
-              <p className="font-display text-xl font-semibold tracking-[-0.02em] text-teal-deep rtl:tracking-normal">{PROOFS[lang][0]}</p>
+          <li className="grid">
+            <div className="flex items-center gap-2.5 px-5 pt-5 sm:px-8 sm:pt-6">
+              <span className="num grid size-7 shrink-0 place-items-center rounded-full bg-teal-deep font-display text-[11px] font-semibold text-white" dir="ltr">01</span>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal rtl:tracking-normal">{PROOFS[lang][0]}</p>
             </div>
-            <div className="grid gap-5 p-5 sm:p-8 lg:grid-cols-[1.35fr_1fr]">
+            <div className="grid gap-5 p-5 pt-4 sm:p-8 sm:pt-5 lg:grid-cols-[1.35fr_1fr]">
           {/* the growth line + controls */}
           <div>
             <div role="radiogroup" aria-label={c.lane} className="flex flex-wrap gap-2">
@@ -182,19 +179,16 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
           </li>
 
           {/* 02 Capacity: the Sabya hub, MSG's own fleet and drivers */}
-          <li className="grid border-t border-teal/12 lg:grid-cols-[10.5rem_1fr]">
-            <div className="relative flex items-center gap-3 px-5 pt-6 sm:px-8 lg:flex-col lg:items-start lg:pb-8 lg:pe-0 lg:pt-8">
-              {/* the line that carries one proof into the next */}
-              <span aria-hidden="true" className="absolute start-[2.5rem] top-0 hidden h-8 w-px bg-teal/25 sm:start-[3.25rem] lg:block" />
-              <span aria-hidden="true" className="absolute bottom-0 start-[2.5rem] top-[4.75rem] hidden w-px bg-teal/25 sm:start-[3.25rem] lg:block" />
-              <span className="num relative grid size-10 shrink-0 place-items-center rounded-full bg-teal-deep font-display text-sm font-semibold text-white" dir="ltr">02</span>
-              <p className="font-display text-xl font-semibold tracking-[-0.02em] text-teal-deep rtl:tracking-normal">{PROOFS[lang][1]}</p>
+          <li className="grid border-t border-teal/12">
+            <div className="flex items-center gap-2.5 px-5 pt-5 sm:px-8 sm:pt-6">
+              <span className="num grid size-7 shrink-0 place-items-center rounded-full bg-teal-deep font-display text-[11px] font-semibold text-white" dir="ltr">02</span>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal rtl:tracking-normal">{PROOFS[lang][1]}</p>
             </div>
-            <div className="p-5 sm:p-8">
+            <div className="p-5 pt-4 sm:p-8 sm:pt-5">
         <div className="grid overflow-hidden rounded-2xl ring-1 ring-sand-900/10 lg:grid-cols-[1.4fr_1fr]">
           <div className="relative min-h-[380px] overflow-hidden sm:min-h-[460px]">
             {warehousePhoto ? (
-              <SabyaDoor alt={s.title} reduce={reduce} />
+              <SabyaDoor alt={lang === "ar" ? "مركز ام اس جي هورايزونز في صبيا من الجو، بين المستودعات المجاورة" : "The MSG Horizons Sabya hub from the air, among the neighbouring warehouses"} reduce={reduce} />
             ) : (
               <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(80%_90%_at_85%_0%,#fff6dc,rgba(255,246,220,0)_60%),linear-gradient(160deg,#f3dfb6,#e6c48b_55%,#d9ae6c)]" />
             )}
@@ -243,15 +237,13 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
           </li>
 
           {/* 03 Reach: the iMile outlet MSG owns and runs, and the district around it */}
-          <li className="grid border-t border-teal/12 lg:grid-cols-[10.5rem_1fr]">
-            <div className="relative flex items-center gap-3 px-5 pt-6 sm:px-8 lg:flex-col lg:items-start lg:pb-8 lg:pe-0 lg:pt-8">
-              {/* the line that carries one proof into the next */}
-              <span aria-hidden="true" className="absolute start-[2.5rem] top-0 hidden h-8 w-px bg-teal/25 sm:start-[3.25rem] lg:block" />
+          <li className="grid border-t border-teal/12">
+            <div className="flex items-center gap-2.5 px-5 pt-5 sm:px-8 sm:pt-6">
               
-              <span className="num relative grid size-10 shrink-0 place-items-center rounded-full bg-teal-deep font-display text-sm font-semibold text-white" dir="ltr">03</span>
-              <p className="font-display text-xl font-semibold tracking-[-0.02em] text-teal-deep rtl:tracking-normal">{PROOFS[lang][2]}</p>
+              <span className="num grid size-7 shrink-0 place-items-center rounded-full bg-teal-deep font-display text-[11px] font-semibold text-white" dir="ltr">03</span>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal rtl:tracking-normal">{PROOFS[lang][2]}</p>
             </div>
-            <div className="p-5 sm:p-8">
+            <div className="p-5 pt-4 sm:p-8 sm:pt-5">
         <div className="grid overflow-hidden rounded-2xl bg-white ring-1 ring-teal/12 sm:grid-cols-[0.8fr_1.2fr]">
           <div className="relative min-h-[300px] overflow-hidden">
             <img src="/media/msg/outlet.jpg" alt={o.alt} loading="lazy" className="absolute inset-0 size-full object-cover [object-position:50%_42%]" />
@@ -312,18 +304,21 @@ export function Money({ cur, approx = false, ar, children }: { cur: string; appr
 }
 
 /**
- * Inside MSG's Sabya hub. The hero already walks through the front door, so here the floor simply settles into
- * place as the card scrolls in.
+ * MSG's Sabya hub from the air (MSG's own photo, retouched). As the card scrolls in, the camera comes down out of
+ * the estate onto MSG's open door: first the neighbourhood of warehouses, then the one that is MSG's.
  */
+const HUB_DOOR = "50% 47%"; // the open door in hub-aerial.webp, as a share of the photo
 function SabyaDoor({ alt, reduce }: { alt: string; reduce: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "center center"] });
   const p = useSpring(scrollYProgress, { ...SPRING_SMOOTH });
-  const scale = useTransform(p, [0, 1], [1.18, 1]);
-  if (reduce) return <img src="/photos/msg/warehouse-floor.webp" alt={alt} className="absolute inset-0 size-full object-cover" loading="lazy" />;
+  const scale = useTransform(p, [0, 1], [1, 1.32]);
+  const y = useTransform(p, [0, 1], ["-4%", "0%"]);
+  const src = "/media/msg/hub-aerial.webp";
+  if (reduce) return <img src={src} alt={alt} className="absolute inset-0 size-full object-cover" style={{ objectPosition: HUB_DOOR }} loading="lazy" />;
   return (
-    <div ref={ref} className="absolute inset-0">
-      <motion.img src="/photos/msg/warehouse-floor.webp" alt={alt} loading="lazy" style={{ scale }} className="absolute inset-0 size-full object-cover" />
+    <div ref={ref} className="absolute inset-0 overflow-hidden">
+      <motion.img src={src} alt={alt} loading="lazy" style={{ scale, y, transformOrigin: HUB_DOOR, objectPosition: HUB_DOOR }} className="absolute inset-0 size-full object-cover" />
     </div>
   );
 }
