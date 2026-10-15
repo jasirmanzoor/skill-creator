@@ -244,6 +244,32 @@ a { text-underline-offset: 0.2em; }
 .plan-dash {
   animation: plan-dash 1.15s linear infinite;
 }
+/* the plan builder's console (components/sections/Planner.tsx): a light running round its edge, chips that switch on */
+@property --plan-a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+.plan-glow {
+  background: conic-gradient(from var(--plan-a), rgba(76, 201, 122, 0) 0deg, rgba(76, 201, 122, 0.75) 50deg, rgba(108, 195, 195, 0) 130deg, rgba(108, 195, 195, 0) 210deg, rgba(184, 245, 207, 0.5) 290deg, rgba(76, 201, 122, 0) 360deg);
+  animation: plan-spin 10s linear infinite;
+}
+@keyframes plan-spin { to { --plan-a: 360deg; } }
+@keyframes plan-chip { 0% { transform: scale(0.92); box-shadow: 0 0 0 0 rgba(76, 201, 122, 0.7); } 60% { box-shadow: 0 0 0 8px rgba(76, 201, 122, 0); } 100% { transform: scale(1); } }
+@keyframes opt-pop { 0% { transform: scale(0.4); } 70% { transform: scale(1.15); } 100% { transform: scale(1); } }
+@keyframes cam-scan { from { transform: translateY(-100%); } to { transform: translateY(500%); } }
+@media (prefers-reduced-motion: reduce) { .plan-glow { animation: none; } }
+
+/* the services' live panels (components/services/ServiceView.tsx): each loop shows the service doing its job */
+.svc-draw { stroke-dasharray: 1; animation: svc-draw 4s var(--ease-in-out) infinite; }
+@keyframes svc-draw { 0% { stroke-dashoffset: 1; } 55%, 85% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+.svc-land { transform-box: fill-box; transform-origin: center; animation: svc-land 4s var(--ease-out) infinite; }
+@keyframes svc-land { 0%, 50% { transform: scale(0.4); opacity: 0.35; } 62% { transform: scale(1.2); opacity: 1; } 70%, 100% { transform: scale(1); opacity: 1; } }
+.svc-gauge { stroke-dasharray: 1; animation: svc-gauge 4s var(--ease-in-out) infinite; }
+@keyframes svc-gauge { 0% { stroke-dashoffset: 1; } 50%, 90% { stroke-dashoffset: 0.18; } 100% { stroke-dashoffset: 1; } }
+@keyframes svc-swap-a { 0%, 45% { transform: translateY(0); opacity: 1; } 55%, 90% { transform: translateY(-100%); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+@keyframes svc-swap-b { 0%, 45% { transform: translateY(100%); opacity: 0; } 55%, 90% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(100%); opacity: 0; } }
+@keyframes svc-pick { 0%, 100% { transform: none; box-shadow: none; } 15%, 35% { transform: translateY(-3px) scale(1.15); box-shadow: 0 0 0 2px #fff, 0 0 0 4px #0f9641; } 50% { transform: none; box-shadow: none; } }
+@keyframes svc-tick { 0% { opacity: 0; transform: translateY(6px) scale(0.96); } 12%, 85% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+@keyframes svc-bar { 0% { transform: scaleX(0); } 45%, 85% { transform: scaleX(1); } 100% { transform: scaleX(1); opacity: 0.3; } }
+@media (prefers-reduced-motion: reduce) { .svc-draw, .svc-land, .svc-gauge { animation: none; stroke-dashoffset: 0; } }
+
 @keyframes plan-ping {
   0% { transform: scale(0.45); opacity: 0.65; }
   100% { transform: scale(2.7); opacity: 0; }

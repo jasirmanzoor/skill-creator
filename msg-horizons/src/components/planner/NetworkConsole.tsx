@@ -704,6 +704,14 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
               onStatus={(s) => (s === "failed" ? setMapFailed(true) : setMapReady(true))}
             />
           ) : null}
+          {/* the viewfinder: this is a camera following your route, not a picture of it */}
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[1]">
+            <div className="absolute inset-0 shadow-[inset_0_0_80px_rgba(11,58,64,0.18)]" />
+            <span className="absolute inset-x-0 top-0 h-1/5 bg-[linear-gradient(180deg,transparent,rgba(19,113,121,0.06)_70%,rgba(19,113,121,0.16))] motion-safe:animate-[cam-scan_7s_var(--ease-in-out)_infinite] motion-reduce:hidden" />
+            {(["start-2.5 top-14 border-s-2 border-t-2 rounded-ss-lg", "end-2.5 top-14 border-e-2 border-t-2 rounded-se-lg", "start-2.5 bottom-2.5 border-s-2 border-b-2 rounded-es-lg", "end-2.5 bottom-2.5 border-e-2 border-b-2 rounded-ee-lg"]).map((k) => (
+              <span key={k} className={`absolute size-5 border-teal-deep/45 ${k}`} />
+            ))}
+          </div>
           {mode !== "canvas" && !mapReady ? (
             <div aria-hidden="true" className="absolute inset-0 grid place-items-center bg-[radial-gradient(70%_60%_at_50%_40%,#d6ebe9,#e9f3f2)]">
               <span className="size-9 animate-spin rounded-full border-[3px] border-teal/20 border-t-teal motion-reduce:animate-none" />
