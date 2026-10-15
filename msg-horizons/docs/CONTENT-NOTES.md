@@ -143,6 +143,17 @@ Domain: the website goes on www.msg-horizons.com only. msg-horizons.com (apex) s
 - Held back: the wide aerial and the sunset facade. Their retouching garbled the sign ("هوررزونز", "فوريزونز").
   They can be used once the sign is corrected, as was done for the hero facade.
 
+## Hero redesign: the console (15 Oct 2026)
+- The opening screen is now MSG's network shown as a control console (`src/components/hero/Command.tsx`). Headline:
+  "The Kingdom's delivery network. Already running." The eyebrow carries the search line, "Last-mile delivery and
+  logistics across Saudi Arabia".
+- Everything on the console is either verified or labelled: the map ("Illustrative network view"), the order card
+  ("Illustrative order"; its steps are the ones MSG runs for every order), the price (MSG's rate card, inside
+  `aside[data-rate-card]`), and the figures under it from `facts.ts` (1,000+ couriers, 100+ vehicles, SAR 20M+,
+  1,000 m² Sabya hub, 24/7). The partner line lists `facts.partners` as text only.
+- The facade and interior walk-in left the hero; the facade still opens the "Why MSG" section. The backdrop is
+  `hub-aerial.webp`, toned down.
+
 ## Leadership outro (12 Oct 2026)
 - Portraits go in `public/leadership/ceo.jpg` and `coo.jpg`; each leader appears only once their file exists.
 - Portraits and quotes supplied by MSG (12 Oct 2026). CEO: "Turn vision into meaningful progress." COO: "Build with

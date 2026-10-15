@@ -405,6 +405,11 @@ html.lenis-on, html.lenis-on body { height: auto; }
 @keyframes hi-line { from { transform: translateY(112%); } }
 @keyframes hi-rise { from { opacity: 0; transform: translateY(18px); } }
 @keyframes hi-fade { from { opacity: 0; } }
+.hi-console { animation: hi-console 1.5s var(--ease-out-expo) var(--hi, 0s) both; }
+@keyframes hi-console { from { opacity: 0; transform: translateY(70px) rotateX(28deg) scale(0.92); } }
+/* the console's floor and scan (components/hero/Command.tsx) */
+@keyframes cmd-floor { to { background-position: 0 64px; } }
+@keyframes cmd-scan { from { transform: translateY(-100%); } to { transform: translateY(420%); } }
 [data-intro="skip"] .hi { animation: none !important; }
 /* once the walk-in has left the facade behind, its ambient loops stop */
 [data-idle], [data-idle] *, [data-offscreen] * { animation-play-state: paused !important; }
