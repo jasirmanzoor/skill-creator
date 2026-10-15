@@ -128,10 +128,13 @@ export function OrderTicker({ c, run, reduce, className = "" }: { c: C; run: boo
   );
 }
 
-/** the console: MSG's network on a screen, tilted toward the visitor, with the lane switch under it */
+/**
+ * The console: MSG's network on a screen, tilted toward the visitor. Over the network view the lane switch sits
+ * under the map; while one order's stages play (`stage` 0–3) the map's camera follows the order instead.
+ */
 export function ConsoleWindow({
-  c, lang, lane, onLane, map, title,
-}: { c: C; lang: Locale; lane: HeroLane; onLane: (l: HeroLane) => void; map: boolean; title: string }) {
+  c, lang, lane, onLane, map, title, stage = -1,
+}: { c: C; lang: Locale; lane: HeroLane; onLane: (l: HeroLane) => void; map: boolean; title: string; stage?: number }) {
   return (
     <div className="rounded-[26px] bg-[linear-gradient(160deg,rgba(255,255,255,0.16),rgba(255,255,255,0.04))] p-2 shadow-[0_60px_120px_-40px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.25)] ring-1 ring-white/15">
       <div className="flex items-center gap-3 px-3 pb-2 pt-1.5">
@@ -141,14 +144,14 @@ export function ConsoleWindow({
       </div>
       <div className="relative overflow-hidden rounded-[20px] bg-[radial-gradient(80%_70%_at_70%_20%,#d6f0ee_0%,rgba(214,240,238,0)_70%),linear-gradient(180deg,#f3fbfb,#e6f5f4)]">
         <div className="relative aspect-[1100/850]">
-          {map ? <HeroMap lang={lang} lane={lane} /> : null}
+          {map ? <HeroMap lang={lang} lane={lane} stage={stage} /> : null}
           {/* the scan: the picture is refreshed, not printed */}
           <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-1/4 bg-[linear-gradient(180deg,transparent,rgba(19,113,121,0.08)_70%,rgba(19,113,121,0.22))] motion-safe:animate-[cmd-scan_6s_var(--ease-in-out)_infinite] motion-reduce:hidden" />
           <p className="absolute bottom-2 start-3 text-[10px] text-teal-deep/70">{c.map.caption}</p>
         </div>
       </div>
       {/* the lane switch sits clear of the order card that overlaps the console's lower corner */}
-      <div role="radiogroup" aria-label={c.command.lanes} className="mt-2 ms-auto grid w-[60%] grid-cols-3 gap-1 rounded-full bg-black/25 p-1 ring-1 ring-white/10 max-lg:hidden">
+      <div role="radiogroup" aria-label={c.command.lanes} inert={stage >= 0} className={`mt-2 ms-auto grid w-[60%] grid-cols-3 gap-1 rounded-full bg-black/25 p-1 ring-1 ring-white/10 transition-opacity duration-300 max-lg:hidden ${stage >= 0 ? "opacity-0" : ""}`}>
         {(["intra", "inter", "sabya"] as const).map((k) => (
           <button key={k} type="button" role="radio" aria-checked={lane === k} onClick={() => onLane(k)} className="tap relative whitespace-nowrap rounded-full px-1.5 py-1.5 text-[11px] font-semibold xl:text-[12px]">
             {lane === k ? <motion.span layoutId="cmd-lane" transition={{ type: "spring", ...SPRING_UI }} className="absolute inset-0 rounded-full bg-white" /> : null}

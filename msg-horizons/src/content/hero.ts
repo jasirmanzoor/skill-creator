@@ -25,8 +25,13 @@ type Copy = {
     wa: string;
   };
   map: { label: string; hub: string; sabya: string; delivered: string; caption: string };
-  /** the opening screen: MSG's network as a live control console (components/hero/Command.tsx) */
+  /** the warehouse walk-in: real MSG photos (public/media/msg, see docs/CONTENT-NOTES.md) */
+  facade: { alt: string; caption: string; hint: string };
+  inside: { eyebrow: string; title: string; lead: string; alt: string; spots: { storage: string; sorting: string; dispatch: string } };
+  /** after the walk-in: MSG's network as a live control console (components/hero/Command.tsx) */
   command: {
+    title: string[];
+    lead: string;
     /** the lead on phones, where the console needs the room */
     leadShort: string;
     waShort: string;
@@ -56,8 +61,8 @@ type Copy = {
 export const heroCopy: Record<Locale, Copy> = {
   en: {
     live: "Operating now · Riyadh · 24/7",
-    title: ["The Kingdom's delivery network.", "Already running."],
-    lead: "MSG Horizons owns the vans, employs the drivers and runs the hub. Your stock is stored, delivered, tracked live and paid back by one accountable team, with the licences and compliance already in place.",
+    title: ["You have something to sell.", "We already have the drivers."],
+    lead: "Have a product, an idea or a shop that should be selling online? MSG runs the storage, shipping and delivery, with the licences, compliance and people already in place. Price a delivery in ten seconds.",
     ctaPlan: "Build my logistics plan",
     ctaTalk: "Talk to MSG on WhatsApp",
     stats: [
@@ -87,6 +92,8 @@ export const heroCopy: Record<Locale, Copy> = {
       caption: "Illustrative network view",
     },
     command: {
+      title: ["The Kingdom's delivery network.", "Already running."],
+      lead: "MSG Horizons owns the vans, employs the drivers and runs the hub. Your stock is stored, delivered, tracked live and paid back by one accountable team, with the licences and compliance already in place.",
       leadShort: "Our own vans, in-house drivers and our own hub. Stored, delivered, tracked live and paid back by one accountable team.",
       waShort: "WhatsApp",
       eyebrow: "Last-mile delivery and logistics across Saudi Arabia",
@@ -118,9 +125,21 @@ export const heroCopy: Record<Locale, Copy> = {
       ],
       hint: "Scroll into the network",
     },
+    facade: {
+      alt: "The MSG Horizons Sabya hub, with the company sign above the open loading door",
+      caption: "Our Sabya hub. Real photo, retouched for presentation.",
+      hint: "Scroll to step inside",
+    },
+    inside: {
+      eyebrow: "Inside the Sabya hub",
+      title: "Stored, sorted and sent out, under one roof.",
+      lead: "Racks for your stock, cages for sorting, and a floor ready for every pickup and dispatch.",
+      alt: "Inside the MSG Horizons Sabya hub: racks of parcels, sorting cages and an open floor",
+      spots: { storage: "Your stock, on racks", sorting: "Sorting", dispatch: "Ready for dispatch" },
+    },
     kingdom: {
-      eyebrow: "Inside the network",
-      title: "From your shelf to your customer's door.",
+      eyebrow: "Then out across the Kingdom",
+      title: "From this floor to your customer's door.",
       lead: "Line-haul between cities, then couriers to the door, every day of the week. One MSG team accountable at every step.",
       rail: "One order through MSG",
       hint: "Keep scrolling to follow one order",
@@ -140,8 +159,8 @@ export const heroCopy: Record<Locale, Copy> = {
   },
   ar: {
     live: "نعمل الآن · الرياض · على مدار الساعة",
-    title: ["شبكة التوصيل في المملكة.", "تعمل الآن."],
-    lead: "ام اس جي هورايزونز تملك المركبات، ومناديبها من فريقها، وتدير مركزها بنفسها. مخزونك يُخزَّن ويُوصَّل ويُتتبَّع مباشرة وتعود أمواله إليك عبر فريق واحد مسؤول، مع التراخيص والامتثال جاهزة مسبقاً.",
+    title: ["لديك ما تبيعه.", "ولدينا المناديب بالفعل."],
+    lead: "لديك منتج أو فكرة أو متجر يجب أن يبيع أونلاين؟ ام اس جي تتولى التخزين والشحن والتوصيل، مع التراخيص والامتثال والفريق جاهزة مسبقاً. احسب تكلفة التوصيل في عشر ثوانٍ.",
     ctaPlan: "ابنِ خطتك اللوجستية",
     ctaTalk: "تحدث مع ام اس جي عبر واتساب",
     stats: [
@@ -171,6 +190,8 @@ export const heroCopy: Record<Locale, Copy> = {
       caption: "عرض توضيحي للشبكة",
     },
     command: {
+      title: ["شبكة التوصيل في المملكة.", "تعمل الآن."],
+      lead: "ام اس جي هورايزونز تملك المركبات، ومناديبها من فريقها، وتدير مركزها بنفسها. مخزونك يُخزَّن ويُوصَّل ويُتتبَّع مباشرة وتعود أمواله إليك عبر فريق واحد مسؤول، مع التراخيص والامتثال جاهزة مسبقاً.",
       leadShort: "مركباتنا الخاصة، ومناديب من فريقنا، ومركزنا الخاص. تخزين وتوصيل وتتبع مباشر وتحصيل أموالك عبر فريق واحد مسؤول.",
       waShort: "واتساب",
       eyebrow: "توصيل الميل الأخير والخدمات اللوجستية في السعودية",
@@ -202,9 +223,21 @@ export const heroCopy: Record<Locale, Copy> = {
       ],
       hint: "مرّر لتدخل الشبكة",
     },
+    facade: {
+      alt: "مركز ام اس جي هورايزونز في صبيا، ولوحة الشركة فوق باب التحميل المفتوح",
+      caption: "مركزنا في صبيا. صورة حقيقية مُحسَّنة للعرض.",
+      hint: "مرّر لتدخل",
+    },
+    inside: {
+      eyebrow: "داخل مركز صبيا",
+      title: "تخزين وفرز وانطلاق، تحت سقف واحد.",
+      lead: "أرفف لمخزونك، وأقفاص للفرز، وأرضية جاهزة لكل استلام وشحن.",
+      alt: "داخل مركز ام اس جي هورايزونز في صبيا: أرفف طرود وأقفاص فرز وأرضية مفتوحة",
+      spots: { storage: "مخزونك على الأرفف", sorting: "الفرز", dispatch: "جاهز للشحن" },
+    },
     kingdom: {
-      eyebrow: "داخل الشبكة",
-      title: "من رفّك إلى باب عميلك.",
+      eyebrow: "ثم إلى أنحاء المملكة",
+      title: "من هذه الأرضية إلى باب عميلك.",
       lead: "نقل بين المدن، ثم مناديب حتى الباب، كل أيام الأسبوع. فريق واحد من ام اس جي مسؤول عن كل خطوة.",
       rail: "طلب واحد عبر ام اس جي",
       hint: "واصل التمرير لتتبع طلباً واحداً",
