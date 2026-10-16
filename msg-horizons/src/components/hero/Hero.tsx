@@ -40,7 +40,18 @@ const FACADE = {
  * network console holds for HOLD, then one order's four stages (set up, store, deliver, settle) share the rest,
  * played inside the same console. The section's height keeps the walk-in over the distance it always had.
  */
-const WALK = 0.36, HOLD = 0.1, STEP = (1 - WALK - HOLD) / STAGE_COUNT;
+const WALK = 0.478, HOLD = 0.0816, STEP = (1 - WALK - HOLD) / STAGE_COUNT;
+/*
+ * Inside the walk-in, scroll is not spent evenly: the facade and the push through the door keep their pace, but
+ * the warehouse floor gets most of the distance, so the visitor has time to stand inside, see the lights come on
+ * and read what happens where before the view moves on. `walkTime` maps the scroll through the walk-in (0 → 1)
+ * onto the scene's timeline (0 → 1): facade to the door [0, 0.45], inside [0.45, 0.8], out to the network [0.8, 1].
+ */
+const WARP = { door: 0.275, floor: 0.875 };
+const walkTime = (r: number) =>
+  r <= WARP.door ? (r / WARP.door) * 0.45
+    : r <= WARP.floor ? 0.45 + ((r - WARP.door) / (WARP.floor - WARP.door)) * 0.35
+      : 0.8 + ((r - WARP.floor) / (1 - WARP.floor)) * 0.2;
 const stageAt = (v: number) => (v < WALK + HOLD ? -1 : Math.min(STAGE_COUNT - 1, Math.floor((v - WALK - HOLD) / STEP)));
 /** the console's resting tilt toward the visitor (degrees); it eases to about half while an order plays */
 const TILT = { x: 9, y: 13 };
@@ -121,7 +132,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   // how far through the four stages the scroll is (0 → 1), for the stage rail's fill
   const sp = useMotionValue(0);
   useMotionValueEvent(scrollYProgress, "change", (v) => {
-    const w = Math.min(1, v / WALK);
+    const w = walkTime(Math.min(1, v / WALK));
     p.set(w);
     const b = w < 0.2 ? 1 : w < 0.8 ? 2 : 3;
     setBeat((x) => (x === b ? x : b));
@@ -203,9 +214,15 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   const inOpacity = useTransform(p, [0.42, 0.46, 0.77, 0.85], [0, 1, 1, 0]);
   const inDark = useTransform(p, [0.44, 0.465, 0.48, 0.5, 0.53], [0.94, 0.4, 0.78, 0.15, 0]);
   const inScale = useTransform(p, [0.43, 0.8, 0.86], [1.22, 1, 0.92]);
+  // a slow dolly across the floor while the visitor stands inside
+  const inPan = useTransform(p, [0.46, 0.8], ["1.6%", "-1.6%"]);
   const lamps = useTransform(p, [0.465, 0.49, 0.53], [0, 1, 0.8]);
-  const inCopy = useTransform(p, [0.52, 0.57, 0.72, 0.78], [0, 1, 1, 0]);
-  const inCopyY = useTransform(p, [0.52, 0.57], [30, 0]);
+  const inCopy = useTransform(p, [0.5, 0.54, 0.74, 0.78], [0, 1, 1, 0]);
+  const inCopyY = useTransform(p, [0.5, 0.54], [30, 0]);
+  // what happens where, one place at a time: the shelves, then sorting, then the dispatch door
+  const spotStorage = useTransform(p, [0.55, 0.58, 0.76, 0.79], [0, 1, 1, 0]);
+  const spotSorting = useTransform(p, [0.61, 0.64, 0.76, 0.79], [0, 1, 1, 0]);
+  const spotDispatch = useTransform(p, [0.67, 0.7, 0.76, 0.79], [0, 1, 1, 0]);
 
   // out to the network: the console rises out of the night and settles, tilted toward the visitor
   const cO = useTransform(p, [0.78, 0.9], [0, 1]);
@@ -433,11 +450,11 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
 
   return (
     <>
-    <section id="hero" ref={section} suppressHydrationWarning aria-labelledby="hero-title" className="relative h-[460svh] bg-deep lg:h-[620svh]">
+    <section id="hero" ref={section} suppressHydrationWarning aria-labelledby="hero-title" className="relative h-[540svh] bg-deep lg:h-[740svh]">
       {/* runs before first paint: a returning visitor, or a page restored part-way down, skips the opening */}
       <script dangerouslySetInnerHTML={{ __html: INTRO_GATE }} />
       {/* where "one order through MSG" begins: the first of the four stages, to the end of the hero */}
-      <div id="sellers" aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 top-[176svh] lg:top-[255svh]" />
+      <div id="sellers" aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 top-[259svh] lg:top-[377svh]" />
       <div
         ref={frame}
         data-theme="dark"
@@ -450,7 +467,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
         <motion.div aria-hidden="true" style={{ opacity: veil }} className="absolute inset-0 z-[2] bg-[#030a0b]" />
 
         <motion.div style={{ opacity: inOpacity }} className="absolute inset-0 z-[3]">
-          <Interior c={c} dark={inDark} scale={inScale} lamps={lamps} copy={inCopy} />
+          <Interior c={c} dark={inDark} scale={inScale} pan={inPan} lamps={lamps} spots={{ storage: spotStorage, sorting: spotSorting, dispatch: spotDispatch }} />
         </motion.div>
 
         <motion.div style={{ opacity: cBack }} className="absolute inset-0 z-[4]"><CommandBackdrop /></motion.div>
@@ -577,13 +594,15 @@ const ROUTES = [
   "M630 702 C 640 800 600 930 560 1120",
 ];
 
+type Spot = "storage" | "sorting" | "dispatch";
+
 function Interior({
-  c, dark, scale, lamps, copy,
+  c, dark, scale, pan, lamps, spots,
 }: {
-  c: C; dark?: MotionValue<number>; scale?: MotionValue<number>; lamps?: MotionValue<number>; copy?: MotionValue<number>;
+  c: C; dark?: MotionValue<number>; scale?: MotionValue<number>; pan?: MotionValue<string>; lamps?: MotionValue<number>; spots?: Record<Spot, MotionValue<number>>;
 }) {
   return (
-    <motion.div className="absolute inset-0 overflow-hidden" style={{ scale }}>
+    <motion.div className="absolute inset-0 overflow-hidden" style={{ scale, x: pan }}>
       {([["hidden landscape:block", INSIDE_WIDE], ["hidden portrait:block", INSIDE_TALL]] as const).map(([vis, v]) => (
         <div key={v.src} className={`absolute inset-0 ${vis}`}>
           <div className="absolute" style={cover(v.ar, 0.5, 0.5)}>
@@ -599,18 +618,18 @@ function Interior({
               ))}
             </motion.div>
             {/* what happens where */}
-            <motion.div className="absolute inset-0" style={{ opacity: copy }}>
+            <div className="absolute inset-0">
               {(["storage", "sorting", "dispatch"] as const).map((k) => (
                 // labels open toward the middle of the picture so they never run off its edge
-                <span key={k} className={`absolute flex -translate-y-1/2 items-center gap-2 ${v.spots[k].x > 0.55 ? "-translate-x-[calc(100%-10px)] flex-row-reverse" : "-translate-x-[10px]"}`} style={at(v.spots[k])} dir="ltr">
+                <motion.span key={k} className={`absolute flex -translate-y-1/2 items-center gap-2 ${v.spots[k].x > 0.55 ? "-translate-x-[calc(100%-10px)] flex-row-reverse" : "-translate-x-[10px]"}`} style={{ ...at(v.spots[k]), opacity: spots?.[k] }} dir="ltr">
                   <span className="relative grid size-5 place-items-center">
                     <span className="absolute inset-0 rounded-full bg-brand-bright/50 motion-safe:animate-ping" />
                     <span className="relative size-2.5 rounded-full bg-brand-bright ring-2 ring-white" />
                   </span>
                   <span dir="auto" className="whitespace-nowrap rounded-full bg-black/55 px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/20 backdrop-blur">{c.inside.spots[k]}</span>
-                </span>
+                </motion.span>
               ))}
-            </motion.div>
+            </div>
           </div>
         </div>
       ))}
