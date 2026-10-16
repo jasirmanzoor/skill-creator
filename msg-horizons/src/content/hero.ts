@@ -27,7 +27,14 @@ type Copy = {
   map: { label: string; hub: string; sabya: string; delivered: string; caption: string };
   /** the warehouse walk-in: real MSG photos (public/media/msg, see docs/CONTENT-NOTES.md) */
   facade: { alt: string; caption: string; hint: string };
-  inside: { eyebrow: string; title: string; lead: string; alt: string; spots: { storage: string; sorting: string; dispatch: string } };
+  inside: {
+    eyebrow: string; title: string; lead: string; alt: string;
+    spots: { storage: string; sorting: string; dispatch: string };
+    /** the glass window each point opens on hover, tap or focus */
+    details: { storage: string; sorting: string; dispatch: string };
+    /** shown beside the first point on phones, where the labels give way to the points alone */
+    tap: string;
+  };
   /** after the walk-in: MSG's network as a live control console (components/hero/Command.tsx) */
   command: {
     title: string[];
@@ -136,6 +143,12 @@ export const heroCopy: Record<Locale, Copy> = {
       lead: "Racks for your stock, cages for sorting, and a floor ready for every pickup and dispatch.",
       alt: "Inside the MSG Horizons Sabya hub: racks of parcels, sorting cages and an open floor",
       spots: { storage: "Your stock, on racks", sorting: "Sorting", dispatch: "Ready for dispatch" },
+      details: {
+        storage: "Secure storage with smart inventory control, in MSG's 1,000 m² Sabya hub.",
+        sorting: "Orders are packed, labelled and sorted by route before they leave the floor.",
+        dispatch: "Loaded onto MSG's own vans, driven by MSG's in-house drivers, out to the door or between cities.",
+      },
+      tap: "Tap a point to look closer",
     },
     kingdom: {
       eyebrow: "Then out across the Kingdom",
@@ -234,6 +247,12 @@ export const heroCopy: Record<Locale, Copy> = {
       lead: "أرفف لمخزونك، وأقفاص للفرز، وأرضية جاهزة لكل استلام وشحن.",
       alt: "داخل مركز ام اس جي هورايزونز في صبيا: أرفف طرود وأقفاص فرز وأرضية مفتوحة",
       spots: { storage: "مخزونك على الأرفف", sorting: "الفرز", dispatch: "جاهز للشحن" },
+      details: {
+        storage: "تخزين آمن مع تحكم ذكي في المخزون، في مركز ام اس جي في صبيا بمساحة 1,000 م².",
+        sorting: "تُغلَّف الطلبات وتُلصق وتُفرز حسب المسار قبل أن تغادر الأرضية.",
+        dispatch: "تُحمَّل على مركبات ام اس جي الخاصة، يقودها مناديب من فريقها، إلى الباب أو بين المدن.",
+      },
+      tap: "اضغط على نقطة لترى عن قرب",
     },
     kingdom: {
       eyebrow: "ثم إلى أنحاء المملكة",

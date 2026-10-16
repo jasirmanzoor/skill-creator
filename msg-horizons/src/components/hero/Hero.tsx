@@ -43,9 +43,9 @@ const FACADE = {
 const WALK = 0.478, HOLD = 0.0816, STEP = (1 - WALK - HOLD) / STAGE_COUNT;
 /*
  * Inside the walk-in, scroll is not spent evenly: the facade and the push through the door keep their pace, but
- * the warehouse floor gets most of the distance, so the visitor has time to stand inside, see the lights come on
- * and read what happens where before the view moves on. `walkTime` maps the scroll through the walk-in (0 → 1)
- * onto the scene's timeline (0 → 1): facade to the door [0, 0.45], inside [0.45, 0.8], out to the network [0.8, 1].
+ * the warehouse floor gets most of the distance, so the visitor has time to stand inside before the view moves
+ * on. `walkTime` maps the scroll through the walk-in (0 → 1) onto the scene's timeline (0 → 1): facade to the
+ * door [0, 0.45], inside [0.45, 0.8], out to the network [0.8, 1]. The console and the stages keep their distances.
  */
 const WARP = { door: 0.275, floor: 0.875 };
 const walkTime = (r: number) =>
@@ -214,15 +214,9 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   const inOpacity = useTransform(p, [0.42, 0.46, 0.77, 0.85], [0, 1, 1, 0]);
   const inDark = useTransform(p, [0.44, 0.465, 0.48, 0.5, 0.53], [0.94, 0.4, 0.78, 0.15, 0]);
   const inScale = useTransform(p, [0.43, 0.8, 0.86], [1.22, 1, 0.92]);
-  // a slow dolly across the floor while the visitor stands inside
-  const inPan = useTransform(p, [0.46, 0.8], ["1.6%", "-1.6%"]);
   const lamps = useTransform(p, [0.465, 0.49, 0.53], [0, 1, 0.8]);
-  const inCopy = useTransform(p, [0.5, 0.54, 0.74, 0.78], [0, 1, 1, 0]);
-  const inCopyY = useTransform(p, [0.5, 0.54], [30, 0]);
-  // what happens where, one place at a time: the shelves, then sorting, then the dispatch door
-  const spotStorage = useTransform(p, [0.55, 0.58, 0.76, 0.79], [0, 1, 1, 0]);
-  const spotSorting = useTransform(p, [0.61, 0.64, 0.76, 0.79], [0, 1, 1, 0]);
-  const spotDispatch = useTransform(p, [0.67, 0.7, 0.76, 0.79], [0, 1, 1, 0]);
+  const inCopy = useTransform(p, [0.52, 0.57, 0.72, 0.78], [0, 1, 1, 0]);
+  const inCopyY = useTransform(p, [0.52, 0.57], [30, 0]);
 
   // out to the network: the console rises out of the night and settles, tilted toward the visitor
   const cO = useTransform(p, [0.78, 0.9], [0, 1]);
@@ -467,10 +461,10 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
         <motion.div aria-hidden="true" style={{ opacity: veil }} className="absolute inset-0 z-[2] bg-[#030a0b]" />
 
         <motion.div style={{ opacity: inOpacity }} className="absolute inset-0 z-[3]">
-          <Interior c={c} dark={inDark} scale={inScale} pan={inPan} lamps={lamps} spots={{ storage: spotStorage, sorting: spotSorting, dispatch: spotDispatch }} />
+          <Interior c={c} dark={inDark} scale={inScale} lamps={lamps} copy={inCopy} live={beat === 2} />
         </motion.div>
 
-        <motion.div style={{ opacity: cBack }} className="absolute inset-0 z-[4]"><CommandBackdrop /></motion.div>
+        <motion.div style={{ opacity: cBack }} className="pointer-events-none absolute inset-0 z-[4]"><CommandBackdrop /></motion.div>
 
         {/* scene copy */}
         <motion.div style={{ opacity: uiOut, y: uiY }} inert={beat !== 1} className="absolute inset-0 z-[5] pt-20">
@@ -597,12 +591,26 @@ const ROUTES = [
 type Spot = "storage" | "sorting" | "dispatch";
 
 function Interior({
-  c, dark, scale, pan, lamps, spots,
+  c, dark, scale, lamps, copy, live = true,
 }: {
-  c: C; dark?: MotionValue<number>; scale?: MotionValue<number>; pan?: MotionValue<string>; lamps?: MotionValue<number>; spots?: Record<Spot, MotionValue<number>>;
+  c: C; dark?: MotionValue<number>; scale?: MotionValue<number>; lamps?: MotionValue<number>; copy?: MotionValue<number>;
+  /** whether the points can be opened (the inside is on screen) */
+  live?: boolean;
 }) {
+  // one glass window open at a time
+  const [open, setOpen] = useState<Spot | null>(null);
+  const [seen, setSeen] = useState(false);
+  const show = (k: Spot | null) => { setOpen(k); if (k) setSeen(true); };
+  useEffect(() => {
+    if (!open) return;
+    const away = (e: PointerEvent) => { if (!(e.target as HTMLElement).closest?.("[data-spot]")) setOpen(null); };
+    const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(null); };
+    document.addEventListener("pointerdown", away);
+    document.addEventListener("keydown", esc);
+    return () => { document.removeEventListener("pointerdown", away); document.removeEventListener("keydown", esc); };
+  }, [open]);
   return (
-    <motion.div className="absolute inset-0 overflow-hidden" style={{ scale, x: pan }}>
+    <motion.div className="absolute inset-0 overflow-hidden" style={{ scale }}>
       {([["hidden landscape:block", INSIDE_WIDE], ["hidden portrait:block", INSIDE_TALL]] as const).map(([vis, v]) => (
         <div key={v.src} className={`absolute inset-0 ${vis}`}>
           <div className="absolute" style={cover(v.ar, 0.5, 0.5)}>
@@ -618,18 +626,19 @@ function Interior({
               ))}
             </motion.div>
             {/* what happens where */}
-            <div className="absolute inset-0">
-              {(["storage", "sorting", "dispatch"] as const).map((k) => (
-                // labels open toward the middle of the picture so they never run off its edge
-                <motion.span key={k} className={`absolute flex -translate-y-1/2 items-center gap-2 ${v.spots[k].x > 0.55 ? "-translate-x-[calc(100%-10px)] flex-row-reverse" : "-translate-x-[10px]"}`} style={{ ...at(v.spots[k]), opacity: spots?.[k] }} dir="ltr">
-                  <span className="relative grid size-5 place-items-center">
-                    <span className="absolute inset-0 rounded-full bg-brand-bright/50 motion-safe:animate-ping" />
-                    <span className="relative size-2.5 rounded-full bg-brand-bright ring-2 ring-white" />
-                  </span>
-                  <span dir="auto" className="whitespace-nowrap rounded-full bg-black/55 px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/20 backdrop-blur">{c.inside.spots[k]}</span>
-                </motion.span>
+            <motion.div className={`absolute inset-0 ${live ? "" : "pointer-events-none"}`} style={{ opacity: copy }}>
+              {(["storage", "sorting", "dispatch"] as const).map((k, i) => (
+                <Hotspot
+                  key={k}
+                  at={v.spots[k]}
+                  label={c.inside.spots[k]}
+                  detail={c.inside.details[k]}
+                  hint={i === 0 && !seen ? c.inside.tap : undefined}
+                  open={open === k}
+                  onOpen={(o) => show(o ? k : null)}
+                />
               ))}
-            </div>
+            </motion.div>
           </div>
         </div>
       ))}
@@ -735,5 +744,67 @@ function StagesStacked({ lang }: { lang: Locale }) {
         ))}
       </div>
     </div>
+  );
+}
+
+/**
+ * One point on the warehouse floor: a pulsing dot (with its label on wide screens) that opens a translucent
+ * glass window of detail on hover, tap or keyboard focus. The window grows out of the dot it belongs to, quickly
+ * in and quicker out, and opens toward the middle of the picture so it never runs off the edge.
+ */
+function Hotspot({
+  at: pt, label, detail, hint, open, onOpen,
+}: { at: Pt; label: string; detail: string; hint?: string; open: boolean; onOpen: (o: boolean) => void }) {
+  const right = pt.x > 0.55; // the label opens toward the middle
+  // the window opens toward the middle too; a point near the middle centres its window over the dot
+  const side = pt.x > 0.62 ? "right" : pt.x < 0.38 ? "left" : "center";
+  const id = `spot-${label.replace(/\W+/g, "-").toLowerCase()}`;
+  return (
+    <span data-spot className="absolute size-11" style={{ ...at(pt), translate: "-50% -50%" }} dir="ltr">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-describedby={open ? id : undefined}
+        aria-label={label}
+        onPointerEnter={(e) => { if (e.pointerType === "mouse") onOpen(true); }}
+        onPointerLeave={(e) => { if (e.pointerType === "mouse") onOpen(false); }}
+        onClick={() => onOpen(!open)}
+        // keyboard focus opens it; a tap's focus is left to the click, so the two never cancel out
+        onFocus={(e) => { if (e.currentTarget.matches(":focus-visible")) onOpen(true); }}
+        onBlur={() => onOpen(false)}
+        className="group relative grid size-11 place-items-center"
+      >
+        <span className="absolute inset-[11px] rounded-full bg-brand-bright/50 motion-safe:animate-ping" />
+        <span className={`relative size-3 rounded-full bg-brand-bright ring-2 ring-white transition-transform duration-150 ease-out group-hover:scale-125 ${open ? "scale-125" : ""}`} />
+      </button>
+      <span
+        dir="auto"
+        className={`pointer-events-none absolute top-1/2 -translate-y-1/2 whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold text-white ring-1 backdrop-blur transition-colors duration-200 portrait:hidden ${right ? "right-full" : "left-full"} bg-black/55 ${open ? "ring-brand-bright/60" : "ring-white/20"}`}
+      >
+        {label}
+      </span>
+      {hint ? (
+        <span dir="auto" className={`pointer-events-none absolute top-1/2 hidden -translate-y-1/2 whitespace-nowrap rounded-full bg-black/55 px-3 py-1 text-[11px] font-semibold text-white/90 ring-1 ring-white/20 backdrop-blur portrait:inline ${right ? "right-full" : "left-full"}`}>{hint}</span>
+      ) : null}
+      <AnimatePresence>
+        {open ? (
+          <motion.span
+            id={id}
+            role="tooltip"
+            initial={{ opacity: 0, scale: 0.94, y: 8, filter: "blur(4px)" }}
+            animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.22, ease: [0.23, 1, 0.32, 1] } }}
+            exit={{ opacity: 0, scale: 0.97, y: 4, filter: "blur(2px)", transition: { duration: 0.14, ease: [0.4, 0, 1, 1] } }}
+            style={{ transformOrigin: side === "right" ? "bottom right" : side === "left" ? "bottom left" : "bottom center" }}
+            className={`pointer-events-none absolute bottom-full mb-1 block w-[min(16rem,70vw)] rounded-2xl bg-[rgba(6,28,32,0.42)] p-3.5 text-white shadow-[0_24px_60px_-20px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(255,255,255,0.35)] ring-1 ring-white/25 backdrop-blur-2xl backdrop-saturate-150 ${side === "right" ? "right-0" : side === "left" ? "left-0" : "left-1/2 -translate-x-1/2"}`}
+          >
+            <span dir="auto" className="flex items-center gap-2 text-sm font-semibold">
+              <span className="size-1.5 rounded-full bg-brand-bright shadow-[0_0_8px_#4cc97a]" />
+              {label}
+            </span>
+            <span dir="auto" className="mt-1.5 block text-[13px] leading-snug text-white/85">{detail}</span>
+          </motion.span>
+        ) : null}
+      </AnimatePresence>
+    </span>
   );
 }
