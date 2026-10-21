@@ -9,6 +9,7 @@ import { facts } from "@/content/facts";
 import type { Locale } from "@/content/i18n";
 import { EASE_OUT, SPRING_UI } from "@/lib/motion";
 import HeroMap from "./HeroMap";
+import { StarfieldBackground } from "../ui/starfield-hero";
 
 /*
  * The opening screen's parts: MSG's network shown as the console a seller would run it from.
@@ -18,14 +19,19 @@ import HeroMap from "./HeroMap";
 
 type C = (typeof heroCopy)["en"];
 
-/** the night the console sits in: MSG's Sabya hub, toned down, and a floor of light receding under it */
-export function CommandBackdrop() {
+/**
+ * The night the console sits in: MSG's Sabya hub, toned down, a field of points in MSG green that scatter from
+ * the cursor and settle back, and a floor of light receding under it. `stars` mounts the field only when the scene
+ * is about to be seen, so it costs nothing during the walk-in.
+ */
+export function CommandBackdrop({ stars = true }: { stars?: boolean }) {
   return (
     <div aria-hidden="true" className="absolute inset-0 overflow-hidden bg-[#03161a]">
       <div className="absolute inset-0 motion-safe:animate-[hero-breathe_24s_var(--ease-ambient)_infinite_alternate]">
         <Image src="/media/msg/hub-aerial.webp" alt="" fill priority sizes="100vw" className="object-cover object-[50%_40%] opacity-[0.22] [filter:grayscale(1)_contrast(1.15)]" />
       </div>
       <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_72%_42%,rgba(19,113,121,0.55),transparent_70%),radial-gradient(50%_40%_at_10%_100%,rgba(11,125,54,0.28),transparent_70%),linear-gradient(180deg,rgba(3,22,26,0.7)_0%,rgba(3,22,26,0.35)_40%,rgba(3,22,26,0.92)_100%)]" />
+      {stars ? <StarfieldBackground particleCount={420} interactionRadius={170} particleColor="#6ee79a" activeColor="#e6fff0" speed={0.5} className="mix-blend-screen" /> : null}
       {/* the floor: lines run toward the viewer, the network never stops */}
       <div className="absolute inset-x-[-30%] bottom-0 h-[55%] origin-bottom [transform:perspective(520px)_rotateX(62deg)] [mask-image:linear-gradient(0deg,#000_10%,transparent_85%)]">
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(108,195,195,0.16)_1px,transparent_1px),linear-gradient(0deg,rgba(108,195,195,0.16)_1px,transparent_1px)] bg-[size:64px_64px] motion-safe:animate-[cmd-floor_3.2s_linear_infinite]" />

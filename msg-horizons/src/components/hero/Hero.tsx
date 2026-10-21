@@ -453,7 +453,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
           <Interior c={c} dark={inDark} scale={inScale} lamps={lamps} copy={inCopy} />
         </motion.div>
 
-        <motion.div style={{ opacity: cBack }} className="absolute inset-0 z-[4]"><CommandBackdrop /></motion.div>
+        <motion.div style={{ opacity: cBack }} className="absolute inset-0 z-[4]"><CommandBackdrop stars={beat >= 2} /></motion.div>
 
         {/* scene copy */}
         <motion.div style={{ opacity: uiOut, y: uiY }} inert={beat !== 1} className="absolute inset-0 z-[5] pt-20">

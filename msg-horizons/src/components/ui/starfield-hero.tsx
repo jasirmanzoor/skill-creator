@@ -288,6 +288,36 @@ function StarfieldCanvas({ particleCount, interactionRadius, baseRgb, activeRgb,
   return <canvas ref={canvasRef} aria-hidden className="absolute inset-0 h-full w-full" style={{ pointerEvents: "none" }} />;
 }
 
+/**
+ * The starfield on its own, as a background layer: fills its positioned parent, ignores the pointer for clicks
+ * (it still reacts to the cursor anywhere on the page) and pauses whenever it is off screen.
+ */
+export function StarfieldBackground({
+  particleCount = 300,
+  interactionRadius = 140,
+  particleColor = "#60a5fa",
+  activeColor = "#ffffff",
+  speed = 0.5,
+  className,
+}: Pick<InteractiveStarfieldHeroProps, "particleCount" | "interactionRadius" | "particleColor" | "activeColor" | "speed" | "className">) {
+  const reduceMotion = useReducedMotion() === true;
+  const baseRgb = React.useMemo(() => hexToRgb(particleColor), [particleColor]);
+  const activeRgb = React.useMemo(() => hexToRgb(activeColor), [activeColor]);
+  return (
+    <div aria-hidden className={cn("pointer-events-none absolute inset-0", className)}>
+      <StarfieldCanvas
+        particleCount={particleCount}
+        interactionRadius={interactionRadius}
+        baseRgb={baseRgb}
+        activeRgb={activeRgb}
+        springK={0.022 + speed * 0.068}
+        damping={0.9 - speed * 0.13}
+        reduceMotion={reduceMotion}
+      />
+    </div>
+  );
+}
+
 // ── Motion presets ────────────────────────────────────────────────────────────
 const UP = {
   hidden: { opacity: 0, y: 22 },
