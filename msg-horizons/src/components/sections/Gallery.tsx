@@ -1,6 +1,6 @@
-import Image from "next/image";
 import { media, hasGallery } from "@/content/media";
 import type { Dictionary, Locale } from "@/content/i18n";
+import HoverExpand from "@/components/ui/hover-expand";
 
 /** Renders only when verified MSG photography has been added to content/media.ts. */
 export default function Gallery({ t, lang }: { t: Dictionary; lang: Locale }) {
@@ -10,14 +10,13 @@ export default function Gallery({ t, lang }: { t: Dictionary; lang: Locale }) {
   return (
     <section id="gallery" aria-labelledby="gallery-title" className="scroll-mt-24 border-t border-line bg-surface/[0.94] sec">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <h2 id="gallery-title" className="h-section text-ink">{t.gallery.title}</h2>
-        <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((m) => (
-            <li key={m.src} className="overflow-hidden rounded-xl border border-line">
-              <Image src={m.src} width={m.width} height={m.height} alt={m.alt[lang]} className="h-full w-full object-cover" sizes="(min-width:1024px) 33vw, (min-width:640px) 50vw, 100vw" />
-            </li>
-          ))}
-        </ul>
+        <p className="text-sm font-semibold text-teal">{t.gallery.eyebrow}</p>
+        <h2 id="gallery-title" className="h-section mt-2 text-ink">{t.gallery.title}</h2>
+        <HoverExpand
+          className="mt-10"
+          items={items.map((m) => ({ src: m.src, alt: m.alt[lang], caption: m.caption?.[lang] }))}
+        />
+        <p className="mt-4 text-sm text-ink/60">{t.gallery.note}</p>
       </div>
     </section>
   );

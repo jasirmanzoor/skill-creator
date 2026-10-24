@@ -331,6 +331,7 @@ export const en = {
   gallery: {
     eyebrow: "On the ground",
     title: "Operations, in the real world.",
+    note: "Real photos of MSG’s Sabya hub and outlet, retouched for presentation.",
   },
   contact: {
     eyebrow: "Talk to MSG",
