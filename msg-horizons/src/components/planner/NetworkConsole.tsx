@@ -8,6 +8,7 @@ import { planRoute, beatSeconds, type Beat, type Place } from "@/lib/routePlan";
 import { KSA, KSA_DOTS, CITY_XY, type P } from "@/lib/ksaGeo";
 import { W, H, ROWS, COLS, rowY, colX, node, type SimConfig } from "@/lib/networkSim";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { NIGHT } from "@/lib/mapNight";
 import type { Timeline } from "./FlyoverMap";
 
 // The real-map flyover (MapLibre) loads on demand; the flat canvas below is the fallback.
@@ -229,7 +230,7 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
       for (let r = -2; r < ROWS + 1; r++) for (let cc = -2; cc < COLS + 1; cc++) {
         const k = hash(r + 3, cc + 3);
         const park = k < 0.12, plaza = !park && k < 0.2;
-        const fill = park ? "#cfe8d6" : plaza ? "#f3ead2" : "#f9faf6";
+        const fill = park ? NIGHT.green : plaza ? "#161f33" : NIGHT.block;
         const a = node(cc, r), b = node(cc + 1, r), d = node(cc + 1, r + 1), e = node(cc, r + 1);
         const ctr = { x: (a.x + b.x + d.x + e.x) / 4, y: (a.y + b.y + d.y + e.y) / 4 };
         const ins = (p: P) => ({ x: p.x + (ctr.x - p.x) * 0.1, y: p.y + (ctr.y - p.y) * 0.1 });
@@ -292,7 +293,7 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
       ctx.restore();
       glyph(x, y - r - 6);
     }
-    const flowColor = (b: Beat) => (b.flow === "cash" ? GOLD : b.flow === "return" ? CORAL : b.flow === "order" ? DEEP : b.who === "you" ? DEEP : TEAL);
+    const flowColor = (b: Beat) => (b.flow === "cash" ? NIGHT.cash : b.flow === "return" ? NIGHT.back : b.flow === "order" || b.who === "you" ? NIGHT.you : NIGHT.parcel);
 
     function draw() {
       const t = clock.current;
@@ -308,7 +309,7 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
       const lw = (px: number) => px / z;
 
       ctx.clearRect(0, 0, view.w, view.h);
-      ctx.fillStyle = city ? "#e3eae6" : "#eef7f7";
+      ctx.fillStyle = NIGHT.ground;
       ctx.fillRect(0, 0, view.w, view.h);
       ctx.save();
       ctx.translate(view.w / 2, view.h / 2);
@@ -322,10 +323,10 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
           b.pts.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
           ctx.closePath();
           ctx.fill();
-          ctx.fillStyle = b.fill === "#f3ead2" ? "#e8dcb8" : "#e9ece4";
+          ctx.fillStyle = b.fill === "#161f33" ? "#1d2840" : NIGHT.blockLit;
           for (const t of b.tex) ctx.fillRect(t.x, t.y, t.w, t.h);
           if (b.tree) {
-            ctx.fillStyle = "#b5d9c0";
+            ctx.fillStyle = "#10292a";
             const m = b.pts;
             const cx = (m[0].x + m[2].x) / 2, cy = (m[0].y + m[2].y) / 2;
             for (const [dx, dy] of [[-16, -8], [0, 5], [15, -4], [-6, 12], [9, 11]]) { ctx.beginPath(); ctx.arc(cx + dx, cy + dy, 4.2, 0, Math.PI * 2); ctx.fill(); }
@@ -335,7 +336,7 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
         for (const pass of ["case", "fill"] as const) {
           for (let r = -3; r < ROWS + 3; r++) {
             const wide = art.r.includes(r);
-            ctx.strokeStyle = pass === "case" ? (wide ? "#dccf9f" : "#c9d6d2") : wide ? "#fff1c4" : "#ffffff";
+            ctx.strokeStyle = pass === "case" ? NIGHT.ground : wide ? NIGHT.streetLit : NIGHT.street;
             ctx.lineWidth = wide ? (pass === "case" ? 10 : 7.5) : pass === "case" ? 5 : 3.2;
             ctx.beginPath();
             for (let x = -500; x <= W + 500; x += 12) (x === -500 ? ctx.moveTo : ctx.lineTo).call(ctx, x, rowY(r, x));
@@ -343,7 +344,7 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
           }
           for (let cc = -6; cc < COLS + 6; cc++) {
             const wide = art.c.includes(cc);
-            ctx.strokeStyle = pass === "case" ? (wide ? "#dccf9f" : "#c9d6d2") : wide ? "#fff1c4" : "#ffffff";
+            ctx.strokeStyle = pass === "case" ? NIGHT.ground : wide ? NIGHT.streetLit : NIGHT.street;
             ctx.lineWidth = wide ? (pass === "case" ? 10 : 7.5) : pass === "case" ? 5 : 3.2;
             ctx.beginPath();
             for (let y = -300; y <= H + 300; y += 12) (y === -300 ? ctx.moveTo : ctx.lineTo).call(ctx, colX(cc, y), y);
@@ -351,15 +352,15 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
           }
         }
       } else {
-        ctx.fillStyle = "#ffffff";
-        ctx.strokeStyle = "rgba(19,113,121,0.25)";
+        ctx.fillStyle = NIGHT.block;
+        ctx.strokeStyle = "rgba(188,215,255,0.28)";
         ctx.lineWidth = lw(1.5);
         ctx.beginPath();
         KSA.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
-        ctx.fillStyle = "rgba(19,113,121,0.16)";
+        ctx.fillStyle = "rgba(188,215,255,0.14)";
         for (const d of KSA_DOTS) ctx.fillRect(d.x - 1.6, d.y - 1.6, 3.2, 3.2);
       }
 
@@ -392,8 +393,19 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
         if (upto > 0.002) {
           const wd = b.vehicle === "truck" ? 6.5 : 5.5;
           trace(i, upto);
-          ctx.strokeStyle = "rgba(255,255,255,0.96)";
-          ctx.lineWidth = lw(wd + 4);
+          ctx.save();
+          ctx.globalCompositeOperation = "lighter";
+          ctx.strokeStyle = NIGHT.light;
+          ctx.globalAlpha = 0.07;
+          ctx.lineWidth = lw(46);
+          ctx.stroke();
+          ctx.strokeStyle = col;
+          ctx.globalAlpha = 0.3;
+          ctx.lineWidth = lw(wd + 9);
+          ctx.stroke();
+          ctx.restore();
+          ctx.strokeStyle = "rgba(7,11,20,0.75)";
+          ctx.lineWidth = lw(wd + 3);
           ctx.stroke();
           ctx.strokeStyle = col;
           ctx.lineWidth = lw(wd);
@@ -420,7 +432,7 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
       ctx.lineJoin = "round";
       const halo = (txt: string, x: number, y: number, fill: string) => {
         ctx.lineWidth = 3.5;
-        ctx.strokeStyle = "rgba(255,255,255,0.92)";
+        ctx.strokeStyle = "rgba(7,11,20,0.9)";
         ctx.strokeText(txt, x, y);
         ctx.fillStyle = fill;
         ctx.fillText(txt, x, y);
@@ -432,7 +444,7 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
           const q = toScreen({ x: a.fx * W, y: a.fy * H + 26 });
           const on = ends.some((pl) => pl.fx === a.fx && pl.fy === a.fy);
           ctx.font = `${on ? 800 : 700} ${on ? 12 : 11}px ${font}`;
-          halo((c.areas[a.id] ?? a.id).toUpperCase(), q.x, q.y, on ? DEEP : "rgba(11,58,64,0.6)");
+          halo((c.areas[a.id] ?? a.id).toUpperCase(), q.x, q.y, on ? "#e6eefc" : "rgba(143,163,192,0.8)");
         }
       } else {
         const used = new Set(plan.places.map((pl) => pl.city));
@@ -446,12 +458,12 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
           if (!on && spots.some((sp) => Math.hypot(sp.x - q.x, sp.y - q.y) < 64)) continue;
           if (placed.some((pp) => Math.abs(pp.x - q.x) < 74 && Math.abs(pp.y - q.y) < 15)) continue;
           placed.push(q);
-          ctx.fillStyle = on ? DEEP : "rgba(11,58,64,0.45)";
+          ctx.fillStyle = on ? NIGHT.you : "rgba(143,163,192,0.55)";
           ctx.beginPath(); ctx.arc(q.x, q.y, on ? 4 : 2.8, 0, Math.PI * 2); ctx.fill();
           ctx.font = `${on ? 800 : 600} ${on ? 13 : 11}px ${font}`;
           const ar = locale === "ar";
           ctx.textAlign = ar ? "right" : "left";
-          halo(cityName(k), q.x + (ar ? -9 : 9), q.y + 1, on ? DEEP : "rgba(11,58,64,0.62)");
+          halo(cityName(k), q.x + (ar ? -9 : 9), q.y + 1, on ? "#e6eefc" : "rgba(143,163,192,0.8)");
           ctx.textAlign = "center";
         }
       }
@@ -487,10 +499,10 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
         if (b.from === b.to) {
           const q = toScreen(world(b.from));
           const pulse = reduce ? 0.5 : (Math.sin(t * 6) + 1) / 2;
-          ctx.strokeStyle = TEAL;
+          ctx.strokeStyle = NIGHT.parcel;
           ctx.lineWidth = 2;
           ctx.beginPath(); ctx.arc(q.x, q.y - 18, 20 + pulse * 6, 0, Math.PI * 2); ctx.stroke();
-          ctx.strokeStyle = "rgba(19,113,121,0.35)";
+          ctx.strokeStyle = "rgba(79,209,197,0.35)";
           ctx.beginPath(); ctx.arc(q.x, q.y - 18, 30 + pulse * 8, 0, Math.PI * 2); ctx.stroke();
         } else {
           const h = at(cur, prog);
@@ -524,7 +536,7 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
           } else {
             ctx.rotate(h.ang);
             const L = b.vehicle === "truck" ? 24 : 17;
-            ctx.fillStyle = b.flow === "return" ? CORAL : b.vehicle === "truck" ? DEEP : GREEN;
+            ctx.fillStyle = b.flow === "return" ? NIGHT.back : b.vehicle === "truck" ? NIGHT.you : NIGHT.door;
             ctx.beginPath(); ctx.roundRect(-L / 2, -6, L, 12, 3); ctx.fill();
             ctx.shadowBlur = 0;
             ctx.fillStyle = "rgba(255,255,255,0.9)";
@@ -706,15 +718,15 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
           ) : null}
           {/* the viewfinder: this is a camera following your route, not a picture of it */}
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[1]">
-            <div className="absolute inset-0 shadow-[inset_0_0_80px_rgba(11,58,64,0.18)]" />
-            <span className="absolute inset-x-0 top-0 h-1/5 bg-[linear-gradient(180deg,transparent,rgba(19,113,121,0.06)_70%,rgba(19,113,121,0.16))] motion-safe:animate-[cam-scan_7s_var(--ease-in-out)_infinite] motion-reduce:hidden" />
+            <div className="absolute inset-0 shadow-[inset_0_0_90px_rgba(0,0,0,0.55)]" />
+            <span className="absolute inset-x-0 top-0 h-1/5 bg-[linear-gradient(180deg,transparent,rgba(188,215,255,0.03)_70%,rgba(188,215,255,0.09))] motion-safe:animate-[cam-scan_7s_var(--ease-in-out)_infinite] motion-reduce:hidden" />
             {(["start-2.5 top-14 border-s-2 border-t-2 rounded-ss-lg", "end-2.5 top-14 border-e-2 border-t-2 rounded-se-lg", "start-2.5 bottom-2.5 border-s-2 border-b-2 rounded-es-lg", "end-2.5 bottom-2.5 border-e-2 border-b-2 rounded-ee-lg"]).map((k) => (
-              <span key={k} className={`absolute size-5 border-teal-deep/45 ${k}`} />
+              <span key={k} className={`absolute size-5 border-[#bcd7ff]/35 ${k}`} />
             ))}
           </div>
           {mode !== "canvas" && !mapReady ? (
-            <div aria-hidden="true" className="absolute inset-0 grid place-items-center bg-[radial-gradient(70%_60%_at_50%_40%,#d6ebe9,#e9f3f2)]">
-              <span className="size-9 animate-spin rounded-full border-[3px] border-teal/20 border-t-teal motion-reduce:animate-none" />
+            <div aria-hidden="true" className="absolute inset-0 grid place-items-center bg-[radial-gradient(70%_60%_at_50%_40%,#121c30,#070b14)]">
+              <span className="size-9 animate-spin rounded-full border-[3px] border-[#bcd7ff]/15 border-t-[#4fd1c5] motion-reduce:animate-none" />
             </div>
           ) : null}
           <div className="absolute start-3 top-3 flex flex-wrap items-center gap-2 sm:start-4 sm:top-4">
@@ -726,35 +738,35 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
               {running ? <PauseGlyph /> : <PlayGlyph />}
               {running ? c.pause : c.play}
             </button>
-            <span className="rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-teal-deep ring-1 ring-teal/10 backdrop-blur">{viewLabel}</span>
+            <span className="rounded-full bg-[#0b1220]/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-[#bcd7ff] ring-1 ring-white/10 backdrop-blur rtl:tracking-normal">{viewLabel}</span>
             {mode === "real" && STYLE_SAT ? (
               <button
                 type="button"
                 aria-pressed={sat}
                 onClick={() => { setSat((v) => !v); setMapReady(false); }}
-                className="rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-teal-deep ring-1 ring-teal/10 backdrop-blur"
+                className="rounded-full bg-[#0b1220]/80 px-3 py-1.5 text-xs font-semibold text-[#bcd7ff] ring-1 ring-white/10 backdrop-blur"
               >
                 {sat ? c.view.street : c.view.satellite}
               </button>
             ) : null}
           </div>
-          <Legend c={c} className="absolute end-4 top-4 hidden sm:block" />
+          <Legend c={c} className="absolute end-4 top-4 hidden sm:block" dark />
           {beat ? (
-            <div className="absolute bottom-4 start-4 hidden w-[min(24rem,60%)] overflow-hidden rounded-2xl bg-white/95 px-3.5 pb-3 pt-2.5 shadow-[0_12px_30px_-16px_rgba(11,58,64,0.6)] ring-1 ring-teal/10 backdrop-blur sm:block sm:px-4 sm:pt-3">
-              <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand rtl:tracking-normal">
+            <div className="absolute bottom-4 start-4 hidden w-[min(24rem,60%)] overflow-hidden rounded-2xl bg-[#0b1220]/85 px-3.5 pb-3 pt-2.5 text-[#e6eefc] shadow-[0_12px_30px_-16px_rgba(0,0,0,0.8)] ring-1 ring-white/10 backdrop-blur sm:block sm:px-4 sm:pt-3">
+              <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#34d399] rtl:tracking-normal">
                 <span className="relative inline-flex size-2">
-                  <span className="plan-ping absolute inset-0 rounded-full bg-brand" />
-                  <span className="relative size-2 rounded-full bg-brand" />
+                  <span className="plan-ping absolute inset-0 rounded-full bg-[#34d399]" />
+                  <span className="relative size-2 rounded-full bg-[#34d399]" />
                 </span>
                 <span className="num" dir="ltr">{active + 1}/{plan.beats.length}</span> · {c.who[beat.who]}
               </p>
               <p className="mt-0.5 font-display text-sm font-semibold leading-snug sm:text-base" aria-live="polite">{fmt(beat)}</p>
-              <span aria-hidden="true" className="mt-2.5 block h-1 overflow-hidden rounded-full bg-teal/15">
-                <span ref={progBar} className="block h-full origin-left rounded-full bg-brand rtl:origin-right" style={{ transform: "scaleX(0)" }} />
+              <span aria-hidden="true" className="mt-2.5 block h-1 overflow-hidden rounded-full bg-white/10">
+                <span ref={progBar} className="block h-full origin-left rounded-full bg-[#34d399] shadow-[0_0_10px_#34d399] rtl:origin-right" style={{ transform: "scaleX(0)" }} />
               </span>
             </div>
           ) : null}
-          <p className={`pointer-events-none absolute end-4 hidden max-w-[34%] ${mode === "real" ? "bottom-10" : "bottom-4"} rounded-xl bg-white/85 px-2.5 py-1 text-end text-[10px] text-teal-deep/75 backdrop-blur lg:block`}>{c.note}</p>
+          <p className={`pointer-events-none absolute end-4 hidden max-w-[34%] ${mode === "real" ? "bottom-10" : "bottom-4"} rounded-xl bg-[#0b1220]/75 px-2.5 py-1 text-end text-[10px] text-[#bcd7ff]/80 backdrop-blur lg:block`}>{c.note}</p>
         </div>
 
         {beat ? (
@@ -825,10 +837,13 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
 }
 
 /** colour key for the route lines; sits on the map from sm up, in the sidebar below that */
-function Legend({ c, className = "", flat = false }: { c: (typeof routeCopy)["en"]; className?: string; flat?: boolean }) {
+function Legend({ c, className = "", flat = false, dark = false }: { c: (typeof routeCopy)["en"]; className?: string; flat?: boolean; dark?: boolean }) {
+  const keys = dark
+    ? ([["parcel", NIGHT.parcel], ["you", NIGHT.you], ["cash", NIGHT.cash], ["back", NIGHT.back]] as const)
+    : ([["parcel", TEAL], ["you", DEEP], ["cash", GOLD], ["back", CORAL]] as const);
   return (
-    <ul className={`${className} grid gap-x-4 gap-y-1.5 rounded-xl p-2.5 text-[11px] font-medium text-teal-deep/85 ${flat ? "grid-cols-2 bg-sea-50/70 ring-1 ring-teal/10" : "bg-white/92 shadow-[0_10px_26px_-16px_rgba(11,58,64,0.6)] ring-1 ring-teal/10 backdrop-blur"}`}>
-      {([["parcel", TEAL], ["you", DEEP], ["cash", GOLD], ["back", CORAL]] as const).map(([k, col]) => (
+    <ul className={`${className} grid gap-x-4 gap-y-1.5 rounded-xl p-2.5 text-[11px] font-medium ${dark ? "bg-[#0b1220]/80 text-[#d7e3f7] ring-1 ring-white/10 backdrop-blur" : flat ? "grid-cols-2 bg-sea-50/70 text-teal-deep/85 ring-1 ring-teal/10" : "bg-white/92 text-teal-deep/85 shadow-[0_10px_26px_-16px_rgba(11,58,64,0.6)] ring-1 ring-teal/10 backdrop-blur"}`}>
+      {keys.map(([k, col]) => (
         <li key={k} className="flex items-center gap-2">
           <span aria-hidden="true" className="h-1.5 w-5 shrink-0 rounded-full" style={{ background: col }} />
           {c.legend[k]}

@@ -9,6 +9,7 @@ import { routeCopy, type Site } from "@/content/routeConsole";
 import { placeLL } from "@/content/routeGeo";
 import { angleDiff, arc, bearing, clamp, haversine, makePath, metresPerPixel, offsetPath, pointAt, slicePath, type LngLat, type Path } from "@/lib/geoRoute";
 import { roadRoute } from "@/lib/routing";
+import { NIGHT, applyNightSkin } from "@/lib/mapNight";
 import type { Beat, RoutePlan } from "@/lib/routePlan";
 
 /**
@@ -38,11 +39,13 @@ type Props = {
   onStatus: (s: "ready" | "failed") => void;
 };
 
-const TEAL = "#137179";
-const DEEP = "#0b3a40";
-const GREEN = "#0b7d36";
-const GOLD = "#c9962e";
-const CORAL = "#d0573f";
+// flows glow on the night map; pins keep the brand colours so their white labels stay legible
+const TEAL = NIGHT.parcel;
+const DEEP = NIGHT.you;
+const GOLD = NIGHT.cash;
+const CORAL = NIGHT.back;
+const PIN_GREEN = "#0b7d36";
+const PIN_DEEP = "#137179";
 const LANE_M = 9;
 const LANE: Record<string, number> = { cash: LANE_M, return: -LANE_M };
 const LIFT: Record<string, number> = { parcel: 0.16, order: 0.16, cash: -0.12, return: -0.26 };
@@ -161,14 +164,19 @@ function pinEl(label: string, color: string) {
   const stem = document.createElement("span");
   stem.className = "h-3 w-0.5 bg-white";
   const dot = document.createElement("span");
-  dot.className = "size-3 rounded-full ring-2 ring-white";
+  dot.className = "relative size-3 rounded-full ring-2 ring-white";
   dot.style.background = color;
+  const ring = document.createElement("span");
+  ring.className = "plan-ping absolute -inset-1.5 rounded-full border-2";
+  ring.style.borderColor = color;
+  dot.append(ring);
   el.append(pill, stem, dot);
   return el;
 }
 
 export default function FlyoverMap(p: Props) {
   const box = useRef<HTMLDivElement>(null);
+  const hud = useRef<HTMLSpanElement>(null);
   const props = useRef(p);
   // the frame loop reads the latest props from here (assigned after each render, ahead of the effects below)
   useEffect(() => { props.current = p; });
@@ -196,6 +204,7 @@ export default function FlyoverMap(p: Props) {
     const tag = document.createElement("span");
     tag.className = "pointer-events-none whitespace-nowrap rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-teal-deep shadow-[var(--shadow-chip)] ring-1 ring-teal/15";
     const tagMarker = new Marker({ element: tag, anchor: "bottom", offset: [0, -24] });
+    const coords = hud.current;
     let loaded = false;
     let disposed = false;
     let raf = 0;
@@ -216,11 +225,14 @@ export default function FlyoverMap(p: Props) {
       map.addSource("veh", { type: "geojson", data: empty });
       map.addImage("arrow", arrowImage(), { pixelRatio: 2 });
       map.addLayer({ id: "ahead", type: "line", source: "ahead", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": ["get", "color"], "line-opacity": 0.8, "line-width": widthExpr(0.6), "line-dasharray": [0.1, 2.4] } });
-      map.addLayer({ id: "done-case", type: "line", source: "done", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": "#ffffff", "line-width": widthExpr(1.6) } });
+      map.addLayer({ id: "street-light", type: "line", source: "done", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": NIGHT.light, "line-opacity": 0.1, "line-width": widthExpr(9), "line-blur": widthExpr(6) } });
+      map.addLayer({ id: "done-glow", type: "line", source: "done", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": ["get", "color"], "line-opacity": 0.45, "line-width": widthExpr(3.2), "line-blur": widthExpr(2.2) } });
+      map.addLayer({ id: "done-case", type: "line", source: "done", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": NIGHT.ground, "line-opacity": 0.7, "line-width": widthExpr(1.6) } });
       map.addLayer({ id: "done", type: "line", source: "done", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": ["get", "color"], "line-width": widthExpr(1) } });
       map.addLayer({ id: "arrows", type: "symbol", source: "done", layout: { "symbol-placement": "line", "symbol-spacing": 64, "icon-image": "arrow", "icon-size": ["interpolate", ["linear"], ["zoom"], 10, 0.35, 17, 0.7], "icon-rotation-alignment": "map", "icon-pitch-alignment": "map", "icon-allow-overlap": true, "icon-ignore-placement": true } });
       map.addLayer({ id: "pulse", type: "circle", source: "veh", filter: ["==", ["get", "k"], "pulse"], paint: { "circle-radius": ["get", "r"], "circle-color": ["get", "color"], "circle-opacity": ["get", "a"], "circle-pitch-alignment": "map", "circle-blur": 0.5 } });
-      map.addLayer({ id: "halo", type: "circle", source: "veh", filter: ["==", ["get", "k"], "veh"], paint: { "circle-radius": ["get", "r"], "circle-color": ["get", "color"], "circle-opacity": 0.22, "circle-pitch-alignment": "map" } });
+      map.addLayer({ id: "lamp", type: "circle", source: "veh", filter: ["==", ["get", "k"], "veh"], paint: { "circle-radius": ["*", ["get", "r"], 3.2], "circle-color": NIGHT.light, "circle-opacity": 0.09, "circle-blur": 1, "circle-pitch-alignment": "map" } });
+      map.addLayer({ id: "halo", type: "circle", source: "veh", filter: ["==", ["get", "k"], "veh"], paint: { "circle-radius": ["get", "r"], "circle-color": ["get", "color"], "circle-opacity": 0.38, "circle-blur": 0.6, "circle-pitch-alignment": "map" } });
       map.addLayer({ id: "veh", type: "symbol", source: "veh", filter: ["==", ["get", "k"], "veh"], layout: { "icon-image": ["get", "icon"], "icon-size": ["get", "s"], "icon-rotate": ["get", "hdg"], "icon-rotation-alignment": "map", "icon-pitch-alignment": "map", "icon-allow-overlap": true, "icon-ignore-placement": true } });
     };
 
@@ -237,7 +249,7 @@ export default function FlyoverMap(p: Props) {
         if (seen.has(key)) continue;
         seen.add(key);
         const label = pl.pin === "site" ? P.c.siteName[pl.city as Site] : pl.pin === "you" ? P.c.pins.you : pl.pin === "drop" ? P.c.pins.drop : P.c.pins.door;
-        const colour = pl.pin === "door" || pl.pin === "drop" ? GREEN : DEEP;
+        const colour = pl.pin === "door" || pl.pin === "drop" ? PIN_GREEN : PIN_DEEP;
         markers.push(new Marker({ element: pinEl(label, colour), anchor: "bottom" }).setLngLat(placeLL(pl)).addTo(map));
       }
       tagMarker.setLngLat(M.legs[0].at).addTo(map);
@@ -340,6 +352,7 @@ export default function FlyoverMap(p: Props) {
 
       if (now - lastCam > 250) {
         lastCam = now;
+        if (coords) coords.textContent = `${Math.abs(cam.lat).toFixed(4)}° ${cam.lat >= 0 ? "N" : "S"}, ${Math.abs(cam.lng).toFixed(4)}° ${cam.lng >= 0 ? "E" : "W"}`;
         host.dataset.cam = [cam.lng.toFixed(5), cam.lat.toFixed(5), cam.zoom.toFixed(2), cam.bearing.toFixed(1), cam.pitch.toFixed(1), cur, prog.toFixed(2)].join(",");
       }
     };
@@ -370,6 +383,7 @@ export default function FlyoverMap(p: Props) {
       if (disposed) return;
       loaded = true;
       window.clearTimeout(loadTimer);
+      if (!props.current.styleUrl.includes("maptiler.com")) applyNightSkin(map);
       addLayers();
       api.current?.setModel(props.current.plan);
     });
@@ -404,6 +418,7 @@ export default function FlyoverMap(p: Props) {
   return (
     <div role="group" aria-label={p.c.canvasLabel} className="absolute inset-0">
       <div ref={box} className="size-full" />
+      <span ref={hud} dir="ltr" aria-hidden="true" className="num pointer-events-none absolute start-9 top-[3.7rem] z-[2] text-[10px] font-medium uppercase tracking-[0.14em] text-[#bcd7ff]/70 sm:start-10" />
     </div>
   );
 }
