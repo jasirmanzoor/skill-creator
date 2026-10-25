@@ -18,7 +18,7 @@ export default function Footer({ t, lang }: { t: Dictionary; lang: Locale }) {
   const f = t.footer;
   const year = new Date().getFullYear();
   return (
-    <footer data-theme="dark" className="border-t border-white/10 bg-night pb-28 pt-16 text-white lg:pb-12">
+    <footer data-theme="dark" className="push-shift border-t border-white/10 bg-night pb-28 pt-16 text-white lg:pb-12">
       <div className="mx-auto grid max-w-7xl gap-12 px-5 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
         <div>
           <Logo inverted />

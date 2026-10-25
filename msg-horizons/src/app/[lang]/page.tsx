@@ -39,7 +39,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       <SmoothScroll />
       <HorizonBackdrop />
       <SiteHeader t={t} lang={lang} />
-      <main id="main" className="overflow-x-clip">
+      <main id="main" className="push-shift overflow-x-clip">
         <Hero t={t} lang={lang} />
         <Pitch t={t} lang={lang} />
         <TrustBar t={t} lang={lang} />

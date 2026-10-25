@@ -27,6 +27,8 @@ export const ar: Dictionary = {
     langSwitch: "English",
     langSwitchLabel: "التبديل إلى الإنجليزية",
     menu: "القائمة",
+    siteMap: "خريطة الموقع",
+    reach: "تواصل مع ام اس جي",
     close: "إغلاق",
   },
   search: {

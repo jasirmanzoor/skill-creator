@@ -385,9 +385,20 @@ a { text-underline-offset: 0.2em; }
 @media (prefers-reduced-motion: reduce) { .seg-tile { transform: none; } }
 
 /* Lenis momentum scroll */
-html.lenis-on, html.lenis-on body { height: auto; }
+html.lenis, html.lenis body, html.lenis-on, html.lenis-on body { height: auto; }
 .lenis-smooth { scroll-behavior: auto !important; }
-.lenis-stopped { overflow: hidden; }
+.lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
+.lenis.lenis-autoToggle { transition-property: overflow; transition-duration: 1ms; transition-behavior: allow-discrete; }
+/* from the Lenis component: nested scrollers keep their own momentum, iframes don't swallow the wheel mid-glide */
+.lenis-on [data-lenis-prevent], .lenis-on [data-lenis-prevent-wheel], .lenis-on [data-lenis-prevent-touch] { overscroll-behavior: contain; }
+.lenis-smooth iframe { pointer-events: none; }
+/* push menu: the page moves aside while the site map slides in (curves from the Push Menu component) */
+:root { --push-w: min(440px, 84vw); }
+.push-shift { transition: translate 0.7s cubic-bezier(0.82, -0.01, 0.88, 0.77); }
+html.push-open .push-shift { translate: calc(var(--push-w) * -1) 0; transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1); }
+html[dir="rtl"].push-open .push-shift { translate: var(--push-w) 0; }
+@media (prefers-reduced-motion: reduce) { .push-shift { transition: none; } }
+@keyframes tw-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
 
 /* EmbeddedPhoto fades toward the inline end in both directions */
 [dir="rtl"] { --fade-end: left; }

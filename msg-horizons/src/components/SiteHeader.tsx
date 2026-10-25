@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Logo from "./ui/Logo";
 import SiteSearch from "./SiteSearch";
+import PushMenu, { MenuButton } from "./PushMenu";
 import { track } from "@/lib/analytics";
-import { whatsappLink } from "@/content/facts";
 import { PRIMARY_NAV } from "@/content/nav";
 import { useActiveSection } from "@/lib/use-active-section";
 import type { Dictionary, Locale } from "@/content/i18n";
@@ -38,27 +38,19 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
     return () => window.removeEventListener("scroll", on);
   }, []);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
-  }, [open]);
+  const close = useCallback(() => setOpen(false), []);
 
   const other = lang === "en" ? "ar" : "en";
-  const solid = open || (scrolled && !overDark);
+  const solid = scrolled && !overDark;
   // ink text on the light hero and light sections; white only over dark sections
-  const ink = !overDark || open;
-  const dark = overDark && !open;
+  const ink = !overDark;
+  const dark = overDark;
   const linkBase = ink ? "text-muted hover:text-ink" : "text-white/80 hover:text-white";
 
   return (
+    <>
     <header
-      className={`fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300 ${
+      className={`push-shift fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300 ${
         dark
           ? "border-white/10 bg-ink/80 backdrop-blur-md"
           : solid
@@ -127,69 +119,12 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
           >
             {t.nav.ctaShort}
           </a>
-          <button
-            type="button"
-            className={`inline-flex min-h-11 items-center gap-2 rounded-md px-2 py-2 lg:hidden ${ink ? "text-ink" : "text-white"}`}
-            aria-expanded={open}
-            aria-controls="mobile-nav"
-            aria-label={open ? t.nav.close : t.nav.menu}
-            onClick={() => setOpen((o) => !o)}
-          >
-            <svg viewBox="0 0 24 24" className="size-5" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-              {open ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 8h16M4 16h16" />}
-            </svg>
-            <span className="text-sm font-medium">{open ? t.nav.close : t.nav.menu}</span>
-          </button>
+          <MenuButton open={open} onClick={() => setOpen((o) => !o)} label={t.nav.menu} ink={ink} />
         </div>
       </div>
 
-      <div id="mobile-nav" hidden={!open} className="h-[calc(100dvh-4rem)] overflow-y-auto border-t border-line bg-paper px-5 pb-10 lg:hidden">
-        <nav aria-label={t.nav.menu}>
-          <ul className="divide-y divide-line">
-            {PRIMARY_NAV.map((item) => {
-              const isActive = active === item.id;
-              return (
-                <li key={item.id}>
-                  <a
-                    href={item.href}
-                    aria-current={isActive ? "location" : undefined}
-                    onClick={() => setOpen(false)}
-                    className={`block py-4 font-display text-2xl font-medium ${isActive ? "text-brand" : "text-ink"}`}
-                  >
-                    {t.nav[NAV_LABEL[item.id]]}
-                  </a>
-                </li>
-              );
-            })}
-            <li>
-              <a href="#sellers" onClick={() => setOpen(false)} className="block py-4 font-display text-2xl font-medium text-ink">
-                {t.nav.sellers}
-              </a>
-            </li>
-          </ul>
-        </nav>
-        <div className="mt-8 grid gap-3">
-          <a
-            href="#planner"
-            onClick={() => {
-              setOpen(false);
-              track("cta_click", { cta: "plan", location: "mobile_menu" });
-            }}
-            className="btn-primary px-5 py-3.5"
-          >
-            {t.nav.cta}
-          </a>
-          <a
-            href={whatsappLink(t.wa.general)}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => track("whatsapp_click", { location: "mobile_menu" })}
-            className="rounded-full border border-line-strong px-5 py-3.5 text-center font-medium text-ink"
-          >
-            {t.nav.talk} · {t.nav.whatsapp}
-          </a>
-        </div>
-      </div>
     </header>
+    <PushMenu t={t} lang={lang} open={open} onClose={close} />
+    </>
   );
 }

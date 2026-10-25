@@ -29,6 +29,8 @@ export const en = {
     langSwitchLabel: "Switch to Arabic",
     menu: "Menu",
     close: "Close",
+    siteMap: "Site map",
+    reach: "Reach MSG",
   },
   search: {
     label: "Search",
