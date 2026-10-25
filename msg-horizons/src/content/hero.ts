@@ -31,6 +31,8 @@ type Copy = {
   /** after the walk-in: MSG's network as a live control console (components/hero/Command.tsx) */
   command: {
     title: string[];
+    /** the headline's second line, typed in turn (the first is title[1]); only what the lead already says */
+    typed: string[];
     lead: string;
     /** the lead on phones, where the console needs the room */
     leadShort: string;
@@ -93,6 +95,7 @@ export const heroCopy: Record<Locale, Copy> = {
     },
     command: {
       title: ["The Kingdom's delivery network.", "Already running."],
+      typed: ["Already running.", "Storing your stock.", "Delivering it.", "Collecting your cash.", "Handling returns."],
       lead: "MSG Horizons owns the vans, employs the drivers and runs the hub. Your stock is stored, delivered, tracked live and paid back by one accountable team, with the licences and compliance already in place.",
       leadShort: "Our own vans, in-house drivers and our own hub. Stored, delivered, tracked live and paid back by one accountable team.",
       waShort: "WhatsApp",
@@ -191,6 +194,7 @@ export const heroCopy: Record<Locale, Copy> = {
     },
     command: {
       title: ["شبكة التوصيل في المملكة.", "تعمل الآن."],
+      typed: ["تعمل الآن.", "تخزّن بضاعتك.", "توصلها لعملائك.", "تحصّل أموالك.", "تدير المرتجعات."],
       lead: "ام اس جي هورايزونز تملك المركبات، ومناديبها من فريقها، وتدير مركزها بنفسها. مخزونك يُخزَّن ويُوصَّل ويُتتبَّع مباشرة وتعود أمواله إليك عبر فريق واحد مسؤول، مع التراخيص والامتثال جاهزة مسبقاً.",
       leadShort: "مركباتنا الخاصة، ومناديب من فريقنا، ومركزنا الخاص. تخزين وتوصيل وتتبع مباشر وتحصيل أموالك عبر فريق واحد مسؤول.",
       waShort: "واتساب",

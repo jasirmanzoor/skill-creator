@@ -19,6 +19,7 @@ import Dust from "./Dust";
 import { STAGE_COUNT } from "./HeroMap";
 import { NeedIcon, StageCard } from "../operation/StageParts";
 import QuoteCard from "./QuoteCard";
+import Typewriter from "../ui/typewriter";
 import { Chip, CommandBackdrop, ConsoleWindow, Depth, fadeUp, OrderTicker, PartnerLine, Strengths, VanIcon } from "./Command";
 
 /*
@@ -297,7 +298,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
       </p>
       <h2 className="mt-3 font-display text-[clamp(1.9rem,min(4vw,7svh),3.7rem)] font-semibold leading-[1.02] tracking-[-0.035em] text-balance sm:mt-4 rtl:leading-[1.25] rtl:tracking-normal">
         <span className="block">{c.command.title[0]}</span>
-        <span className="block bg-[linear-gradient(90deg,#b8f5cf,#6cc3c3)] bg-clip-text text-transparent rtl:bg-[linear-gradient(270deg,#b8f5cf,#6cc3c3)]">{c.command.title[1]}</span>
+        <span className="block bg-[linear-gradient(90deg,#b8f5cf,#6cc3c3)] bg-clip-text text-transparent rtl:bg-[linear-gradient(270deg,#b8f5cf,#6cc3c3)]"><Typewriter words={c.command.typed} cursorClassName="bg-[#b8f5cf]" /></span>
       </h2>
       <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-white/80 text-pretty sm:mt-4 sm:text-lg">
         <span className="sm:hidden">{c.command.leadShort}</span><span className="max-sm:hidden">{c.command.lead}</span>
