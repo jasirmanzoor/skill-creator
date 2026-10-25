@@ -12,6 +12,7 @@ import type { Locale } from "@/content/i18n";
 import { track } from "@/lib/analytics";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import TrackedLink from "../ui/TrackedLink";
+import FocusReveal from "../ui/focus-reveal";
 import { ArrowIcon, WhatsAppIcon } from "../ui/icons";
 
 /**
@@ -246,7 +247,7 @@ export default function GrowthBand({ lang, warehousePhoto }: { lang: Locale; war
             <div className="p-5 pt-4 sm:p-8 sm:pt-5">
         <div className="grid overflow-hidden rounded-2xl bg-white ring-1 ring-teal/12 sm:grid-cols-[0.8fr_1.2fr]">
           <div className="relative min-h-[300px] overflow-hidden">
-            <img src="/media/msg/outlet.jpg" alt={o.alt} loading="lazy" className="absolute inset-0 size-full object-cover [object-position:50%_42%]" />
+            <FocusReveal src="/media/msg/outlet.jpg" alt={o.alt} pos="50% 42%" />
           </div>
           <div className="flex flex-col justify-center gap-5 p-6 sm:p-10 lg:flex-row lg:items-center lg:gap-10">
             <div className="flex-1">

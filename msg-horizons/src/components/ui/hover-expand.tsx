@@ -6,13 +6,14 @@
  *
  * Changes from the original: built on motion/react, tiles share the row through flex-grow so the strip fits any
  * width, it stacks vertically on phones, every tile is a real button (focus and tap open it, hover only for a
- * mouse), captions are bilingual, and reduced-motion visitors get the change without the travel.
+ * mouse), captions are bilingual, reduced-motion visitors get the change without the travel, and each photo
+ * comes into focus as it scrolls in (see focus-reveal.tsx).
  */
-import Image from "next/image";
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { EASE_IN_OUT, EASE_OUT } from "@/lib/motion";
 import { cn } from "@/lib/utils";
+import FocusReveal from "./focus-reveal";
 
 export type ExpandItem = {
   src: string;
@@ -48,13 +49,11 @@ export default function HoverExpand({ items, initial = 0, badge, className }: { 
               data-press="soft"
               className="group absolute inset-0 size-full cursor-pointer text-start focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-white"
             >
-              <Image
+              <FocusReveal
                 src={item.src}
                 alt={item.alt}
-                fill
-                sizes="(min-width: 640px) 60vw, 100vw"
-                style={{ objectPosition: item.pos }}
-                className={cn("object-cover transition-[filter] duration-300", !open && "[filter:saturate(0.6)_brightness(0.85)]")}
+                pos={item.pos}
+                className={cn("transition-[filter] duration-300", !open && "[filter:saturate(0.6)_brightness(0.85)]")}
               />
               {badge && (
                 <span className="absolute start-2 top-2 rounded-full bg-black/55 px-2 py-0.5 text-[0.6875rem] font-medium text-white backdrop-blur-sm">{badge}</span>
