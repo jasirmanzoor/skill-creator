@@ -27,6 +27,8 @@ export const ar: Dictionary = {
     langSwitch: "English",
     langSwitchLabel: "التبديل إلى الإنجليزية",
     menu: "القائمة",
+    siteMap: "خريطة الموقع",
+    reach: "تواصل مع ام اس جي",
     close: "إغلاق",
   },
   search: {
@@ -328,6 +330,7 @@ export const ar: Dictionary = {
   gallery: {
     eyebrow: "على أرض الواقع",
     title: "العمليات في الواقع.",
+    note: "صور حقيقية لمركز ام اس جي في صبيا ومنفذها، معدّلة للعرض.",
   },
   contact: {
     eyebrow: "تحدث مع ام اس جي",

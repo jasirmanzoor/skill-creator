@@ -31,7 +31,7 @@ export default function MobileBar({ t }: { t: Dictionary }) {
   }, [show]);
   return (
     <div
-      className={`fixed inset-x-3 bottom-3 z-40 flex items-center gap-2 rounded-2xl border border-line bg-surface/95 p-2 shadow-[var(--shadow-float)] backdrop-blur transition-ui duration-[240ms] lg:hidden ${
+      className={`push-shift fixed inset-x-3 bottom-3 z-40 flex items-center gap-2 rounded-2xl border border-line bg-surface/95 p-2 shadow-[var(--shadow-float)] backdrop-blur transition-ui duration-[240ms] lg:hidden ${
         show ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-[calc(100%+0.75rem)] opacity-0"
       }`}
       aria-hidden={!show}

@@ -1,7 +1,10 @@
 "use client";
 
 import { EASE_OUT } from "@/lib/motion";
+import NumberFlow from "@number-flow/react";
 import { motion } from "motion/react";
+import { approxCost } from "@/lib/estimate";
+import { RiyadhClock } from "../hero/Command";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -146,6 +149,8 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
   const k = cockpitCopy[lang];
   const cv = coveredCopy[lang];
   const sizing = step === 2;
+  // the four answers so far: who you are, what you move (once past it), your numbers, what matters
+  const answered = (persona ? 1 : 0) + (step > 1 || cargo.length ? 1 : 0) + (step > 2 || netTouched ? 1 : 0) + (priorities.length ? 1 : 0);
 
   return (
     <section id="planner" aria-labelledby="planner-title" className="relative scroll-mt-16 py-8 text-white lg:py-10">
@@ -160,38 +165,57 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
           <p className="max-w-xl text-lg text-white/75 text-pretty lg:justify-self-end">{p.lead}</p>
         </div>
 
-        <div className="mt-6 overflow-hidden rounded-[2rem] bg-surface text-ink shadow-[0_40px_120px_-40px_rgba(0,0,0,0.7)] ring-1 ring-white/10">
+        {/* the plan builder as MSG's console: a light runs round its edge while it waits for answers */}
+        <div className="relative mt-6 rounded-[2.25rem] p-px shadow-[0_50px_140px_-50px_rgba(0,0,0,0.85)]">
+          <div aria-hidden="true" className="plan-glow absolute inset-0 rounded-[2.25rem]" />
+          <div className="relative rounded-[calc(2.25rem-1px)] bg-[linear-gradient(160deg,#123d44,#0a2629)] p-1.5 ring-1 ring-white/10 sm:p-2">
+            <div className="flex items-center gap-3 px-3 pb-2 pt-1 text-white">
+              <span aria-hidden="true" className="flex gap-1.5"><span className="size-2.5 rounded-full bg-white/25" /><span className="size-2.5 rounded-full bg-white/25" /><span className="size-2.5 rounded-full bg-brand-bright/80" /></span>
+              <span className="truncate text-[12px] font-semibold text-white/85">{k.console}</span>
+              <span className="ms-auto hidden items-center gap-2 rounded-full bg-white/[0.08] px-2.5 py-1 text-[11px] font-semibold text-white/85 ring-1 ring-white/10 sm:inline-flex">
+                <span className={`size-1.5 rounded-full ${step === 4 ? "bg-brand-bright" : "bg-white/50"}`} />
+                {plan && step === 4 ? t.planner.result.models[plan.model].name : k.draft}
+              </span>
+              <span className="max-sm:ms-auto"><RiyadhClock label={lang === "ar" ? "الرياض" : "Riyadh"} /></span>
+            </div>
+        <div className="overflow-hidden rounded-[1.75rem] bg-surface text-ink">
           <div className={`grid grid-cols-[minmax(0,1fr)] lg:min-h-[38rem] ${sizing ? "lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]" : "lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]"}`}>
             {/* the conversation */}
             <div className="flex min-w-0 flex-col p-5 sm:p-8">
               {step < 4 ? (
                 <>
-                  <div className="flex items-center justify-between gap-4">
-                    <ol aria-label={p.steps.persona.q} className="flex items-center gap-1.5">
-                      {k.steps.map((label, i) => {
-                        const done = i < step;
-                        const here = i === step;
-                        return (
-                          <li key={label}>
-                            <button
-                              type="button"
-                              disabled={!done}
-                              onClick={() => go(i as Step)}
-                              aria-current={here ? "step" : undefined}
-                              className={`inline-flex items-center gap-2 rounded-full py-1 pe-3 ps-1 text-xs font-semibold transition-colors duration-300 ${
-                                here ? "bg-ink text-white" : done ? "bg-brand-soft text-brand hover:bg-brand/15" : "bg-subtle text-muted"
-                              }`}
-                            >
-                              <span className={`grid size-6 place-items-center rounded-full text-[11px] ${here ? "bg-white/20" : done ? "bg-brand text-white" : "bg-line"}`}>
-                                {done ? <CheckIcon className="size-3" /> : <span className="num">{i + 1}</span>}
-                              </span>
-                              <span className={here ? "" : "hidden sm:inline"}>{label}</span>
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ol>
-                    <p className="num hidden text-xs text-muted sm:block" aria-live="polite">{fmt(p.stepOf, { n: step + 1, total: TOTAL })}</p>
+                  {/* the path through the four questions: the line fills to where you are */}
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="relative min-w-0 flex-1 max-w-md">
+                      <span aria-hidden="true" className="absolute inset-x-3 top-3 h-0.5 rounded-full bg-line" />
+                      <span aria-hidden="true" className="absolute inset-x-3 top-3 h-0.5 origin-left rounded-full bg-brand transition-transform duration-500 ease-[cubic-bezier(.23,1,.32,1)] rtl:origin-right" style={{ transform: `scaleX(${step / (TOTAL - 1)})` }} />
+                      <ol aria-label={p.steps.persona.q} className="relative grid grid-cols-4">
+                        {k.steps.map((label, i) => {
+                          const done = i < step;
+                          const here = i === step;
+                          return (
+                            <li key={label} className={i === 0 ? "justify-self-start" : i === TOTAL - 1 ? "justify-self-end" : "justify-self-center"}>
+                              <button
+                                type="button"
+                                disabled={!done}
+                                onClick={() => go(i as Step)}
+                                aria-current={here ? "step" : undefined}
+                                className={`group flex flex-col items-center gap-1.5 text-[11px] font-semibold transition-colors duration-300 sm:text-xs ${here ? "text-ink" : done ? "text-brand hover:text-brand-strong" : "text-muted"}`}
+                              >
+                                <span className={`relative grid size-6 place-items-center rounded-full text-[11px] transition-[background-color,box-shadow,color] duration-300 ${
+                                  here ? "bg-ink text-white shadow-[0_0_0_4px_rgba(12,14,17,0.08)]" : done ? "bg-brand text-white" : "bg-surface text-muted ring-2 ring-line"
+                                }`}>
+                                  {here ? <span aria-hidden="true" className="plan-ping absolute inset-0 rounded-full bg-ink/30" /> : null}
+                                  <span className="relative">{done ? <CheckIcon className="size-3" /> : <span className="num">{i + 1}</span>}</span>
+                                </span>
+                                <span className={here ? "" : "max-sm:sr-only"}>{label}</span>
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ol>
+                    </div>
+                    <p className="num hidden pt-1 text-xs text-muted sm:block" aria-live="polite">{fmt(p.stepOf, { n: step + 1, total: TOTAL })}</p>
                   </div>
 
                   {/* each step simply arrives: nothing waits on the previous one leaving, so quick clicks can never strand the panel */}
@@ -264,7 +288,15 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
                       </div>
                     </motion.div>
 
-                  <div className="mt-8">
+                  {/* the plan building itself: how far along it is, the price once the numbers are in, and the services it has switched on */}
+                  <div className="mt-8 rounded-2xl border border-line bg-paper/60 p-4">
+                    <div className="mb-3 flex items-center gap-3">
+                      <BuiltRing value={answered / TOTAL} />
+                      <p className="text-sm font-semibold text-ink">
+                        <span className="num">{fmt(k.built, { n: Math.round((answered / TOTAL) * 100) })}</span>
+                      </p>
+                      {step === 3 ? <LiveEstimate net={net} lang={lang} label={k.estimate} reduce={reduce} /> : null}
+                    </div>
                     <PlanModules t={t} input={liveInput} label={k.setup} />
                   </div>
 
@@ -312,6 +344,8 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
             )}
           </div>
         </div>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -326,14 +360,21 @@ function Option({
       role={role}
       aria-checked={checked}
       onClick={onClick}
+      onPointerMove={(e) => {
+        // a soft light follows the pointer across the tile
+        const r = e.currentTarget.getBoundingClientRect();
+        e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`);
+        e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`);
+      }}
       data-press="soft"
       title={desc || undefined}
-      className={`group relative flex min-h-[3.5rem] items-center gap-2.5 rounded-xl border bg-surface px-2.5 py-2 text-start transition-ui duration-200 sm:gap-3 sm:px-3 ${
+      className={`group relative isolate flex min-h-[3.5rem] items-center gap-2.5 overflow-hidden rounded-xl border bg-surface px-2.5 py-2 text-start transition-ui duration-200 sm:gap-3 sm:px-3 ${
         checked
           ? "border-brand bg-brand-soft/60 shadow-[0_0_0_1px_var(--color-brand),0_16px_32px_-22px_rgba(11,125,54,0.7)]"
           : "border-line-strong/70 hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-[var(--shadow-card)]"
       }`}
     >
+      <span aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-300 [background:radial-gradient(140px_circle_at_var(--mx,50%)_var(--my,50%),rgba(19,113,121,0.13),transparent_70%)] group-hover:opacity-100" />
       <span className={`inline-flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors ${
         checked ? "bg-brand text-white" : "bg-subtle text-ink-3 group-hover:bg-ink group-hover:text-white"
       }`}>
@@ -348,7 +389,7 @@ function Option({
       <span aria-hidden="true" className={`inline-flex size-5 shrink-0 items-center justify-center border-2 transition-colors ${role === "checkbox" ? "rounded-md" : "rounded-full"} ${
         checked ? "border-brand bg-brand text-white" : "border-line-strong bg-surface group-hover:border-ink/50"
       }`}>
-        {checked ? <CheckIcon className="size-3.5" /> : null}
+        {checked ? <CheckIcon className="size-3.5 motion-safe:animate-[opt-pop_0.35s_var(--ease-out)]" /> : null}
       </span>
     </button>
   );
@@ -405,9 +446,10 @@ function Result({
             aria-controls="plan-tabpanel"
             tabIndex={tab === id ? 0 : -1}
             onClick={() => setTab(id)}
-            className={`min-w-0 flex-1 rounded-full px-2 py-2 text-xs font-semibold leading-tight transition-ui sm:text-sm ${tab === id ? "bg-surface text-ink shadow-[0_1px_3px_rgba(12,14,17,0.15)]" : "text-muted hover:text-ink"}`}
+            className={`relative min-w-0 flex-1 rounded-full px-2 py-2 text-xs font-semibold leading-tight transition-colors sm:text-sm ${tab === id ? "text-ink" : "text-muted hover:text-ink"}`}
           >
-            {k.tabs[id]}
+            {tab === id ? <motion.span layoutId="plan-tab" transition={{ type: "spring", stiffness: 420, damping: 34 }} className="absolute inset-0 rounded-full bg-surface shadow-[0_1px_3px_rgba(12,14,17,0.15)]" /> : null}
+            <span className="relative">{k.tabs[id]}</span>
           </button>
         ))}
       </div>
@@ -490,5 +532,34 @@ function Result({
         </div>
       </div>
     </>
+  );
+}
+
+/** how much of the plan is built, as a ring that closes with each answer */
+function BuiltRing({ value }: { value: number }) {
+  const C = 2 * Math.PI * 15;
+  return (
+    <svg viewBox="0 0 36 36" className="size-9 shrink-0 -rotate-90" aria-hidden="true">
+      <circle cx="18" cy="18" r="15" fill="none" stroke="var(--color-line)" strokeWidth="3.5" />
+      <circle cx="18" cy="18" r="15" fill="none" stroke="var(--color-brand)" strokeWidth="3.5" strokeLinecap="round"
+        strokeDasharray={C} strokeDashoffset={C * (1 - value)} className="transition-[stroke-dashoffset] duration-700 ease-[cubic-bezier(.23,1,.32,1)]" />
+    </svg>
+  );
+}
+
+/** the approximate price per order at the visitor's numbers, carried on once the volume step is done */
+function LiveEstimate({ net, lang, label, reduce }: { net: SizerInput; lang: Locale; label: string; reduce: boolean }) {
+  const cost = approxCost(net);
+  const ar = lang === "ar";
+  return (
+    <aside data-rate-card aria-label={label} className="ms-auto text-end">
+      <span className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-brand rtl:tracking-normal">{label}</span>
+      <span className="flex items-baseline justify-end gap-1 font-display font-semibold text-ink">
+        <span className="text-xs text-ink/70">≈</span>
+        {ar ? null : <span className="text-xs text-ink/70">SAR</span>}
+        <span className="num text-xl" dir="ltr">{reduce ? cost.perOrder : <NumberFlow value={cost.perOrder} locales="en-US" />}</span>
+        {ar ? <span className="text-xs text-ink/70">ريال</span> : null}
+      </span>
+    </aside>
   );
 }

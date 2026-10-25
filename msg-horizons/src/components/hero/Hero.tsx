@@ -3,7 +3,7 @@
 import { SPRING_SMOOTH } from "@/lib/motion";
 import NumberFlow from "@number-flow/react";
 import Image from "next/image";
-import { motion, useMotionValue, useMotionValueEvent, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
+import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { heroCopy, type HeroLane } from "@/content/hero";
 import { experience, NEED_STAGES, NEEDS_BY_STAGE } from "@/content/experience";
@@ -16,9 +16,11 @@ import { usePlan } from "../PlanContext";
 import TrackedLink from "../ui/TrackedLink";
 import { WhatsAppIcon } from "../ui/icons";
 import Dust from "./Dust";
-import HeroMap, { STAGE_COUNT } from "./HeroMap";
+import { STAGE_COUNT } from "./HeroMap";
 import { NeedIcon, StageCard } from "../operation/StageParts";
 import QuoteCard from "./QuoteCard";
+import Typewriter from "../ui/typewriter";
+import { Chip, CommandBackdrop, ConsoleWindow, Depth, fadeUp, OrderTicker, PartnerLine, Strengths, VanIcon } from "./Command";
 
 /*
  * Geometry of MSG's own photos (public/media/msg), as fractions of each image. Everything drawn on top of a
@@ -35,12 +37,14 @@ const FACADE = {
   lamp: { x: 0.4365, y: 0.399 },
 };
 /*
- * The scroll through the hero: the walk-in (facade, inside, out to the Kingdom) takes the first WALK of it, the
- * network holds for HOLD, then one order's four stages (set up, store, deliver, settle) share the rest.
- * The section's height is chosen so the walk-in runs over the same distance it always has.
+ * The scroll through the hero: the walk-in (facade, inside, out to the network) takes the first WALK of it, the
+ * network console holds for HOLD, then one order's four stages (set up, store, deliver, settle) share the rest,
+ * played inside the same console. The section's height keeps the walk-in over the distance it always had.
  */
-const WALK = 0.4, HOLD = 0.06, STEP = (1 - WALK - HOLD) / STAGE_COUNT;
+const WALK = 0.36, HOLD = 0.1, STEP = (1 - WALK - HOLD) / STAGE_COUNT;
 const stageAt = (v: number) => (v < WALK + HOLD ? -1 : Math.min(STAGE_COUNT - 1, Math.floor((v - WALK - HOLD) / STEP)));
+/** the console's resting tilt toward the visitor (degrees); it eases to about half while an order plays */
+const TILT = { x: 9, y: 13 };
 const RATE_LANE: Record<HeroLane, Lane> = { intra: "intra", inter: "inter", sabya: "sabyaMajor" };
 type Pt = { x: number; y: number };
 type Inside = { src: string; ar: number; lamps: Pt[]; spots: Record<"storage" | "sorting" | "dispatch", Pt> };
@@ -82,14 +86,17 @@ function doorZoom(fw: number, fh: number) {
 }
 
 /**
- * First screen: MSG's real warehouse. The facade breathes in warm light (drifting sky, a light sweep, the sign
- * glowing, deliveries flowing out of the door); scrolling walks the visitor through the doorway, the lights
- * come on inside, and the view pulls out to the network across the Kingdom. Under reduced motion the same three
- * scenes simply stack.
+ * First screen: MSG's real warehouse. The facade breathes in warm light; scrolling walks the visitor through the
+ * doorway, the lights come on inside, and the view pulls out to MSG's network as a control console: the network
+ * live on the map, one order walking through every step MSG owns, the price from MSG's own rate card and the
+ * verified figures under it. Scrolling on, the same console plays one order through set up, store, deliver and
+ * settle: the map's camera goes where each stage happens, the stage's card comes forward, its answers take the
+ * copy column and a rail under it tracks the order. Under reduced motion the scenes simply stack.
  */
 export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   const L: Locale = lang ?? "en";
   const c = heroCopy[L];
+  const rtl = L === "ar";
   const reduce = useReducedMotion();
   const staged = !reduce;
   const section = useRef<HTMLElement>(null);
@@ -98,14 +105,19 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   const { quote, setQuote } = usePlan();
   const lane: HeroLane = quote.lane === "intra" || quote.lane === "inter" ? quote.lane : "sabya";
   const orders = quote.orders;
+  const rate = rateFor(RATE_LANE[lane], orders);
   const setLane = (l: HeroLane) => setQuote({ lane: RATE_LANE[l] });
   const setOrders = (n: number) => setQuote({ orders: n });
   const [beat, setBeat] = useState(1);
   const [stage, setStage] = useState(-1);
+  const [priceOpen, setPriceOpen] = useState(false);
+  const inStage = staged && beat === 3 && stage >= 0;
+  const n = experience[L].needs;
+  const guide = experience[L].journey.ui.guideItems;
 
   // the walk-in is driven by scroll through the (tall) section
   const { scrollYProgress } = useScroll({ target: section, offset: ["start start", "end end"] });
-  // copied into a plain motion value so every layer reads the same progress (no per-layer native scroll timelines)
+  // copied into plain motion values so every layer reads the same progress
   const p = useMotionValue(0);
   // how far through the four stages the scroll is (0 → 1), for the stage rail's fill
   const sp = useMotionValue(0);
@@ -116,6 +128,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
     setBeat((x) => (x === b ? x : b));
     const s = stageAt(v);
     setStage((x) => (x === s ? x : s));
+    if (b !== 3 || s >= 0) setPriceOpen(false); // the quote belongs to the network view
     sp.set(Math.max(0, (v - WALK - HOLD) / (1 - WALK - HOLD)));
   });
   // the stage rail jumps to the middle of a stage's stretch of scroll
@@ -150,7 +163,14 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   // the header picks its colours from the section under it; tell it when the scene changes
   useEffect(() => { window.dispatchEvent(new Event("scroll")); }, [beat]);
 
-  // pointer parallax: the sky moves more than the building
+  useEffect(() => {
+    if (!priceOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setPriceOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [priceOpen]);
+
+  // pointer parallax: the sky moves more than the building, and the console leans toward the pointer
   const mx = useMotionValue(0), my = useMotionValue(0);
   const sx = useSpring(mx, { ...SPRING_SMOOTH }), sy = useSpring(my, { ...SPRING_SMOOTH });
   const skyX = useTransform(sx, [-0.5, 0.5], [22, -22]);
@@ -188,10 +208,25 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   const inCopy = useTransform(p, [0.52, 0.57, 0.72, 0.78], [0, 1, 1, 0]);
   const inCopyY = useTransform(p, [0.52, 0.57], [30, 0]);
 
-  // out to the Kingdom
-  const kOpacity = useTransform(p, [0.78, 0.86], [0, 1]);
-  const kMap = useTransform(p, [0.78, 0.95], [1.3, 1]);
-  const kCopy = useTransform(p, [0.84, 0.9], [0, 1]);
+  // out to the network: the console rises out of the night and settles, tilted toward the visitor
+  const cO = useTransform(p, [0.78, 0.9], [0, 1]);
+  const cBack = useTransform(p, [0.76, 0.86], [0, 1]);
+  const cLift = useTransform(p, [0.78, 1], [70, 0]);
+  const cScale = useTransform(p, [0.78, 1], [0.9, 1]);
+  const tiltTo = useMotionValue(1);
+  useEffect(() => { tiltTo.set(inStage ? 0.45 : 1); }, [inStage, tiltTo]);
+  const tiltK = useSpring(tiltTo, { stiffness: 60, damping: 18 });
+  const rise = useTransform(p, [0.78, 1], [1.8, 1]); // the console comes in steeper and settles to its lean
+  const dir = rtl ? -1 : 1;
+  const ry = useTransform(() => (-TILT.y * dir + sx.get() * 7) * tiltK.get());
+  const rx = useTransform(() => (TILT.x * rise.get() - sy.get() * 6) * tiltK.get());
+
+  // "Price a delivery": the quote opens over the console on wide screens; phones go to the card below the hero
+  const openPrice = (e: React.MouseEvent) => {
+    if (!window.matchMedia("(min-width: 1024px)").matches) return;
+    e.preventDefault();
+    setPriceOpen(true);
+  };
 
   const facade = (
     <Facade
@@ -221,11 +256,11 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
       <div className="lg:mt-2 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-end lg:gap-10">
       <div>
         <p className="hi hi-rise mt-4 max-w-xl text-base leading-relaxed text-white/85 text-pretty sm:text-lg" style={{ ["--hi" as string]: "1.8s" }}>{c.lead}</p>
-        {/* phones: the price is on the first screen; the full card waits below the walk-in */}
+        {/* phones: the price is on the first screen; the full card waits below the hero */}
         <aside data-rate-card aria-label={c.quote.title} className="hi hi-rise mt-4 lg:hidden" style={{ ["--hi" as string]: "1.95s" }}>
           <a href="#hero-quote" className="inline-flex max-w-full flex-wrap items-baseline gap-x-2 gap-y-0.5 rounded-2xl bg-white/95 px-4 py-2.5 text-sm text-teal-deep shadow-[var(--shadow-float)]">
             <span className="text-teal-deep/75">{c.quote.perOrder}</span>
-            <span className="num font-display text-lg font-semibold" dir="ltr">≈ {c.quote.cur} {rateFor(RATE_LANE[lane], orders)}</span>
+            <span className="num font-display text-lg font-semibold" dir="ltr">≈ {c.quote.cur} {rate}</span>
             <span className="flex basis-full items-center gap-1.5 text-teal-deep/75">
               {c.quote.lanes[lane]} · <span className="num" dir="ltr">{orders.toLocaleString("en-US")}</span> {c.quote.perMonth}
               <svg viewBox="0 0 24 24" className="size-3.5 text-teal" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M6 13l6 6 6-6" /></svg>
@@ -253,8 +288,125 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
     </div>
   );
 
-  const kingdom = (
-    <Kingdom c={c} lang={L} lane={lane} go={!staged || beat === 3} map={!staged || beat >= 2} reduce={reduce} stage={staged && beat === 3 ? stage : -1} onStage={staged ? goStage : undefined} progress={sp} />
+  /* ---- the network console ---- */
+
+  const overview = (
+    <div className="text-white">
+      <p className="inline-flex items-center gap-2 rounded-full bg-white/[0.07] px-3 py-1.5 text-[11px] font-semibold text-white/85 ring-1 ring-white/15 sm:text-xs">
+        <span className="relative flex size-2"><span className="absolute inset-0 animate-ping rounded-full bg-brand-bright/70 motion-reduce:hidden" /><span className="relative size-2 rounded-full bg-brand-bright" /></span>
+        {c.command.eyebrow}
+      </p>
+      <h2 className="mt-3 font-display text-[clamp(1.9rem,min(4vw,7svh),3.7rem)] font-semibold leading-[1.02] tracking-[-0.035em] text-balance sm:mt-4 rtl:leading-[1.25] rtl:tracking-normal">
+        <span className="block">{c.command.title[0]}</span>
+        <span className="block bg-[linear-gradient(90deg,#b8f5cf,#6cc3c3)] bg-clip-text text-transparent rtl:bg-[linear-gradient(270deg,#b8f5cf,#6cc3c3)]"><Typewriter words={c.command.typed} cursorClassName="bg-[#b8f5cf]" /></span>
+      </h2>
+      <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-white/80 text-pretty sm:mt-4 sm:text-lg">
+        <span className="sm:hidden">{c.command.leadShort}</span><span className="max-sm:hidden">{c.command.lead}</span>
+      </p>
+      <div className="mt-4 flex flex-wrap items-center gap-2.5 sm:mt-6 sm:gap-3">
+        <a href="#hero-quote" onClick={openPrice} aria-haspopup="dialog" className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 font-semibold text-teal-deep shadow-[0_10px_40px_-10px_rgba(184,245,207,0.6)] transition-transform hover:-translate-y-0.5 sm:py-3.5">
+          {c.command.ctaPrice}
+          <svg viewBox="0 0 24 24" className="size-4 rtl:-scale-x-100" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </a>
+        <TrackedLink href={whatsappLink(t.wa.general)} target="_blank" rel="noopener noreferrer" event="whatsapp_click" props={{ location: "hero_console" }}
+          aria-label={c.ctaTalk}
+          className="inline-flex items-center gap-2 rounded-full bg-white/[0.08] px-5 py-3 font-semibold text-white ring-1 ring-white/25 transition-colors hover:bg-white/15 sm:py-3.5">
+          <WhatsAppIcon className="size-5 text-brand-bright" /> <span className="max-sm:hidden">{c.ctaTalk}</span><span className="sm:hidden">{c.command.waShort}</span>
+        </TrackedLink>
+      </div>
+      <div className="mt-7 max-lg:hidden"><PartnerLine c={c} /></div>
+    </div>
+  );
+
+  const priceChip = (
+    <aside data-rate-card aria-label={c.command.price.t}>
+      <button type="button" onClick={() => setPriceOpen(true)} aria-haspopup="dialog" aria-expanded={priceOpen}
+        className="group block w-[15.5rem] rounded-2xl bg-white p-3.5 text-start text-teal-deep shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)] ring-1 ring-black/5 transition-transform hover:-translate-y-0.5">
+        <span className="block text-[11px] font-semibold text-teal">{c.command.price.t}</span>
+        <span className="mt-1 flex items-baseline gap-1.5 font-display font-semibold">
+          <span className="text-base opacity-80">≈</span>
+          {rtl ? null : <span className="text-sm opacity-80">{c.quote.cur}</span>}
+          <span className="num text-3xl" dir="ltr">{reduce ? rate : <NumberFlow value={rate} locales="en-US" />}</span>
+          {rtl ? <span className="text-sm opacity-80">{c.quote.cur}</span> : null}
+          <span className="font-sans text-xs font-normal text-teal-deep/70">{c.command.price.per}</span>
+        </span>
+        <span className="mt-0.5 block text-[11px] text-teal-deep/70">{c.quote.lanes[lane]} · <span className="num" dir="ltr">{orders.toLocaleString("en-US")}</span> {c.quote.perMonth}</span>
+        <span className="mt-2.5 flex items-center justify-between border-t border-teal/10 pt-2 text-[12px] font-semibold text-teal">
+          {c.command.price.open}
+          <svg viewBox="0 0 24 24" className="size-4 transition-transform group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </span>
+      </button>
+    </aside>
+  );
+
+  // a layer pinned to the console that comes and goes with the view: in, it settles; out, it drops back and tips
+  const swap = (on: boolean) =>
+    `transition-[opacity,translate,rotate] duration-500 ease-[cubic-bezier(.23,1,.32,1)] ${on ? "translate-y-0 rotate-0 opacity-100" : "pointer-events-none translate-y-4 rotate-[-2deg] opacity-0"}`;
+
+  const console3d = (
+    <div className="relative mx-auto w-full max-w-[640px] max-lg:w-[min(100%,calc(29svh*1100/850+1rem))] lg:my-12 lg:w-[min(100%,calc((100svh-25rem)*1100/850))] [perspective:1700px]">
+      <motion.div style={staged ? { rotateX: rx, rotateY: ry, transformStyle: "preserve-3d" } : undefined} className="relative">
+        <ConsoleWindow c={c} lang={L} lane={lane} onLane={setLane} map={!staged || beat >= 2} title={c.command.console} stage={inStage ? stage : -1} />
+        {/* front, lower corner: the order card over the network; each stage's own card while the order plays */}
+        <Depth z={90} className="absolute -bottom-12 -start-10 hidden h-0 w-[17.5rem] lg:block xl:-start-14">
+          <div aria-hidden={inStage || undefined} className={`absolute inset-x-0 bottom-0 ${swap(!inStage)}`}>
+            <OrderTicker c={c} run={staged && beat === 3 && !inStage} reduce={reduce} />
+          </div>
+          {staged
+            ? NEED_STAGES.map((st, i) => (
+                <div key={st} aria-hidden={stage !== i || !inStage || undefined} className={`absolute inset-x-0 bottom-0 ${swap(inStage && stage === i)}`}>
+                  <div className="motion-safe:animate-[op-float_6s_var(--ease-ambient)_infinite_alternate] [&>div]:p-3.5 [&>div]:text-[13px] [&>div]:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)]">
+                    <StageCard stage={st} c={n} guide={guide} />
+                  </div>
+                </div>
+              ))
+            : null}
+        </Depth>
+        <Depth z={120} className={`absolute -top-10 end-3 hidden transition-opacity duration-200 lg:block ${priceOpen ? "opacity-0" : ""}`}>{priceChip}</Depth>
+        <Depth z={60} className="absolute -bottom-14 end-2 hidden lg:block">
+          <div aria-hidden={(inStage && stage !== 2) || undefined} className={swap(!inStage || stage === 2)}>
+            <Chip icon={VanIcon} t={c.command.fleet.t} d={c.command.fleet.d} />
+          </div>
+        </Depth>
+      </motion.div>
+      {/* the ten-second price, opened over the console */}
+      <AnimatePresence>
+        {priceOpen ? (
+          <motion.div {...fadeUp} role="dialog" aria-modal="false" aria-label={c.quote.title} className="absolute inset-x-0 top-4 z-20 hidden lg:block">
+            <div className="relative">
+              <QuoteCard lang={L} reduce={reduce} lane={lane} onLane={setLane} orders={orders} onOrders={setOrders} />
+              <button type="button" onClick={() => setPriceOpen(false)} aria-label={c.command.price.close} autoFocus
+                className="absolute -end-3 -top-3 grid size-9 place-items-center rounded-full bg-white text-teal-deep shadow-[0_8px_20px_-8px_rgba(0,0,0,0.5)] ring-1 ring-black/5 transition-colors hover:bg-sea-100">
+                <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+              </button>
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </div>
+  );
+
+  const scene = (
+    <div className="relative mx-auto grid h-full max-w-7xl grid-rows-[1fr_auto] px-4 pb-4 pt-[4.5rem] sm:px-5 lg:px-8 lg:pb-6 lg:pt-20">
+      <div className="grid content-center items-center gap-4 lg:grid-cols-[0.92fr_1.08fr] lg:gap-6 xl:gap-10">
+        <div className="order-2 grid [grid-template-areas:'s'] lg:order-1">
+          <Panel on={!inStage}>{overview}</Panel>
+          {staged
+            ? NEED_STAGES.map((st, i) => (
+                <Panel key={st} on={inStage && stage === i}>
+                  <p className="mb-3 text-sm font-semibold text-brand-mint max-lg:hidden">{c.kingdom.title}</p>
+                  <StageCopy n={n} st={st} i={i} on={inStage && stage === i} dark />
+                </Panel>
+              ))
+            : null}
+        </div>
+        <div className="order-1 lg:order-2 lg:ps-6 xl:ps-10">{console3d}</div>
+      </div>
+      <div className="mt-4 grid border-t border-white/12 pt-3.5 [grid-template-areas:'s'] lg:mt-6 lg:pt-5">
+        <Panel on={!inStage}><Strengths c={c} go={!staged || beat === 3} reduce={reduce} ar={rtl} /></Panel>
+        {staged ? <Panel on={inStage}><StageRail n={n} label={c.kingdom.rail} stage={inStage ? stage : -1} onStage={goStage} progress={sp} dark /></Panel> : null}
+      </div>
+    </div>
   );
 
   if (!staged) {
@@ -270,8 +422,11 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
           <Scrim />
           <div className="absolute inset-0">{inside}</div>
         </div>
-        <div className="relative bg-[linear-gradient(180deg,#f3fbfb,#ffffff)] py-16">{kingdom}</div>
-        <div id="sellers" className="relative scroll-mt-16 bg-white pb-16"><StagesStacked lang={L} /></div>
+        <div data-theme="dark" className="relative min-h-[100svh] overflow-hidden">
+          <CommandBackdrop />
+          <div className="relative">{scene}</div>
+        </div>
+        <div id="sellers" className="relative scroll-mt-16 bg-white py-16"><StagesStacked lang={L} /></div>
         <div id="hero-quote" className="scroll-mt-20 px-4 pb-12 pt-2 lg:hidden"><QuoteCard lang={L} reduce={reduce} lane={lane} onLane={setLane} orders={orders} onOrders={setOrders} /></div>
       </section>
     );
@@ -279,14 +434,14 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
 
   return (
     <>
-    <section id="hero" ref={section} suppressHydrationWarning aria-labelledby="hero-title" className="relative h-[425svh] bg-deep lg:h-[575svh]">
+    <section id="hero" ref={section} suppressHydrationWarning aria-labelledby="hero-title" className="relative h-[460svh] bg-deep lg:h-[620svh]">
       {/* runs before first paint: a returning visitor, or a page restored part-way down, skips the opening */}
       <script dangerouslySetInnerHTML={{ __html: INTRO_GATE }} />
-      {/* where "one partner for the whole operation" begins: the first of the four stages, to the end of the hero */}
-      <div id="sellers" aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 top-[169svh] lg:top-[247svh]" />
+      {/* where "one order through MSG" begins: the first of the four stages, to the end of the hero */}
+      <div id="sellers" aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 top-[176svh] lg:top-[255svh]" />
       <div
         ref={frame}
-        data-theme={beat < 3 ? "dark" : undefined}
+        data-theme="dark"
         onPointerMove={onMove}
         onPointerLeave={() => { mx.set(0); my.set(0); }}
         className="sticky top-0 h-[100svh] overflow-hidden [container-type:size]"
@@ -299,7 +454,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
           <Interior c={c} dark={inDark} scale={inScale} lamps={lamps} copy={inCopy} />
         </motion.div>
 
-        <motion.div style={{ opacity: kOpacity }} className="absolute inset-0 z-[4] bg-[radial-gradient(90%_70%_at_80%_10%,#c4e9e7_0%,rgba(196,233,231,0)_60%),radial-gradient(70%_60%_at_0%_100%,#e2f4f3_0%,rgba(226,244,243,0)_60%),linear-gradient(180deg,#f3fbfb,#ffffff)]" />
+        <motion.div style={{ opacity: cBack }} className="absolute inset-0 z-[4]"><CommandBackdrop stars={beat >= 2} /></motion.div>
 
         {/* scene copy */}
         <motion.div style={{ opacity: uiOut, y: uiY }} inert={beat !== 1} className="absolute inset-0 z-[5] pt-20">
@@ -310,8 +465,8 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
           <Scrim />
           {inside}
         </motion.div>
-        <motion.div style={{ opacity: kCopy }} inert={beat !== 3} className="absolute inset-0 z-[6] flex items-center pt-14 lg:pt-16">
-          <motion.div style={{ scale: kMap }} className="w-full">{kingdom}</motion.div>
+        <motion.div style={{ opacity: cO, y: cLift, scale: cScale }} inert={beat !== 3} className="absolute inset-0 z-[6]">
+          {scene}
         </motion.div>
 
         <motion.p aria-hidden="true" style={{ opacity: hint }} className="pointer-events-none absolute inset-x-0 bottom-3 z-[7] hidden flex-col items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/80 lg:flex rtl:tracking-normal">
@@ -320,7 +475,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
         </motion.p>
       </div>
     </section>
-    {/* on phones the ten-second price follows the walk-in */}
+    {/* on phones the ten-second price follows the hero */}
     <div id="hero-quote" className="relative scroll-mt-20 bg-white px-4 pb-12 pt-8 lg:hidden">
       <QuoteCard lang={L} reduce={reduce} lane={lane} onLane={setLane} orders={orders} onOrders={setOrders} />
     </div>
@@ -464,88 +619,6 @@ function Interior({
   );
 }
 
-/**
- * Out across the Kingdom, then one order through MSG. The network map carries the four stages of the operation
- * (set up, store, deliver, settle): the camera moves to where each one happens and draws it there, the stage's
- * answers take over the copy column, and the stage's card floats over the map. A rail under the map jumps
- * between stages. Without `onStage` (reduced motion) the map shows the network and the stages stack below.
- */
-function Kingdom({
-  c, lang, lane, go, map, reduce, stage = -1, onStage, progress,
-}: { c: C; lang: Locale; lane: HeroLane; go: boolean; map: boolean; reduce: boolean; stage?: number; onStage?: (i: number) => void; progress?: MotionValue<number> }) {
-  const n = experience[lang].needs;
-  const guide = experience[lang].journey.ui.guideItems;
-  const inStage = stage >= 0;
-  return (
-    <div className="mx-auto grid max-w-7xl items-center gap-4 px-4 text-teal-deep sm:px-5 lg:grid-cols-[0.82fr_1.18fr] lg:gap-10 lg:px-8">
-      <div className="order-2 lg:order-1">
-        <div className={inStage ? "max-lg:hidden" : undefined}>
-          <p className="text-sm font-semibold text-teal">{c.kingdom.eyebrow}</p>
-          <h2 className="h-scene mt-2">{c.kingdom.title}</h2>
-          <p className={`mt-3 max-w-lg text-teal-deep/80 text-pretty sm:text-lg ${inStage ? "hidden" : onStage ? "max-lg:hidden" : ""}`}>{c.kingdom.lead}</p>
-        </div>
-        <div className="relative mt-4 grid [grid-template-areas:'s'] lg:mt-7">
-          {/* the network in numbers */}
-          <Panel on={!inStage}>
-            <dl className="grid max-w-md grid-cols-3 divide-x divide-teal/15 rtl:divide-x-reverse">
-              {c.stats.map((s, i) => (
-                <div key={s.l} className={i ? "ps-5" : "pe-5"}>
-                  <dd className="num font-display text-3xl font-semibold tracking-[-0.02em] sm:text-4xl">
-                    {reduce ? `${s.v.toLocaleString("en-US")}${s.suffix}` : <Counter v={s.v} suffix={s.suffix} go={go} delay={i * 0.15} />}
-                  </dd>
-                  <dt className="mt-1 text-sm text-teal-deep/70">{s.l}</dt>
-                </div>
-              ))}
-            </dl>
-            <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
-              {onStage ? (
-                <span className="hidden items-center gap-2 text-sm text-teal-deep/70 lg:inline-flex">
-                  <span aria-hidden="true" className="block h-5 w-px overflow-hidden bg-teal/20"><span className="block h-2 w-px animate-[hero-drip_1.6s_var(--ease-ambient)_infinite] bg-teal" /></span>
-                  {c.kingdom.hint}
-                </span>
-              ) : null}
-            </div>
-          </Panel>
-          {/* one order, stage by stage */}
-          {onStage
-            ? NEED_STAGES.map((st, i) => (
-                <Panel key={st} on={stage === i}>
-                  <StageCopy n={n} st={st} i={i} on={stage === i} />
-                </Panel>
-              ))
-            : null}
-        </div>
-      </div>
-
-      <div className="relative order-1 mx-auto w-full max-w-[640px] max-lg:w-[min(100%,calc(38svh*1100/850))] lg:order-2 lg:w-[min(100%,calc(58svh*1100/850))]">
-        <div className="relative aspect-[1100/850]">
-          <div aria-hidden="true" className="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(108,195,195,0.35),transparent_70%)] blur-2xl" />
-          <div className="absolute inset-0 [mask-composite:intersect] [mask-image:linear-gradient(90deg,transparent,#000_7%,#000_93%,transparent),linear-gradient(180deg,transparent,#000_7%,#000_93%,transparent)]">
-            {map ? <HeroMap lang={lang} lane={lane} stage={stage} /> : null}
-          </div>
-          {/* the stage's card, floating over the map */}
-          {onStage ? (
-            <div aria-hidden={!inStage || undefined} className="pointer-events-none absolute -end-2 bottom-[10%] hidden w-[15.5rem] lg:block xl:-end-5">
-              {NEED_STAGES.map((st, i) => (
-                <div
-                  key={st}
-                  className={`absolute inset-x-0 bottom-0 transition-[opacity,translate,rotate] duration-700 ease-[cubic-bezier(.2,.7,.2,1)] ${stage === i ? "translate-y-0 rotate-0 opacity-100" : "translate-y-5 rotate-[-2deg] opacity-0"}`}
-                >
-                  <div className="motion-safe:animate-[op-float_6s_var(--ease-ambient)_infinite_alternate] [&>div]:p-3.5 [&>div]:text-[13px]">
-                    <StageCard stage={st} c={n} guide={guide} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : null}
-          <p className="absolute start-2 top-0 text-[11px] text-teal-deep/60 lg:bottom-1 lg:top-auto">{c.map.caption}</p>
-        </div>
-        {onStage && progress ? <StageRail n={n} label={c.kingdom.rail} stage={stage} onStage={onStage} progress={progress} /> : null}
-      </div>
-    </div>
-  );
-}
-
 /** one layer of the copy column; the others wait, hidden and inert, in the same grid cell */
 function Panel({ on, children }: { on: boolean; children: React.ReactNode }) {
   return (
@@ -562,54 +635,55 @@ function Panel({ on, children }: { on: boolean; children: React.ReactNode }) {
 type NeedsC = (typeof experience)["en"]["needs"];
 type Stage = (typeof NEED_STAGES)[number];
 
-function StageCopy({ n, st, i, on }: { n: NeedsC; st: Stage; i: number; on: boolean }) {
+/** one stage's answers; `dark` sets them on the network console's night */
+function StageCopy({ n, st, i, on, dark = false }: { n: NeedsC; st: Stage; i: number; on: boolean; dark?: boolean }) {
   return (
-    <div>
-      <p className="flex items-baseline gap-3 text-teal">
+    <div className={dark ? "text-white" : undefined}>
+      <p className={`flex items-baseline gap-3 ${dark ? "text-brand-bright" : "text-teal"}`}>
         <span className="num font-display text-sm font-semibold" dir="ltr">0{i + 1} / 0{NEED_STAGES.length}</span>
-        <span className="h-px flex-1 bg-teal/20" />
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-sea-100 px-2.5 py-1 text-[11px] font-semibold">
-          <span className="size-1.5 rounded-full bg-teal" />
+        <span className={`h-px flex-1 ${dark ? "bg-white/15" : "bg-teal/20"}`} />
+        <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${dark ? "bg-white/10 text-white/90" : "bg-sea-100"}`}>
+          <span className={`size-1.5 rounded-full ${dark ? "bg-brand-bright" : "bg-teal"}`} />
           {n.owner}
         </span>
       </p>
       <h3 className="mt-2 font-display text-4xl font-semibold tracking-[-0.035em] sm:text-5xl rtl:tracking-normal">{n.stages[st].t}</h3>
-      <p className="mt-1 text-teal-deep/70 sm:text-lg">{n.stages[st].d}</p>
-      <ul data-stage-answers data-inview={on || undefined} className="needs-grid mt-3 divide-y divide-teal/10 border-y border-teal/10 lg:mt-5">
+      <p className={`mt-1 sm:text-lg ${dark ? "text-white/75" : "text-teal-deep/70"}`}>{n.stages[st].d}</p>
+      <ul data-stage-answers data-inview={on || undefined} className={`needs-grid mt-3 divide-y border-y lg:mt-5 ${dark ? "divide-white/10 border-white/10" : "divide-teal/10 border-teal/10"}`}>
         {NEEDS_BY_STAGE[st].map((id, k) => (
           <li
             key={id}
             className={`flex items-start gap-3 py-2.5 transition-[opacity,translate] duration-700 lg:gap-4 lg:py-3.5 ${on ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"}`}
             style={{ transitionDelay: on ? `${150 + k * 90}ms` : "0ms" }}
           >
-            <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-teal to-teal-deep text-white shadow-[0_10px_20px_-10px_rgba(11,58,64,0.8)] lg:size-11 [&_svg]:size-6 lg:[&_svg]:size-7">
+            <span className={`inline-flex size-9 shrink-0 items-center justify-center rounded-xl text-white lg:size-11 [&_svg]:size-6 lg:[&_svg]:size-7 ${dark ? "bg-white/[0.08] text-brand-bright ring-1 ring-white/15" : "bg-gradient-to-br from-teal to-teal-deep shadow-[0_10px_20px_-10px_rgba(11,58,64,0.8)]"}`}>
               <NeedIcon id={id} />
             </span>
             <div className="min-w-0 flex-1">
-              <h4 className="text-sm text-teal-deep/70 max-lg:hidden">{n.items[id].q}</h4>
+              <h4 className={`text-sm max-lg:hidden ${dark ? "text-white/70" : "text-teal-deep/70"}`}>{n.items[id].q}</h4>
               <p className="font-display text-[15px] font-semibold leading-snug text-pretty sm:text-lg lg:mt-0.5 xl:text-xl">{n.items[id].a}</p>
             </div>
           </li>
         ))}
       </ul>
-      {st === "settle" ? <p className="mt-3 text-xs text-teal-deep/75 max-lg:hidden">{n.note}</p> : null}
+      {st === "settle" ? <p className={`mt-3 text-xs max-lg:hidden ${dark ? "text-white/70" : "text-teal-deep/75"}`}>{n.note}</p> : null}
     </div>
   );
 }
 
 /** the four stages under the map: where the order is now, and a way to jump to any stage */
-function StageRail({ n, label, stage, onStage, progress }: { n: NeedsC; label: string; stage: number; onStage: (i: number) => void; progress: MotionValue<number> }) {
+function StageRail({ n, label, stage, onStage, progress, dark = false }: { n: NeedsC; label: string; stage: number; onStage: (i: number) => void; progress: MotionValue<number>; dark?: boolean }) {
   return (
-    <nav aria-label={label} className="mt-3 lg:mt-4">
+    <nav aria-label={label}>
       <ol className="grid grid-cols-4 gap-2">
         {NEED_STAGES.map((st, i) => (
           <li key={st}>
             <button type="button" onClick={() => onStage(i)} aria-current={i === stage ? "step" : undefined} className="group tap block w-full text-start">
-              <span className="block h-1 overflow-hidden rounded-full bg-teal/15">
-                <StageFill p={progress} i={i} />
+              <span className={`block h-1 overflow-hidden rounded-full ${dark ? "bg-white/15" : "bg-teal/15"}`}>
+                <StageFill p={progress} i={i} dark={dark} />
               </span>
-              <span className={`mt-2 flex items-baseline gap-1.5 text-xs font-semibold transition-colors sm:text-sm ${i === stage ? "text-teal-deep" : "text-teal-deep/60 group-hover:text-teal-deep"}`}>
-                <span className="num text-[11px] text-teal" dir="ltr">0{i + 1}</span>
+              <span className={`mt-2 flex items-baseline gap-1.5 text-xs font-semibold transition-colors sm:text-sm ${dark ? (i === stage ? "text-white" : "text-white/70 group-hover:text-white") : i === stage ? "text-teal-deep" : "text-teal-deep/60 group-hover:text-teal-deep"}`}>
+                <span className={`num text-[11px] ${dark ? "text-brand-bright" : "text-teal"}`} dir="ltr">0{i + 1}</span>
                 {n.stages[st].t}
               </span>
             </button>
@@ -621,9 +695,9 @@ function StageRail({ n, label, stage, onStage, progress }: { n: NeedsC; label: s
 }
 
 /** one quarter of the stages' scroll: empty before its stage, filling during it, full after */
-function StageFill({ p, i }: { p: MotionValue<number>; i: number }) {
+function StageFill({ p, i, dark = false }: { p: MotionValue<number>; i: number; dark?: boolean }) {
   const transform = useTransform(p, (v) => `scaleX(${Math.min(1, Math.max(0, v * NEED_STAGES.length - i)).toFixed(4)})`);
-  return <motion.span className="block h-full origin-left rounded-full bg-teal rtl:origin-right" style={{ transform }} />;
+  return <motion.span className={`block h-full origin-left rounded-full rtl:origin-right ${dark ? "bg-brand-bright shadow-[0_0_12px_rgba(76,201,122,0.8)]" : "bg-teal"}`} style={{ transform }} />;
 }
 
 /** reduced motion: the same four stages, one after another */
@@ -643,21 +717,5 @@ function StagesStacked({ lang }: { lang: Locale }) {
         ))}
       </div>
     </div>
-  );
-}
-
-/** counts up once its scene is on screen */
-function Counter({ v, suffix, go, delay }: { v: number; suffix: string; go: boolean; delay: number }) {
-  const [n, setN] = useState(0);
-  useEffect(() => {
-    if (!go) return;
-    const id = window.setTimeout(() => setN(v), delay * 1000);
-    return () => window.clearTimeout(id);
-  }, [go, v, delay]);
-  return (
-    <>
-      <NumberFlow value={n} suffix={suffix} locales="en-US" format={{ useGrouping: true }} aria-hidden="true" />
-      <span className="sr-only">{`${v.toLocaleString("en-US")}${suffix}`}</span>
-    </>
   );
 }

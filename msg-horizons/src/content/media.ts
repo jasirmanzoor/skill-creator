@@ -18,8 +18,35 @@ export type MediaItem = {
 
 export const media: Record<"fleet" | "warehouse" | "operations" | "team", MediaItem[]> = {
   fleet: [],
-  warehouse: [],
-  operations: [],
+  warehouse: [
+    {
+      src: "/media/msg/hub-open.webp", width: 1448, height: 1086,
+      alt: { en: "The MSG Horizons Sabya hub with its doors open and the floor lit", ar: "مركز ام اس جي في صبيا وأبوابه مفتوحة وأرضيته مضاءة" },
+      caption: { en: "Sabya hub, open for the day", ar: "مركز صبيا، مفتوح لليوم" },
+    },
+    {
+      src: "/media/msg/hub-floor.webp", width: 1200, height: 900,
+      alt: { en: "Inside the Sabya hub: racking and parcels on the warehouse floor", ar: "داخل مركز صبيا: الرفوف والطرود على أرضية المستودع" },
+      caption: { en: "Inside the 1,000 m² floor", ar: "داخل مساحة ١٬٠٠٠ م²" },
+    },
+    {
+      src: "/media/msg/hub-aerial.webp", width: 1448, height: 1086,
+      alt: { en: "The Sabya hub seen from the air", ar: "مركز صبيا من الجو" },
+      caption: { en: "The hub from the air", ar: "المركز من الجو" },
+    },
+    {
+      src: "/media/msg/interior.jpg", width: 1260, height: 950,
+      alt: { en: "Storage aisles inside the Sabya hub", ar: "ممرات التخزين داخل مركز صبيا" },
+      caption: { en: "Stock, stored and picked here", ar: "المخزون يُخزَّن ويُجهَّز هنا" },
+    },
+  ],
+  operations: [
+    {
+      src: "/media/msg/outlet.jpg", width: 1210, height: 1700,
+      alt: { en: "The walk-in parcel outlet MSG runs as an iMile franchise", ar: "منفذ الطرود الذي تديره ام اس جي كامتياز لـ iMile" },
+      caption: { en: "Walk-in parcel outlet", ar: "منفذ استلام الطرود" },
+    }
+  ],
   team: [],
 };
 

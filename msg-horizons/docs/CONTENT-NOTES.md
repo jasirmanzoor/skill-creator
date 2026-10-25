@@ -143,9 +143,28 @@ Domain: the website goes on www.msg-horizons.com only. msg-horizons.com (apex) s
 - Held back: the wide aerial and the sunset facade. Their retouching garbled the sign ("هوررزونز", "فوريزونز").
   They can be used once the sign is corrected, as was done for the hero facade.
 
+## Hero redesign: the console (15 Oct 2026)
+- The opening screen is now MSG's network shown as a control console (`src/components/hero/Command.tsx`). Headline:
+  "The Kingdom's delivery network. Already running." The eyebrow carries the search line, "Last-mile delivery and
+  logistics across Saudi Arabia".
+- Everything on the console is either verified or labelled: the map ("Illustrative network view"), the order card
+  ("Illustrative order"; its steps are the ones MSG runs for every order), the price (MSG's rate card, inside
+  `aside[data-rate-card]`), and the figures under it from `facts.ts` (1,000+ couriers, 100+ vehicles, SAR 20M+,
+  1,000 m² Sabya hub, 24/7). The partner line lists `facts.partners` as text only.
+- The facade and interior walk-in left the hero; the facade still opens the "Why MSG" section. The backdrop is
+  `hub-aerial.webp`, toned down.
+
 ## Leadership outro (12 Oct 2026)
 - Portraits go in `public/leadership/ceo.jpg` and `coo.jpg`; each leader appears only once their file exists.
 - Portraits and quotes supplied by MSG (12 Oct 2026). CEO: "Turn vision into meaningful progress." COO: "Build with
   purpose, create lasting impact." The portraits are cropped from MSG's quote cards so the text is not shown twice.
   The Arabic quotes are our translation. Names are not yet supplied; the cards show the role only.
 
+
+## Illustrative dispatch-day images (24 Oct 2026, requested by MSG in chat)
+- Four AI-generated images (Figma image generation) in `public/media/illustrative/`: the parked fleet, loading at the
+  bay, a van leaving the yard, a doorstep handover. Listed in `src/content/scenes.ts`, shown in the Fleet section.
+- MSG chose "labelled, unbranded": no MSG logo or sign was added, every tile carries an "Illustrative" badge, and a
+  note under the strip says they are not photographs of MSG's fleet or sites. They stay out of `content/media.ts`.
+- The vans show their makers' badges (Toyota, Ford) and the yard scene has unreadable road signs; nothing implies MSG.
+- Replace each with MSG's own photo of the same moment when one arrives.

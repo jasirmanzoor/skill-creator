@@ -487,7 +487,8 @@ export default function HeroMap({ lang, lane, stage = -1 }: { lang: Locale; lane
 
     let raf = 0, last = performance.now();
     const loop = (now: number) => {
-      const real = Math.min(1, (now - last) / 1000);
+      // a frame's timestamp can precede the mount's performance.now(): never step time backwards
+      const real = Math.max(0, Math.min(1, (now - last) / 1000));
       last = now;
       if (visible && !document.hidden) frame(Math.min(0.05, real), real);
       raf = requestAnimationFrame(loop);
