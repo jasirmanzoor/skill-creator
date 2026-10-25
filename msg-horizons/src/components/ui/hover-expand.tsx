@@ -22,7 +22,7 @@ export type ExpandItem = {
   pos?: string;
 };
 
-export default function HoverExpand({ items, initial = 0, className }: { items: ExpandItem[]; initial?: number; className?: string }) {
+export default function HoverExpand({ items, initial = 0, badge, className }: { items: ExpandItem[]; initial?: number; badge?: string; className?: string }) {
   const [active, setActive] = useState(initial);
   const reduce = useReducedMotion();
 
@@ -56,6 +56,9 @@ export default function HoverExpand({ items, initial = 0, className }: { items: 
                 style={{ objectPosition: item.pos }}
                 className={cn("object-cover transition-[filter] duration-300", !open && "[filter:saturate(0.6)_brightness(0.85)]")}
               />
+              {badge && (
+                <span className="absolute start-2 top-2 rounded-full bg-black/55 px-2 py-0.5 text-[0.6875rem] font-medium text-white backdrop-blur-sm">{badge}</span>
+              )}
               <AnimatePresence initial={false}>
                 {open && item.caption && (
                   <motion.span

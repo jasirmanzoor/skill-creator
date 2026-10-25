@@ -160,3 +160,11 @@ Domain: the website goes on www.msg-horizons.com only. msg-horizons.com (apex) s
   purpose, create lasting impact." The portraits are cropped from MSG's quote cards so the text is not shown twice.
   The Arabic quotes are our translation. Names are not yet supplied; the cards show the role only.
 
+
+## Illustrative dispatch-day images (24 Oct 2026, requested by MSG in chat)
+- Four AI-generated images (Figma image generation) in `public/media/illustrative/`: the parked fleet, loading at the
+  bay, a van leaving the yard, a doorstep handover. Listed in `src/content/scenes.ts`, shown in the Fleet section.
+- MSG chose "labelled, unbranded": no MSG logo or sign was added, every tile carries an "Illustrative" badge, and a
+  note under the strip says they are not photographs of MSG's fleet or sites. They stay out of `content/media.ts`.
+- The vans show their makers' badges (Toyota, Ford) and the yard scene has unreadable road signs; nothing implies MSG.
+- Replace each with MSG's own photo of the same moment when one arrives.
