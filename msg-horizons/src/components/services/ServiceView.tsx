@@ -8,12 +8,12 @@ import { serviceHud } from "@/content/serviceHud";
 import { EASE_OUT, SPRING_SMOOTH } from "@/lib/motion";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
-/** MSG's own photography for each service (2026 company profile) */
+/** the photo for each service: MSG's own (2026 company profile) and MSG-branded fleet imagery */
 export const PHOTO: Record<ServiceId, { src: string; pos: string }> = {
   "last-mile": { src: "/media/msg/van-road-wide.webp", pos: "90% 62%" },
   warehousing: { src: "/media/msg/hub-racks.webp", pos: "50% 52%" },
-  "land-freight": { src: "/photos/clean/riyadh-night.webp", pos: "50% 60%" },
-  fleet: { src: "/photos/clean/fleet-car.webp", pos: "50% 62%" },
+  "land-freight": { src: "/media/msg/land-freight-truck.webp", pos: "40% 55%" },
+  fleet: { src: "/media/msg/fleet-hiace-close.webp", pos: "62% 62%" },
   manpower: { src: "/media/msg/hub-team.webp", pos: "60% 55%" },
   tracking: { src: "/media/msg/hub-sorting.webp", pos: "50% 55%" },
   account: { src: "/media/msg/hub-room.webp", pos: "45% 58%" },

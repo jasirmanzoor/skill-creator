@@ -2,7 +2,7 @@ import Image from "next/image";
 import Reveal from "../ui/Reveal";
 import OpsClock from "../fleet/OpsClock";
 import { media } from "@/content/media";
-import { dispatchDay } from "@/content/scenes";
+import { dispatchDay, hiaceFleet } from "@/content/scenes";
 import HoverExpand from "../ui/hover-expand";
 import type { Dictionary, Locale } from "@/content/i18n";
 
@@ -25,13 +25,19 @@ export default function Fleet({ t, lang }: { t: Dictionary; lang: Locale }) {
         </div>
 
         <div className="mt-16">
+          <h3 className="text-xl font-semibold text-ink">{hiaceFleet.title[lang]}</h3>
+          <HoverExpand
+            className="mt-6"
+            items={hiaceFleet.scenes.map((x) => ({ src: x.src, pos: x.pos, alt: x.alt[lang], caption: x.caption[lang] }))}
+          />
+        </div>
+
+        <div className="mt-16">
           <h3 className="text-xl font-semibold text-ink">{dispatchDay.title[lang]}</h3>
           <HoverExpand
             className="mt-6"
-            badge={dispatchDay.badge[lang]}
             items={dispatchDay.scenes.map((x) => ({ src: x.src, pos: x.pos, alt: x.alt[lang], caption: x.caption[lang] }))}
           />
-          <p className="mt-4 text-sm text-ink/60">{dispatchDay.note[lang]}</p>
         </div>
 
         {photo ? (

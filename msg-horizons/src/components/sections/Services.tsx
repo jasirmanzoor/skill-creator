@@ -102,3 +102,4 @@ function Stages({ t, lang }: { t: Dictionary; lang: Locale }) {
     </section>
   );
 }
+
