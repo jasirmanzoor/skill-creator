@@ -12,10 +12,10 @@ import { useReducedMotion } from "@/lib/use-reduced-motion";
 export const PHOTO: Record<ServiceId, { src: string; pos: string }> = {
   "last-mile": { src: "/media/msg/van-road-wide.webp", pos: "90% 62%" },
   warehousing: { src: "/media/msg/hub-racks.webp", pos: "50% 52%" },
-  "land-freight": { src: "/media/msg/hub-cartons.webp", pos: "50% 58%" },
+  "land-freight": { src: "/photos/clean/riyadh-night.webp", pos: "50% 60%" },
   fleet: { src: "/photos/clean/fleet-car.webp", pos: "50% 62%" },
   manpower: { src: "/media/msg/hub-team.webp", pos: "60% 55%" },
-  tracking: { src: "/media/msg/hub-aisles.webp", pos: "50% 52%" },
+  tracking: { src: "/media/msg/hub-sorting.webp", pos: "50% 55%" },
   account: { src: "/media/msg/hub-room.webp", pos: "45% 58%" },
 };
 

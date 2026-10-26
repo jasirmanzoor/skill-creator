@@ -1,5 +1,6 @@
 "use client";
 
+import RaysLayer from "../fx/RaysLayer";
 import { SPRING_SMOOTH } from "@/lib/motion";
 import Image from "next/image";
 import { AnimatePresence, motion, useInView, useScroll, useSpring, useTransform } from "motion/react";
@@ -88,6 +89,7 @@ export default function Pitch({ t, lang }: { t: Dictionary; lang: Locale }) {
       </motion.div>
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,#0b1016_0%,rgba(11,16,22,0.82)_30%,rgba(11,16,22,0.9)_70%,#0b1016_100%)]" />
       <div aria-hidden="true" className={`absolute inset-0 -z-10 transition-opacity duration-[1200ms] ease-out ${msg ? "opacity-100" : "opacity-0"} bg-[radial-gradient(60%_50%_at_75%_30%,rgba(76,201,122,0.18),transparent_70%)]`} />
+      <RaysLayer className="-z-10" />
 
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:items-end">

@@ -1,5 +1,6 @@
 "use client";
 
+import RaysLayer from "../fx/RaysLayer";
 import NumberFlow from "@number-flow/react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
@@ -73,7 +74,8 @@ export default function LaunchSequence({ t, lang }: { t: Dictionary; lang: Local
   };
 
   return (
-    <section id="journey" ref={ref} aria-labelledby="launch-title" className="relative scroll-mt-16 overflow-hidden bg-pitch sec text-white" data-theme="dark">
+    <section id="journey" ref={ref} aria-labelledby="launch-title" className="relative isolate scroll-mt-16 overflow-hidden bg-pitch sec text-white" data-theme="dark">
+      <RaysLayer className="-z-10" />
       {/* aurora: the sea-glass colours, lit from behind the console */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_80%_20%,rgba(201,150,46,0.20),transparent_70%),radial-gradient(50%_45%_at_10%_90%,rgba(11,125,54,0.16),transparent_70%)]" />
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-[0.12] [background-image:linear-gradient(rgba(255,255,255,0.5)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.5)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(70%_60%_at_70%_40%,#000,transparent)]" />

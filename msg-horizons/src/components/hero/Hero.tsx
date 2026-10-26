@@ -1,5 +1,6 @@
 "use client";
 
+import RaysLayer from "../fx/RaysLayer";
 import { SPRING_SMOOTH } from "@/lib/motion";
 import NumberFlow from "@number-flow/react";
 import Image from "next/image";
@@ -15,7 +16,6 @@ import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { usePlan } from "../PlanContext";
 import TrackedLink from "../ui/TrackedLink";
 import { WhatsAppIcon } from "../ui/icons";
-import Dust from "./Dust";
 import { STAGE_COUNT } from "./HeroMap";
 import { NeedIcon, StageCard } from "../operation/StageParts";
 import QuoteCard from "./QuoteCard";
@@ -414,6 +414,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
       <section id="hero" ref={section} aria-labelledby="hero-title" className="relative bg-deep">
         <div ref={frame} data-theme="dark" className="relative h-[100svh] min-h-[640px] overflow-hidden [container-type:size]">
           {facade}
+          <RaysLayer />
           <Scrim />
           <div className="absolute inset-0 pt-20">{promise}</div>
         </div>
@@ -447,8 +448,9 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
         className="sticky top-0 h-[100svh] overflow-hidden [container-type:size]"
       >
         {facade}
-        <Dust run={beat === 1} className="z-[1]" />
         <motion.div aria-hidden="true" style={{ opacity: veil }} className="absolute inset-0 z-[2] bg-[#030a0b]" />
+        {/* the site's light falls through the walk-in too (it replaced the drifting dust) */}
+        <RaysLayer className="z-[3]" />
 
         <motion.div style={{ opacity: inOpacity }} className="absolute inset-0 z-[3]">
           <Interior c={c} dark={inDark} scale={inScale} lamps={lamps} copy={inCopy} />

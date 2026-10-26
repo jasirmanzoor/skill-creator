@@ -1,4 +1,5 @@
 import ContactForm from "./ContactForm";
+import RaysLayer from "../fx/RaysLayer";
 import Reveal from "../ui/Reveal";
 import TrackedLink from "../ui/TrackedLink";
 import { MailIcon, PhoneIcon, PinIcon, WhatsAppIcon } from "../ui/icons";
@@ -11,7 +12,8 @@ export default function Contact({ t, lang }: { t: Dictionary; lang: Locale }) {
   const ch = c.channels;
   const row = "flex items-center gap-4 border-b border-white/15 py-4 transition-colors";
   return (
-    <section id="contact" data-theme="dark" aria-labelledby="contact-title" className="on-dark scroll-mt-16 bg-night/80 sec-finale text-white backdrop-blur-[2px]">
+    <section id="contact" data-theme="dark" aria-labelledby="contact-title" className="on-dark relative isolate scroll-mt-16 overflow-hidden bg-night sec-finale text-white">
+      <RaysLayer className="-z-10" />
       <div className="mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-[1fr_1.15fr] lg:px-8">
         <Reveal>
           <h2 id="contact-title" className="h-display">
