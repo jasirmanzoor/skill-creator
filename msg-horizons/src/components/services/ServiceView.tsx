@@ -10,13 +10,13 @@ import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 /** MSG's own photography for each service (2026 company profile) */
 export const PHOTO: Record<ServiceId, { src: string; pos: string }> = {
-  "last-mile": { src: "/photos/clean/courier-mall.webp", pos: "50% 35%" },
-  warehousing: { src: "/photos/msg/warehouse-floor.webp", pos: "50% 55%" },
-  "land-freight": { src: "/photos/clean/riyadh-night.webp", pos: "50% 60%" },
+  "last-mile": { src: "/media/msg/van-road-wide.webp", pos: "90% 62%" },
+  warehousing: { src: "/media/msg/hub-racks.webp", pos: "50% 52%" },
+  "land-freight": { src: "/media/msg/hub-cartons.webp", pos: "50% 58%" },
   fleet: { src: "/photos/clean/fleet-car.webp", pos: "50% 62%" },
-  manpower: { src: "/photos/clean/team.webp", pos: "50% 45%" },
-  tracking: { src: "/photos/clean/courier-mall.webp", pos: "30% 40%" },
-  account: { src: "/photos/clean/business.webp", pos: "50% 30%" },
+  manpower: { src: "/media/msg/hub-team.webp", pos: "60% 55%" },
+  tracking: { src: "/media/msg/hub-aisles.webp", pos: "50% 52%" },
+  account: { src: "/media/msg/hub-room.webp", pos: "45% 58%" },
 };
 
 type Props = {

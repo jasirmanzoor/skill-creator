@@ -36,7 +36,7 @@ export default function Fleet({ t, lang }: { t: Dictionary; lang: Locale }) {
 
         {photo ? (
           <figure className="mt-16 overflow-hidden rounded-xl border border-line">
-            <Image src={photo.src} width={photo.width} height={photo.height} alt={photo.alt[lang]} className="h-auto w-full object-cover" sizes="(min-width:1280px) 1216px, 100vw" />
+            <Image src={photo.src} width={photo.width} height={photo.height} alt={photo.alt[lang]} className="aspect-[4/5] w-full object-cover sm:aspect-[21/9]" style={{ objectPosition: "72% 64%" }} sizes="(min-width:1280px) 1216px, 100vw" />
             {photo.caption ? <figcaption className="p-4 text-sm text-muted">{photo.caption[lang]}</figcaption> : null}
           </figure>
         ) : null}

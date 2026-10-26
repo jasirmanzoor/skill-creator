@@ -17,7 +17,13 @@ export type MediaItem = {
 };
 
 export const media: Record<"fleet" | "warehouse" | "operations" | "team", MediaItem[]> = {
-  fleet: [],
+  fleet: [
+    {
+      src: "/media/msg/van-road.webp", width: 1200, height: 1600,
+      alt: { en: "An MSG delivery van on the road under a cloudy sky", ar: "شاحنة توصيل تابعة لـ ام اس جي على الطريق تحت سماء غائمة" },
+      caption: { en: "On the road", ar: "على الطريق" },
+    },
+  ],
   warehouse: [
     {
       src: "/media/msg/hub-open.webp", width: 1448, height: 1086,
@@ -38,6 +44,26 @@ export const media: Record<"fleet" | "warehouse" | "operations" | "team", MediaI
       src: "/media/msg/interior.jpg", width: 1260, height: 950,
       alt: { en: "Storage aisles inside the Sabya hub", ar: "ممرات التخزين داخل مركز صبيا" },
       caption: { en: "Stock, stored and picked here", ar: "المخزون يُخزَّن ويُجهَّز هنا" },
+    },
+    {
+      src: "/media/msg/hub-racks.webp", width: 1200, height: 1600,
+      alt: { en: "Rows of racking full of parcels under the warehouse roof", ar: "صفوف من الرفوف المليئة بالطرود تحت سقف المستودع" },
+      caption: { en: "Racked, sorted, ready to go", ar: "على الرفوف، مفرزة وجاهزة" },
+    },
+    {
+      src: "/media/msg/hub-sorting.webp", width: 1600, height: 1200,
+      alt: { en: "The sorting floor: roll cages of parcels between the racks", ar: "أرضية الفرز: عربات الطرود بين الرفوف" },
+      caption: { en: "The sorting floor", ar: "أرضية الفرز" },
+    },
+    {
+      src: "/media/msg/hub-team.webp", width: 1600, height: 1200,
+      alt: { en: "MSG staff at work beside pallets and parcel cages", ar: "فريق ام اس جي يعمل بجوار المنصات وعربات الطرود" },
+      caption: { en: "The team on the floor", ar: "الفريق في الموقع" },
+    },
+    {
+      src: "/media/msg/hub-cartons.webp", width: 1200, height: 1600,
+      alt: { en: "Cartons staged by the dock, ready to be loaded", ar: "كراتين مجهزة عند منطقة التحميل وجاهزة للشحن" },
+      caption: { en: "Staged for dispatch", ar: "جاهزة للإرسال" },
     },
   ],
   operations: [
