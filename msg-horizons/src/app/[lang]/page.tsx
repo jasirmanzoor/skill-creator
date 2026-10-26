@@ -3,7 +3,6 @@ import { getDictionary, isLocale } from "@/content/i18n";
 import { PlanProvider } from "@/components/PlanContext";
 import SiteHeader from "@/components/SiteHeader";
 import Hero from "@/components/hero/Hero";
-import HorizonBackdrop from "@/components/HorizonBackdrop";
 import Planner from "@/components/sections/Planner";
 import TrustBar from "@/components/sections/TrustBar";
 import LiveTracking from "@/components/live/LiveTracking";
@@ -42,7 +41,6 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
   return (
     <PlanProvider>
       <SmoothScroll />
-      <HorizonBackdrop />
       <SiteHeader t={t} lang={lang} />
       <main id="main" className="push-shift overflow-x-clip">
         {c(0, <>

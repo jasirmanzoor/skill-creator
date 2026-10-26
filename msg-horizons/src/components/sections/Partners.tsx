@@ -81,7 +81,7 @@ export default function Partners({ lang }: { lang: Locale }) {
   }, [reduce]);
 
   return (
-    <section id="partners" aria-labelledby="partners-title" className="relative scroll-mt-16 overflow-hidden border-y border-line bg-surface/[0.94] sec">
+    <section id="partners" aria-labelledby="partners-title" className="relative scroll-mt-16 overflow-hidden border-y border-line bg-surface/[0.62] sec">
       <div className="mx-auto max-w-7xl px-5 text-center lg:px-8">
         <h2 id="partners-title" className="h-section mx-auto max-w-3xl text-ink">
           {c.title}

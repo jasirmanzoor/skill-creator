@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import RaysBackdrop from "@/components/fx/RaysBackdrop";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import { IBM_Plex_Sans_Arabic, Inter, Inter_Tight } from "next/font/google";
@@ -151,6 +152,7 @@ export default async function RootLayout({ children, params }: Props) {
         <script dangerouslySetInnerHTML={{ __html: BOOT }} />
       </head>
       <body>
+        <RaysBackdrop />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(lang) }} />
         {children}
         {/* Enable Web Analytics + Speed Insights in the Vercel dashboard, then set NEXT_PUBLIC_VERCEL_ANALYTICS=1. */}

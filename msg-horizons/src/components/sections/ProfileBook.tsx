@@ -80,7 +80,7 @@ export default function ProfileBook({ t, lang }: { t: Dictionary; lang: Locale }
   );
 
   return (
-    <section aria-labelledby="profile-book-title" className="relative overflow-hidden border-t border-line bg-paper/[0.94] sec">
+    <section aria-labelledby="profile-book-title" className="relative overflow-hidden border-t border-line bg-paper/[0.55] sec">
       <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
         <Reveal>
           <p className="text-sm font-semibold text-teal">{c.eyebrow}</p>

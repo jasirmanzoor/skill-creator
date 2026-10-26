@@ -19,7 +19,7 @@ export default function ServicesList({ t, lang }: { t: Dictionary; lang: Locale 
   const index = facts.services.indexOf(open);
 
   return (
-    <section id="services" aria-labelledby="services-title" className="scroll-mt-16 border-t border-line bg-paper/[0.94] sec">
+    <section id="services" aria-labelledby="services-title" className="scroll-mt-16 border-t border-line bg-paper/[0.55] sec">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-2 lg:items-end">
           <div>

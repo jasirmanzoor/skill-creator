@@ -93,7 +93,7 @@ html {
   text-rendering: optimizeLegibility;
 }
 body {
-  background: transparent; /* the fixed HorizonBackdrop (z -10) must paint above the body box */
+  background: transparent; /* the fixed light-rays backdrop (z -10) must paint above the body box */
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
@@ -365,7 +365,7 @@ a { text-underline-offset: 0.2em; }
   background:
     radial-gradient(90% 60% at 85% 0%, rgba(196, 233, 231, 0.9), transparent 70%),
     radial-gradient(70% 50% at 0% 100%, rgba(226, 244, 243, 0.95), transparent 70%),
-    linear-gradient(180deg, #f3fbfb 0%, #ffffff 100%);
+    linear-gradient(180deg, rgba(243, 251, 251, 0.78) 0%, rgba(255, 255, 255, 0.66) 100%);
   color: var(--color-teal-deep);
 }
 .sea-band .label { color: var(--color-teal); }
@@ -731,7 +731,7 @@ html.dark .sea-band {
   background:
     radial-gradient(90% 60% at 85% 0%, rgba(19, 113, 121, 0.45), transparent 70%),
     radial-gradient(70% 50% at 0% 100%, rgba(11, 58, 64, 0.6), transparent 70%),
-    linear-gradient(180deg, #08191c 0%, #0a0e11 100%);
+    linear-gradient(180deg, rgba(8, 25, 28, 0.8) 0%, rgba(10, 14, 17, 0.7) 100%);
 }
 html.dark .sea-glass {
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(92, 194, 199, 0.05));
@@ -773,3 +773,9 @@ html.dark aside.text-sand-900 .bg-white { background-color: #fff; }
 [data-tech] { -webkit-text-fill-color: transparent; }
 .tech-host { position: absolute; inset: 0; pointer-events: none; -webkit-text-fill-color: initial; }
 .tech-line { position: absolute; display: block; }
+
+/* ---------- The background: React Bits' LightRays (components/fx/RaysBackdrop) ---------- */
+.rays-backdrop { background: var(--color-paper); }
+html.dark .rays-backdrop { background: radial-gradient(120% 90% at 0% 0%, #141b24 0%, var(--color-night) 60%); }
+.light-rays { position: relative; width: 100%; height: 100%; overflow: hidden; }
+.light-rays__canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }

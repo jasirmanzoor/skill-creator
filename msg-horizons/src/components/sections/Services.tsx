@@ -33,7 +33,7 @@ function Stages({ t, lang }: { t: Dictionary; lang: Locale }) {
   const h = serviceHud[lang];
   const n = (k: number) => String(k).padStart(2, "0");
   return (
-    <section id="services" aria-labelledby="services-title" data-theme="dark" className="relative scroll-mt-16 bg-deep text-white">
+    <section id="services" aria-labelledby="services-title" data-theme="dark" className="relative scroll-mt-16 bg-deep/[0.88] text-white">
       <div className="mx-auto max-w-7xl px-5 pb-4 pt-24 lg:px-8 lg:pt-28">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-bright rtl:tracking-normal">{s.eyebrow}</p>
         <div className="mt-3 grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
