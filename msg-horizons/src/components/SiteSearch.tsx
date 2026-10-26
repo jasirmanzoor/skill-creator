@@ -78,7 +78,7 @@ export default function SiteSearch({
 
       {open && (
         <div
-          className="fixed inset-0 z-[60] flex items-start justify-center bg-ink/50 px-4 pt-[12vh] backdrop-blur-sm"
+          className="fixed inset-0 z-[60] flex items-start justify-center bg-night/50 px-4 pt-[12vh] backdrop-blur-sm"
           role="presentation"
           onClick={(e) => {
             if (e.target === e.currentTarget) setOpen(false);

@@ -16,9 +16,8 @@ import { createPortal } from "react-dom";
 import { STOPS } from "@/content/journey";
 import { facts, whatsappLink } from "@/content/facts";
 import type { Dictionary, Locale } from "@/content/i18n";
-import { pageTop } from "@/lib/journey";
-import { focusPanel, isDeckPanel } from "@/lib/deck";
-import { lockScroll, scrollToY } from "@/lib/scroller";
+import { goTo } from "@/lib/book";
+import { lockScroll } from "@/lib/scroller";
 import { track } from "@/lib/analytics";
 import { useActiveSection } from "@/lib/use-active-section";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
@@ -86,16 +85,11 @@ export default function PushMenu({ t, lang, open, onClose }: { t: Dictionary; la
     };
   }, [open, onClose, reduce]);
 
-  const land = useCallback((id: string, i: number) => {
+  const land = useCallback((id: string) => {
     onClose();
     track("cta_click", { cta: "site_map", location: id });
     // let the page unlock first, then travel the way the route rail does
-    window.setTimeout(() => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      if (isDeckPanel(id)) focusPanel(id, reduce, true);
-      else scrollToY(i === 0 ? 0 : pageTop(el) - 64, { immediate: reduce, force: true });
-    }, 30);
+    window.setTimeout(() => goTo(id, { immediate: reduce }), 30);
   }, [onClose, reduce]);
 
   if (!mounted) return null;
@@ -144,7 +138,7 @@ export default function PushMenu({ t, lang, open, onClose }: { t: Dictionary; la
                 <li key={s.id} className="overflow-hidden border-b border-white/10">
                   <a
                     href={`#${s.id}`}
-                    onClick={(e) => { e.preventDefault(); land(s.id, i); }}
+                    onClick={(e) => { e.preventDefault(); land(s.id); }}
                     aria-current={here ? "location" : undefined}
                     className="group flex items-baseline gap-4 py-3 outline-none focus-visible:bg-white/5"
                     style={{ ...row(i), transform: open ? "translateY(0)" : "translateY(110%)", opacity: open ? 1 : 0 }}
@@ -164,7 +158,7 @@ export default function PushMenu({ t, lang, open, onClose }: { t: Dictionary; la
 
         <div className="grid gap-5 border-t border-white/10 px-6 py-6 sm:px-8" style={{ ...row(n), transform: open ? "translateY(0)" : "translateY(16px)", opacity: open ? 1 : 0 }}>
           <div className="grid grid-cols-2 gap-2.5">
-            <a href="#planner" onClick={(e) => { e.preventDefault(); land("planner", 4); track("cta_click", { cta: "plan", location: "site_map" }); }} className="rounded-full bg-white px-4 py-3 text-center text-sm font-semibold text-teal-deep">
+            <a href="#planner" onClick={(e) => { e.preventDefault(); land("planner"); track("cta_click", { cta: "plan", location: "site_map" }); }} className="rounded-full bg-white px-4 py-3 text-center text-sm font-semibold text-teal-deep">
               {t.nav.ctaShort}
             </a>
             <a href={whatsappLink(t.wa.general)} target="_blank" rel="noopener noreferrer" onClick={() => track("whatsapp_click", { location: "site_map" })} className="rounded-full px-4 py-3 text-center text-sm font-semibold text-white ring-1 ring-white/25">

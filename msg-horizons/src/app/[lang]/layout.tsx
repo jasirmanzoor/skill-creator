@@ -132,6 +132,8 @@ function jsonLd(lang: Locale) {
   return JSON.stringify(org).replace(/</g, "\\u003c");
 }
 
+const BOOT = `(function(){var d=document.documentElement;d.classList.add("book");try{var t=localStorage.getItem("msg-theme");var k=t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches);d.classList.toggle("dark",k);d.style.colorScheme=k?"dark":"light"}catch(e){}})()`;
+
 export default async function RootLayout({ children, params }: Props) {
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
@@ -142,7 +144,12 @@ export default async function RootLayout({ children, params }: Props) {
       lang={lang}
       dir={dirOf(lang)}
       className={`${display.variable} ${sans.variable} ${arabic.variable}`}
+      suppressHydrationWarning
     >
+      <head>
+        {/* before first paint: open the book on its cover, and pick the theme (saved choice, else the device's) */}
+        <script dangerouslySetInnerHTML={{ __html: BOOT }} />
+      </head>
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(lang) }} />
         {children}

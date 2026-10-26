@@ -2,18 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { OBSERVED_SECTIONS, type NavId } from "@/content/nav";
+import { onBookState } from "./book";
 
 /** Highlights the section currently under the sticky header. */
 export function useActiveSection(): NavId | null {
   const [active, setActive] = useState<NavId | null>(null);
 
   useEffect(() => {
-    const nodes = OBSERVED_SECTIONS.map((id) => document.getElementById(id)).filter(
+    const all = OBSERVED_SECTIONS.map((id) => document.getElementById(id)).filter(
       (el): el is HTMLElement => Boolean(el),
     );
-    if (!nodes.length) return;
+    if (!all.length) return;
 
     const read = () => {
+      // only the open chapter of the book is on the page (components/book)
+      const nodes = all.filter((el) => el.getClientRects().length > 0);
+      if (!nodes.length) return setActive(null);
       const probe = 96;
       let current: NavId | null = null;
       for (const el of nodes) {
@@ -35,7 +39,9 @@ export function useActiveSection(): NavId | null {
     read();
     window.addEventListener("scroll", read, { passive: true });
     window.addEventListener("hashchange", read);
+    const off = onBookState(() => requestAnimationFrame(read));
     return () => {
+      off();
       window.removeEventListener("scroll", read);
       window.removeEventListener("hashchange", read);
     };

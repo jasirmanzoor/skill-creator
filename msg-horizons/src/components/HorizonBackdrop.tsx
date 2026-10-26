@@ -1,16 +1,17 @@
 "use client";
 
 import { EASE_OUT } from "@/lib/motion";
-import { motion, useScroll, useTransform, type MotionValue } from "motion/react";
+import { motion, useMotionValue, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
+import { bookTime } from "@/lib/book";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 
 /**
  * The cinematic backdrop: one real desert horizon, fixed behind the whole page.
  *
  *  • Dolly: during the first screen of scroll the camera pushes in toward the horizon.
- *  • A day in one scroll: the scene moves from bright day (top) through golden hour and dusk
- *    to night (bottom, where visitors contact MSG). It tells the 24/7 story without words.
+ *  • A day in one book: the scene moves from bright day (the cover) through golden hour and dusk
+ *    to night (the last chapter, where visitors contact MSG). It tells the 24/7 story without words.
  *  • "MSG" stands on the horizon as a sand-toned landmark; at night it is softly lit.
  *
  * Alignment: the horizon sits at 50.8% of the photo; object-position 50% 50.8% pins that point
@@ -31,18 +32,24 @@ const STARS = Array.from({ length: 140 }, (_, i) => {
 export default function HorizonBackdrop() {
   const reduce = useReducedMotion();
   const { scrollY } = useScroll();
-  const k = useSceneKeyframes();
 
   // camera
   const dolly = useTransform(scrollY, [0, 900], [1, reduce ? 1 : 1.14]);
   const blurOpacity = useTransform(scrollY, [0, 900], [0, 0.55]);
 
-  // time of day, anchored to real section positions (robust to content length, language and screen size)
-  const golden = useTransform(scrollY, [k.goldenIn, k.goldenPeak, k.duskIn], [0, 1, 0.35]);
-  const dusk = useTransform(scrollY, [k.duskIn, k.duskFull], [0, 1]);
-  const night = useTransform(scrollY, [k.nightIn, k.nightFull], [0, 1]);
-  const litLetters = useTransform(scrollY, [k.nightIn, k.nightFull], [0, 0.5]); // ambient, never competing with content
-  const dayLetters = useTransform(scrollY, [k.nightIn, k.nightFull], [1, 0.4]);
+  // time of day follows the book: bright day on the cover, golden hour around the fleet, dusk for enterprise and
+  // night when the visitor talks to MSG. The dark theme is the night shift: the scene goes to night everywhere.
+  const time = useSpring(bookTime, { stiffness: 40, damping: 18, restDelta: 0.0005 });
+  const t = reduce ? bookTime : time;
+  const darkTheme = useDarkTheme();
+  const shift = useMotionValue(0);
+  useEffect(() => shift.set(darkTheme ? 1 : 0), [darkTheme, shift]);
+  const golden = useTransform(t, [0.42, 0.62, 0.74], [0, 1, 0.35]);
+  const dusk = useTransform(t, [0.74, 0.88], [0, 1]);
+  const nightByTime = useTransform(t, [0.9, 1], [0, 1]);
+  const night = useTransform([nightByTime, shift], ([a, b]: number[]) => Math.max(a, b));
+  const litLetters = useTransform(night, [0, 1], [0, 0.5]); // ambient, never competing with content
+  const dayLetters = useTransform(night, [0, 1], [1, 0.4]);
 
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#dfe7f3]">
@@ -89,7 +96,7 @@ export default function HorizonBackdrop() {
       <motion.div className="absolute inset-0" style={{ opacity: night, background: `linear-gradient(to bottom, #050a1c 0%, #0b1433 ${HORIZON}%, #0d1120 ${HORIZON + 0.5}%, #07090f 100%)` }}>
         <svg className="absolute inset-0 h-full w-full" preserveAspectRatio="none">
           {STARS.map((st, i) => (
-            <circle key={i} cx={`${st.x}%`} cy={`${st.y}%`} r={st.s} fill="#fff" opacity={st.o} />
+            <circle key={i} cx={`${st.x.toFixed(3)}%`} cy={`${st.y.toFixed(3)}%`} r={st.s} fill="#fff" opacity={st.o} />
           ))}
         </svg>
         {/* faint glow of the horizon: operations still running */}
@@ -105,34 +112,17 @@ export default function HorizonBackdrop() {
   );
 }
 
-/**
- * Scroll positions (px) where the light changes, measured from the live sections:
- * golden hour peaks at #fleet, dusk arrives with #enterprise, night is complete before #contact.
- */
-function useSceneKeyframes() {
-  const [k, setK] = useState({ goldenIn: 1e6, goldenPeak: 1e6 + 1, duskIn: 1e6 + 2, duskFull: 1e6 + 3, nightIn: 1e6 + 4, nightFull: 1e6 + 5 });
-  useEffect(() => {
-    const measure = () => {
-      const top = (id: string) => {
-        const el = document.getElementById(id);
-        return el ? el.getBoundingClientRect().top + window.scrollY : NaN;
-      };
-      const vh = window.innerHeight;
-      const fleet = top("fleet"), ent = top("enterprise"), contact = top("contact");
-      if ([fleet, ent, contact].some(Number.isNaN)) return;
-      const inc = (a: number[]) => a.map((v, i) => Math.max(v, (a[i - 1] ?? -Infinity) + 1)); // keep strictly increasing
-      const [goldenIn, goldenPeak, duskIn, duskFull, nightIn, nightFull] = inc([
-        fleet - vh * 1.5, fleet, ent - vh, ent + vh * 0.4, contact - vh * 2.2, contact - vh * 0.6,
-      ]);
-      setK({ goldenIn, goldenPeak, duskIn, duskFull, nightIn, nightFull });
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(document.body);
-    window.addEventListener("resize", measure);
-    return () => { ro.disconnect(); window.removeEventListener("resize", measure); };
-  }, []);
-  return k;
+/** the dark theme (components/theme): html.dark */
+function useDarkTheme() {
+  return useSyncExternalStore(
+    (cb) => {
+      const mo = new MutationObserver(cb);
+      mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+      return () => mo.disconnect();
+    },
+    () => document.documentElement.classList.contains("dark"),
+    () => false,
+  );
 }
 
 /**

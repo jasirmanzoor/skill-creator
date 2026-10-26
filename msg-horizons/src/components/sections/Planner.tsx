@@ -1,5 +1,6 @@
 "use client";
 
+import { goTo } from "@/lib/book";
 import { EASE_OUT } from "@/lib/motion";
 import NumberFlow from "@number-flow/react";
 import { motion } from "motion/react";
@@ -122,7 +123,7 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
     if (!input) return;
     setPlan(input);
     track("plan_share", { channel: "form" });
-    document.getElementById("contact")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    goTo("contact");
     window.setTimeout(() => document.getElementById("lead-name")?.focus({ preventScroll: true }), 700);
   };
 

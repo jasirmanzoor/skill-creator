@@ -92,6 +92,11 @@ export default function Footer({ t, lang }: { t: Dictionary; lang: Locale }) {
       </div>
       <div className="mx-auto mt-12 max-w-7xl border-t border-white/10 px-5 pt-6 text-xs text-white/45 lg:px-8">
         © <span className="num">{year}</span> {facts.legalName}. {f.rights}
+        <span className="mt-2 block">
+          {lang === "ar" ? "مكونات الواجهة مستوحاة من " : "Interface components after "}
+          <a href="https://skiper-ui.com" target="_blank" rel="noopener noreferrer" className="underline decoration-white/25 hover:text-white">Skiper UI</a>
+          {lang === "ar" ? "، وشريط الفصول من مكوّن Timeline Slider لـ Matthias Ölschlegel." : ", and the chapter rail after the Timeline Slider by Matthias Ölschlegel."}
+        </span>
       </div>
     </footer>
   );

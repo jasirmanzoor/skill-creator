@@ -17,6 +17,21 @@ based in Riyadh. It is bilingual (English / Arabic RTL), built on Next.js 16 and
 | Proof | Metrics, 10 pillars, vision |
 | Contact (night) | Lead form with a WhatsApp/email fallback, plus WhatsApp, phone, email and HQ |
 
+## The book: chapters, not one long scroll
+The homepage is a book of nine chapters (`src/content/chapters.ts`): Start, Why MSG, Your price, Your plan, Live network,
+Fleet & hubs, Proof, Enterprise, Talk to MSG. One chapter is open at a time and the next one is reached by turning the page:
+the open chapter lifts off its spine and turns away in 3D (View Transitions; right-to-left in Arabic).
+- **Steering:** the route rail along the bottom (`components/book/RouteRail`, after the Timeline Slider component by
+  Matthias Ölschlegel), the page-turn card at the end of each chapter, any `#link` on the page, `]` and `[`, and the
+  browser's back button (each chapter is a history entry). `goTo(id)` in `src/lib/book.ts` does the same from code.
+- **Engine:** `components/book/RouteBook`. Every chapter is in the HTML, so search engines and visitors without
+  JavaScript read the whole page; the backdrop's time of day follows the chapter (day on the cover, night at contact).
+- **Dark theme:** the night shift (`components/ThemeToggle`, after Skiper UI's Skiper26). It starts on the device's
+  setting, remembers a choice, and its palette is in `globals.css` under `html.dark`.
+- **Inside the chapters:** company figures roll in (`ui/CountUp`, after Skiper37), the Sabya hub photos are dealt as a
+  stack (`ui/PhotoDeck`, after Skiper17), and the company profile is a flip book (`sections/ProfileBook`).
+  Skiper UI's free licence asks for attribution; it is in the footer.
+
 ## Route console map
 The planner's route console flies a **real 3D map** (MapLibre GL + OpenFreeMap streets and buildings): the camera
 chases the vehicle along real roads at a tilt, swoops between steps, pulls up on long hops and circles at a site.

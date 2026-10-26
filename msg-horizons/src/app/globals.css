@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* dark: utilities follow the theme toggle (html.dark), not only the device setting */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
  * MSG Horizons design system — editorial / industrial.
  * Light, restrained, typographic. One brand colour (MSG green) used only for data and key accents.
@@ -545,3 +548,197 @@ html[dir="rtl"].push-open .push-shift { translate: var(--push-w) 0; }
   /* wide surfaces (a tab card, a full-width row) only need a hint */
   :where([data-press="soft"]):active { scale: 0.99; }
 }
+
+/* ---------- The book: one chapter open at a time (components/book) ---------- */
+/* Without JavaScript there is no .book class and every chapter stacks into one long page. */
+html.book [data-chapter]:not([data-current]) { display: none; }
+[data-chapter]:focus { outline: none; }
+html.book:not([data-open-chapter="contact"]) .book-footer { display: none; }
+
+/* Chrome that stays put while the page turns underneath it */
+body > header { view-transition-name: site-header; }
+.route-rail { view-transition-name: route-rail; }
+.mobile-bar { view-transition-name: mobile-bar; }
+
+/*
+ * Turning the page. The open chapter is hinged on its spine (left in English, right in Arabic): it lifts, turns
+ * away and darkens as it leaves the light, while the next chapter, lying underneath, comes up out of its shadow.
+ * Turning back lays the previous page down over the open one.
+ */
+:root[data-turn]::view-transition-group(root) { animation-duration: 0.95s; }
+:root[data-turn]::view-transition-old(root),
+:root[data-turn]::view-transition-new(root) { mix-blend-mode: normal; animation-duration: 0.95s; animation-fill-mode: both; }
+:root[data-turn="next"]::view-transition-old(root) { z-index: 2; transform-origin: left center; animation-name: page-lift; animation-timing-function: cubic-bezier(0.55, 0.06, 0.35, 1); }
+:root[data-turn="next"]::view-transition-new(root) { z-index: 1; animation-name: page-rise; animation-timing-function: cubic-bezier(0.3, 0.6, 0.3, 1); }
+:root[data-turn="prev"]::view-transition-new(root) { z-index: 2; transform-origin: left center; animation-name: page-lay; animation-timing-function: cubic-bezier(0.3, 0.7, 0.25, 1); }
+:root[data-turn="prev"]::view-transition-old(root) { z-index: 1; animation-name: page-sink; animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+:root[dir="rtl"][data-turn="next"]::view-transition-old(root) { transform-origin: right center; animation-name: page-lift-rtl; }
+:root[dir="rtl"][data-turn="prev"]::view-transition-new(root) { transform-origin: right center; animation-name: page-lay-rtl; }
+
+@keyframes page-lift {
+  0% { transform: perspective(2400px) rotateY(0deg); filter: brightness(1); }
+  100% { transform: perspective(2400px) rotateY(-96deg); filter: brightness(0.5); }
+}
+@keyframes page-lift-rtl {
+  0% { transform: perspective(2400px) rotateY(0deg); filter: brightness(1); }
+  100% { transform: perspective(2400px) rotateY(96deg); filter: brightness(0.5); }
+}
+@keyframes page-lay {
+  0% { transform: perspective(2400px) rotateY(-96deg); filter: brightness(0.5); }
+  100% { transform: perspective(2400px) rotateY(0deg); filter: brightness(1); }
+}
+@keyframes page-lay-rtl {
+  0% { transform: perspective(2400px) rotateY(96deg); filter: brightness(0.5); }
+  100% { transform: perspective(2400px) rotateY(0deg); filter: brightness(1); }
+}
+@keyframes page-rise {
+  0% { transform: scale(0.965); filter: brightness(0.62); }
+  100% { transform: none; filter: brightness(1); }
+}
+@keyframes page-sink {
+  0% { transform: none; filter: brightness(1); }
+  100% { transform: scale(0.965); filter: brightness(0.62); }
+}
+
+/* The page-turn card at the end of a chapter, with a corner that lifts as you reach for it */
+.turn-card { transition: transform 0.6s var(--ease-out), box-shadow 0.6s var(--ease-out), border-color 0.3s; }
+.turn-card:hover { transform: translateY(-4px); box-shadow: 0 2px 4px rgba(12, 14, 17, 0.06), 0 40px 70px -36px rgba(12, 14, 17, 0.45); }
+.turn-curl {
+  position: absolute;
+  inset-inline-end: 0;
+  bottom: 0;
+  width: 3.25rem;
+  height: 3.25rem;
+  pointer-events: none;
+  background: linear-gradient(to top left, var(--color-ink) 0 50%, var(--color-line) 50%, var(--color-surface) 88%);
+  border-start-start-radius: 0.75rem;
+  filter: drop-shadow(-6px -6px 10px rgba(12, 14, 17, 0.18));
+  transition: width 0.6s var(--ease-out), height 0.6s var(--ease-out);
+}
+[dir="rtl"] .turn-curl {
+  background: linear-gradient(to top right, var(--color-ink) 0 50%, var(--color-line) 50%, var(--color-surface) 88%);
+  filter: drop-shadow(6px -6px 10px rgba(12, 14, 17, 0.18));
+}
+.turn-card:hover .turn-curl, .turn-card:focus-visible .turn-curl { width: 6.5rem; height: 6.5rem; }
+.turn-card:hover .turn-arrow { transform: scale(1.1) translateX(4px); }
+[dir="rtl"] .turn-card:hover .turn-arrow { transform: scale(1.1) translateX(-4px); }
+@media (prefers-reduced-motion: reduce) {
+  .turn-card, .turn-curl { transition: none; }
+  .turn-card:hover { transform: none; }
+}
+
+/* ---------- The route rail (components/book/RouteRail) ---------- */
+.rail-track {
+  scrollbar-width: none;
+  mask-image: linear-gradient(to right, transparent, #000 1.5rem, #000 calc(100% - 1.5rem), transparent);
+}
+.rail-track::-webkit-scrollbar { display: none; }
+.rail-light {
+  background: radial-gradient(circle, rgba(76, 201, 122, 0.55) 0%, rgba(76, 201, 122, 0.18) 45%, transparent 70%);
+  animation: rail-breathe 2.8s var(--ease-ambient) infinite;
+}
+@keyframes rail-breathe { 50% { transform: scale(1.25); opacity: 0.7; } }
+@media (prefers-reduced-motion: reduce) { .rail-light { animation: none; } }
+/* the chrome shows its new state at once; its own motion (the rail's light, the bar) does the moving */
+::view-transition-old(site-header), ::view-transition-old(route-rail), ::view-transition-old(mobile-bar) { display: none; }
+::view-transition-new(site-header), ::view-transition-new(route-rail), ::view-transition-new(mobile-bar) { animation: none; }
+
+/* ---------- The company profile book (components/ui/FlipBook) ---------- */
+.flipbook { width: min(18rem, 42vw); aspect-ratio: 0.72; }
+@media (min-width: 64rem) { .flipbook { width: min(17rem, 21vw); } }
+.book-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: var(--color-surface);
+}
+.book-spine {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 12%;
+  pointer-events: none;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.16), transparent);
+}
+.book-spine-end { inset-inline-start: auto; inset-inline-end: 0; transform: scaleX(-1); }
+[dir="rtl"] .book-spine { background: linear-gradient(to left, rgba(0, 0, 0, 0.16), transparent); }
+
+/* ---------- Dark theme: the night shift (components/ThemeToggle) ----------
+ * The same design at night. Grounds go to deep ink-blue, type goes to paper white, MSG green and the Red Sea glass
+ * keep their roles in brighter, night-legible tones, and the horizon behind the page turns to night (HorizonBackdrop).
+ * Sections that were already dark (the pitch, the stages, the night contact) are unchanged.
+ */
+html.dark {
+  color-scheme: dark;
+  --color-paper: #0a0e11;
+  --color-surface: #11171b;
+  --color-subtle: #172026;
+  --color-line: #242e35;
+  --color-line-strong: #36424b;
+  --color-ink: #edf1f2;
+  --color-ink-2: #dce2e4;
+  --color-ink-3: #c2cace;
+  --color-muted: #9ca7ae;
+  --color-faint: #6f7b84;
+  --color-brand: #2fb366;
+  --color-brand-strong: #26985a;
+  --color-brand-soft: #0f2a1b;
+  --color-brand-vivid: #3cc776;
+  --color-teal: #5cc2c7;
+  --color-teal-deep: #cdecec;
+  --color-sea-50: #0b1a1c;
+  --color-sea-100: #0e2326;
+  --color-sea-200: #153538;
+  --color-sea-400: #4aa9aa;
+  --color-danger: #ff8a7a;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 24px 48px -28px rgba(0, 0, 0, 0.8);
+  --shadow-float: 0 18px 40px -16px rgba(0, 0, 0, 0.8);
+}
+/* white cards and fields become night surfaces; ink-filled controls stay readable on them */
+html.dark .bg-white { background-color: var(--color-surface); }
+html.dark .bg-ink { color: var(--color-paper); }
+html.dark .bg-teal-deep { background-color: #0b3a40; }
+html.dark .btn-primary:not(.on-dark) { background-color: #0f5a61; color: #fff; }
+/* filled brand and teal controls keep their daylight depth, so white type on them stays legible */
+html.dark .bg-brand { background-color: #0b7d36; }
+html.dark .bg-teal { background-color: #137179; }
+html.dark .btn-primary.on-dark { background: #fff; color: #0b3a40; }
+html.dark .bg-\[\#f3f8f7\], html.dark .bg-\[\#e6f1ef\] { background-color: var(--color-subtle); }
+html.dark input, html.dark textarea, html.dark select { color-scheme: dark; }
+html.dark ::selection { background: var(--color-brand-bright); color: var(--color-pitch); }
+html.dark :focus-visible { outline-color: var(--color-brand-bright); }
+/* the backdrop's day tint under the page */
+html.dark { background: var(--color-night); }
+
+/* The theme turns over in a circle that grows out of the toggle (Skiper26: circle, from the button) */
+:root[data-theme-turn]::view-transition-old(root) { animation: none; z-index: -1; }
+:root[data-theme-turn]::view-transition-new(root) {
+  animation: theme-reveal 0.7s var(--ease-out-expo) both;
+  mix-blend-mode: normal;
+}
+@keyframes theme-reveal {
+  from { clip-path: circle(0 at var(--theme-x, 90%) var(--theme-y, 2rem)); }
+  to { clip-path: circle(var(--theme-r, 150vmax) at var(--theme-x, 90%) var(--theme-y, 2rem)); }
+}
+:root[data-theme-turn] body > header, :root[data-theme-turn] .route-rail, :root[data-theme-turn] .mobile-bar { view-transition-name: none; }
+/* Red Sea glass at night: deep water, lit glass */
+html.dark .sea-band {
+  background:
+    radial-gradient(90% 60% at 85% 0%, rgba(19, 113, 121, 0.45), transparent 70%),
+    radial-gradient(70% 50% at 0% 100%, rgba(11, 58, 64, 0.6), transparent 70%),
+    linear-gradient(180deg, #08191c 0%, #0a0e11 100%);
+}
+html.dark .sea-glass {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(92, 194, 199, 0.05));
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 24px 48px -28px rgba(0, 0, 0, 0.8);
+}
+/* frosted white panels on the light bands become frosted night panels */
+html.dark :is(.bg-white\/60, .bg-white\/65, .bg-white\/70, .bg-white\/75, .bg-white\/80, .bg-white\/85, .bg-white\/90, .bg-white\/92, .bg-white\/95) { background-color: rgb(17 23 27 / 0.84); }
+html.dark .bg-\[linear-gradient\(180deg\,rgba\(243\,251\,251\,0\.55\)\,rgba\(243\,251\,251\,0\.85\)\)\] { background: linear-gradient(180deg, rgb(10 14 17 / 0.55), rgb(10 14 17 / 0.85)); }
+/* the sunlit Sabya card stays sunlit at night: an accent, like a lit window */
+html.dark aside.text-sand-900 :is(.bg-white\/70, .bg-white\/75, .bg-white\/80, .bg-white\/85) { background-color: rgb(255 255 255 / 0.7); }
+html.dark aside.text-sand-900 .bg-white { background-color: #fff; }
+.turn-num::before { content: attr(data-num); }

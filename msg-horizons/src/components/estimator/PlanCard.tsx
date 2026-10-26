@@ -1,5 +1,6 @@
 "use client";
 
+import { goTo } from "@/lib/book";
 import { EASE_OUT, EASE_IN_OUT } from "@/lib/motion";
 import { motion } from "motion/react";
 import { roadmapCopy, SEGMENT_PERSONA, type Segment } from "@/content/roadmap";
@@ -120,7 +121,7 @@ export default function PlanCard({
               onClick={() => {
                 setPlan(input);
                 track("plan_share", { channel: "form" });
-                document.getElementById("contact")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                goTo("contact");
                 window.setTimeout(() => document.getElementById("lead-name")?.focus({ preventScroll: true }), 700);
               }}
               className="inline-flex items-center justify-center rounded-xl border border-teal/33 px-4 py-3 font-medium text-teal-deep hover:border-teal/40"

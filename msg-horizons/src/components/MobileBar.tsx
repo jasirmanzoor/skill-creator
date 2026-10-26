@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { track } from "@/lib/analytics";
 import { whatsappLink } from "@/content/facts";
+import { bookState, onBookState } from "@/lib/book";
 import type { Dictionary } from "@/content/i18n";
 import { WhatsAppIcon } from "./ui/icons";
 
@@ -11,18 +12,22 @@ export const ROUTE_SLOT_ID = "route-slot";
 export const MOBILE_BAR_EVENT = "msg-mobilebar";
 export const MOBILE_BAR_ATTR = "data-mobilebar";
 
-/** Thumb-reach actions on mobile, shown after the hero and hidden over the contact section. */
+/** Thumb-reach actions on mobile, shown past the cover and hidden in the contact chapter. */
 export default function MobileBar({ t }: { t: Dictionary }) {
   const [show, setShow] = useState(false);
   useEffect(() => {
+    // past the cover (or scrolled into it), and never in the last chapter, where the contact form is
     const on = () => {
+      const { index, id } = bookState();
+      if (id) return setShow(id !== "contact" && (index > 0 || window.scrollY > window.innerHeight * 0.8));
       const contact = document.getElementById("contact");
       const inContact = contact ? contact.getBoundingClientRect().top < window.innerHeight * 0.6 : false;
       setShow(window.scrollY > window.innerHeight * 0.8 && !inContact);
     };
     on();
+    const off = onBookState(on);
     window.addEventListener("scroll", on, { passive: true });
-    return () => window.removeEventListener("scroll", on);
+    return () => { off(); window.removeEventListener("scroll", on); };
   }, []);
   // the route docks its progress button here instead of floating over the page
   useEffect(() => {
@@ -31,7 +36,7 @@ export default function MobileBar({ t }: { t: Dictionary }) {
   }, [show]);
   return (
     <div
-      className={`push-shift fixed inset-x-3 bottom-3 z-40 flex items-center gap-2 rounded-2xl border border-line bg-surface/95 p-2 shadow-[var(--shadow-float)] backdrop-blur transition-ui duration-[240ms] lg:hidden ${
+      className={`mobile-bar push-shift fixed inset-x-3 bottom-3 z-40 flex items-center gap-2 rounded-2xl border border-line bg-surface/95 p-2 shadow-[var(--shadow-float)] backdrop-blur transition-ui duration-[240ms] lg:hidden ${
         show ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-[calc(100%+0.75rem)] opacity-0"
       }`}
       aria-hidden={!show}

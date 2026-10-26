@@ -1,4 +1,5 @@
 import Reveal from "../ui/Reveal";
+import CountUp from "../ui/CountUp";
 import TrackedLink from "../ui/TrackedLink";
 import WorkforcePipeline from "../enterprise/WorkforcePipeline";
 import PeakControl from "../enterprise/PeakControl";
@@ -33,7 +34,7 @@ export default function Enterprise({ t, lang }: { t: Dictionary; lang: Locale })
               <h3 className="font-display text-3xl font-semibold tracking-[-0.02em] rtl:tracking-normal">{wf.title}</h3>
               <p className="mt-2 max-w-xl text-teal-deep/75">{wf.lead}</p>
             </div>
-            <p className="num font-display text-6xl font-semibold tracking-[-0.03em]">{facts.metrics.couriers.display}</p>
+            <p className="num font-display text-6xl font-semibold tracking-[-0.03em]"><CountUp value={facts.metrics.couriers.display} /></p>
           </Reveal>
           <div className="mt-8">
             <WorkforcePipeline stages={facts.workforceStages.map((k) => wf.stages[k])} site={wf.site} />

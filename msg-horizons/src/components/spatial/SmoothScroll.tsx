@@ -19,7 +19,7 @@ export default function SmoothScroll() {
     const lenis = new Lenis({
       duration: 1.2,
       smoothWheel: true,
-      anchors: { offset: -64 },
+      // #links are handled by the book (components/book/RouteBook): it turns to the chapter, then lands
       autoRaf: true,
       autoToggle: true,
       allowNestedScroll: true,

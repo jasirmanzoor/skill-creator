@@ -3,8 +3,10 @@
 import { useCallback, useEffect, useState } from "react";
 import Logo from "./ui/Logo";
 import SiteSearch from "./SiteSearch";
+import ThemeToggle from "./ThemeToggle";
 import PushMenu, { MenuButton } from "./PushMenu";
 import { track } from "@/lib/analytics";
+import { onBookState } from "@/lib/book";
 import { PRIMARY_NAV } from "@/content/nav";
 import { useActiveSection } from "@/lib/use-active-section";
 import type { Dictionary, Locale } from "@/content/i18n";
@@ -34,8 +36,9 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
       );
     };
     on();
+    const off = onBookState(() => requestAnimationFrame(on));
     window.addEventListener("scroll", on, { passive: true });
-    return () => window.removeEventListener("scroll", on);
+    return () => { off(); window.removeEventListener("scroll", on); };
   }, []);
 
   const close = useCallback(() => setOpen(false), []);
@@ -52,7 +55,7 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
     <header
       className={`push-shift fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300 ${
         dark
-          ? "border-white/10 bg-ink/80 backdrop-blur-md"
+          ? "border-white/10 bg-night/80 backdrop-blur-md"
           : solid
             ? "border-line bg-paper/90 backdrop-blur-md"
             : "border-transparent bg-transparent"
@@ -102,6 +105,7 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
 
         <div className="flex items-center gap-1.5 sm:gap-3">
           <SiteSearch t={t} lang={lang} inverted={!ink} />
+          <ThemeToggle lang={lang} />
           <a
             href={`/${other}`}
             hrefLang={other}
