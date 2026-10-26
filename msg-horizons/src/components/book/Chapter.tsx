@@ -1,5 +1,6 @@
 import { fmt, type Locale } from "@/content/i18n";
 import { bookCopy, CHAPTERS } from "@/content/chapters";
+import Opener from "./Opener";
 
 /**
  * One page of the book. The first chapter is marked open in the HTML so the cover paints at once; RouteBook opens
@@ -11,6 +12,7 @@ export default function Chapter({ n, lang, children }: { n: number; lang: Locale
   const next = CHAPTERS[n + 1];
   return (
     <div data-chapter={ch.id} data-current={n === 0 ? "" : undefined} tabIndex={-1} aria-label={ch.title[lang]} className="chapter">
+      <Opener n={n} lang={lang} />
       {children}
       {next ? <TurnPage n={n} lang={lang} /> : null}
     </div>

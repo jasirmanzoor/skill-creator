@@ -29,6 +29,7 @@ import Chapter from "@/components/book/Chapter";
 import RouteBook from "@/components/book/RouteBook";
 import RouteRail from "@/components/book/RouteRail";
 import Stage from "@/components/book/Stage";
+import TechHeadings from "@/components/fx/TechHeadings";
 
 export default async function Home({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
@@ -78,6 +79,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       <MobileBar t={t} />
       <RouteRail lang={lang} />
       <RouteBook lang={lang} />
+      <TechHeadings lang={lang} />
     </PlanProvider>
   );
 }
