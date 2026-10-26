@@ -530,7 +530,8 @@ await test("accessibility: axe-core finds no serious/critical violations in any 
         await page.waitForTimeout(300);
         const h = await page.evaluate(() => document.documentElement.scrollHeight);
         for (let y = 0; y < h; y += 800) { await page.evaluate((yy) => window.scrollTo(0, yy), y); await page.waitForTimeout(60); }
-        await page.waitForTimeout(600); // let header/theme transitions settle before sampling colours
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await page.waitForTimeout(1000); // let header/theme transitions settle before sampling colours
         const v = await page.evaluate(async () =>
           // eslint-disable-next-line no-undef
           (await axe.run(document, { resultTypes: ["violations"] })).violations.map((v) => ({

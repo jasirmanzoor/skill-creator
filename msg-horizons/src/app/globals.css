@@ -742,3 +742,7 @@ html.dark .bg-\[linear-gradient\(180deg\,rgba\(243\,251\,251\,0\.55\)\,rgba\(243
 html.dark aside.text-sand-900 :is(.bg-white\/70, .bg-white\/75, .bg-white\/80, .bg-white\/85) { background-color: rgb(255 255 255 / 0.7); }
 html.dark aside.text-sand-900 .bg-white { background-color: #fff; }
 .turn-num::before { content: attr(data-num); }
+
+/* the pitch's own clock: how long until the scene turns over by itself (components/pitch) */
+.pitch-timer { animation: pitch-timer linear both; }
+@keyframes pitch-timer { from { transform: scaleX(0); } to { transform: scaleX(1); } }
