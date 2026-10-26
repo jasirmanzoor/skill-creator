@@ -47,7 +47,7 @@ export default function ProfileBook({ t, lang }: { t: Dictionary; lang: Locale }
 
   const pages: React.ReactNode[] = [
     <div key="cover" className="relative flex h-full flex-col justify-between overflow-hidden bg-deep p-[9%] text-white">
-      <span aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(80%_60%_at_80%_0%,rgba(19,113,121,0.7),transparent_70%),radial-gradient(70%_50%_at_0%_100%,rgba(11,125,54,0.45),transparent_70%)]" />
+      <span aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(80%_60%_at_80%_0%,rgba(201,150,46,0.32),transparent_70%),radial-gradient(70%_50%_at_0%_100%,rgba(11,125,54,0.3),transparent_70%)]" />
       <Logo inverted className="relative" />
       <span className="relative">
         <span className="block font-display text-[clamp(1.1rem,3.2vw,2rem)] font-semibold leading-tight">{c.cover}</span>

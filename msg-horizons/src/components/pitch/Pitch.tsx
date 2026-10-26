@@ -86,7 +86,7 @@ export default function Pitch({ t, lang }: { t: Dictionary; lang: Locale }) {
           className={`object-cover transition-opacity duration-[1200ms] ease-out [filter:grayscale(1)_brightness(0.4)] ${msg ? "opacity-0" : "opacity-100"}`}
         />
       </motion.div>
-      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,#061c20_0%,rgba(6,28,32,0.82)_30%,rgba(6,28,32,0.9)_70%,#061c20_100%)]" />
+      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,#0b1016_0%,rgba(11,16,22,0.82)_30%,rgba(11,16,22,0.9)_70%,#0b1016_100%)]" />
       <div aria-hidden="true" className={`absolute inset-0 -z-10 transition-opacity duration-[1200ms] ease-out ${msg ? "opacity-100" : "opacity-0"} bg-[radial-gradient(60%_50%_at_75%_30%,rgba(76,201,122,0.18),transparent_70%)]`} />
 
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
@@ -151,7 +151,7 @@ export default function Pitch({ t, lang }: { t: Dictionary; lang: Locale }) {
         {/* the operation: loose and adrift on your own, in line around one team with MSG */}
         <div
           ref={stage}
-          className={`relative mt-8 overflow-hidden rounded-3xl py-6 ring-1 transition-colors duration-[900ms] ${msg ? "bg-[#0a2c22] ring-brand-bright/25" : "bg-[#0c1b1f] ring-white/10"}`}
+          className={`relative mt-8 overflow-hidden rounded-3xl py-6 ring-1 transition-colors duration-[900ms] ${msg ? "bg-[#0a2c22] ring-brand-bright/25" : "bg-[#111720] ring-white/10"}`}
         >
           {/* light sweeping across as MSG takes over */}
           <AnimatePresence>
@@ -208,7 +208,7 @@ function Operation({ rows, labels, withMsg, reduce }: { rows: PitchRow[]; labels
           animate={withMsg ? { x: 0, y: 0, rotate: 0, scale: 1 } : { ...drift, scale: 0.98 }}
           transition={withMsg ? { ...spring, delay } : reduce ? { duration: 0 } : { duration: 5 + i * 0.6, repeat: Infinity, ease: "easeInOut" }}
           className={`relative flex h-32 items-center gap-3.5 overflow-hidden rounded-2xl border px-4 transition-[background-color,border-color] duration-500 lg:h-[7.5rem] lg:px-5 ${
-            withMsg ? "border-brand-bright/50 bg-[#0d3f2a]" : "border-dashed border-[#e5735c]/55 bg-[#14262b]"
+            withMsg ? "border-brand-bright/50 bg-[#0d3f2a]" : "border-dashed border-[#e5735c]/55 bg-[#172029]"
           }`}
           style={{ transitionDelay: `${delay}s` }}
         >
@@ -284,7 +284,7 @@ function Operation({ rows, labels, withMsg, reduce }: { rows: PitchRow[]; labels
           animate={withMsg ? { scale: [0.96, 1.03, 1] } : { scale: 1 }}
           transition={reduce ? { duration: 0 } : { duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
           className={`relative grid h-14 place-items-center overflow-hidden rounded-2xl transition-colors duration-500 lg:h-16 ${
-            withMsg ? "bg-brand-bright font-display text-lg font-semibold text-pitch" : "border border-dashed border-white/25 bg-[#101f23] text-sm font-semibold uppercase tracking-[0.14em] text-white/55 rtl:tracking-normal"
+            withMsg ? "bg-brand-bright font-display text-lg font-semibold text-pitch" : "border border-dashed border-white/25 bg-[#141b24] text-sm font-semibold uppercase tracking-[0.14em] text-white/55 rtl:tracking-normal"
           }`}
         >
           <AnimatePresence mode="popLayout" initial={false}>

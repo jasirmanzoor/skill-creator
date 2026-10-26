@@ -75,7 +75,7 @@ export default function LaunchSequence({ t, lang }: { t: Dictionary; lang: Local
   return (
     <section id="journey" ref={ref} aria-labelledby="launch-title" className="relative scroll-mt-16 overflow-hidden bg-pitch sec text-white" data-theme="dark">
       {/* aurora: the sea-glass colours, lit from behind the console */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_80%_20%,rgba(19,113,121,0.55),transparent_70%),radial-gradient(50%_45%_at_10%_90%,rgba(11,125,54,0.28),transparent_70%)]" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_80%_20%,rgba(201,150,46,0.20),transparent_70%),radial-gradient(50%_45%_at_10%_90%,rgba(11,125,54,0.16),transparent_70%)]" />
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-[0.12] [background-image:linear-gradient(rgba(255,255,255,0.5)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.5)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(70%_60%_at_70%_40%,#000,transparent)]" />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-5 lg:px-8">
@@ -160,7 +160,7 @@ export default function LaunchSequence({ t, lang }: { t: Dictionary; lang: Local
             className="relative lg:sticky lg:top-24 lg:self-start"
           >
             <div className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(160deg,rgba(255,255,255,0.10),rgba(255,255,255,0.03))] p-2 ring-1 ring-white/12 shadow-[0_60px_120px_-50px_rgba(0,0,0,0.9)] backdrop-blur-xl">
-              <div className="relative overflow-hidden rounded-[1.6rem] bg-[radial-gradient(120%_90%_at_100%_0%,#0f4d55_0%,#08262b_55%,#061c20_100%)]">
+              <div className="relative overflow-hidden rounded-[1.6rem] bg-[radial-gradient(120%_90%_at_100%_0%,#2a2416_0%,#131a22_55%,#0b1016_100%)]">
                 {/* title bar */}
                 <div className="flex items-center justify-between gap-3 border-b border-white/10 px-5 py-3.5">
                   <span className="flex items-center gap-2.5 text-sm font-semibold">

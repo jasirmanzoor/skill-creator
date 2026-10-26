@@ -107,7 +107,7 @@ export default function PushMenu({ t, lang, open, onClose }: { t: Dictionary; la
       <div
         aria-hidden="true"
         onClick={onClose}
-        className={`fixed inset-0 z-[55] bg-[#061c20]/35 transition-opacity duration-500 ${open ? "opacity-100" : "pointer-events-none opacity-0"}`}
+        className={`fixed inset-0 z-[55] bg-pitch/40 transition-opacity duration-500 ${open ? "opacity-100" : "pointer-events-none opacity-0"}`}
       />
       <div
         id="site-map"
@@ -116,7 +116,7 @@ export default function PushMenu({ t, lang, open, onClose }: { t: Dictionary; la
         aria-modal="true"
         aria-label={t.nav.siteMap}
         inert={!open}
-        className="fixed inset-y-0 end-0 z-[60] flex w-[var(--push-w)] flex-col overflow-y-auto overscroll-contain bg-[#061c20] text-white"
+        className="fixed inset-y-0 end-0 z-[60] flex w-[var(--push-w)] flex-col overflow-y-auto overscroll-contain bg-pitch text-white"
         data-lenis-prevent
         style={{
           transform: open ? "translateX(0)" : `translateX(${lang === "ar" ? "-100%" : "100%"})`,

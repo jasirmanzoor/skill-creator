@@ -30,7 +30,7 @@ export function CommandBackdrop({ stars = true }: { stars?: boolean }) {
       <div className="absolute inset-0 motion-safe:animate-[hero-breathe_24s_var(--ease-ambient)_infinite_alternate]">
         <Image src="/media/msg/hub-aerial.webp" alt="" fill priority sizes="100vw" className="object-cover object-[50%_40%] opacity-[0.22] [filter:grayscale(1)_contrast(1.15)]" />
       </div>
-      <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_72%_42%,rgba(19,113,121,0.55),transparent_70%),radial-gradient(50%_40%_at_10%_100%,rgba(11,125,54,0.28),transparent_70%),linear-gradient(180deg,rgba(3,22,26,0.7)_0%,rgba(3,22,26,0.35)_40%,rgba(3,22,26,0.92)_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_72%_42%,rgba(201,150,46,0.20),transparent_70%),radial-gradient(50%_40%_at_10%_100%,rgba(11,125,54,0.16),transparent_70%),linear-gradient(180deg,rgba(8,11,16,0.7)_0%,rgba(8,11,16,0.35)_40%,rgba(8,11,16,0.92)_100%)]" />
       {stars ? <StarfieldBackground particleCount={420} interactionRadius={170} particleColor="#6ee79a" activeColor="#e6fff0" speed={0.5} className="mix-blend-screen" /> : null}
       {/* the floor: lines run toward the viewer, the network never stops */}
       <div className="absolute inset-x-[-30%] bottom-0 h-[55%] origin-bottom [transform:perspective(520px)_rotateX(62deg)] [mask-image:linear-gradient(0deg,#000_10%,transparent_85%)]">

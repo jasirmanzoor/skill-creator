@@ -39,9 +39,12 @@
   --color-sea-400: #6cc3c3;
   --color-teal: #137179;
   --color-teal-deep: #0b3a40;
-  /* Dark grounds: the hub at dusk (hero, deck), the pitch, and the night sky (contact, footer). */
-  --color-deep: #08262b;
-  --color-pitch: #061c20;
+  /*
+   * Dark grounds: graphite night. Blue-black ink lit by a warm sodium-lamp sand from the desert horizon, with MSG
+   * green kept for what MSG does (checks, lines, live states). Used by the stages, the pitch, services and the menu.
+   */
+  --color-deep: #131a22;
+  --color-pitch: #0b1016;
   --color-night: #07090f;
   --color-silver: #c3cdd2;
   --color-danger: #b42318;
@@ -746,3 +749,22 @@ html.dark aside.text-sand-900 .bg-white { background-color: #fff; }
 /* the pitch's own clock: how long until the scene turns over by itself (components/pitch) */
 .pitch-timer { animation: pitch-timer linear both; }
 @keyframes pitch-timer { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* ---------- React Bits: ScrollExpand and TechText (components/fx) ---------- */
+.scroll-expand { position: relative; width: 100%; }
+.scroll-expand__track { position: relative; }
+.scroll-expand__stage { position: sticky; top: 0; display: grid; place-items: center; overflow: hidden; }
+.scroll-expand__frame { position: absolute; inset: 0; overflow: hidden; will-change: clip-path; }
+.scroll-expand__media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: transform; }
+.scroll-expand__shade { position: absolute; inset: 0; background: radial-gradient(70% 60% at 50% 50%, rgb(8 11 16 / 0.5), rgb(8 11 16 / 0.15)); pointer-events: none; }
+.scroll-expand__scrim { position: absolute; inset: 0; opacity: 0; pointer-events: none; background: linear-gradient(180deg, rgb(8 11 16 / 0.55), rgb(8 11 16 / 0.92)); }
+.scroll-expand__overlay { position: absolute; inset: 0; opacity: 0; }
+.scroll-expand__title { position: relative; z-index: 2; display: grid; place-items: center; }
+.scroll-expand__hint {
+  position: absolute; bottom: 11.5rem; inset-inline: 0; z-index: 2; text-align: center; pointer-events: none;
+  font-size: 0.75rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: rgb(255 255 255 / 0.7);
+}
+:lang(ar) .scroll-expand__hint { letter-spacing: 0; }
+.tech-text { position: relative; width: 100%; height: 100%; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.tech-text-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+@media (min-width: 64rem) { .scroll-expand__hint { bottom: 7.5rem; } }
