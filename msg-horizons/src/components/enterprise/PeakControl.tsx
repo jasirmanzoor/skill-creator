@@ -79,6 +79,7 @@ export default function PeakControl({ stages, labels, lang, leaders = [] }: { st
         {outro ? (
           <motion.div key="bg" aria-hidden="true" className="pointer-events-none absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.8, ease: EASE_OUT }}>
             <motion.img
+                loading="lazy"
               src="/media/msg/hub-floor-soft.webp"
               alt=""
               className="absolute inset-0 size-full object-cover"

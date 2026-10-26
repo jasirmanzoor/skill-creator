@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import type { Locale } from "@/content/i18n";
 import { onBookState } from "@/lib/book";
+import { isTouch, useLowPower } from "@/lib/perf";
 
 const TechText = dynamic(() => import("./TechText"), { ssr: false });
 
@@ -16,7 +17,10 @@ const DIGITS = /[0-9٠-٩]/;
 const SKIP = "[data-tech-skip], .tech-text, .scroll-expand__title, button, [role=tab], [role=radio], [role=dialog], .flipbook";
 
 type Line = { key: string; text: string; left: number; top: number; width: number; height: number; color: string; size: number; weight: string; family: string; spacing: number };
-type Target = { id: number; el: HTMLElement; host: HTMLElement; lines: Line[]; interactive: boolean };
+type Target = { id: number; el: HTMLElement; host: HTMLElement; lines: Line[]; interactive: boolean; live: boolean };
+/** how many headings are drawn at once: the ones on screen, nearest the middle first */
+const MAX_LIVE = 5;
+const MAX_LIVE_TOUCH = 3;
 
 /**
  * React Bits' TechText on every heading of the site, words only. Each heading keeps its real text in the page (for
@@ -24,17 +28,39 @@ type Target = { id: number; el: HTMLElement; host: HTMLElement; lines: Line[]; i
  * exactly where the browser set it, in the heading's own font, size, weight and colour. A light sweeps along each
  * line, turning the letter it passes into a dashed outline inside a technical frame; the letters assemble on arrival,
  * and a tap kicks them up like a wave. Headings with a figure in them, Arabic (whose letters join, while TechText draws
- * one letter at a time) and headings inside controls keep their normal type. Only the open chapter is measured.
+ * one letter at a time) and headings inside controls keep their normal type. Only the open chapter is measured, and
+ * only the few headings on screen are drawn (the rest are plain type until you reach them), so the page stays smooth;
+ * weaker devices and visitors who ask for less motion keep plain type throughout.
  */
 export default function TechHeadings({ lang }: { lang: Locale }) {
   const [targets, setTargets] = useState<Target[]>([]);
+  const low = useLowPower();
 
   useEffect(() => {
-    if (lang === "ar") return;
+    if (lang === "ar" || low) return;
+    const limit = isTouch() ? MAX_LIVE_TOUCH : MAX_LIVE;
     const known = new Map<HTMLElement, Target>();
+    let dead = false; // set on cleanup, so a late callback (fonts, observers) cannot bring the headings back
     let ids = 0;
     let raf = 0;
-    const publish = () => setTargets([...known.values()].filter((t) => t.lines.length));
+    const onScreen = new Set<HTMLElement>();
+    const publish = () => {
+      // draw the headings in view, the ones nearest the middle of the screen first; the others stay plain type
+      const mid = window.innerHeight / 2;
+      const live = new Set(
+        [...known.values()]
+          .filter((t) => t.lines.length && onScreen.has(t.el))
+          .map((t) => ({ t, d: Math.abs(t.el.getBoundingClientRect().top + t.el.offsetHeight / 2 - mid) }))
+          .sort((a, b) => a.d - b.d)
+          .slice(0, limit)
+          .map((x) => x.t),
+      );
+      known.forEach((t) => {
+        t.live = live.has(t);
+        t.el.toggleAttribute("data-tech", t.live);
+      });
+      setTargets([...live]);
+    };
 
     const measure = (el: HTMLElement): Line[] => {
       const box = el.getBoundingClientRect();
@@ -117,11 +143,11 @@ export default function TechHeadings({ lang }: { lang: Locale }) {
         host.setAttribute("aria-hidden", "true");
         host.className = "tech-host";
         el.appendChild(host);
-        el.setAttribute("data-tech", "");
-        const t: Target = { id: ids++, el, host, lines: [], interactive: !el.closest("a") };
+        const t: Target = { id: ids++, el, host, lines: [], interactive: !el.closest("a"), live: false };
         known.set(el, t);
         refresh(el);
         ro.observe(el);
+        view.observe(el);
         mo.observe(el, { childList: true, characterData: true, subtree: true });
         publish();
       };
@@ -131,13 +157,14 @@ export default function TechHeadings({ lang }: { lang: Locale }) {
 
     const scan = () => {
       raf = 0;
+      if (dead) return;
       document.querySelectorAll<HTMLElement>(SELECTOR).forEach((el) => {
         if (el.getClientRects().length) adopt(el);
       });
       known.forEach((_, el) => refresh(el));
       publish();
     };
-    const later = () => { if (!raf) raf = requestAnimationFrame(scan); };
+    const later = () => { if (!dead && !raf) raf = requestAnimationFrame(scan); };
 
     const ro = new ResizeObserver((entries) => {
       entries.forEach((e) => refresh(e.target as HTMLElement));
@@ -160,24 +187,31 @@ export default function TechHeadings({ lang }: { lang: Locale }) {
     document.fonts?.ready.then(later);
     const off = onBookState(() => window.setTimeout(later, 60));
     window.addEventListener("resize", later);
+    const view = new IntersectionObserver((entries) => {
+      entries.forEach((e) => (e.isIntersecting ? onScreen.add(e.target as HTMLElement) : onScreen.delete(e.target as HTMLElement)));
+      publish();
+    });
     const io = new IntersectionObserver((entries) => entries.forEach((e) => e.isIntersecting && later()));
     document.querySelectorAll(SELECTOR).forEach((el) => io.observe(el));
 
     return () => {
+      dead = true;
       window.clearTimeout(first);
       cancelAnimationFrame(raf);
       off();
       ro.disconnect();
       mo.disconnect();
       io.disconnect();
+      view.disconnect();
       theme.disconnect();
       window.removeEventListener("resize", later);
       known.forEach((t) => {
         t.host.remove();
         t.el.removeAttribute("data-tech");
       });
+      setTargets([]);
     };
-  }, [lang]);
+  }, [lang, low]);
 
   return (
     <>

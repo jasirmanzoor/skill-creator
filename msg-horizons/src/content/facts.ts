@@ -50,6 +50,17 @@ export const facts = {
   outlet: { brand: "iMile", model: "franchise", deliveryRadiusKm: 5 },
 
   /** "Our Valued Partners" — 2026 profile. Text only; no third-party logos without permission. */
+  /**
+   * MSG's own online store, supplied by MSG on 26 Oct 2026 ("our existing ecommerce business site"). A Salla store for
+   * perfumes and beauty; the VAT number printed on perfmix.com is corporate.taxId. Category links are the store's own.
+   * The store's wording is its own: nothing about its prices, promotions or shipping is repeated on this site.
+   */
+  ownStore: {
+    name: "Perfmix",
+    nameAr: "بيرفمكس",
+    url: "https://perfmix.com",
+    categories: { mens: "https://perfmix.com/category/yNaZwD", unisex: "https://perfmix.com/category/voGnjo", alternatives: "https://perfmix.com/category/XRyxnY" },
+  },
   partners: ["AJEX", "Keeta", "iMile", "Logistiq", "J&T Express", "Naqel", "Landmark"],
 
   /** Services promoted on the website. Customs Clearance is excluded by project instruction. */

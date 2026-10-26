@@ -194,7 +194,12 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   }, [zmax]);
   const zk = useTransform(p, [0.1, 0.43], [0, 1], { clamp: true });
   const zoom = useTransform(() => 1 + (zmax.get() - 1) * zk.get() ** 3);
-  const facadeFx = useTransform(p, [0.3, 0.43], ["blur(0px) brightness(1)", "blur(10px) brightness(0.3)"]);
+  // no filter at all until the walk-in begins: a standing blur(0px) keeps this full-screen layer on the slow filter path
+  const facadeFx = useTransform(p, (v) => {
+    if (v <= 0.3) return "none";
+    const k = Math.min(1, (v - 0.3) / 0.13);
+    return `blur(${10 * k}px) brightness(${1 - 0.7 * k})`;
+  });
   const veil = useTransform(p, [0.33, 0.43], [0, 1]);
   const uiOut = useTransform(p, [0, 0.08, 0.18], [1, 1, 0]);
   const uiY = useTransform(p, [0, 0.18], [0, -70]);

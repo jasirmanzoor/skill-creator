@@ -50,6 +50,12 @@ export default function Footer({ t, lang }: { t: Dictionary; lang: Locale }) {
               </li>
             ))}
             <li>
+              <a className="inline-flex min-h-11 items-center hover:text-white" href={facts.ownStore.url} target="_blank" rel="noopener">
+                {lang === "ar" ? facts.ownStore.nameAr : facts.ownStore.name}
+                <span className="sr-only"> ({lang === "ar" ? "يفتح في تبويب جديد" : "opens in a new tab"})</span>
+              </a>
+            </li>
+            <li>
               <a className="inline-flex min-h-11 items-center hover:text-white" href={`/${lang === "en" ? "ar" : "en"}`} hrefLang={lang === "en" ? "ar" : "en"}>
                 {t.nav.langSwitch}
               </a>

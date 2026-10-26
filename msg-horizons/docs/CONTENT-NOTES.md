@@ -168,3 +168,12 @@ Domain: the website goes on www.msg-horizons.com only. msg-horizons.com (apex) s
   note under the strip says they are not photographs of MSG's fleet or sites. They stay out of `content/media.ts`.
 - The vans show their makers' badges (Toyota, Ford) and the yard scene has unreadable road signs; nothing implies MSG.
 - Replace each with MSG's own photo of the same moment when one arrives.
+
+## Perfmix (26 Oct 2026)
+MSG asked for "an element of our existing ecommerce business site, perfmix.com". The VAT number printed on perfmix.com is
+`corporate.taxId`, so the store is MSG's. perfmix.com is a Salla store whose policy (`frame-ancestors`) lets only Salla frame it,
+so it cannot be iframed: `components/sections/Perfmix.tsx` is a native set of three of the store's own category banners
+(men's, unisex, alternatives; copied to `public/media/perfmix/`) that link out, in the Company chapter and the footer.
+Facts used: name, URL, category links (`facts.ownStore`). Deliberately not repeated: the store's free-shipping banner and promo
+code, prices, and any claim about its delivery. The copy "We sell online ourselves, so we know what a seller needs" is an
+inference from MSG's own statement and should be confirmed by MSG.

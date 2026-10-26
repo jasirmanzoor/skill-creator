@@ -344,6 +344,11 @@ const LightRays = ({
     const frame = (now) => {
       raf = 0;
       if (lost) return;
+      // the light drifts slowly: 30 frames a second is as smooth to the eye and half the work for the GPU
+      if (last && now - last < 30) {
+        raf = requestAnimationFrame(frame);
+        return;
+      }
       const s = settingsRef.current;
       const dt = clamp((now - last) / 1000 || 0, 0, 0.05);
       last = Math.max(last, now);

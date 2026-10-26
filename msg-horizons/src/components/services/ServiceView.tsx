@@ -68,6 +68,7 @@ export default function ServiceView({ id, index, total, lang, name, fact, href }
               exit={{ opacity: 0, transition: { delay: 0.7, duration: 0.01 } }}
             >
               <motion.img
+                loading="lazy"
                 src={p.src}
                 alt=""
                 decoding="async"

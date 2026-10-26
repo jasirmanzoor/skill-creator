@@ -24,6 +24,7 @@ import Footer from "@/components/Footer";
 import MobileBar from "@/components/MobileBar";
 import SmoothScroll from "@/components/spatial/SmoothScroll";
 import Depth from "@/components/spatial/Depth";
+import Perfmix from "@/components/sections/Perfmix";
 import Chapter from "@/components/book/Chapter";
 import RouteBook from "@/components/book/RouteBook";
 import RouteRail from "@/components/book/RouteRail";
@@ -67,6 +68,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
           <Depth><Proof t={t} /></Depth>
           <Depth><ProfileBook t={t} lang={lang} /></Depth>
           <Depth><Partners lang={lang} /></Depth>
+          <Depth><Perfmix lang={lang} /></Depth>
         </>)}
         {c(7, <Depth><Enterprise t={t} lang={lang} /></Depth>)}
         {c(8, <Depth><Contact t={t} lang={lang} /></Depth>)}

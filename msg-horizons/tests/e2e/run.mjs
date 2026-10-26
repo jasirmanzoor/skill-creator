@@ -19,6 +19,7 @@ let failed = 0;
 const results = [];
 
 async function test(name, fn) {
+  if (process.env.E2E_ONLY && !name.includes(process.env.E2E_ONLY)) return; // E2E_ONLY="search" runs just the tests whose name has it
   if (process.env.E2E_VERBOSE) console.log("… " + name);
   const t0 = Date.now();
   try {
@@ -515,6 +516,87 @@ await test("book: on a phone the rail turns to a chapter, and the theme toggle s
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), "no horizontal page scroll");
   assert.deepEqual(errors, []);
   await ctx.close();
+});
+
+await test("search: any service-related keyword (en + ar, typos too) lands on the right MSG page, and nothing dead-ends", async () => {
+  const { page, ctx, errors } = await open("/en", { reducedMotion: "reduce" });
+  const ask = async (q) => {
+    await page.keyboard.press("/");
+    const box = page.getByRole("dialog").getByRole("searchbox");
+    await box.fill(q);
+    const items = await page.getByRole("dialog").locator("ul li a").allTextContents();
+    const msg = await page.getByRole("dialog").getByRole("status").count();
+    await page.keyboard.press("Escape");
+    return { first: items[0] || "", count: items.length, fallback: msg > 0 };
+  };
+  const expectFirst = [
+    ["courier company", /last-mile|courier|parcel/i], ["3PL", /e-commerce|online/i], ["shopify store", /e-commerce|online/i], ["warehouse", /warehous/i], ["wharehouse", /warehous/i],
+    ["trucking", /freight|road/i], ["hire drivers", /driver|manpower/i], ["telematics", /fleet/i], ["how much", /plan|price|quote/i], ["whatsapp", /contact|talk/i],
+  ];
+  for (const [q, re] of expectFirst) {
+    const r = await ask(q);
+    assert.ok(re.test(r.first), `"${q}" → "${r.first}"`);
+  }
+  const none = await ask("zzqxv blorp");
+  assert.ok(none.fallback && none.count >= 2, "an unknown word still offers the plan builder and contact");
+  const many = await ask("best courier company in jeddah");
+  assert.ok(many.count >= 1 && !many.fallback, "extra words and cities do not hide the match");
+  assert.deepEqual(errors, []);
+  await ctx.close();
+
+  const ar = await open("/ar", { reducedMotion: "reduce" });
+  const askAr = async (q) => {
+    await ar.page.keyboard.press("/");
+    await ar.page.getByRole("dialog").getByRole("searchbox").fill(q);
+    const items = await ar.page.getByRole("dialog").locator("ul li a").allTextContents();
+    await ar.page.keyboard.press("Escape");
+    return items[0] || "";
+  };
+  for (const [q, re] of [["شركة توصيل", /توصيل/], ["مستودعات", /تخزين|مستودع/], ["اسطول", /أسطول|أساطيل|الأسطول/], ["سائقين", /مناديب|سائق|عمال|قوى/]]) {
+    const first = await askAr(q);
+    assert.ok(re.test(first), `"${q}" → "${first}"`);
+  }
+  assert.deepEqual(ar.errors, []);
+  await ar.ctx.close();
+});
+
+await test("perfmix: MSG's own store is shown in the company chapter, links out safely, and its pictures load (en + ar)", async () => {
+  for (const lang of ["en", "ar"]) {
+    const { page, ctx, errors } = await open(`/${lang}#perfmix`, { reducedMotion: "reduce" });
+    assert.equal(await page.evaluate(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter), "proof", "#perfmix opens the company chapter");
+    const links = await page.locator("#perfmix a").evaluateAll((as) => as.map((a) => ({ href: a.href, rel: a.rel, target: a.target })));
+    assert.equal(links.length, 4, "the store link and three categories");
+    for (const l of links) {
+      assert.ok(l.href.startsWith("https://perfmix.com"), l.href);
+      assert.ok(l.target === "_blank" && /noopener/.test(l.rel), "external links open in a new tab, noopener");
+    }
+    await page.locator("#perfmix img").last().scrollIntoViewIfNeeded();
+    await page.waitForFunction(() => [...document.querySelectorAll("#perfmix img")].every((i) => i.complete && i.naturalWidth > 0));
+    assert.ok(!/free shipping|P90|شحن مجاني/i.test(await page.locator("#perfmix").innerText()), "the store's promotion is not repeated");
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  }
+});
+
+await test("performance: few heading canvases at once, none on a weak device, and later chapters' photos wait", async () => {
+  const seen = [];
+  const full = await open("/en?perf=full", { reducedMotion: "no-preference" });
+  full.page.on("response", (r) => /\.(webp|jpg|png)/.test(r.url()) && seen.push(r.url()));
+  await full.page.reload({ waitUntil: "networkidle" });
+  await full.page.waitForTimeout(2500);
+  const drawn = await full.page.evaluate(() => document.querySelectorAll("[data-tech]").length);
+  assert.ok(drawn <= 5, `at most 5 headings drawn at once, saw ${drawn}`);
+  assert.ok(!seen.some((u) => /land-freight-truck|fleet-hiace|hub-racks/.test(u)), "photos of chapters nobody opened are not fetched");
+  assert.ok(seen.length <= 14, `first load fetches ${seen.length} images`);
+  await full.ctx.close();
+
+  const low = await open("/en?perf=low", { reducedMotion: "no-preference" });
+  await low.page.waitForTimeout(2500);
+  assert.equal(await low.page.evaluate(() => document.documentElement.dataset.perf), "low");
+  assert.equal(await low.page.evaluate(() => document.querySelectorAll("[data-tech], .tech-line").length), 0, "plain headings on a weak device");
+  assert.ok((await low.page.evaluate(() => document.querySelectorAll(".light-rays canvas, .rays-backdrop canvas").length)) <= 1, "at most the still backdrop");
+  assert.ok(await low.page.getByRole("heading", { level: 1 }).first().isVisible(), "the heading text is plainly there");
+  await low.ctx.close();
 });
 
 await test("accessibility: axe-core finds no serious/critical violations in any chapter (en + ar, light + dark)", async () => {

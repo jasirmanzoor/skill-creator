@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { track } from "@/lib/analytics";
-import { buildSearchIndex, searchSite } from "@/lib/site-search";
+import { buildSearchIndex, fallbackHits, searchSite } from "@/lib/site-search";
+import { POPULAR, searchCopy } from "@/content/searchTerms";
 import type { Dictionary, Locale } from "@/content/i18n";
 
 export default function SiteSearch({
@@ -18,7 +19,11 @@ export default function SiteSearch({
   const [q, setQ] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const index = useMemo(() => buildSearchIndex(t, lang), [t, lang]);
-  const hits = useMemo(() => searchSite(index, q), [index, q]);
+  const found = useMemo(() => searchSite(index, q, lang), [index, q, lang]);
+  const asked = q.trim().length >= 2;
+  const unmatched = asked && found.length === 0;
+  const hits = unmatched ? fallbackHits(index) : found;
+  const c = searchCopy[lang];
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -45,7 +50,7 @@ export default function SiteSearch({
   }, [open]);
 
   const go = (href: string, id: string) => {
-    track("search_select", { q, id });
+    track("search_select", { q, id, matched: !unmatched });
     setOpen(false);
     setQ("");
     if (href.startsWith("#")) window.location.hash = href.slice(1);
@@ -119,10 +124,35 @@ export default function SiteSearch({
               </button>
             </form>
             <p className="px-4 pt-3 text-xs text-faint">{t.search.hint}</p>
+            {!asked && (
+              <div className="px-4 pb-3 pt-3">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-brand">{c.popular}</p>
+                <ul className="mt-2 flex flex-wrap gap-2">
+                  {POPULAR[lang].map((term) => (
+                    <li key={term}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setQ(term);
+                          track("search_popular", { term });
+                          inputRef.current?.focus();
+                        }}
+                        className="min-h-9 rounded-full border border-line px-3.5 text-sm text-ink transition-colors hover:border-brand hover:text-brand"
+                      >
+                        {term}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {unmatched && (
+              <div className="px-4 pt-3" role="status">
+                <p className="font-medium text-ink">{c.fallbackTitle}</p>
+                <p className="mt-1 text-sm text-muted">{c.fallbackLead}</p>
+              </div>
+            )}
             <ul className="max-h-[50vh] overflow-y-auto p-2 pb-3">
-              {q.trim().length >= 2 && hits.length === 0 && (
-                <li className="px-3 py-6 text-sm text-muted">{t.search.empty}</li>
-              )}
               {hits.map((hit) => (
                 <li key={hit.id}>
                   <a

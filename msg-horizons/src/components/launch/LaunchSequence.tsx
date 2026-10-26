@@ -195,6 +195,7 @@ export default function LaunchSequence({ t, lang }: { t: Dictionary; lang: Local
                     {id === "live" ? (
                       <motion.div key="hub" aria-hidden="true" className="pointer-events-none absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.6, ease: EASE_OUT }}>
                         <motion.img
+                loading="lazy"
                           src="/media/msg/hub-open.webp"
                           alt=""
                           className="absolute inset-0 size-full object-cover"

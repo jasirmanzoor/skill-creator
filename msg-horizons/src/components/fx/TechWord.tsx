@@ -1,6 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
+import { useLowPower } from "@/lib/perf";
 import type { Locale } from "@/content/i18n";
 
 const TechText = dynamic(() => import("./TechText"), { ssr: false });
@@ -12,16 +14,26 @@ const LETTERS_ONLY = /^[^0-9٠-٩]+$/;
  * Words drawn by React Bits' TechText: a light sweeps along the word, each letter it passes turns to a dashed outline
  * inside a technical selection frame, and a tap kicks the letters up like a wave (drag a letter and it springs
  * back). Used for words only, never figures. Arabic letters join, and TechText draws one letter at a time, so Arabic
- * keeps its normal type. The canvas is decoration: the real text is beside it for search and screen readers.
+ * keeps its normal type. The canvas is decoration: the real text is beside it for search and screen readers. It is
+ * drawn only while the word is near the screen, and weaker devices keep plain type.
  */
 export default function TechWord({ text, lang, className = "", fallbackClassName = "" }: { text: string; lang: Locale; className?: string; fallbackClassName?: string }) {
-  if (lang === "ar" || !LETTERS_ONLY.test(text)) return <span className={fallbackClassName}>{text}</span>;
+  const box = useRef<HTMLSpanElement>(null);
+  const [near, setNear] = useState(false);
+  const plain = useLowPower();
+  useEffect(() => {
+    if (plain || !box.current) return;
+    const io = new IntersectionObserver(([e]) => setNear(e.isIntersecting), { rootMargin: "25% 0px" });
+    io.observe(box.current);
+    return () => io.disconnect();
+  }, [plain]);
+  if (lang === "ar" || !LETTERS_ONLY.test(text) || plain) return <span className={fallbackClassName}>{text}</span>;
   return (
-    <span className={`relative flex flex-col ${className}`}>
+    <span ref={box} className={`relative flex flex-col ${className}`}>
       <span className="sr-only">{text}</span>
       {lines(text).map((line) => (
         <span key={line} aria-hidden="true" className="relative block min-h-0 flex-1">
-          <Draw text={line} />
+          {near ? <Draw text={line} /> : null}
         </span>
       ))}
     </span>

@@ -174,7 +174,7 @@ export default function ScrollExpand({
         <div ref={stageRef} className="scroll-expand__stage">
           <div ref={frameRef} className="scroll-expand__frame">
             {/* eslint-disable-next-line @next/next/no-img-element -- transformed every frame; next/image adds nothing here */}
-            <img ref={mediaRef} className="scroll-expand__media" src={src} alt={alt} draggable={false} decoding="async" style={{ objectPosition: mediaPosition }} />
+            <img ref={mediaRef} className="scroll-expand__media" src={src} alt={alt} draggable={false} loading="lazy" decoding="async" style={{ objectPosition: mediaPosition }} />
             <div className="scroll-expand__shade" />
             <div ref={scrimRef} className="scroll-expand__scrim" />
             {children ? (
