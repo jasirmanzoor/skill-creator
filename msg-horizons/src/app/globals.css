@@ -793,3 +793,66 @@ html.dark .rays-backdrop { background: radial-gradient(120% 90% at 0% 0%, #16233
 html[data-perf="low"] [class*="animate-[hero-"] { animation-play-state: paused !important; }
 html[data-perf="low"] [class*="animate-[hero-clouds"],
 html[data-perf="low"] [class*="animate-[hero-sweep"] { display: none !important; }
+
+/* ------------------------------------------------------------------
+   The company profile (app/[lang]/company-profile), after the "Selene" template: its own night ground, the HUD's
+   mono type, the display scale, the corner brackets and the reveal. Scoped to .pf-root / html.pf-page.
+   ------------------------------------------------------------------ */
+html.pf-page { background: #05070c; color-scheme: dark; }
+html.pf-page body { background: #05070c; overflow-x: clip; }
+.pf-root { --font-mono: var(--font-pf-mono), ui-monospace, Menlo, monospace; }
+.pf-root ::selection { background: #009df8; color: #05070c; }
+.pf-root :focus-visible { outline: 1.5px solid #009df8; outline-offset: 3px; border-radius: 4px; }
+.pf-display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.9rem, 4.2vw, 4rem);
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+:lang(ar) .pf-display { letter-spacing: 0; line-height: 1.3; }
+.pf-brackets {
+  background:
+    linear-gradient(currentColor, currentColor) top left / 14px 1px,
+    linear-gradient(currentColor, currentColor) top left / 1px 14px,
+    linear-gradient(currentColor, currentColor) top right / 14px 1px,
+    linear-gradient(currentColor, currentColor) top right / 1px 14px,
+    linear-gradient(currentColor, currentColor) bottom left / 14px 1px,
+    linear-gradient(currentColor, currentColor) bottom left / 1px 14px,
+    linear-gradient(currentColor, currentColor) bottom right / 14px 1px,
+    linear-gradient(currentColor, currentColor) bottom right / 1px 14px;
+  background-repeat: no-repeat;
+}
+.pf-root [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+  transition: opacity 1s cubic-bezier(0.2, 0.7, 0.1, 1), transform 1s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+.pf-root [data-reveal].is-in { opacity: 1; transform: none; }
+html[data-film] .pf-root [data-reveal] { transition-duration: 0.6s; }
+@media (prefers-reduced-motion: reduce) { .pf-root [data-reveal] { transform: none; } }
+@keyframes pf-leg-in { from { opacity: 0; transform: translate3d(0, 12px, 0); } }
+
+/* The company profile deck (app/[lang]/company-profile/deck): each page's content arrives as the page lands. */
+.dk-slide [data-in] {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition: opacity 0.9s cubic-bezier(0.2, 0.7, 0.1, 1), transform 0.9s cubic-bezier(0.2, 0.7, 0.1, 1), letter-spacing 1.4s cubic-bezier(0.2, 0.7, 0.1, 1), filter 1.2s ease, clip-path 1.3s cubic-bezier(0.65, 0, 0.35, 1);
+  transition-delay: calc(var(--i, 0) * 70ms + 380ms);
+}
+.dk-slide[data-state="active"] [data-in], .dk-slide[data-state="shown"] [data-in] { opacity: 1; transform: none; }
+.dk-slide[data-state="shown"] [data-in], .dk-slide[data-state="shown"] .dk-draw, .dk-slide[data-state="shown"] .dk-grow { transition: none; }
+.dk-slide .dk-title { letter-spacing: 0.6em; margin-right: -0.6em; filter: blur(12px); }
+.dk-slide:is([data-state="active"], [data-state="shown"]) .dk-title { letter-spacing: 0.26em; margin-right: -0.26em; filter: none; }
+.dk-slide .dk-reveal-img { clip-path: inset(0 0 0 100%); }
+.dk-slide[dir="rtl"] .dk-reveal-img { clip-path: inset(0 100% 0 0); }
+.dk-slide:is([data-state="active"], [data-state="shown"]) .dk-reveal-img { clip-path: inset(0 0 0 0); }
+.dk-slide .dk-draw { stroke-dasharray: 1 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.8s cubic-bezier(0.45, 0.05, 0.25, 1) 0.8s; }
+.dk-slide:is([data-state="active"], [data-state="shown"]) .dk-draw { stroke-dashoffset: 0; }
+.dk-slide .dk-grow { transform: scale(0); transition: transform 1.6s cubic-bezier(0.2, 0.7, 0.1, 1) 2s; }
+.dk-slide:is([data-state="active"], [data-state="shown"]) .dk-grow { transform: scale(1); }
+@media (prefers-reduced-motion: reduce) { .dk-slide [data-in] { transform: none; transition-property: opacity; } }
+@page { size: 1920px 1080px; margin: 0; }
+html[data-print] body { margin: 0; background: #05070c; }
+html[data-print] .dk-print { width: 1920px; }

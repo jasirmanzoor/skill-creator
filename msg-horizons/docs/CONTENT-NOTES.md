@@ -201,3 +201,16 @@ inference from MSG's own statement and should be confirmed by MSG.
 - **Removed sections** at MSG's request ("discard the sections that are not very necessary"): the network photo band,
   the 7-step launch sequence, the Red Sea growth band and the partner constellation (the partner logos remain in the
   strip under the opening). The company profile is now its own chapter.
+
+## Company profile (27 Oct 2026)
+
+- **One page** at `/[lang]/company-profile` (components/profile), built on the "Selene" landing template MSG supplied:
+  the dawn over Riyadh (HORIZONS; sky photograph generated in Canva, skyline, hub door and floor drawn in code, MSG's
+  own van cut out from its photo), a day at the hub as a reel of stills, the network from Riyadh to the Sabya hub,
+  three ways to work with MSG and the seven services, the scale, and the first conversation (a WhatsApp hand-off).
+  Every word is in `content/profile.ts`, curated from the dictionaries; every figure comes from `facts.ts`.
+- **Flip-book deck** at `/[lang]/company-profile/deck`: ten 1920 × 1080 pages with 3D page turns. `?print` lays them
+  out for the PDFs in `public/media/profile/` (regenerate with `reel/profile-pdf.mjs`, then
+  `reel/profile-pdf-shrink.py`). Linked from the site's company-profile chapter.
+- Not used from MSG's Drive photo folders: two phone screenshots (one a private chat) and a candid photo of a resting
+  worker. Other companies' names and number plates are removed from anything derived from those photos.

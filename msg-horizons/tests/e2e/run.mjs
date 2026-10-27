@@ -537,6 +537,41 @@ await test("perfmix: MSG's own store is shown in the company chapter, links out 
   }
 });
 
+await test("company profile: the dawn, the day, the network, the scale and a WhatsApp hand-off, in both languages", async () => {
+  for (const lang of ["en", "ar"]) {
+    const { page, ctx, errors } = await open(`/${lang}/company-profile`);
+    assert.equal(await page.locator("h1").count(), 1, `${lang}: one h1`);
+    assert.match(await page.locator("h1").innerText(), /HORIZONS/);
+    for (const id of ["top", "day", "network", "paths", "scale", "contact"]) assert.equal(await page.locator(`#${id}`).count(), 1, `${lang}: #${id}`);
+    // scroll through: the map draws, the figures count to their values from facts.ts
+    await page.locator("#network").scrollIntoViewIfNeeded();
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(2600);
+    assert.match(await page.locator("#scale dl").innerText(), /1,000/, `${lang}: couriers counted`);
+    await page.locator("#contact button[type=submit]").click();
+    assert.ok((await page.locator("#pf-status").innerText()).length > 0, `${lang}: the form asks for a name and company`);
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  }
+  const pdf = await fetch(BASE + "/media/profile/MSG-Horizons-Company-Profile-EN.pdf");
+  assert.equal(pdf.status, 200, "the PDF is served");
+});
+
+await test("company profile deck: pages turn by key, the counter follows, and the PDF links resolve", async () => {
+  const { page, ctx, errors } = await open("/en/company-profile/deck");
+  const counter = (n) => page.locator('nav [aria-live="polite"]', { hasText: `${n} / 10` }).waitFor();
+  await counter("01");
+  await page.keyboard.press("PageDown");
+  await counter("02");
+  await page.waitForTimeout(1300);
+  await page.keyboard.press("PageDown");
+  await counter("03");
+  const href = await page.getByRole("link", { name: "Download PDF" }).getAttribute("href");
+  assert.equal((await fetch(BASE + href)).status, 200);
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
 await test("performance: few film-filled headings at once, none on a weak device, and later chapters' photos wait", async () => {
   const seen = [];
   const full = await open("/en?perf=full", { reducedMotion: "no-preference" });

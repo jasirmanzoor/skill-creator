@@ -18,6 +18,7 @@ const copy: Record<Locale, {
   eyebrow: string; title: string; lead: string; talk: string;
   cover: string; year: string; coverSub: string; who: string; whoLead: string; hq: string; cr: string;
   services: string; back: string; backSub: string; next: string; prev: string; again: string; page: string;
+  open: string; deck: string; pdf: string;
 }> = {
   en: {
     eyebrow: "Company profile",
@@ -38,6 +39,9 @@ const copy: Record<Locale, {
     prev: "Previous page",
     again: "Close the book",
     page: "{n} / {total}",
+    open: "Open the full profile",
+    deck: "Flip through the deck",
+    pdf: "Download PDF",
   },
   ar: {
     eyebrow: "الملف التعريفي",
@@ -58,6 +62,9 @@ const copy: Record<Locale, {
     prev: "الصفحة السابقة",
     again: "أغلق الكتاب",
     page: "{n} / {total}",
+    open: "افتح الملف التعريفي كاملًا",
+    deck: "تصفّح الكتيّب",
+    pdf: "تنزيل PDF",
   },
 };
 
@@ -185,6 +192,12 @@ export default function ProfileBook({ t, lang }: { t: Dictionary; lang: Locale }
           <div className="mt-8 flex flex-wrap gap-3">
             <a href="#contact" className="inline-flex min-h-12 items-center rounded-full bg-white px-6 text-sm font-semibold text-deep transition-transform hover:-translate-y-0.5">{c.talk}</a>
             <a href={whatsappLink()} target="_blank" rel="noopener" className="inline-flex min-h-12 items-center rounded-full px-6 text-sm font-semibold text-white ring-1 ring-white/30 transition-colors hover:bg-white/10">{t.nav.whatsapp}</a>
+          </div>
+          {/* the company profile on its own: the one-page version, the flip-book deck and its PDF */}
+          <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-semibold">
+            <a href={`/${lang}/company-profile`} className="inline-flex items-center gap-2 text-brand-mint underline-offset-4 hover:underline">{c.open} <span aria-hidden="true" className="rtl:-scale-x-100">→</span></a>
+            <a href={`/${lang}/company-profile/deck`} className="text-white/80 underline-offset-4 hover:text-white hover:underline">{c.deck}</a>
+            <a href={`/media/profile/MSG-Horizons-Company-Profile-${lang.toUpperCase()}.pdf`} download className="text-white/80 underline-offset-4 hover:text-white hover:underline">{c.pdf}</a>
           </div>
         </div>
         <div className="profile-book">

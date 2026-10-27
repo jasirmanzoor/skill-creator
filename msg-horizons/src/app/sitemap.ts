@@ -15,5 +15,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...entry("", 1),
     ...entry("/services", 0.9),
     ...SERVICE_SLUGS.flatMap((s) => entry(`/services/${s}`, 0.85)),
+    ...entry("/company-profile", 0.8),
   ];
 }
