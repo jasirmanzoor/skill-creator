@@ -59,9 +59,9 @@ export const hiaceFleet = {
       caption: { en: "Loaded at the depot before the first run", ar: "التحميل في المستودع قبل أول رحلة" },
     },
     {
-      src: "/media/photos/loading.webp",
-      pos: "45% 55%",
-      alt: { en: "A driver sliding cartons into a van backed up to a loading dock", ar: "سائق يُدخل الكراتين إلى شاحنة عند رصيف التحميل" },
+      src: "/media/photos/dispatch.webp",
+      pos: "40% 55%",
+      alt: { en: "A worker pulling a pallet jack with a wrapped pallet up to a loaded box truck at the dock", ar: "عامل يسحب رافعة طبالي يدوية عليها طبلية مغلّفة نحو شاحنة صندوقية محمّلة عند الرصيف" },
       caption: { en: "Out for dispatch", ar: "في طريقها للتوزيع" },
     },
     {

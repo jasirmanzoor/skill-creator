@@ -192,8 +192,10 @@ inference from MSG's own statement and should be confirmed by MSG.
   Replaced 27 Oct at MSG's request: `sorting.webp` (Enterprise plate: MSG's earlier plate photo, edited in Canva to a
   small crew at one row of sorting tables, no conveyor, no back row). `van-desert.webp` (Live network plate) is MSG's own
   supplied image, with the old green livery replaced by the new lockup. Rule from MSG: no one in a shemagh or thobe shown
-  doing labour on the warehouse floor; keep crews small and everything at true scale. The fleet-strip loading photo and
-  the tracking photo wait on MSG's own on-ground photographs.
+  doing labour on the warehouse floor; keep crews small and everything at true scale. `dispatch.webp` (fleet strip, "Out
+  for dispatch") and `courier-route.webp` (live tracking) are MSG's own on-ground photographs from Riyadh last-mile hubs
+  (Drive, 27 Oct), recomposed and lightly enhanced in Canva, with other companies' names and number plates removed.
+  Not used from those folders: two phone screenshots (one a private chat) and one candid photo of a resting worker.
 - **Retired** (they carried the old logo): the Toyota Hiace renders and the van photo with the old livery. The real
   hub photographs (warehouse, sorting, team, aerial, outlet) are unchanged and still used in the gallery and profile.
 - **Removed sections** at MSG's request ("discard the sections that are not very necessary"): the network photo band,

@@ -15,7 +15,7 @@ export const PHOTO: Record<ServiceId, { src: string; pos: string }> = {
   "land-freight": { src: "/media/msg/land-freight-truck.webp", pos: "40% 55%" },
   fleet: { src: "/media/photos/fleet-depot.webp", pos: "55% 60%" },
   manpower: { src: "/media/photos/manpower.webp", pos: "50% 45%" },
-  tracking: { src: "/media/photos/tracking.webp", pos: "45% 55%" },
+  tracking: { src: "/media/photos/courier-route.webp", pos: "30% 55%" },
   account: { src: "/media/photos/account.webp", pos: "50% 50%" },
 };
 
