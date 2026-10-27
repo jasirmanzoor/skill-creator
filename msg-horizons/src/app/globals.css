@@ -830,7 +830,7 @@ html.pf-page body { background: #05070c; overflow-x: clip; }
   transition: opacity 1s cubic-bezier(0.2, 0.7, 0.1, 1), transform 1s cubic-bezier(0.2, 0.7, 0.1, 1);
 }
 .pf-root [data-reveal].is-in { opacity: 1; transform: none; }
-html[data-film] .pf-root [data-reveal] { transition-duration: 0.6s; }
+
 @media (prefers-reduced-motion: reduce) { .pf-root [data-reveal] { transform: none; } }
 @keyframes pf-leg-in { from { opacity: 0; transform: translate3d(0, 12px, 0); } }
 
@@ -856,3 +856,8 @@ html[data-film] .pf-root [data-reveal] { transition-duration: 0.6s; }
 @page { size: 1920px 1080px; margin: 0; }
 html[data-print] body { margin: 0; background: #05070c; }
 html[data-print] .dk-print { width: 1920px; }
+/* the profile film (?film): nothing runs on the wall clock, so every render of a frame is the same */
+html[data-film] .pf-root [data-reveal] { transition: none; }
+html[data-film] .pf-root .animate-bounce, html[data-film] .pf-root [class*="pf-leg-in"] { animation: none; }
+html[data-film] .pf-root * { transition-duration: 0s !important; }
+html[data-film] { scroll-behavior: auto !important; }

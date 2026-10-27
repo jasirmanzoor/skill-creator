@@ -38,7 +38,7 @@ function Count({ value, prefix = "", suffix = "", text, active }: { value: numbe
     const el = ref.current;
     if (!el) return;
     const done = () => (el.textContent = text ?? `${prefix}${value.toLocaleString("en-US")}${suffix}`);
-    if (!active || document.documentElement.hasAttribute("data-print")) return void done();
+    if (!active || text || document.documentElement.hasAttribute("data-print")) return void done();
     let raf = 0;
     const t0 = performance.now() + 350;
     const step = (now: number) => {

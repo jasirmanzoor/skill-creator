@@ -29,7 +29,7 @@ export default function Scale({ c }: { c: ProfileCopy }) {
       c.scale.metrics.forEach((m, i) => {
         const el = numRefs.current[i];
         if (!el) return;
-        el.textContent = m.text && k >= 1 ? m.text : `${m.prefix ?? ""}${Math.round(m.value * k).toLocaleString("en-US")}${m.suffix.length > 3 ? "" : m.suffix}`;
+        el.textContent = m.text ? m.text : `${m.prefix ?? ""}${Math.round(m.value * k).toLocaleString("en-US")}${m.suffix.length > 3 ? "" : m.suffix}`;
       });
       if (k >= 1) done = true;
     });

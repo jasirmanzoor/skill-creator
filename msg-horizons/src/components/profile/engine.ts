@@ -18,7 +18,17 @@ export function startScroll(reduced: boolean): () => void {
   if (isFilm()) {
     (window as unknown as { __profileTick: Tick }).__profileTick = (t) => subscribers.forEach((fn) => fn(t));
     document.documentElement.dataset.film = "";
-    return () => {};
+    // a frame-by-frame render is not real time, so the reveals follow the scroll instead of the clock
+    const off = onFrame(() => {
+      const vh = window.innerHeight;
+      document.querySelectorAll<HTMLElement>(".pf-root [data-reveal]").forEach((el) => {
+        const delay = parseFloat(el.style.transitionDelay) || 0;
+        const k = easeOutCubic(clamp((vh * 0.95 - el.getBoundingClientRect().top - delay * 0.5) / (vh * 0.2)));
+        el.style.opacity = String(k);
+        el.style.transform = `translate3d(0, ${(24 * (1 - k)).toFixed(2)}px, 0)`;
+      });
+    });
+    return off;
   }
   if (!reduced) lenis = new Lenis({ lerp: 0.09, smoothWheel: true, wheelMultiplier: 0.9 });
   let raf = 0;
