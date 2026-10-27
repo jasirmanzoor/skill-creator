@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Logo from "./ui/Logo";
 import SiteSearch from "./SiteSearch";
 import ThemeToggle from "./ThemeToggle";
+import Glass, { useGlass } from "./fx/Glass";
 import PushMenu, { MenuButton } from "./PushMenu";
 import { track } from "@/lib/analytics";
 import { onBookState } from "@/lib/book";
@@ -49,18 +50,21 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
   const ink = !overDark;
   const dark = overDark;
   const linkBase = ink ? "text-muted hover:text-ink" : "text-white/80 hover:text-white";
+  const glass = useGlass();
+  const blur = glass ? "" : " backdrop-blur-md";
 
   return (
     <>
     <header
       className={`push-shift fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300 ${
         dark
-          ? "border-white/10 bg-night/80 backdrop-blur-md"
+          ? `border-white/10 ${glass ? "bg-night/70" : "bg-night/80"}${blur}`
           : solid
-            ? "border-line bg-paper/90 backdrop-blur-md"
+            ? `border-line ${glass ? "bg-paper/80" : "bg-paper/90"}${blur}`
             : "border-transparent bg-transparent"
       }`}
     >
+      {dark || solid ? <Glass /> : null}
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-3 focus:z-50 focus:rounded-md focus:bg-ink focus:px-4 focus:py-2 focus:text-white"

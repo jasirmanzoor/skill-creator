@@ -26,7 +26,7 @@ type Copy = {
   };
   map: { label: string; hub: string; sabya: string; delivered: string; caption: string };
   /** the warehouse walk-in: real MSG photos (public/media/msg, see docs/CONTENT-NOTES.md) */
-  facade: { alt: string; caption: string; hint: string };
+  facade: { alt: string; hint: string };
   inside: { eyebrow: string; title: string; lead: string; alt: string; spots: { storage: string; sorting: string; dispatch: string } };
   /** after the walk-in: MSG's network as a live control console (components/hero/Command.tsx) */
   command: {
@@ -130,7 +130,6 @@ export const heroCopy: Record<Locale, Copy> = {
     },
     facade: {
       alt: "The MSG Horizons Sabya hub, with the company sign above the open loading door",
-      caption: "Our Sabya hub. Real photo, retouched for presentation.",
       hint: "Scroll to step inside",
     },
     inside: {
@@ -229,7 +228,6 @@ export const heroCopy: Record<Locale, Copy> = {
     },
     facade: {
       alt: "مركز ام اس جي هورايزونز في صبيا، ولوحة الشركة فوق باب التحميل المفتوح",
-      caption: "مركزنا في صبيا. صورة حقيقية مُحسَّنة للعرض.",
       hint: "مرّر لتدخل",
     },
     inside: {

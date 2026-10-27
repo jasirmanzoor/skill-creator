@@ -21,7 +21,7 @@ export default function WorkforcePipeline({ stages, site }: { stages: Stage[]; s
             animate={{ transform: ["translateX(0%)", "translateX(100%)"] }}
             transition={{ duration: 6, ease: "linear", repeat: Infinity }}
           >
-            <span className="absolute start-0 top-1/2 -ms-1 size-2 -translate-y-1/2 rounded-full bg-teal shadow-[0_0_12px_rgba(19,113,121,0.6)]" />
+            <span className="absolute start-0 top-1/2 -ms-1 size-2 -translate-y-1/2 rounded-full bg-teal shadow-[0_0_12px_rgba(10,90,153,0.6)]" />
           </motion.span>
         ) : null}
         {all.map((_, i) => (

@@ -198,35 +198,10 @@ await test("service landing pages: indexable, one h1, FAQ + Service schema, in s
   assert.equal((await fetch(`${BASE}/en/services/not-a-service`)).status, 404);
 });
 
-await test("red sea bands: no walk-in table, live approx cost per order, Sabya slot", async () => {
-  for (const lang of ["en", "ar"]) {
-    const { page, ctx, errors } = await open(`/${lang}`, { viewport: { width: 440, height: 900 } });
-    assert.equal(await page.locator("#network [data-rate-card]").count(), 0, `${lang}: no rate table in the network band`);
-    const sabya = await page.locator("#growth aside[data-rate-card]").last().locator("dd").allTextContents();
-    assert.deepEqual(sabya.map((t) => t.replace(/\D/g, "")), ["17", "28"], `${lang}: Sabya approx per order`);
-    assert.match(await page.locator("#growth h3").first().innerText(), /1,000/);
-    // price band: 120 intra-city = walk-in 33 → 3,960; 300 = 299 band 21 → 6,300
-    await reach(page, "growth");
-    const panel = page.locator("#growth aside[data-rate-card]").first();
-    const slider = page.locator("#growth input[type=range]");
-    await slider.fill("120");
-    await page.waitForTimeout(900);
-    assert.equal(await panel.locator("[data-monthly]").getAttribute("data-monthly"), "3960", `${lang}: 120 × 33`);
-    await slider.fill("300");
-    await page.waitForTimeout(900);
-    assert.equal(await panel.locator("[data-monthly]").getAttribute("data-monthly"), "6300", `${lang}: 300 × 21`);
-    assert.match(await panel.getByRole("link").getAttribute("href"), /wa\.me\/966578061556/);
-    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${lang}: no horizontal page scroll`);
-    assert.deepEqual(errors, []);
-    await ctx.close();
-  }
-});
-
-await test("experience: seller answers on the map, 7-step launch sequence, partner logos load", async () => {
+await test("experience: seller answers on the map, partner logos load", async () => {
   for (const lang of ["en", "ar"]) {
     const { page, ctx, errors } = await open(`/${lang}`);
     assert.equal(await page.locator("#hero [data-stage-answers] li").count(), 9, `${lang}: nine seller answers across the four stages`);
-    assert.equal(await page.locator("#journey [role=tab]").count(), 7, `${lang}: seven launch steps`);
     await reach(page, "partners");
     await page.waitForTimeout(600);
     const logos = await page.locator("#partners img").evaluateAll((els) => els.map((e) => [e.getAttribute("alt"), e.complete && e.naturalWidth > 0]));
@@ -247,22 +222,6 @@ await test("one order on the map: the stage rail moves the hero through set up �
   assert.match(await page.locator('#hero [aria-current="step"]').innerText(), /Set up/);
   await rail.getByRole("button", { name: /Settle/ }).click();
   await page.waitForFunction(() => document.querySelector('#hero [aria-current="step"]')?.textContent?.includes("Settle"), null, { timeout: 5000 });
-  assert.deepEqual(errors, []);
-  await ctx.close();
-});
-
-await test("launch sequence: seven steps, keyboard, WhatsApp start", async () => {
-  const { page, ctx, errors } = await open("/en");
-  const sec = page.locator("#journey");
-  await reach(page, "journey");
-  await sec.getByRole("tab", { name: /Project agreement/ }).click();
-  const panel = page.locator("#launch-panel");
-  await panel.getByText("Signed").waitFor();
-  await page.keyboard.press("ArrowDown");
-  await panel.getByText("3 of 3 delivered").waitFor();
-  assert.equal(await sec.getByRole("tab", { selected: true }).getAttribute("id"), "launch-tab-5");
-  const wa = await sec.getByRole("link", { name: /Start with step one/ }).getAttribute("href");
-  assert.match(wa, /^https:\/\/wa\.me\/966578061556\?text=/);
   assert.deepEqual(errors, []);
   await ctx.close();
 });
@@ -465,7 +424,7 @@ await test("book: one chapter open; the rail, #links, ] and [ and the back butto
   for (const [lang, rail] of [["en", "Chapters"], ["ar", "الفصول"]]) {
     const { page, ctx, errors } = await open(`/${lang}`, { reducedMotion: "reduce" });
     const opened = () => page.evaluate(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter);
-    assert.equal(await page.locator("[data-chapter]").count(), 9, `${lang}: nine chapters in the HTML`);
+    assert.equal(await page.locator("[data-chapter]").count(), 10, `${lang}: ten chapters in the HTML`);
     assert.equal(await opened(), "hero", `${lang}: opens on the cover`);
     assert.ok(!(await page.locator("#contact").isVisible()), `${lang}: later chapters wait`);
     const nav = page.getByRole("navigation", { name: rail });
@@ -478,11 +437,11 @@ await test("book: one chapter open; the rail, #links, ] and [ and the back butto
     await page.keyboard.press("[");
     await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "estimate");
     // a #link to a section deep in another chapter turns there and lands on the section
-    await page.evaluate(() => { const a = document.createElement("a"); a.href = "#partners"; a.id = "t-link"; a.textContent = "x"; document.querySelector("[data-current]").prepend(a); });
+    await page.evaluate(() => { const a = document.createElement("a"); a.href = "#perfmix"; a.id = "t-link"; a.textContent = "x"; document.querySelector("[data-current]").prepend(a); });
     await page.evaluate(() => document.getElementById("t-link").click());
     await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "proof");
     await page.waitForTimeout(200);
-    const top = await page.locator("#partners").evaluate((el) => el.getBoundingClientRect().top);
+    const top = await page.locator("#perfmix").evaluate((el) => el.getBoundingClientRect().top);
     assert.ok(Math.abs(top - 64) < 80, `${lang}: landed on the section (${top})`);
     await page.goBack();
     await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "estimate");
@@ -578,22 +537,22 @@ await test("perfmix: MSG's own store is shown in the company chapter, links out 
   }
 });
 
-await test("performance: few heading canvases at once, none on a weak device, and later chapters' photos wait", async () => {
+await test("performance: few film-filled headings at once, none on a weak device, and later chapters' photos wait", async () => {
   const seen = [];
   const full = await open("/en?perf=full", { reducedMotion: "no-preference" });
   full.page.on("response", (r) => /\.(webp|jpg|png)/.test(r.url()) && seen.push(r.url()));
   await full.page.reload({ waitUntil: "networkidle" });
   await full.page.waitForTimeout(2500);
-  const drawn = await full.page.evaluate(() => document.querySelectorAll("[data-tech]").length);
-  assert.ok(drawn <= 5, `at most 5 headings drawn at once, saw ${drawn}`);
-  assert.ok(!seen.some((u) => /land-freight-truck|fleet-hiace|hub-racks/.test(u)), "photos of chapters nobody opened are not fetched");
+  const drawn = await full.page.evaluate(() => document.querySelectorAll("[data-masked]").length);
+  assert.ok(drawn <= 4, `at most 4 headings filled with the film at once, saw ${drawn}`);
+  assert.ok(!seen.some((u) => /land-freight-truck|photos\/|hub-racks/.test(u)), `photos of chapters nobody opened are not fetched: ${seen.filter((u) => /land-freight-truck|photos\/|hub-racks/.test(u)).join(", ")}`);
   assert.ok(seen.length <= 14, `first load fetches ${seen.length} images`);
   await full.ctx.close();
 
   const low = await open("/en?perf=low", { reducedMotion: "no-preference" });
   await low.page.waitForTimeout(2500);
   assert.equal(await low.page.evaluate(() => document.documentElement.dataset.perf), "low");
-  assert.equal(await low.page.evaluate(() => document.querySelectorAll("[data-tech], .tech-line").length), 0, "plain headings on a weak device");
+  assert.equal(await low.page.evaluate(() => document.querySelectorAll("[data-masked], .masked-heading").length), 0, "plain headings on a weak device");
   assert.ok((await low.page.evaluate(() => document.querySelectorAll(".light-rays canvas, .rays-backdrop canvas").length)) <= 1, "at most the still backdrop");
   assert.ok(await low.page.getByRole("heading", { level: 1 }).first().isVisible(), "the heading text is plainly there");
   await low.ctx.close();

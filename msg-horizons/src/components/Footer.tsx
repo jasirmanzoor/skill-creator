@@ -23,7 +23,7 @@ export default function Footer({ t, lang }: { t: Dictionary; lang: Locale }) {
         <div>
           <Logo inverted />
           <p className="mt-4 max-w-sm text-white/65">{f.tagline}</p>
-          <p className="mt-2 text-sm text-white/45">{facts.nameAr}</p>
+          <p className="mt-2 text-sm text-white/60">{facts.nameAr}</p>
         </div>
 
         <nav aria-label={f.services}>
@@ -96,7 +96,7 @@ export default function Footer({ t, lang }: { t: Dictionary; lang: Locale }) {
           </dl>
         </div>
       </div>
-      <div className="mx-auto mt-12 max-w-7xl border-t border-white/10 px-5 pt-6 text-xs text-white/45 lg:px-8">
+      <div className="mx-auto mt-12 max-w-7xl border-t border-white/10 px-5 pt-6 text-xs text-white/60 lg:px-8">
         © <span className="num">{year}</span> {facts.legalName}. {f.rights}
         <span className="mt-2 block">
           {lang === "ar" ? "مكونات الواجهة مستوحاة من " : "Interface components after "}

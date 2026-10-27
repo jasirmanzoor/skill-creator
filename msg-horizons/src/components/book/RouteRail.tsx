@@ -6,6 +6,7 @@ import { fmt, type Locale } from "@/content/i18n";
 import { bookCopy, CHAPTERS } from "@/content/chapters";
 import { bookState, chapterProgress, onBookState } from "@/lib/book";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import Glass, { useGlass } from "../fx/Glass";
 import { MOBILE_BAR_ATTR, MOBILE_BAR_EVENT } from "../MobileBar";
 
 const onBar = (cb: () => void) => { window.addEventListener(MOBILE_BAR_EVENT, cb); return () => window.removeEventListener(MOBILE_BAR_EVENT, cb); };
@@ -51,14 +52,16 @@ export default function RouteRail({ lang }: { lang: Locale }) {
 
   const prev = CHAPTERS[active - 1];
   const next = CHAPTERS[active + 1];
+  const glass = useGlass();
 
   return (
     <nav
       aria-label={c.rail}
-      className={`route-rail fixed inset-x-3 z-40 mx-auto flex max-w-[60rem] items-center gap-1 rounded-full border border-line bg-surface/85 p-1.5 shadow-[var(--shadow-float)] backdrop-blur-xl transition-[bottom] duration-300 lg:inset-x-6 lg:bottom-5 ${
+      className={`route-rail fixed inset-x-3 z-40 mx-auto flex max-w-[60rem] items-center gap-1 rounded-full border border-line p-1.5 shadow-[var(--shadow-float)] transition-[bottom] ${glass ? "bg-surface/70" : "bg-surface/85 backdrop-blur-xl"} duration-300 lg:inset-x-6 lg:bottom-5 ${
         docked ? "bottom-[5.4rem]" : "bottom-3"
       }`}
     >
+      <Glass radius={28} />
       <EndButton href={prev ? `#${prev.id}` : undefined} label={c.previous} dir="prev" />
       <ol ref={track} className="rail-track relative flex min-w-0 flex-1 items-center overflow-x-auto overscroll-x-contain px-6">
         {CHAPTERS.map((ch, i) => {
@@ -104,7 +107,7 @@ export default function RouteRail({ lang }: { lang: Locale }) {
                       transition={{ duration: 0.35, delay: reduce ? 0 : 0.22, ease: [0.23, 1, 0.32, 1] }}
                       className="flex items-center gap-2.5 whitespace-nowrap py-2 pe-4 ps-3"
                     >
-                      <span className="font-display text-xs font-semibold tabular-nums text-brand-bright dark:text-[#0b7d36]">{num(i)}</span>
+                      <span className="font-display text-xs font-semibold tabular-nums text-brand-bright dark:text-[#006bb6]">{num(i)}</span>
                       <span className="text-sm font-semibold">{ch.title[lang]}</span>
                       <span className="hidden text-xs text-paper/60 xl:inline">{ch.hint[lang]}</span>
                     </motion.span>

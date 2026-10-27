@@ -1,5 +1,6 @@
 "use client";
 
+import Logo from "../ui/Logo";
 import { EASE_OUT } from "@/lib/motion";
 import { AnimatePresence, motion } from "motion/react";
 import type { LiveCopy } from "@/content/liveTracking";
@@ -20,14 +21,14 @@ export default function DriverPhone({
     <div
       role="group"
       aria-label={d.label}
-      className="relative w-[15.5rem] shrink-0 rounded-[2.4rem] bg-[#0a1316] p-[7px] shadow-[0_50px_90px_-30px_rgba(0,0,0,0.75),0_0_0_1px_rgba(255,255,255,0.1)]"
+      className="relative w-[15.5rem] shrink-0 rounded-[2.4rem] bg-[#0b1326] p-[7px] shadow-[0_50px_90px_-30px_rgba(0,0,0,0.75),0_0_0_1px_rgba(255,255,255,0.1)]"
     >
-      <div className="relative flex h-[29rem] flex-col overflow-hidden rounded-[2rem] bg-[#f3f8f7] text-ink">
-        <span aria-hidden="true" className="absolute left-1/2 top-2 z-10 h-5 w-[4.5rem] -translate-x-1/2 rounded-full bg-[#0a1316]" />
+      <div className="relative flex h-[29rem] flex-col overflow-hidden rounded-[2rem] bg-[#f3f6fb] text-ink">
+        <span aria-hidden="true" className="absolute left-1/2 top-2 z-10 h-5 w-[4.5rem] -translate-x-1/2 rounded-full bg-[#0b1326]" />
 
         <div className="flex items-center justify-between px-4 pb-3 pt-10">
           <span className="flex items-center gap-2">
-            <span className="grid size-7 place-items-center rounded-lg bg-brand text-[9px] font-extrabold tracking-tight text-white" aria-hidden="true">MSG</span>
+            <span className="grid size-7 place-items-center rounded-lg bg-deep" aria-hidden="true"><Logo inverted variant="mark" height={13} /></span>
             <span className="font-display text-[14px] font-semibold text-teal-deep">{d.app}</span>
           </span>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-2 py-1 text-[11px] font-semibold text-teal-deep ring-1 ring-line">
@@ -46,7 +47,7 @@ export default function DriverPhone({
               exit={reduce ? { opacity: 0 } : { opacity: 0, transform: "translateY(-14px)" }}
               transition={swap}
             >
-              <div className="mx-4 rounded-2xl bg-white p-3.5 shadow-[0_10px_30px_-18px_rgba(11,58,64,0.45)] ring-1 ring-line">
+              <div className="mx-4 rounded-2xl bg-white p-3.5 shadow-[0_10px_30px_-18px_rgba(28,44,81,0.45)] ring-1 ring-line">
                 <p className="flex items-center gap-2.5 text-[14px] font-semibold">
                   <span className="relative grid size-8 place-items-center rounded-full bg-brand-soft text-brand">
                     <span className="absolute inset-0 animate-ping rounded-full bg-brand/30 motion-reduce:hidden" aria-hidden="true" />
@@ -78,7 +79,7 @@ export default function DriverPhone({
                 <button
                   type="button"
                   onClick={onApprove}
-                  className="relative w-full rounded-2xl bg-brand py-3.5 text-[15px] font-semibold text-white shadow-[0_14px_28px_-14px_rgba(11,125,54,0.9)] transition-transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
+                  className="relative w-full rounded-2xl bg-brand py-3.5 text-[15px] font-semibold text-white shadow-[0_14px_28px_-14px_rgba(0,107,182,0.9)] transition-transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
                 >
                   {d.approve}
                 </button>
@@ -93,7 +94,7 @@ export default function DriverPhone({
               exit={reduce ? { opacity: 0 } : { opacity: 0, transform: "translateY(-14px)" }}
               transition={swap}
             >
-              <div className="mx-4 rounded-2xl bg-gradient-to-br from-brand to-[#075f29] p-4 text-white shadow-[0_18px_36px_-20px_rgba(11,125,54,0.9)]">
+              <div className="mx-4 rounded-2xl bg-gradient-to-br from-brand to-[#075f29] p-4 text-white shadow-[0_18px_36px_-20px_rgba(0,107,182,0.9)]">
                 <span className="relative grid size-12 place-items-center rounded-full bg-white/15">
                   <span className="plan-ping absolute inset-0 rounded-full bg-white/35 motion-reduce:hidden" aria-hidden="true" />
                   <LocateGlyph className="relative size-6" />

@@ -9,7 +9,7 @@ export type NeedsCopy = (typeof experience)["en"]["needs"];
 
 /** the glass card each stage carries over the map */
 export function StageCard({ stage, c, guide }: { stage: NeedStage; c: NeedsCopy; guide: string[] }) {
-  const shell = "rounded-2xl bg-white/92 p-4 text-teal-deep shadow-[0_20px_40px_-20px_rgba(11,58,64,0.7)] ring-1 ring-white/60 backdrop-blur sm:max-w-sm";
+  const shell = "rounded-2xl bg-white/92 p-4 text-teal-deep shadow-[0_20px_40px_-20px_rgba(28,44,81,0.7)] ring-1 ring-white/60 backdrop-blur sm:max-w-sm";
   const tick = (
     <span className="grid size-5 shrink-0 place-items-center rounded-full bg-teal text-white">
       <svg viewBox="0 0 16 16" className="size-3" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>

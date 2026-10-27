@@ -88,7 +88,7 @@ export default function Pitch({ t, lang }: { t: Dictionary; lang: Locale }) {
         />
       </motion.div>
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,#0b1016_0%,rgba(11,16,22,0.82)_30%,rgba(11,16,22,0.9)_70%,#0b1016_100%)]" />
-      <div aria-hidden="true" className={`absolute inset-0 -z-10 transition-opacity duration-[1200ms] ease-out ${msg ? "opacity-100" : "opacity-0"} bg-[radial-gradient(60%_50%_at_75%_30%,rgba(76,201,122,0.18),transparent_70%)]`} />
+      <div aria-hidden="true" className={`absolute inset-0 -z-10 transition-opacity duration-[1200ms] ease-out ${msg ? "opacity-100" : "opacity-0"} bg-[radial-gradient(60%_50%_at_75%_30%,rgba(0,157,248,0.18),transparent_70%)]`} />
       <RaysLayer className="-z-10" />
 
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
@@ -165,7 +165,7 @@ export default function Pitch({ t, lang }: { t: Dictionary; lang: Locale }) {
                 animate={{ x: "110%", opacity: 0 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 1.4, ease: [0.65, 0, 0.35, 1] }}
-                className="pointer-events-none absolute inset-y-0 z-10 w-2/3 bg-[linear-gradient(100deg,transparent,rgba(76,201,122,0.22),transparent)] rtl:-scale-x-100"
+                className="pointer-events-none absolute inset-y-0 z-10 w-2/3 bg-[linear-gradient(100deg,transparent,rgba(0,157,248,0.22),transparent)] rtl:-scale-x-100"
               />
             ) : null}
           </AnimatePresence>
@@ -267,7 +267,7 @@ function Operation({ rows, labels, withMsg, reduce }: { rows: PitchRow[]; labels
           />
           {withMsg && !reduce ? (
             <motion.span
-              className="absolute start-1/2 size-1.5 -translate-x-1/2 rounded-full bg-white shadow-[0_0_8px_2px_rgba(76,201,122,0.9)] rtl:translate-x-1/2"
+              className="absolute start-1/2 size-1.5 -translate-x-1/2 rounded-full bg-white shadow-[0_0_8px_2px_rgba(0,157,248,0.9)] rtl:translate-x-1/2"
               initial={{ top: top ? "100%" : "0%", opacity: 0 }}
               animate={{ top: top ? ["100%", "0%"] : ["0%", "100%"], opacity: [0, 1, 0] }}
               transition={{ duration: 1.1, delay: delay + 0.6, repeat: Infinity, repeatDelay: 1.4, ease: "easeInOut" }}
@@ -286,7 +286,7 @@ function Operation({ rows, labels, withMsg, reduce }: { rows: PitchRow[]; labels
           animate={withMsg ? { scale: [0.96, 1.03, 1] } : { scale: 1 }}
           transition={reduce ? { duration: 0 } : { duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
           className={`relative grid h-14 place-items-center overflow-hidden rounded-2xl transition-colors duration-500 lg:h-16 ${
-            withMsg ? "bg-brand-bright font-display text-lg font-semibold text-pitch" : "border border-dashed border-white/25 bg-[#141b24] text-sm font-semibold uppercase tracking-[0.14em] text-white/55 rtl:tracking-normal"
+            withMsg ? "bg-brand-bright font-display text-lg font-semibold text-pitch" : "border border-dashed border-white/25 bg-[#16233f] text-sm font-semibold uppercase tracking-[0.14em] text-white/55 rtl:tracking-normal"
           }`}
         >
           <AnimatePresence mode="popLayout" initial={false}>

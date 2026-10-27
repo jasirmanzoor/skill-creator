@@ -177,3 +177,20 @@ so it cannot be iframed: `components/sections/Perfmix.tsx` is a native set of th
 Facts used: name, URL, category links (`facts.ownStore`). Deliberately not repeated: the store's free-shipping banner and promo
 code, prices, and any claim about its delivery. The copy "We sell online ourselves, so we know what a seller needs" is an
 inference from MSG's own statement and should be confirmed by MSG.
+
+## Rebrand, brand film and new section photos (27 Oct 2026)
+- **Brand identity** from MSG's 2026 brand guidelines (PDF supplied by MSG): the parcel-and-arrow mark and the
+  "MSG Horizons LOGISTICS" lockups were taken from the PDF's own vector paths into `public/brand/` (navy and white).
+  Colours: navy `#1C2C51`, blue `#009DF8`, white; `--color-brand` is the blue deepened to `#006BB6` for AA small text.
+  Fonts: Funnel Sans (English), Readex Pro (Arabic). Not changed: the legal name in `facts.ts` (the guidelines' stamp
+  reads "MSG Horizons Logistics Co.") and the contact email/phone (the guidelines show mock-up details); confirm first.
+- **Brand film** (`reel/`): a 15 s motion piece built from the mark, rendered from code (Playwright, 60 fps, 3-subframe
+  motion blur, Web Audio soundtrack). It opens the site and fills the headings (two recoloured "fill" cuts).
+- **Section photos** in `public/media/photos/` are generated photographs (Figma image generation), made to look like
+  ordinary photos of each section's work: no logos, no readable text. They are not MSG's own photos and stay out of
+  `content/media.ts`. The "Your price" plate uses `account.webp` until the online-seller photo is generated.
+- **Retired** (they carried the old logo): the Toyota Hiace renders and the van photo with the old livery. The real
+  hub photographs (warehouse, sorting, team, aerial, outlet) are unchanged and still used in the gallery and profile.
+- **Removed sections** at MSG's request ("discard the sections that are not very necessary"): the network photo band,
+  the 7-step launch sequence, the Red Sea growth band and the partner constellation (the partner logos remain in the
+  strip under the opening). The company profile is now its own chapter.

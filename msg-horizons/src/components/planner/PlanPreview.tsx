@@ -22,7 +22,7 @@ export default function PlanModules({ t, input, label }: { t: Dictionary; input:
             <li
               key={id}
               className={`inline-flex items-center gap-1.5 rounded-full py-1 pe-3 ps-1.5 text-xs transition-ui duration-500 ${
-                m ? `motion-safe:animate-[plan-chip_0.6s_var(--ease-out)] ${m.core ? "bg-brand font-semibold text-white shadow-[0_8px_18px_-10px_rgba(11,125,54,0.8)]" : "bg-brand-soft font-semibold text-brand"}` : "bg-subtle text-muted"
+                m ? `motion-safe:animate-[plan-chip_0.6s_var(--ease-out)] ${m.core ? "bg-brand font-semibold text-white shadow-[0_8px_18px_-10px_rgba(0,107,182,0.8)]" : "bg-brand-soft font-semibold text-brand"}` : "bg-subtle text-muted"
               }`}
             >
               <ServiceIcon id={id} className="size-3.5" />

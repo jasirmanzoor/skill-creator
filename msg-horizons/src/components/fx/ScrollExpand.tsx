@@ -19,6 +19,8 @@ type Props = {
   /** the frame's starting size on phones, where the desktop proportions are too narrow to read */
   mobileStart?: [number, number];
   startRadius?: number;
+  /** "hex": the frame starts as the MSG mark's hexagon (the parcel) and its corners open out to full bleed */
+  shape?: "rounded" | "hex";
   endRadius?: number;
   mediaZoom?: number;
   scrollDistance?: number;
@@ -32,8 +34,8 @@ type Props = {
 
 /**
  * A framed photo that opens up to the whole screen as the page scrolls, then hands the stage to its content, after
- * React Bits' ScrollExpand (window-scroll mode). The stage holds while the frame's clip grows from a rounded card to
- * full bleed and the photo settles from its zoom; the title lifts away and the content arrives once the frame is
+ * React Bits' ScrollExpand (window-scroll mode). The stage holds while the frame's clip grows from a rounded card (or
+ * the MSG mark's hexagon) to full bleed and the photo settles from its zoom; the title lifts away and the content arrives once the frame is
  * open. One requestAnimationFrame loop eases toward the scroll position; no React renders while scrolling. The
  * content stays in the HTML, and is inert until it shows.
  */
@@ -47,6 +49,7 @@ export default function ScrollExpand({
   startHeight = 58,
   mobileStart = [84, 46],
   startRadius = 24,
+  shape = "rounded",
   endRadius = 0,
   mediaZoom = 1.35,
   scrollDistance = 1.2,
@@ -65,9 +68,9 @@ export default function ScrollExpand({
   const overlayRef = useRef<HTMLDivElement>(null);
   const scrimRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
-  const props = useRef({ startWidth, startHeight, mobileStart, startRadius, endRadius, mediaZoom, scrollDistance, holdDistance, smoothing, overlayScrim, enabled });
+  const props = useRef({ startWidth, startHeight, mobileStart, startRadius, shape, endRadius, mediaZoom, scrollDistance, holdDistance, smoothing, overlayScrim, enabled });
   useEffect(() => {
-    props.current = { startWidth, startHeight, mobileStart, startRadius, endRadius, mediaZoom, scrollDistance, holdDistance, smoothing, overlayScrim, enabled };
+    props.current = { startWidth, startHeight, mobileStart, startRadius, shape, endRadius, mediaZoom, scrollDistance, holdDistance, smoothing, overlayScrim, enabled };
   });
 
   const apply = useCallback((p: number) => {
@@ -84,7 +87,16 @@ export default function ScrollExpand({
     const ix = Math.max(0, (100 - w) / 2);
     const iy = Math.max(0, (100 - h) / 2);
     const r = c.startRadius + (c.endRadius - c.startRadius) * e;
-    frame.style.clipPath = `inset(${iy}% ${ix}% ${iy}% ${ix}% round ${r}px)`;
+    if (c.shape === "hex") {
+      // the mark's hexagon: points left and right, its corner cuts as deep as the mark's (0.29 of its height)
+      const W = frame.clientWidth, H = frame.clientHeight;
+      const x0 = (ix / 100) * W, x1 = W - x0, y0 = (iy / 100) * H, y1 = H - y0;
+      const q = 0.29 * (y1 - y0) * (1 - e), ym = H / 2;
+      const P = (x: number, y: number) => `${x.toFixed(1)}px ${y.toFixed(1)}px`;
+      frame.style.clipPath = `polygon(${P(x0, ym)}, ${P(x0 + q, y0)}, ${P(x1 - q, y0)}, ${P(x1, ym)}, ${P(x1 - q, y1)}, ${P(x0 + q, y1)})`;
+    } else {
+      frame.style.clipPath = `inset(${iy}% ${ix}% ${iy}% ${ix}% round ${r}px)`;
+    }
     media.style.transform = `scale(${c.mediaZoom + (1 - c.mediaZoom) * e})`;
     if (scrimRef.current) scrimRef.current.style.opacity = `${c.overlayScrim * e}`;
     if (titleRef.current) {

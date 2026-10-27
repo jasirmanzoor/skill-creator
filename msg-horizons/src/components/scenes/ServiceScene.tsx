@@ -1,15 +1,15 @@
 /* eslint-disable @next/next/no-img-element -- local, pre-optimised webp from MSG's company profile */
 import type { ServiceId } from "@/content/facts";
 
-/** MSG's own photography for each service (2026 company profile), and MSG-branded fleet imagery. */
+/** a photo for each service: everyday scenes of the work itself, and the long-haul truck in MSG's livery */
 const PHOTO: Record<ServiceId, { src: string; pos?: string }> = {
-  "last-mile": { src: "/photos/clean/courier-mall.webp", pos: "50% 35%" },
-  warehousing: { src: "/photos/msg/warehouse-floor.webp", pos: "50% 55%" },
+  "last-mile": { src: "/media/photos/lastmile.webp", pos: "55% 50%" },
+  warehousing: { src: "/media/photos/warehousing.webp", pos: "55% 50%" },
   "land-freight": { src: "/media/msg/land-freight-truck.webp", pos: "40% 55%" },
-  fleet: { src: "/media/msg/fleet-hiace-close.webp", pos: "62% 62%" },
-  manpower: { src: "/photos/clean/team.webp", pos: "50% 45%" },
-  tracking: { src: "/photos/clean/courier-mall.webp", pos: "50% 35%" },
-  account: { src: "/photos/clean/business.webp", pos: "50% 30%" },
+  fleet: { src: "/media/photos/fleet-depot.webp", pos: "55% 60%" },
+  manpower: { src: "/media/photos/manpower.webp", pos: "50% 45%" },
+  tracking: { src: "/media/photos/tracking.webp", pos: "45% 55%" },
+  account: { src: "/media/photos/account.webp", pos: "50% 50%" },
 };
 
 export default function ServiceScene({ id }: { id: ServiceId }) {

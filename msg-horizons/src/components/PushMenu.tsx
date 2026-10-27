@@ -126,7 +126,7 @@ export default function PushMenu({ t, lang, open, onClose }: { t: Dictionary; la
         }}
       >
         <div className="flex h-16 shrink-0 items-center justify-between ps-6 pe-3 sm:ps-8 sm:pe-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#b8f5cf] rtl:tracking-normal">{t.nav.siteMap}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#a8dcff] rtl:tracking-normal">{t.nav.siteMap}</p>
           <MenuButton open={open} onClick={onClose} label={t.nav.close} ink={false} controls={false} />
         </div>
 
@@ -145,10 +145,10 @@ export default function PushMenu({ t, lang, open, onClose }: { t: Dictionary; la
                   >
                     <span className="num w-6 shrink-0 text-xs font-medium text-white/45" dir="ltr">{String(i + 1).padStart(2, "0")}</span>
                     <span className="min-w-0 flex-1">
-                      <span className={`block font-display text-xl font-semibold leading-tight transition-colors group-hover:text-[#b8f5cf] sm:text-2xl ${here ? "text-[#b8f5cf]" : ""}`}>{s.title[lang]}</span>
+                      <span className={`block font-display text-xl font-semibold leading-tight transition-colors group-hover:text-[#a8dcff] sm:text-2xl ${here ? "text-[#a8dcff]" : ""}`}>{s.title[lang]}</span>
                       <span className="mt-0.5 block truncate text-[13px] text-white/60">{s.hint[lang]}</span>
                     </span>
-                    {here ? <span className="shrink-0 rounded-full bg-[#b8f5cf]/15 px-2 py-0.5 text-[10px] font-semibold text-[#b8f5cf]">{t.nav.youAreHere}</span> : null}
+                    {here ? <span className="shrink-0 rounded-full bg-[#a8dcff]/15 px-2 py-0.5 text-[10px] font-semibold text-[#a8dcff]">{t.nav.youAreHere}</span> : null}
                   </a>
                 </li>
               );

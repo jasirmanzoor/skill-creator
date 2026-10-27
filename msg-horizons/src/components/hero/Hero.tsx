@@ -19,25 +19,16 @@ import { WhatsAppIcon } from "../ui/icons";
 import { STAGE_COUNT } from "./HeroMap";
 import { NeedIcon, StageCard } from "../operation/StageParts";
 import QuoteCard from "./QuoteCard";
+import Reel from "./Reel";
 import Typewriter from "../ui/typewriter";
 import { Chip, CommandBackdrop, ConsoleWindow, Depth, fadeUp, OrderTicker, PartnerLine, Strengths, VanIcon } from "./Command";
 
 /*
- * Geometry of MSG's own photos (public/media/msg), as fractions of each image. Everything drawn on top of a
- * photo (the sign's glow, the routes, the lamps, the hotspots) is placed in these coordinates, so it stays on
- * the right pixel at any screen size.
+ * Geometry of the hub's interior photos (public/media/msg), as fractions of each image. Everything drawn on top
+ * of a photo (the lamps, the hotspots) is placed in these coordinates, so it stays on the right pixel at any size.
  */
-const FACADE = {
-  ar: 1448 / 1086,
-  door: { x: 0.4354, y: 0.4383, w: 0.2051, h: 0.3425 },
-  anchorY: 0.4,
-  // the building below the roofline (the sky behind it drifts on its own layer)
-  building: "polygon(0% 25.05%, 2.07% 25.05%, 2.14% 18.78%, 42.96% 12.43%, 97.51% 18.69%, 100% 18.32%, 100% 100%, 0% 100%)",
-  sign: { x: 469 / 1448, y: 153 / 1086, w: 283 / 1448, h: 101 / 1086 },
-  lamp: { x: 0.4365, y: 0.399 },
-};
 /*
- * The scroll through the hero: the walk-in (facade, inside, out to the network) takes the first WALK of it, the
+ * The scroll through the hero: the walk-in (the film, inside, out to the network) takes the first WALK of it, the
  * network console holds for HOLD, then one order's four stages (set up, store, deliver, settle) share the rest,
  * played inside the same console. The section's height keeps the walk-in over the distance it always had.
  */
@@ -61,8 +52,6 @@ const INSIDE_TALL: Inside = {
   spots: { storage: { x: 0.3, y: 0.32 }, sorting: { x: 0.505, y: 0.4 }, dispatch: { x: 0.7, y: 0.36 } },
 };
 
-/** how far the facade is set down in the frame to leave room for sky above the roof, as a share of the frame's height */
-const SKY = 0.14;
 
 /** a box with the photo's proportions that always covers the frame, keeping (ax, ay) as central as it can; `drop` sets it lower */
 const cover = (ar: number, ax: number, ay: number, drop = 0): React.CSSProperties => ({
@@ -74,20 +63,10 @@ const cover = (ar: number, ax: number, ay: number, drop = 0): React.CSSPropertie
 });
 const at = (p: Pt) => ({ left: `${p.x * 100}%`, top: `${p.y * 100}%` });
 
-/** how far the camera has to push in for the doorway to fill the frame */
-function doorZoom(fw: number, fh: number) {
-  const W = Math.max(fw, fh * FACADE.ar), H = W / FACADE.ar;
-  const left = Math.min(0, Math.max(fw - W, fw / 2 - FACADE.door.x * W));
-  const top = Math.min(0, Math.max(fh - H, fh / 2 - FACADE.anchorY * H)) + SKY * fh;
-  const cx = left + FACADE.door.x * W, cy = top + FACADE.door.y * H;
-  const zx = (2 * Math.max(cx, fw - cx)) / (FACADE.door.w * W);
-  const zy = (2 * Math.max(cy, fh - cy)) / (FACADE.door.h * H);
-  return Math.max(zx, zy) * 1.08;
-}
 
 /**
- * First screen: MSG's real warehouse. The facade breathes in warm light; scrolling walks the visitor through the
- * doorway, the lights come on inside, and the view pulls out to MSG's network as a control console: the network
+ * First screen: MSG's brand film (Reel), behind the promise. Scrolling pushes the camera into the film, into the hub
+ * where the lights come on, and the view pulls out to MSG's network as a control console: the network
  * live on the map, one order walking through every step MSG owns, the price from MSG's own rate card and the
  * verified figures under it. Scrolling on, the same console plays one order through set up, store, deliver and
  * settle: the map's camera goes where each stage happens, the stage's card comes forward, its answers take the
@@ -170,12 +149,9 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [priceOpen]);
 
-  // pointer parallax: the sky moves more than the building, and the console leans toward the pointer
+  // pointer parallax: the console leans toward the pointer
   const mx = useMotionValue(0), my = useMotionValue(0);
   const sx = useSpring(mx, { ...SPRING_SMOOTH }), sy = useSpring(my, { ...SPRING_SMOOTH });
-  const skyX = useTransform(sx, [-0.5, 0.5], [22, -22]);
-  const bldX = useTransform(sx, [-0.5, 0.5], [9, -9]);
-  const bldY = useTransform(sy, [-0.5, 0.5], [5, -5]);
   const onMove = (e: React.PointerEvent) => {
     if (!staged || e.pointerType !== "mouse" || !frame.current) return;
     const r = frame.current.getBoundingClientRect();
@@ -183,17 +159,9 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
     my.set((e.clientY - r.top) / r.height - 0.5);
   };
 
-  // the push through the doorway
-  const zmax = useMotionValue(5);
-  useEffect(() => {
-    const el = frame.current;
-    if (!el) return;
-    const ro = new ResizeObserver(() => zmax.set(doorZoom(el.clientWidth, el.clientHeight)));
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [zmax]);
+  // the push into the film
   const zk = useTransform(p, [0.1, 0.43], [0, 1], { clamp: true });
-  const zoom = useTransform(() => 1 + (zmax.get() - 1) * zk.get() ** 3);
+  const zoom = useTransform(() => 1 + 1.8 * zk.get() ** 3);
   // no filter at all until the walk-in begins: a standing blur(0px) keeps this full-screen layer on the slow filter path
   const facadeFx = useTransform(p, (v) => {
     if (v <= 0.3) return "none";
@@ -233,18 +201,8 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
     setPriceOpen(true);
   };
 
-  const facade = (
-    <Facade
-      c={c}
-      staged={staged}
-      idle={staged && beat !== 1}
-      zoom={staged ? zoom : undefined}
-      fx={staged ? facadeFx : undefined}
-      skyX={staged ? skyX : undefined}
-      bldX={staged ? bldX : undefined}
-      bldY={staged ? bldY : undefined}
-    />
-  );
+  // the opening is MSG's brand film; scrolling pushes the camera into it on the way into the hub
+  const facade = <Reel zoom={staged ? zoom : undefined} fx={staged ? facadeFx : undefined} idle={staged && beat !== 1} lang={L} />;
 
   const promise = (
     <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-4 pb-10 text-white sm:px-5 lg:px-8 lg:pb-14">
@@ -278,7 +236,6 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
             <WhatsAppIcon className="size-5 text-brand-bright" /> {c.ctaTalk}
           </TrackedLink>
         </div>
-        <p className="hi hi-fade mt-5 text-xs text-white/70 max-lg:pe-16" style={{ ["--hi" as string]: "2.4s" }}>{c.facade.caption}</p>
       </div>
       <QuoteCard lang={L} reduce={reduce} lane={lane} onLane={setLane} orders={orders} onOrders={setOrders} className="hi hi-rise hidden [--hi:2.15s] lg:block" />
       </div>
@@ -303,13 +260,13 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
       </p>
       <h2 className="mt-3 font-display text-[clamp(1.9rem,min(4vw,7svh),3.7rem)] font-semibold leading-[1.02] tracking-[-0.035em] text-balance sm:mt-4 rtl:leading-[1.25] rtl:tracking-normal">
         <span className="block">{c.command.title[0]}</span>
-        <span className="block bg-[linear-gradient(90deg,#b8f5cf,#6cc3c3)] bg-clip-text text-transparent rtl:bg-[linear-gradient(270deg,#b8f5cf,#6cc3c3)]"><Typewriter words={c.command.typed} cursorClassName="bg-[#b8f5cf]" /></span>
+        <span className="block bg-[linear-gradient(90deg,#a8dcff,#5fb3ec)] bg-clip-text text-transparent rtl:bg-[linear-gradient(270deg,#a8dcff,#5fb3ec)]"><Typewriter words={c.command.typed} cursorClassName="bg-[#a8dcff]" /></span>
       </h2>
       <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-white/80 text-pretty sm:mt-4 sm:text-lg">
         <span className="sm:hidden">{c.command.leadShort}</span><span className="max-sm:hidden">{c.command.lead}</span>
       </p>
       <div className="mt-4 flex flex-wrap items-center gap-2.5 sm:mt-6 sm:gap-3">
-        <a href="#hero-quote" onClick={openPrice} aria-haspopup="dialog" className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 font-semibold text-teal-deep shadow-[0_10px_40px_-10px_rgba(184,245,207,0.6)] transition-transform hover:-translate-y-0.5 sm:py-3.5">
+        <a href="#hero-quote" onClick={openPrice} aria-haspopup="dialog" className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 font-semibold text-teal-deep shadow-[0_10px_40px_-10px_rgba(168,220,255,0.6)] transition-transform hover:-translate-y-0.5 sm:py-3.5">
           {c.command.ctaPrice}
           <svg viewBox="0 0 24 24" className="size-4 rtl:-scale-x-100" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
         </a>
@@ -392,7 +349,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   );
 
   const scene = (
-    <div className="relative mx-auto grid h-full max-w-7xl grid-rows-[1fr_auto] px-4 pb-4 pt-[4.5rem] sm:px-5 lg:px-8 lg:pb-6 lg:pt-20">
+    <div className="relative mx-auto grid h-full max-w-7xl grid-rows-[1fr_auto] px-4 pb-[5.5rem] pt-[4.5rem] sm:px-5 lg:px-8 lg:pb-[5.75rem] lg:pt-20">
       <div className="grid content-center items-center gap-4 lg:grid-cols-[0.92fr_1.08fr] lg:gap-6 xl:gap-10">
         <div className="order-2 grid [grid-template-areas:'s'] lg:order-1">
           <Panel on={!inStage}>{overview}</Panel>
@@ -453,7 +410,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
         className="sticky top-0 h-[100svh] overflow-hidden [container-type:size]"
       >
         {facade}
-        <motion.div aria-hidden="true" style={{ opacity: veil }} className="absolute inset-0 z-[2] bg-[#030a0b]" />
+        <motion.div aria-hidden="true" style={{ opacity: veil }} className="absolute inset-0 z-[2] bg-[#0b1326]" />
         {/* the site's light falls through the walk-in too (it replaced the drifting dust) */}
         <RaysLayer className="z-[3]" />
 
@@ -493,97 +450,14 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
 /** darkens the lower part of a photo so the copy over it stays readable */
 function Scrim() {
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(3,14,16,0.55)_0%,rgba(3,14,16,0)_22%,rgba(3,14,16,0)_42%,rgba(3,14,16,0.82)_100%)] lg:bg-[linear-gradient(180deg,rgba(3,14,16,0.5)_0%,rgba(3,14,16,0)_20%,rgba(3,14,16,0)_45%,rgba(3,14,16,0.85)_100%)]" />
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(11,19,38,0.55)_0%,rgba(11,19,38,0)_22%,rgba(11,19,38,0)_42%,rgba(11,19,38,0.82)_100%)] lg:bg-[linear-gradient(180deg,rgba(11,19,38,0.5)_0%,rgba(11,19,38,0)_20%,rgba(11,19,38,0)_45%,rgba(11,19,38,0.85)_100%)]" />
   );
 }
 
 type C = (typeof heroCopy)["en"];
 
-function Facade({
-  c, staged, idle, zoom, fx, skyX, bldX, bldY,
-}: {
-  c: C; staged: boolean; idle?: boolean; zoom?: MotionValue<number>; fx?: MotionValue<string>; skyX?: MotionValue<number>; bldX?: MotionValue<number>; bldY?: MotionValue<number>;
-}) {
-  const d = FACADE.door;
-  return (
-    <motion.div
-      className="absolute"
-      data-idle={idle || undefined}
-      style={{ ...cover(FACADE.ar, d.x, FACADE.anchorY, SKY), scale: zoom, filter: fx, transformOrigin: `${d.x * 100}% ${d.y * 100}%` }}
-    >
-      <div className={staged ? "hi hi-push absolute inset-0" : "absolute inset-0"} style={{ transformOrigin: `${d.x * 100}% ${d.y * 100}%` }}>
-      <div className={`absolute inset-0 ${staged ? "motion-safe:animate-[hero-breathe_22s_var(--ease-ambient)_infinite_alternate]" : ""}`} style={{ transformOrigin: `${d.x * 100}% ${d.y * 100}%` }}>
-        {/* the sky, on its own layer behind the roof */}
-        {/* it reaches above the photograph, so the frame holds more sky than the camera did */}
-        <motion.div aria-hidden="true" className="absolute inset-x-0 scale-[1.12]" style={{ x: skyX, top: `-${SKY * 100}cqh`, height: `calc(30.39% + ${SKY * 100}cqh)` }}>
-          <div className="absolute inset-0 motion-safe:animate-[hero-sky_70s_var(--ease-ambient)_infinite_alternate]">
-            <Image src="/media/msg/facade-sky.jpg" alt="" fill sizes="100vw" className="object-cover object-bottom" />
-          </div>
-          {/* a second pass of the same clouds, mirrored and brighter, crossing the other way */}
-          <div className="absolute inset-0 opacity-50 mix-blend-screen motion-safe:animate-[hero-clouds_95s_linear_infinite_alternate]">
-            <Image src="/media/msg/facade-sky.jpg" alt="" fill sizes="100vw" className="-scale-x-100 object-cover object-bottom" />
-          </div>
-          {staged ? <div className="hi hi-night absolute inset-0 bg-[#02070a]" /> : null}
-        </motion.div>
-
-        {/* the building */}
-        <motion.div className="absolute inset-0 scale-[1.02]" style={{ x: bldX, y: bldY, clipPath: FACADE.building }}>
-          <Image src="/media/msg/facade.jpg" alt={c.facade.alt} fill priority sizes="(max-aspect-ratio: 4/3) 134vh, 100vw" className="object-cover" />
-          {/* night over the building; the sign, the doorway and the routes glow above it */}
-          {staged ? <div aria-hidden="true" className="hi hi-night absolute inset-0 bg-[#02070a]" /> : null}
-          {/* light passing over the walls */}
-          <div aria-hidden="true" className="absolute inset-0 overflow-hidden mix-blend-soft-light">
-            <div className="absolute inset-y-0 -left-1/2 w-1/2 bg-[linear-gradient(100deg,transparent_0%,rgba(255,244,214,0.75)_50%,transparent_100%)] motion-safe:animate-[hero-sweep_9s_var(--ease-ambient)_infinite]" />
-          </div>
-          {/* the sign, lit */}
-          <div aria-hidden="true" className={staged ? "hi hi-sign absolute" : "absolute"} style={{ left: `${FACADE.sign.x * 100}%`, top: `${FACADE.sign.y * 100}%`, width: `${FACADE.sign.w * 100}%`, height: `${FACADE.sign.h * 100}%` }}>
-            <span className="absolute inset-[-40%_-12%] rounded-[40%] bg-[radial-gradient(closest-side,rgba(255,252,240,0.35),transparent)] mix-blend-screen motion-safe:animate-[hero-sign_4.5s_var(--ease-ambient)_infinite]" />
-            <Image src="/media/msg/sign-glow.png" alt="" fill sizes="20vw" className="object-fill opacity-90 mix-blend-screen blur-[3px] motion-safe:animate-[hero-sign_4.5s_var(--ease-ambient)_infinite]" />
-            <Image src="/media/msg/sign-glow.png" alt="" fill sizes="20vw" className="object-fill opacity-40 mix-blend-screen" />
-          </div>
-          {/* a lamp glimmering inside the doorway */}
-          <span aria-hidden="true" className="absolute size-[3.4%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(255,255,240,0.6),rgba(255,255,240,0))] mix-blend-screen motion-safe:animate-[hero-lamp_3.2s_var(--ease-ambient)_infinite]" style={at(FACADE.lamp)} />
-          {/* the doorway: warm light inside, and the shutter that rolls up to open the day */}
-          {staged ? (
-            <div aria-hidden="true" className="absolute overflow-hidden" style={{ left: `${(d.x - d.w / 2) * 100}%`, top: `${(d.y - d.h / 2) * 100}%`, width: `${d.w * 100}%`, height: `${d.h * 100}%` }}>
-              <span className="hi hi-spill absolute inset-0 bg-[radial-gradient(85%_75%_at_50%_72%,rgba(255,232,180,0.8),rgba(255,232,180,0)_78%)] mix-blend-screen" />
-              <span className="hi hi-shutter absolute inset-0 bg-[#10181a] bg-[repeating-linear-gradient(180deg,rgba(255,255,255,0.08)_0_2px,rgba(0,0,0,0.3)_2px_10px)] shadow-[0_8px_16px_rgba(0,0,0,0.65)]" />
-            </div>
-          ) : null}
-          {/* deliveries leaving the door */}
-          <svg aria-hidden="true" viewBox="0 0 1448 1086" preserveAspectRatio="none" className="absolute inset-0 size-full">
-            <defs>
-              <radialGradient id="hero-threshold"><stop offset="0" stopColor="var(--color-brand-bright)" stopOpacity="0.55" /><stop offset="1" stopColor="var(--color-brand-bright)" stopOpacity="0" /></radialGradient>
-            </defs>
-            <ellipse cx="630" cy="700" rx="240" ry="34" fill="url(#hero-threshold)" className="motion-safe:animate-[hero-lamp_3.2s_var(--ease-ambient)_infinite]" />
-            {ROUTES.map((d, i) => (
-              <g key={i}>
-                <path d={d} pathLength={1} fill="none" stroke="var(--color-brand-bright)" strokeOpacity="0.25" strokeWidth="9" strokeLinecap="round" className={staged ? "hi hi-draw" : undefined} style={{ ["--hi" as string]: `${1.9 + i * 0.12}s` }} />
-                <g className={staged ? "hi hi-fade" : undefined} style={{ ["--hi" as string]: "2.5s" }}>
-                <path d={d} fill="none" stroke="#b8f5cf" strokeWidth="3" strokeLinecap="round" strokeDasharray="3 22" className={staged ? "motion-safe:animate-[hero-flow_1.4s_linear_infinite]" : ""} />
-                {staged ? (
-                  <circle r="7" fill="#eafff1" className="motion-reduce:hidden" style={{ filter: "drop-shadow(0 0 8px #4cc97a)" }}>
-                    <animateMotion dur={`${3.2 + i * 0.6}s`} begin={`${2.6 + i * 0.9}s`} repeatCount="indefinite" path={d} />
-                  </circle>
-                ) : null}
-                </g>
-              </g>
-            ))}
-          </svg>
-        </motion.div>
-      </div>
-      </div>
-    </motion.div>
-  );
-}
-
 const INTRO_GATE = `try{var s=document.currentScript.parentElement;if(sessionStorage.getItem("msg-intro")||window.scrollY>40)s.dataset.intro="skip";else sessionStorage.setItem("msg-intro","1")}catch(e){}`;
 
-const ROUTES = [
-  "M630 702 C 520 738 300 762 -40 792",
-  "M630 702 C 760 738 1040 766 1490 792",
-  "M630 702 C 640 800 600 930 560 1120",
-];
 
 function Interior({
   c, dark, scale, lamps, copy,
@@ -663,7 +537,7 @@ function StageCopy({ n, st, i, on, dark = false }: { n: NeedsC; st: Stage; i: nu
             className={`flex items-start gap-3 py-2.5 transition-[opacity,translate] duration-700 lg:gap-4 lg:py-3.5 ${on ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"}`}
             style={{ transitionDelay: on ? `${150 + k * 90}ms` : "0ms" }}
           >
-            <span className={`inline-flex size-9 shrink-0 items-center justify-center rounded-xl text-white lg:size-11 [&_svg]:size-6 lg:[&_svg]:size-7 ${dark ? "bg-white/[0.08] text-brand-bright ring-1 ring-white/15" : "bg-gradient-to-br from-teal to-teal-deep shadow-[0_10px_20px_-10px_rgba(11,58,64,0.8)]"}`}>
+            <span className={`inline-flex size-9 shrink-0 items-center justify-center rounded-xl text-white lg:size-11 [&_svg]:size-6 lg:[&_svg]:size-7 ${dark ? "bg-white/[0.08] text-brand-bright ring-1 ring-white/15" : "bg-gradient-to-br from-teal to-teal-deep shadow-[0_10px_20px_-10px_rgba(28,44,81,0.8)]"}`}>
               <NeedIcon id={id} />
             </span>
             <div className="min-w-0 flex-1">
@@ -704,7 +578,7 @@ function StageRail({ n, label, stage, onStage, progress, dark = false }: { n: Ne
 /** one quarter of the stages' scroll: empty before its stage, filling during it, full after */
 function StageFill({ p, i, dark = false }: { p: MotionValue<number>; i: number; dark?: boolean }) {
   const transform = useTransform(p, (v) => `scaleX(${Math.min(1, Math.max(0, v * NEED_STAGES.length - i)).toFixed(4)})`);
-  return <motion.span className={`block h-full origin-left rounded-full rtl:origin-right ${dark ? "bg-brand-bright shadow-[0_0_12px_rgba(76,201,122,0.8)]" : "bg-teal"}`} style={{ transform }} />;
+  return <motion.span className={`block h-full origin-left rounded-full rtl:origin-right ${dark ? "bg-brand-bright shadow-[0_0_12px_rgba(0,157,248,0.8)]" : "bg-teal"}`} style={{ transform }} />;
 }
 
 /** reduced motion: the same four stages, one after another */

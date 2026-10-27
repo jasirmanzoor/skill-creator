@@ -101,9 +101,9 @@ export default function CourierField({ ariaLabel, hqLabel }: { ariaLabel: string
     };
 
     function drawHQ() {
-      ctx.fillStyle = "#0c0e11";
+      ctx.fillStyle = "#111a33";
       ctx.beginPath(); ctx.arc(hqX, hqY, 4, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = "rgba(12,14,17,0.35)"; ctx.lineWidth = 1;
+      ctx.strokeStyle = "rgba(17,26,51,0.35)"; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.arc(hqX, hqY, 9, 0, Math.PI * 2); ctx.stroke();
     }
 
@@ -232,7 +232,7 @@ export default function CourierField({ ariaLabel, hqLabel }: { ariaLabel: string
       {hq ? (
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute translate-x-3 translate-y-2.5 whitespace-nowrap rounded bg-surface/95 px-1.5 py-0.5 text-xs font-semibold text-ink shadow-[0_0_0_1px_rgba(12,14,17,0.08)]"
+          className="pointer-events-none absolute translate-x-3 translate-y-2.5 whitespace-nowrap rounded bg-surface/95 px-1.5 py-0.5 text-xs font-semibold text-ink shadow-[0_0_0_1px_rgba(17,26,51,0.08)]"
           style={{ left: hq.x, top: hq.y - 8 }}
         >
           {hqLabel}

@@ -35,7 +35,7 @@ export default function RaysLayer({ className = "" }: { className?: string }) {
     <div ref={box} aria-hidden="true" className={`pointer-events-none absolute inset-0 mix-blend-screen ${className}`}>
       {on && !low ? <LightRays
         raysOrigin="top-left"
-        raysColor="#FFD39A"
+        raysColor="#bfe3ff"
         raysSpeed={1}
         lightSpread={1}
         rayLength={3}
