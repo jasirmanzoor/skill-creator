@@ -62,7 +62,7 @@ export const hiaceFleet = {
       src: "/media/photos/loading.webp",
       pos: "45% 55%",
       alt: { en: "A driver sliding cartons into a van backed up to a loading dock", ar: "سائق يُدخل الكراتين إلى شاحنة عند رصيف التحميل" },
-      caption: { en: "Out of the bay, into the van", ar: "من الرصيف إلى الشاحنة" },
+      caption: { en: "Out for dispatch", ar: "في طريقها للتوزيع" },
     },
     {
       src: "/media/photos/van-road.webp",

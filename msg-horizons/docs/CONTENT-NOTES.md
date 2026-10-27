@@ -189,6 +189,11 @@ inference from MSG's own statement and should be confirmed by MSG.
 - **Section photos** in `public/media/photos/` are generated photographs (Figma image generation), made to look like
   ordinary photos of each section's work: no logos, no readable text. They are not MSG's own photos and stay out of
   `content/media.ts`. The "Your price" plate uses `account.webp` until the online-seller photo is generated.
+  Replaced 27 Oct at MSG's request: `sorting.webp` (Enterprise plate: MSG's earlier plate photo, edited in Canva to a
+  small crew at one row of sorting tables, no conveyor, no back row). `van-desert.webp` (Live network plate) is MSG's own
+  supplied image, with the old green livery replaced by the new lockup. Rule from MSG: no one in a shemagh or thobe shown
+  doing labour on the warehouse floor; keep crews small and everything at true scale. The fleet-strip loading photo and
+  the tracking photo wait on MSG's own on-ground photographs.
 - **Retired** (they carried the old logo): the Toyota Hiace renders and the van photo with the old livery. The real
   hub photographs (warehouse, sorting, team, aerial, outlet) are unchanged and still used in the gallery and profile.
 - **Removed sections** at MSG's request ("discard the sections that are not very necessary"): the network photo band,

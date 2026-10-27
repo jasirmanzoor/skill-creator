@@ -8,10 +8,10 @@ const PLATE: Record<string, { src: string; pos: string }> = {
   why: { src: "/media/msg/hub-open.webp", pos: "50% 55%" },
   estimate: { src: "/media/photos/account.webp", pos: "50% 55%" }, // stand-in until the online-seller photo is generated
   planner: { src: "/media/photos/planner.webp", pos: "45% 45%" },
-  "live-tracking": { src: "/media/photos/van-road.webp", pos: "45% 60%" },
+  "live-tracking": { src: "/media/photos/van-desert.webp", pos: "74% 62%" }, // the van in the new livery, on the road out of town
   fleet: { src: "/media/msg/hub-aerial.webp", pos: "50% 50%" },
   proof: { src: "/media/msg/hub-team.webp", pos: "60% 55%" },
-  enterprise: { src: "/media/photos/peak.webp", pos: "50% 55%" },
+  enterprise: { src: "/media/photos/sorting.webp", pos: "50% 50%" },
   contact: { src: "/media/msg/facade.jpg", pos: "50% 45%" },
 };
 
