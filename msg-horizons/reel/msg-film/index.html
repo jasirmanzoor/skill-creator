@@ -178,6 +178,8 @@ const SL = { x0: 552, x1: 940, y: 512 };                 // its slider
 const knobX = (v) => SL.x0 + (v / 1000) * (SL.x1 - SL.x0);
 const V40 = toSlider(40), V300 = toSlider(300);
 const dragV = (t) => lerp(V40, V300, expoInOut(seg(t, 2.6, 3.2)));
+let TIER_T = 3.2; // when the dragged volume first reaches the tier, measured below
+for (let q = 2.6; q <= 3.2; q += 1 / 720) if (toOrders(dragV(q)) >= TIER_FROM) { TIER_T = q; break; }
 const PB = { x: 360, y: 230, w: 1200, h: 540 };          // the plan builder
 const NODES = [410, 560, 710, 860].map((x) => [x, 330]);
 const PH = { x: 520, y: 170, w: 340, h: 660 };           // the driver's phone
@@ -259,11 +261,14 @@ function priceCard(t) {
   // the result panel
   RR(964, 318, 408, 120, 18, NAVY);
   T(988, 352, "Approx. per order", 13.5, SILVER, 500); T(1184, 352, "Approx. per month", 13.5, SILVER, 500);
-  const per = rateFor(lane, n), per0 = rateFor("intra", n), month = per * n;
+  // the drag crosses MSG's 299-a-month tier here; the per-order figure rolls from then, and the monthly total
+  // follows the figure on screen, so the two always agree
+  const tTier = TIER_T, tr = t < 3.5 ? expoInOut(seg(t, tTier, tTier + 0.24)) : 1, lr = expoInOut(seg(t, 3.5, 3.74));
+  const per0 = rateFor("intra", n), shown = t < 3.5 ? (tr < 0.5 ? RATE.intra.walkin : RATE.intra.t299) : lr < 0.5 ? RATE.intra.t299 : RATE.inter.t299;
+  const month = shown * n;
   // the per-order figure rolls when it changes (the tier at 299, then the lane)
   const roll = (tc, a, b, x, y, size) => { const u = expoInOut(seg(t, tc, tc + 0.24)); const c = clipRect(x - 4, y - size, 120, size * 1.25); out.push(`<g ${c}>`); if (u < 1) T(x, y - u * size * 1.2, String(a), size, WHITE, 600); if (u > 0) T(x, y + (1 - u) * size * 1.2, String(b), size, WHITE, 600); out.push("</g>"); };
   T(988, 414, "≈ SAR", 15, WHITE, 500);
-  const tTier = 3.11; // the drag reaches 300 orders here
   if (t < 3.5) roll(tTier, 33, per0, 1036, 418, 42); else roll(3.5, 21, 30, 1036, 418, 42);
   T(1184, 412, "SAR", 15, SILVER, 500); T(1220, 412, fm(month), 28, WHITE, 600);
   RR(964, 452, 408, 56, 14, NAVY); IC("whatsapp", 1048, 468, 22, WHITE, 1.8); T(1078, 487, "Get this quote on WhatsApp", 16, WHITE, 600);
