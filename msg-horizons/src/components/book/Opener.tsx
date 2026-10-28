@@ -6,7 +6,7 @@ import MaskWord from "../fx/MaskWord";
 /** each chapter's opening plate: one of MSG's own photographs (public/media/msg) */
 const PLATE: Record<string, { src: string; pos: string }> = {
   why: { src: "/media/msg/hub-open.webp", pos: "50% 55%" },
-  estimate: { src: "/media/photos/account.webp", pos: "50% 55%" }, // stand-in until the online-seller photo is generated
+  estimate: { src: "/media/photos/seller.webp", pos: "45% 50%" },
   planner: { src: "/media/photos/planner.webp", pos: "45% 45%" },
   "live-tracking": { src: "/media/photos/van-desert.webp", pos: "74% 62%" }, // the van in the new livery, on the road out of town
   fleet: { src: "/media/msg/hub-aerial.webp", pos: "50% 50%" },

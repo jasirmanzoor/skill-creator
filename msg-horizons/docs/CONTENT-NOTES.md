@@ -188,7 +188,7 @@ inference from MSG's own statement and should be confirmed by MSG.
   motion blur, Web Audio soundtrack). It opens the site and fills the headings (two recoloured "fill" cuts).
 - **Section photos** in `public/media/photos/` are generated photographs (Figma image generation), made to look like
   ordinary photos of each section's work: no logos, no readable text. They are not MSG's own photos and stay out of
-  `content/media.ts`. The "Your price" plate uses `account.webp` until the online-seller photo is generated.
+  `content/media.ts`. The "Your price" plate is `seller.webp` (an online seller packing an order at home, Figma, 28 Oct).
   Replaced 27 Oct at MSG's request: `sorting.webp` (Enterprise plate: MSG's earlier plate photo, edited in Canva to a
   small crew at one row of sorting tables, no conveyor, no back row). `van-desert.webp` (Live network plate) is MSG's own
   supplied image, with the old green livery replaced by the new lockup. Rule from MSG: no one in a shemagh or thobe shown
