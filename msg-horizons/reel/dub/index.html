@@ -1,0 +1,504 @@
+<!doctype html>
+<!--
+  Dub, 15 s product film: "One Click".
+  The through-line object is the click: one teal dot, the data point of Dub's own conversion chart. It cuts the hook,
+  becomes the text caret, the Conversion Tracking knob, the chart's data point, a notification badge and the
+  "Confirm payouts" button, floods the frame, and opens into the bowl of the "d" in Dub's logo.
+
+  The interface is rebuilt from dub.co's own product shots as vector layers (nothing is a screenshot), every number
+  on screen is one that Dub's mock-ups show. 120 BPM, a beat every 0.5 s. Every pixel is computed from time inside
+  window.seek(t): no CSS animation, no timers, no state carried between frames. One typeface (Satoshi, Dub's
+  headline face), one accent (the chart teal, #00D4BD) used only on the dot and the key word.
+-->
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face { font-family: "Satoshi"; src: url("Satoshi-Variable.woff2") format("woff2"); font-weight: 300 900; font-display: block; }
+  html, body { margin: 0; background: #FAFAFA; }
+  #stage { width: 1920px; height: 1080px; overflow: hidden; display: block; background: #FAFAFA; }
+  text { font-family: "Satoshi"; }
+</style>
+</head>
+<body>
+<svg id="stage" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080"></svg>
+<script src="audio.js"></script>
+<script>
+(() => {
+const BG = "#FAFAFA", INK = "#0A0A0A", MUTED = "#737373", MUTED2 = "#A3A3A3", LINE = "#E5E5E5", PANEL = "#F4F4F5", PILL = "#262626", ACC = "#00D4BD", WHITE = "#FFFFFF";
+const W = 1920, H = 1080, FX = 960, FY = 460, DT = 1 / 180;
+const svg = document.getElementById("stage");
+const LOGO = "M11 2H14V13.9332L14.0003 13.9731L14.0003 14C14.0003 14.0223 14.0002 14.0445 14 14.0668V21H11V19.7455C9.86619 20.5362 8.48733 21 7.00016 21C3.13408 21 0 17.866 0 14C0 10.134 3.13408 7 7.00016 7C8.48733 7 9.86619 7.46375 11 8.25452V2ZM7 17.9998C9.20914 17.9998 11 16.209 11 13.9999C11 11.7908 9.20914 10 7 10C4.79086 10 3 11.7908 3 13.9999C3 16.209 4.79086 17.9998 7 17.9998ZM32 2H35V8.25474C36.1339 7.46383 37.5128 7 39.0002 7C42.8662 7 46.0003 10.134 46.0003 14C46.0003 17.866 42.8662 21 39.0002 21C35.1341 21 32 17.866 32 14V2ZM39 17.9998C41.2091 17.9998 43 16.209 43 13.9999C43 11.7908 41.2091 10 39 10C36.7909 10 35 11.7908 35 13.9999C35 16.209 36.7909 17.9998 39 17.9998ZM19 7H16V14C16 14.9192 16.1811 15.8295 16.5329 16.6788C16.8846 17.5281 17.4003 18.2997 18.0503 18.9497C18.7003 19.5997 19.472 20.1154 20.3213 20.4671C21.1706 20.8189 22.0809 21 23.0002 21C23.9194 21 24.8297 20.8189 25.679 20.4671C26.5283 20.1154 27.3 19.5997 27.95 18.9497C28.6 18.2997 29.1157 17.5281 29.4675 16.6788C29.8192 15.8295 30.0003 14.9192 30.0003 14H30V7H27V14C27 15.0608 26.5785 16.0782 25.8284 16.8283C25.0783 17.5784 24.0609 17.9998 23 17.9998C21.9391 17.9998 20.9217 17.5784 20.1716 16.8283C19.4215 16.0782 19 15.0608 19 14V7Z"; // dub's own wordmark, 46 x 24
+
+/* ---------- time: every easing is a function of time ---------- */
+const clamp = (v, a = 0, b = 1) => (v < a ? a : v > b ? b : v);
+const lerp = (a, b, u) => a + (b - a) * u;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const expoOut = (u) => (u >= 1 ? 1 : 1 - Math.pow(2, -10 * u));
+const expoIn = (u) => (u <= 0 ? 0 : Math.pow(2, 10 * (u - 1)) - 0.001 * (1 - u));
+const expoInOut = (u) => (u <= 0 ? 0 : u >= 1 ? 1 : u < 0.5 ? Math.pow(2, 20 * u - 10) / 2 : (2 - Math.pow(2, -20 * u + 10)) / 2);
+/** a spring released at t0: critically damped with a touch of under-damping, so it overshoots by about 2% at most */
+const spring = (t, t0, w = 18) => { const x = Math.max(0, t - t0); return 1 - (1 + w * x) * Math.exp(-w * x); };
+const hash = (n) => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const lp2 = (a, b, u) => [lerp(a[0], b[0], u), lerp(a[1], b[1], u)];
+const RGB = {};
+const rgb = (h) => RGB[h] || (RGB[h] = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16)));
+const mixc = (a, b, u) => { const A = typeof a === "string" ? rgb(a) : a, B = typeof b === "string" ? rgb(b) : b; return [lerp(A[0], B[0], u), lerp(A[1], B[1], u), lerp(A[2], B[2], u)]; };
+const css = (c) => (typeof c === "string" ? c : `rgb(${Math.round(c[0])},${Math.round(c[1])},${Math.round(c[2])})`);
+
+/* ---------- drawing: the frame is one SVG string ---------- */
+let out = [], defs = [], FIL = new Map(), clipN = 0;
+const f1 = (v) => (Math.round(v * 10) / 10).toString();
+const E = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+const T = (x, y, s, size, fill = INK, weight = 500, extra = "") => { if (s === "") return; out.push(`<text x="${f1(x)}" y="${f1(y)}" font-size="${size}" font-weight="${weight}" fill="${css(fill)}" ${extra}>${E(s)}</text>`); };
+const RR = (x, y, w, h, r, fill, stroke, sw = 1, extra = "") => { if (w <= 0 || h <= 0) return; out.push(`<rect x="${f1(x)}" y="${f1(y)}" width="${f1(w)}" height="${f1(h)}" rx="${f1(Math.min(r, w / 2, h / 2))}" fill="${fill ? css(fill) : "none"}" ${stroke ? `stroke="${css(stroke)}" stroke-width="${sw}"` : ""} ${extra}/>`); };
+const CI = (x, y, r, fill, extra = "") => { if (r > 0) out.push(`<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(r)}" fill="${css(fill)}" ${extra}/>`); };
+const LN = (x1, y1, x2, y2, stroke = LINE, sw = 1, extra = "") => out.push(`<line x1="${f1(x1)}" y1="${f1(y1)}" x2="${f1(x2)}" y2="${f1(y2)}" stroke="${css(stroke)}" stroke-width="${sw}" ${extra}/>`);
+const PL = (p, stroke, sw, extra = "") => p.length > 1 && out.push(`<polyline points="${p.map((q) => f1(q[0]) + "," + f1(q[1])).join(" ")}" fill="none" stroke="${css(stroke)}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" ${extra}/>`);
+const clipRect = (x, y, w, h) => { const id = "c" + clipN++; defs.push(`<clipPath id="${id}"><rect x="${f1(x)}" y="${f1(y)}" width="${f1(Math.max(0, w))}" height="${f1(Math.max(0, h))}"/></clipPath>`); return `clip-path="url(#${id})"`; };
+const clipCircle = (x, y, r) => { const id = "c" + clipN++; defs.push(`<clipPath id="${id}"><circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(Math.max(0, r))}"/></clipPath>`); return `clip-path="url(#${id})"`; };
+/** a directional blur sized from speed, quantised so a frame reuses a handful of filters */
+const blur = (sx, sy) => {
+  sx = Math.min(30, Math.abs(sx)); sy = Math.min(30, Math.abs(sy));
+  if (sx < 0.5 && sy < 0.5) return "";
+  const qx = Math.round(sx * 2) / 2, qy = Math.round(sy * 2) / 2, id = `b${qx * 2}_${qy * 2}`;
+  if (!FIL.has(id)) FIL.set(id, `<filter id="${id}" x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="${qx} ${qy}"/></filter>`);
+  return `filter="url(#${id})"`;
+};
+const camBlur = (sx, sy) => {
+  sx = Math.min(18, Math.abs(sx)); sy = Math.min(18, Math.abs(sy));
+  if (sx < 0.5 && sy < 0.5) return "";
+  const qx = Math.round(sx * 2) / 2, qy = Math.round(sy * 2) / 2, id = `k${qx * 2}_${qy * 2}`;
+  if (!FIL.has(id)) FIL.set(id, `<filter id="${id}" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="${qx} ${qy}"/></filter>`);
+  return `filter="url(#${id})"`;
+};
+
+/* ---------- icons (24-grid, stroked) ---------- */
+const ICONS = {
+  link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  globe: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+  chevron: '<path d="m6 9 6 6 6-6"/>',
+  chart: '<path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>',
+  tag: '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5"/>',
+  folder: '<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
+  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  check: '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+  calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/>',
+  filter: '<path d="M3 6h18"/><path d="M7 12h10"/><path d="M10 18h4"/>',
+  more: '<circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>',
+  help: '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>',
+  dot: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  mail: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/>',
+  chat: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
+  wallet: '<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>',
+  shield: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
+  zap: '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+  qr: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20v.01M20 20v.01"/>',
+  image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/>',
+};
+const IC = (name, x, y, size, color = MUTED, sw = 1.8, extra = "") => out.push(`<g transform="translate(${f1(x)} ${f1(y)}) scale(${(size / 24).toFixed(4)})" fill="none" stroke="${css(color)}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" ${extra}>${ICONS[name]}</g>`);
+const logoMark = (x, y, s, fill, extra = "") => out.push(`<path transform="translate(${f1(x)} ${f1(y)}) scale(${s})" d="${LOGO}" fill="${css(fill)}" fill-rule="evenodd" ${extra}/>`);
+
+/* ---------- measuring: type is measured at runtime, never hard-coded ---------- */
+let MC = null;
+const tw = (s, size, weight = 500) => { MC.font = `${weight} ${size}px Satoshi`; return MC.measureText(s).width; };
+const fm = (v) => Math.round(v).toLocaleString("en-US");
+
+/* ======================= the camera: one, always moving ======================= */
+const KD = Math.log(1.04) / 2; // a 4% push every scene (2 s), continuous, so each scene starts where the last ended
+// arrival time, world point, effective zoom, and how long the move takes (it starts d seconds before)
+const CK = [
+  [0, 960, 460, 1.0, 0],
+  [2.25, 800, 358, 2.35, 0.55],   // into the URL field
+  [3.5, 800, 505, 1.75, 0.5],     // out to the whole column
+  [4.6, 960, 600, 1.4, 0.6],      // the analytics window
+  [5.5, 1290, 400, 2.0, 0.5],     // onto Sales
+  [6.6, 1110, 440, 1.45, 0.6],    // the partner overview
+  [7.2, 1330, 420, 2.3, 0.5],     // onto the tasks
+  [8.6, 960, 580, 1.4, 0.6],      // the payouts window
+  [9.5, 900, 450, 2.0, 0.5],      // onto the pending rows
+  [10.5, 900, 470, 2.25, 0.4],
+  [11.5, 960, 420, 2.6, 0.5],
+  [12.0, 1010, 380, 2.9, 0.5],    // the button, on the click
+  [12.5, 1010, 400, 2.5, 0.5],    // and back a touch, so the chips and totals stay readable
+].map(([t, x, y, z, d]) => ({ t, x, y, d, zl: Math.log(z / Math.exp(KD * t)) }));
+function camAt(t) {
+  let a = CK[0];
+  for (let i = 1; i < CK.length; i++) {
+    const b = CK[i];
+    if (t >= b.t) { a = b; continue; }
+    const u = expoInOut(seg(t, b.t - b.d, b.t));
+    return { x: lerp(a.x, b.x, u), y: lerp(a.y, b.y, u), z: Math.exp(lerp(a.zl, b.zl, u) + KD * t) };
+  }
+  return { x: a.x, y: a.y, z: Math.exp(a.zl + KD * t) };
+}
+const proj = (c, x, y) => [FX + (x - c.x) * c.z, FY + (y - c.y) * c.z];
+
+/* ======================= scene 1 (0-2 s): the hook ======================= */
+const HFS = 270, HTR = -0.035 * HFS, HLH = 0.92 * HFS;
+const HK = {};
+function layoutHook() {
+  MC.font = `500 ${HFS}px Satoshi`;
+  const cap = MC.measureText("H").actualBoundingBoxAscent, sp = MC.measureText(" ").width + HTR;
+  const word = (s, x0) => ({ s, x0, xs: [...s].map((_, i) => x0 + MC.measureText(s.slice(0, i)).width + HTR * i), w: MC.measureText(s).width + HTR * (s.length - 1) });
+  const a = word("Clicks", 0), b = word("aren't", a.w + sp), c = word("revenue", 0);
+  const bw = Math.max(b.x0 + b.w, c.w), left = FX - bw / 2;
+  const yb1 = FY + (cap - HLH) / 2, yb2 = yb1 + HLH;
+  Object.assign(HK, { cap, left, yb1, yb2, words: [[a, yb1, 0.0], [b, yb1, 0.5], [c, yb2, 1.0]], dotY: yb2 - 68, bw });
+  HK.words.forEach(([w]) => { w.xs = w.xs.map((x) => x + left); w.x0 += left; });
+}
+function hook(t) {
+  if (t >= 2.0) return;
+  const dx = t >= 1.5 ? dotState(t).x : 99999, edge = dx - 68 * 0.9;
+  HK.words.forEach(([w, yb, t0], wi) => {
+    const clip = clipRect(w.x0 - 40, yb - HK.cap * 1.12, w.w + 80, HK.cap * 1.12 + 6);
+    out.push(`<g ${clip}>`);
+    [...w.s].forEach((ch, i) => {
+      const rise = (1 - expoOut(seg(t, t0 + 0.024 * i, t0 + 0.024 * i + 0.34))) * HK.cap * 1.3;
+      const leave = wi < 2 ? expoIn(seg(t, 1.72 + 0.022 * (i + wi * 6), 1.72 + 0.022 * (i + wi * 6) + 0.26)) * HK.cap * 1.35 : 0;
+      const y = yb + rise - leave, vy = (rise - leave) - ((1 - expoOut(seg(t - DT, t0 + 0.024 * i, t0 + 0.024 * i + 0.34))) * HK.cap * 1.3 - (wi < 2 ? expoIn(seg(t - DT, 1.72 + 0.022 * (i + wi * 6), 1.72 + 0.022 * (i + wi * 6) + 0.26)) * HK.cap * 1.35 : 0));
+      if (wi === 2 && w.xs[i] > edge) return; // the dot has been through here
+      if (y > yb + HK.cap * 1.3 || y < yb - HK.cap * 2.4) return;
+      T(w.xs[i], y, ch, HFS, INK, 500, `${blur(0, vy * 0.5)}`);
+    });
+    out.push("</g>");
+  });
+}
+
+/* ======================= the through-line dot: one object, a new role in every scene ======================= */
+const F0 = [487.3, 355];                      // where the caret sits in the destination field
+const KNOB = { off: [1076, 711], on: [1092, 711] };
+const CP = [[802, 278], [883, 365], [936, 265], [1010, 504], [1073, 226], [1125, 342], [1180, 265], [1266, 226], [1315, 443], [1355, 160], [1400, 187], [1455, 342], [1492, 315]]
+  .map(([x, v]) => [712 + ((x - 802) / 690) * 816, 830 - v * 0.65]); // Dub's own sales curve, read off its product shot
+const LEG = [1289, 314];
+const RV = [380, 420, 600, 400, 440, 700, 300, 640, 560, 420, 700, 770, 640, 300, 280].map((v, i, a) => [700 + (i / (a.length - 1)) * 396, 760 - v * 0.425]);
+const BADGE = [1560, 358];
+const BTN = { x: 962, y: 252, w: 130, h: 32 };
+const BTNC = [BTN.x + BTN.w / 2, BTN.y + BTN.h / 2];
+const lens = (p) => { const L = [0]; for (let i = 1; i < p.length; i++) L.push(L[i - 1] + Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1])); return L; };
+const polyAt = (p, u) => { const L = lens(p), d = u * L[L.length - 1]; let i = 1; while (i < p.length - 1 && L[i] < d) i++; return lp2(p[i - 1], p[i], (d - L[i - 1]) / (L[i] - L[i - 1] || 1)); };
+const polyTo = (p, u) => { const L = lens(p), d = u * L[L.length - 1], r = [p[0]]; for (let i = 1; i < p.length; i++) { if (L[i] <= d) r.push(p[i]); else { r.push(lp2(p[i - 1], p[i], (d - L[i - 1]) / (L[i] - L[i - 1]))); break; } } return r; };
+const bez = (a, c, b, u) => [(1 - u) * (1 - u) * a[0] + 2 * u * (1 - u) * c[0] + u * u * b[0], (1 - u) * (1 - u) * a[1] + 2 * u * (1 - u) * c[1] + u * u * b[1]];
+const URL = "http://acme.com", SLUG = "dHIYcs";
+const typedN = (t, t0, rate, n) => Math.min(n, Math.max(0, Math.floor((t - t0) / rate) + (t >= t0 ? 1 : 0)));
+function dotState(t) {
+  const S = (x, y, w, h, rx, fill = ACC) => ({ x, y, w, h, rx, fill });
+  if (t < 1.5) return null;
+  const sq = (x, y, r) => S(x, y, 2 * r, 2 * r, r);
+  if (t < 1.75) { const u = expoOut(seg(t, 1.5, 1.75)), xe = HK.left + 68; return Object.assign(sq(lerp(2150, xe, u), HK.dotY, 68), { x: lerp(2150, xe, u) }); }
+  if (t < 2.0) { const u = expoInOut(seg(t, 1.75, 2.0)), p = lp2([HK.left + 68, HK.dotY], F0, u), r = lerp(68, 14, u); return sq(p[0], p[1], r); }
+  if (t < 2.2) { const u = expoOut(seg(t, 2.0, 2.2)), w = lerp(28, 2.6, u), h = lerp(28, 22, u); return S(F0[0], F0[1], w, h, Math.min(w, h) / 2); }
+  const cx = F0[0] + tw(URL.slice(0, typedN(t, 2.72, 0.024, URL.length)), 14) - 0.4;
+  if (t < 3.2) return S(cx, F0[1], 2.6, 22, 1.3);
+  if (t < 3.5) { const u = expoInOut(seg(t, 3.2, 3.5)), p = lp2([cx, F0[1]], KNOB.off, u), w = lerp(2.6, 16, u), h = lerp(22, 16, u); return S(p[0], p[1], w, h, Math.min(w, h) / 2); }
+  if (t < 3.8) { const u = expoOut(seg(t, 3.5, 3.8)); return sq(lerp(KNOB.off[0], KNOB.on[0], u), KNOB.on[1], 8); }
+  if (t < 4.0) return sq(KNOB.on[0], KNOB.on[1], 8);
+  if (t < 4.5) { const u = expoInOut(seg(t, 4.0, 4.5)), p = lp2(KNOB.on, CP[0], u); return sq(p[0], p[1], lerp(8, 10, u)); }
+  if (t < 5.05) { const p = polyAt(CP, expoInOut(seg(t, 4.5, 5.0))); return sq(p[0], p[1], 10); }
+  const tip = CP[CP.length - 1];
+  if (t < 5.45) { const u = expoInOut(seg(t, 5.05, 5.45)), p = bez(tip, [1440, 470], LEG, u), w = lerp(20, 11, u); return S(p[0], p[1], w, w, lerp(10, 3, u)); }
+  if (t < 5.5) return S(LEG[0], LEG[1], 11, 11, 3);
+  if (t < 6.0) { const u = expoOut(seg(t, 5.5, 5.8)), w = lerp(11, 16, u); return S(LEG[0], LEG[1], w, w, lerp(3, 8, u)); }
+  if (t < 6.3) { const u = expoInOut(seg(t, 6.0, 6.3)), p = lp2(LEG, RV[0], u); return sq(p[0], p[1], lerp(8, 10, u)); }
+  if (t < 6.75) { const p = polyAt(RV, expoInOut(seg(t, 6.3, 6.7))); return sq(p[0], p[1], 10); }
+  const rt = RV[RV.length - 1];
+  if (t < 7.0) { const u = expoInOut(seg(t, 6.75, 7.0)), p = bez(rt, [1330, 470], BADGE, u); return sq(p[0], p[1], 10); }
+  if (t < 8.0) { const u = expoOut(seg(t, 7.0, 7.3)), w = lerp(20, 26, u), pk = 1 + 0.14 * bump(t, 7.75, 0.2); return S(BADGE[0], BADGE[1], w * pk, w * pk, lerp(10, 7, u)); }
+  if (t < 8.5) { const u = expoInOut(seg(t, 8.0, 8.5)), p = lp2(BADGE, BTNC, u), w = lerp(26, 20, u); return S(p[0], p[1], w, w, lerp(7, 10, u)); }
+  const g = expoOut(seg(t, 8.5, 9.0)), press = 1 - 0.035 * bump(t, 12.0, 0.18);
+  const fill = t < 12.0 ? mixc(ACC, INK, expoOut(seg(t, 8.5, 8.8))) : mixc(INK, ACC, expoOut(seg(t, 12.0, 12.14)));
+  return S(BTNC[0], BTNC[1], lerp(20, BTN.w, g) * press, lerp(20, BTN.h, g) * press, lerp(10, 8, g), fill);
+}
+const bump = (t, t0, d) => (t < t0 || t > t0 + d ? 0 : Math.sin(((t - t0) / d) * Math.PI));
+function drawDot(t, cam) {
+  const d = dotState(t);
+  if (!d) return;
+  const q = dotState(t - DT) || d;
+  const b = blur(Math.abs(d.x - q.x) * cam.z * 0.5, Math.abs(d.y - q.y) * cam.z * 0.5);
+  RR(d.x - d.w / 2, d.y - d.h / 2, d.w, d.h, d.rx, d.fill, null, 0, b);
+  if (t >= 7.0 && t < 8.5) { const k = expoOut(seg(t, 7.1, 7.3)) * (1 - expoOut(seg(t, 8.0, 8.2))); if (k > 0.01) T(d.x, d.y + 5.5, "2", 14, WHITE, 700, `text-anchor="middle" fill-opacity="${k.toFixed(2)}"`); }
+  if (t >= 8.8 && t < 12.6) {
+    const k = expoOut(seg(t, 8.8, 9.15)), c = clipRect(d.x - d.w / 2, d.y - 20, d.w * k, 40);
+    out.push(`<g ${c}>`); T(d.x, d.y + 4.5, "Confirm payouts", 12.5, t < 12.0 ? WHITE : mixc(WHITE, INK, expoOut(seg(t, 12.0, 12.14))), 600, 'text-anchor="middle"'); out.push("</g>");
+  }
+}
+
+/* ======================= the app window: rail, sidebar, main panel ======================= */
+const WIN = { x: 300, y: 140, w: 1320, h: 800 };
+function appWindow(title, groups, active, badges = {}) {
+  RR(WIN.x, WIN.y, WIN.w, WIN.h, 18, PANEL, LINE);
+  logoMark(322, 176, 0.5, INK);
+  CI(332, 252, 14, INK); out.push('<path d="M326 258 L332 244 L338 258 Z" fill="#fff"/>');
+  IC("dot", 318, 288, 28, MUTED, 1.4); IC("zap", 318, 334, 28, MUTED, 1.4);
+  T(388, 196, title, 15, INK, 700);
+  let y = 224;
+  for (const [hd, items] of groups) {
+    if (hd) { T(388, y + 14, hd, 12, MUTED2, 500); y += 26; }
+    for (const it of items) {
+      const act = it === active;
+      if (act) RR(376, y, 216, 32, 8, "#E8E8EA");
+      IC(it === "Links" ? "link" : it === "Domains" ? "globe" : it === "Analytics" || it === "Commissions" ? "chart" : it === "Folders" ? "folder" : it === "Tags" ? "tag" : it === "Messages" ? "chat" : it === "Payouts" ? "wallet" : it === "Fraud Detection" ? "shield" : it === "Email Campaigns" ? "mail" : it === "All partners" || it === "Groups" || it === "Applications" || it === "Customers" ? "users" : "dot", 388, y + 8, 16, act ? INK : MUTED, 1.7);
+      T(414, y + 21, it, 13, act ? INK : "#404040", act ? 600 : 500);
+      if (badges[it] !== undefined) { RR(566, y + 7, 20, 18, 5, "#E4E4E7"); T(576, y + 20, badges[it], 11, "#404040", 600, 'text-anchor="middle"'); }
+      y += 34;
+    }
+    y += 12;
+  }
+  RR(612, 148, 1000, 784, 12, WHITE, LINE);
+}
+const SL_GROUPS = [[null, ["Links", "Domains"]], ["Insights", ["Analytics", "Events", "Customers"]], ["Library", ["Folders", "Tags", "UTM Templates"]]];
+const PP_GROUPS = [[null, ["Overview", "Payouts", "Messages"]], ["Partners", ["All partners", "Groups", "Partner Network", "Applications"]], ["Insights", ["Analytics", "Commissions", "Fraud Detection"]], ["Engagement", ["Bounties", "Email Campaigns", "Resources"]]];
+const btn = (x, y, w, label, icon, h = 32) => { RR(x, y, w, h, 8, WHITE, LINE); let tx = x + 12; if (icon) { IC(icon, x + 10, y + h / 2 - 7, 14, "#404040", 1.8); tx = x + 30; } T(tx, y + h / 2 + 4.5, label, 12.5, INK, 500); };
+
+/* ----- the new-link modal (scene 2) ----- */
+const MODAL = { x: 440, y: 220, w: 1040, h: 640 };
+function qrCells() { const n = 21, c = []; for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) { const fin = (a, b) => { const di = Math.max(Math.abs(i - a), Math.abs(j - b)); return di === 3 || di <= 1; }; const inFin = (a, b) => Math.abs(i - a) <= 3 && Math.abs(j - b) <= 3; let on; if (inFin(3, 3)) on = fin(3, 3); else if (inFin(3, 17)) on = fin(3, 17); else if (inFin(17, 3)) on = fin(17, 3); else on = hash(i * 21 + j + 3) > 0.52; if (on) c.push([i, j]); } return c; }
+const QR = qrCells();
+function modal(t) {
+  RR(MODAL.x, MODAL.y, MODAL.w, MODAL.h, 14, WHITE, LINE);
+  RR(468, 238, 22, 22, 6, "#F0F0F0"); IC("link", 472, 242, 14, INK, 2);
+  T(498, 254, "Links", 13, MUTED, 500); IC("chevron", 540, 241, 14, MUTED2, 2, 'transform-origin="547 248" transform="rotate(-90)"');
+  out.push(`<path d="M544 243 l5 5 l-5 5" fill="none" stroke="${MUTED2}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`);
+  IC("globe", 560, 242, 14, INK, 1.8); T(580, 254, "New link", 13, INK, 600);
+  IC("x", 1440, 242, 16, MUTED, 1.8);
+  // destination url
+  T(472, 318, "Destination URL", 13, INK, 600); IC("help", 580, 306, 13, MUTED2, 1.6);
+  const focus = t >= 2.72;
+  RR(472, 332, 638, 46, 8, WHITE, focus ? INK : "#D4D4D4", focus ? 1.5 : 1);
+  const n = typedN(t, 2.72, 0.024, URL.length);
+  T(486, 360, URL.slice(0, n), 14, INK, 500);
+  // short link
+  T(472, 408, "Short link", 13, INK, 600); IC("help", 542, 396, 13, MUTED2, 1.6);
+  RR(472, 422, 638, 46, 8, WHITE, "#D4D4D4"); RR(472, 422, 134, 46, 8, "#FAFAFA", "#D4D4D4"); T(488, 450, "go.acme.com", 14, "#404040", 500);
+  const sn = typedN(t, 3.12, 0.045, SLUG.length); T(620, 450, SLUG.slice(0, sn), 14, INK, 500);
+  // tags + comments
+  T(472, 498, "Tags", 13, INK, 600); RR(472, 512, 638, 46, 8, WHITE, "#D4D4D4"); IC("tag", 486, 527, 16, MUTED2, 1.7); T(510, 540, "Select tags", 14, MUTED2, 500);
+  T(472, 588, "Comments (optional)", 13, INK, 600); RR(472, 602, 638, 70, 8, WHITE, "#D4D4D4"); T(486, 628, "Add comments", 14, MUTED2, 500);
+  // conversion tracking: the toggle's knob is the dot
+  T(472, 716, "Conversion Tracking", 13, INK, 600); IC("help", 612, 704, 13, MUTED2, 1.6);
+  const tg = expoOut(seg(t, 3.5, 3.8));
+  RR(1066, 701, 36, 20, 10, mixc("#D4D4D4", INK, tg));
+  if (t < 3.45) CI(1076, 711, 8, WHITE, `stroke="${MUTED2}" stroke-width="0.8"`);
+  // right column
+  T(1138, 318, "Folder", 13, INK, 600); RR(1138, 332, 310, 32, 8, WHITE, "#D4D4D4"); IC("folder", 1150, 340, 16, "#16A34A".length ? MUTED : MUTED, 1.7); T(1174, 353, "Links", 13, INK, 500); IC("chevron", 1424, 340, 16, MUTED, 1.8);
+  T(1138, 406, "QR Code", 13, INK, 600); IC("help", 1196, 394, 13, MUTED2, 1.6);
+  RR(1138, 420, 310, 100, 8, "#FAFAFA", "#E5E5E5");
+  const qp = expoOut(seg(t, 3.12, 3.55));
+  if (qp < 0.02) { IC("qr", 1281, 436, 24, MUTED2, 1.6); T(1293, 482, "Enter a link to", 11, MUTED, 500, 'text-anchor="middle"'); T(1293, 496, "generate a preview", 11, MUTED, 500, 'text-anchor="middle"'); }
+  else { const c = clipRect(1243, 425, 100, 90 * qp); out.push(`<g ${c}>`); RR(1243, 425, 100, 90, 4, WHITE); QR.forEach(([i, j]) => out.push(`<rect x="${1251 + j * 4}" y="${430 + i * 4}" width="4" height="4" fill="${INK}"/>`)); out.push("</g>"); }
+  T(1138, 558, "Custom Link Preview", 13, INK, 600); RR(1412, 546, 36, 20, 10, "#D4D4D4"); CI(1422, 556, 8, WHITE);
+  [0, 1, 2, 3].forEach((i) => RR(1138 + i * 78, 574, 70, 28, 6, WHITE, "#D4D4D4"));
+  RR(1138, 612, 310, 108, 8, "#FAFAFA", "#E5E5E5"); IC("image", 1281, 640, 24, MUTED2, 1.6); T(1293, 690, "Enter a link to", 11, MUTED, 500, 'text-anchor="middle"'); T(1293, 704, "generate a preview", 11, MUTED, 500, 'text-anchor="middle"');
+  T(1138, 746, "Add a title..", 12, MUTED2, 500); T(1138, 768, "Add a description..", 12, MUTED2, 500);
+  // bottom bar
+  LN(MODAL.x, 780, MODAL.x + MODAL.w, 780, LINE);
+  ["UTM", "Targeting", "A/B Test", "Password", "Expiration"].forEach((s, i) => { T(498 + i * 110, 826, s, 12, MUTED, 500); IC("dot", 472 + i * 110, 813, 16, MUTED2, 1.5); });
+  RR(1318, 806, 130, 40, 8, INK); T(1383, 831, "Create link", 13, WHITE, 600, 'text-anchor="middle"');
+}
+
+/* ----- scene 3: conversion analytics ----- */
+function analytics(t) {
+  appWindow("Short Links", SL_GROUPS, "Analytics");
+  T(640, 192, "Analytics", 16, INK, 700); LN(612, 214, 1612, 214, LINE);
+  btn(640, 238, 84, "Filter", "filter"); IC("chevron", 700, 247, 14, MUTED2, 2);
+  btn(732, 238, 132, "Last 24 hours", "calendar"); IC("chevron", 840, 247, 14, MUTED2, 2);
+  btn(1388, 238, 140, "Switch to Events", "zap"); RR(1536, 238, 40, 32, 8, WHITE, LINE); IC("more", 1548, 246, 16, MUTED, 2);
+  RR(640, 290, 944, 630, 10, WHITE, LINE); LN(640, 372, 1584, 372, LINE);
+  const cw = 944 / 3, cells = [["Clicks", MUTED2, 7200, (v) => (v < 1000 ? fm(v) : (v / 1000).toFixed(1) + "K"), 4.3, 4.85], ["Leads", MUTED2, 165, (v) => fm(v), 4.45, 4.95], ["Sales", ACC, 506, (v) => "$" + fm(v), 4.6, 5.1]];
+  cells.forEach(([name, col, val, f, t0, t1], i) => {
+    const x = 640 + i * cw, v = val * expoOut(seg(t, t0, t1));
+    if (i) LN(x, 290, x, 372, LINE);
+    if (name === "Sales") { if (t < 5.4) RR(x + 20, 307, 11, 11, 3, "#D4D4D4"); } else RR(x + 20, 307, 11, 11, 3, "#D4D4D4");
+    T(x + 38, 317, name, 12.5, MUTED, 500); T(x + 20, 358, f(v), 28, INK, 600);
+  });
+  const ux = 640 + lerp(0, 2, expoInOut(seg(t, 5.0, 5.35))) * cw;
+  RR(ux, 371, cw, 2.5, 1, INK);
+  [0, 200, 400, 600].forEach((v) => { const y = 830 - v * 0.65; LN(700, y, 1560, y, "#EDEDED"); T(660, y + 4, "$" + v, 10.5, MUTED2, 500); });
+  ["4:00 PM", "8:00 PM", "12:00 AM", "4:00 AM", "8:00 AM", "12:00 PM"].forEach((s, i) => T(740 + i * 152, 860, s, 10.5, MUTED2, 500, 'text-anchor="middle"'));
+  const p = expoInOut(seg(t, 4.5, 5.0));
+  if (p > 0.004) PL(polyTo(CP, p), ACC, 2.4);
+}
+
+/* ----- scene 4: the partner overview ----- */
+function overview(t) {
+  appWindow("Partner Program", PP_GROUPS, "Overview", { Payouts: 2, Messages: 4, Applications: 3, "Fraud Detection": 3, Bounties: 2 });
+  T(640, 192, "Overview", 16, INK, 700); LN(612, 214, 1612, 214, LINE);
+  btn(640, 238, 132, "Last 30 days", "calendar");
+  RR(640, 290, 476, 470, 10, WHITE, LINE);
+  T(660, 320, "Revenue", 12.5, MUTED, 500); IC("chevron", 716, 309, 14, MUTED2, 2); RR(1020, 306, 76, 28, 7, WHITE, LINE); T(1058, 324, "View all", 11.5, INK, 500, 'text-anchor="middle"');
+  const rv = 210429 * expoOut(seg(t, 6.15, 6.85));
+  T(660, 372, "$" + fm(rv) + ".00", 32, INK, 600);
+  [200, 400, 600, 800].forEach((v) => { const y = 760 - v * 0.425; LN(700, y, 1096, y, "#EDEDED"); T(660, y + 4, "$" + v, 10.5, MUTED2, 500); });
+  if (t > 6.32) PL(polyTo(RV, expoInOut(seg(t, 6.3, 6.7))), INK, 2);
+  RR(1136, 290, 448, 200, 10, WHITE, LINE); T(1156, 318, "Tasks", 12.5, MUTED, 500);
+  const hov = t >= 7.55 && t < 8.1;
+  [["Confirm pending payouts", "2", "wallet"], ["Respond to partners", "4", "chat"], ["Review new applications", "12", "users"]].forEach(([s, n, ic], i) => {
+    const y = 336 + i * 46;
+    if (i === 0 && hov) RR(1144, y, 432, 44, 8, "#F4F4F5");
+    IC(ic, 1160, y + 14, 16, "#404040", 1.7); T(1190, y + 27, s, 13, INK, 500);
+    if (i === 0) { if (t < 7.0) RR(1548, y + 10, 26, 24, 7, "#E4E4E7"), T(1561, y + 27, n, 13, "#404040", 600, 'text-anchor="middle"'); }
+    else { RR(1546, y + 10, n.length > 1 ? 30 : 26, 24, 7, "#E4E4E7"); T(1546 + (n.length > 1 ? 15 : 13), y + 27, n, 13, "#404040", 600, 'text-anchor="middle"'); }
+  });
+  RR(1136, 510, 448, 250, 10, WHITE, LINE); T(1156, 540, "Program links", 12.5, MUTED, 500); RR(1478, 524, 86, 28, 7, WHITE, LINE); T(1521, 542, "Branding", 11.5, INK, 500, 'text-anchor="middle"');
+  [["Landing page", "partners.dub.co/acme-projects"], ["Application page", "partners.dub.co/acme-projects/apply"]].forEach(([a, b], i) => { const y = 566 + i * 62; RR(1156, y, 408, 52, 8, "#FAFAFA", LINE); T(1176, y + 22, a, 13, INK, 600); T(1176, y + 40, b, 11.5, MUTED, 500); });
+}
+
+/* ----- scene 5: payouts ----- */
+const ROWS = [["Oct 2 - Nov 30, 2025", "Sophie Anderson", "Dec 12", 340.0], ["Oct 1 - Nov 28, 2025", "Luca Romano", "Dec 12", 340.0], ["Nov 4 - Nov 24, 2025", "Emma Stevenson", "Dec 8", 42.1], ["Oct 5 - Nov 20, 2025", "Logan Rivers", "Dec 7", 33.75], ["Oct 6 - Nov 20, 2025", "Mia Thompson", "Dec 7", 19.85], ["Sep 12 - Nov 19, 2025", "Jimmy Tey", "Dec 2", 342.67], ["Sep 1 - Nov 18, 2025", "Ethan Carter", "Dec 2", 512.89], ["Aug 23 - Nov 14, 2025", "Olivia Carter", "Dec 1", 785.45]];
+const money = (v) => "$" + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const COLX = [656, 843, 1032, 1221, 1410];
+function payouts(t) {
+  appWindow("Partner Program", PP_GROUPS, "Payouts", { Payouts: t < 12.0 ? 2 : 0, Messages: 4, Applications: 3, "Fraud Detection": 3, Bounties: 2 });
+  T(640, 192, "Payouts", 16, INK, 700); LN(612, 214, 1612, 214, LINE);
+  const cc = expoOut(seg(t, 12.0, 12.5)), pend = 722.1 * (1 - cc), tot = 10258.9 + 722.1 * cc;
+  RR(640, 240, 944, 90, 10, "#FAFAFA", LINE); LN(1112, 240, 1112, 330, LINE);
+  T(664, 270, "Pending payouts", 12, MUTED, 500); T(664, 308, money(pend) + " USD", 22, INK, 600);
+  T(1136, 270, "Total paid", 12, MUTED, 500); T(1136, 308, money(tot) + " USD", 22, INK, 600); RR(1456, 252, 108, 32, 8, WHITE, LINE); T(1510, 272.5, "View invoices", 12, INK, 500, 'text-anchor="middle"');
+  btn(640, 346, 124, "Payout settings");
+  RR(640, 400, 944, 408, 10, WHITE, LINE);
+  ["Period", "Partner", "Status", "Paid", "Amount"].forEach((s, i) => T(COLX[i], 425, s, 12, INK, 700));
+  LN(640, 440, 1584, 440, LINE);
+  ROWS.forEach(([per, name, paid, amt], i) => {
+    const y = 440 + i * 46, u = expoOut(seg(t, 9.0 + 0.07 * i, 9.4 + 0.07 * i));
+    if (u <= 0) return;
+    const c = clipRect(641, y, 942, 46 * u); out.push(`<g ${c}>`);
+    const cy = cursorAt(t), hv = t >= 9.95 && t < 11.95 && i < 3 && Math.abs(cy[1] - (y + 23)) < 23 && cy[0] > 640 && cy[0] < 1584;
+    if (hv) RR(641, y + 0.5, 942, 45, 0, "#FAFAFA");
+    LN(640, y + 46, 1584, y + 46, "#F0F0F0");
+    T(COLX[0], y + 28, per, 12.5, "#262626", 500);
+    CI(COLX[1] + 9, y + 23, 9, mixc("#E4E4E7", "#D4D4D8", hash(i * 3.3))); T(COLX[1] + 24, y + 28, name, 12.5, "#262626", 500);
+    const pend0 = i < 3, ci = pend0 ? expoOut(seg(t, 12.05 + 0.1 * i, 12.3 + 0.1 * i)) : 1;
+    // status chip: pending retracts upward through the chip, completed rises in
+    const ch = clipRect(COLX[2] - 2, y + 11, 96, 25); out.push(`<g ${ch}>`);
+    if (ci < 1) { RR(COLX[2], y + 13, 78, 21, 6, "#F4F4F5", LINE); IC("clock", COLX[2] + 7, y + 17.5, 12, MUTED, 1.9, `transform="translate(0 ${f1(-ci * 26)})"`); T(COLX[2] + 24, y + 28 - ci * 26, "Pending", 11.5, "#404040", 500); }
+    if (ci > 0) { const dy = (1 - ci) * 26; RR(COLX[2], y + 13 + dy, 92, 21, 6, "#EDEDEE"); IC("check", COLX[2] + 7, y + 17.5 + dy, 12, INK, 2); T(COLX[2] + 24, y + 28 + dy, "Completed", 11.5, INK, 600); }
+    out.push("</g>");
+    T(COLX[3], y + 28, pend0 && ci < 1 ? "-" : paid, 12.5, "#262626", 500, pend0 && ci > 0 && ci < 1 ? `fill-opacity="${ci}"` : "");
+    T(COLX[4], y + 28, money(amt), 12.5, "#262626", 500);
+    out.push("</g>");
+  });
+}
+
+/* ======================= the cursor: drives every interaction ======================= */
+const CL = [[2.4, 2.72, 700, 360], [3.2, 3.5, 1081, 716], [3.85, 4.3, 1700, 820], [4.55, 5.0, 1330, 336], [5.5, 5.9, 1700, 200], [7.1, 7.75, 1330, 358], [8.0, 8.4, 1700, 620], [9.45, 10.0, 760, 463], [10.05, 10.3, 760, 509], [10.55, 10.8, 760, 555], [11.5, 11.95, 1030, 276]];
+const CLICKS = [2.72, 3.5, 5.0, 7.75, 12.0];
+function cursorAt(t) {
+  let p = [1500, 700];
+  for (const [t0, t1, x, y] of CL) { if (t < t0) return p; if (t < t1) return lp2(p, [x, y], expoInOut(seg(t, t0, t1))); p = [x, y]; }
+  return p;
+}
+function drawCursor(t, cam) {
+  if (t < 2.4 || t > 12.5) return;
+  const w = cursorAt(t), w0 = cursorAt(t - DT), s = proj(cam, w[0], w[1]), s0 = proj(cam, w0[0], w0[1]);
+  let k = 1;
+  for (const c of CLICKS) k -= 0.2 * bump(t, c - 0.04, 0.2);
+  const sc = 1.9 * k, b = blur(Math.min(10, Math.abs(s[0] - s0[0]) * 0.4), Math.min(10, Math.abs(s[1] - s0[1]) * 0.4));
+  for (const c of CLICKS) {
+    const u = seg(t, c, c + 0.4);
+    if (u > 0 && u < 1) out.push(`<circle cx="${f1(s[0])}" cy="${f1(s[1])}" r="${f1(8 + 30 * expoOut(u))}" fill="none" stroke="${INK}" stroke-width="2" stroke-opacity="${(0.45 * (1 - u)).toFixed(2)}"/>`);
+  }
+  out.push(`<g ${b}><path transform="translate(${f1(s[0])} ${f1(s[1])}) scale(${sc.toFixed(3)})" d="M0 0 L0 17 L4.4 13.2 L7.4 20 L10 18.9 L7.1 12.3 L12.6 12.3 Z" fill="${INK}" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></g>`);
+}
+
+/* ======================= the caption pill: Dub's own, from its homepage ======================= */
+const PILLS = [["Short Links", "link", "Create and manage short links at scale"], ["Conversion Analytics", "chart", "Understand exactly how your marketing drives revenue"], ["Affiliate Programs", "users", "All-in-one partner management platform"]];
+function drawPill(t) {
+  if (t < 2.0 || t > 12.4) return;
+  const inU = expoOut(seg(t, 2.0, 2.5)), outU = expoIn(seg(t, 12.0, 12.35)), y0 = 940, dy = (1 - inU) * 120 + outU * 120;
+  const c = clipRect(440, y0, 1040, 100);
+  out.push(`<g ${c}><g transform="translate(0 ${f1(dy)})">`);
+  RR(460, y0, 1000, 100, 18, PILL); RR(486, y0 + 24, 52, 52, 12, "#3F3F46");
+  const idx = t < 4.0 ? 0 : t < 6.0 ? 1 : 2, prev = idx - 1, sw = idx ? [4.0, 6.0][idx - 1] : 2.0;
+  const band = (yy, h, draw, tOut, tIn, i) => { const cb = clipRect(550, yy, 760, h); out.push(`<g ${cb}>`); draw(i, tOut, tIn); out.push("</g>"); };
+  const textFor = (i, off) => { const [ti, ic, de] = PILLS[i]; T(560, y0 + 44 + off, ti, 24, WHITE, 700); T(560, y0 + 76 + off * 1.25, de, 16, "#A3A3A3", 500); };
+  [idx, prev].forEach((i, n) => {
+    if (i < 0) return;
+    const off = n === 0 ? (1 - expoOut(seg(t, sw + (idx ? 0.22 : 0.15), sw + (idx ? 0.52 : 0.55)))) * 56 : -expoIn(seg(t, sw, sw + 0.22)) * 56;
+    if (n === 1 && seg(t, sw, sw + 0.22) >= 1) return;
+    if (n === 0 && idx > 0 && t < sw + 0.22) return;
+    const cb = clipRect(550, y0 + 14, 760, 76); out.push(`<g ${cb}>`); textFor(i, off); out.push("</g>");
+  });
+  const icn = PILLS[idx][1]; IC(icn, 499, y0 + 37, 26, WHITE, 1.8);
+  RR(1318, y0 + 26, 118, 48, 10, WHITE); T(1377, y0 + 56, "Learn more", 15, INK, 600, 'text-anchor="middle"');
+  out.push("</g></g>");
+}
+
+/* ======================= the payoff: flood, dot, ring, logo, line, button ======================= */
+const LS = 11, LOGO0 = [FX - 23 * LS, 430 - 12 * LS], BOWL = [LOGO0[0] + 7 * LS, LOGO0[1] + 14 * LS];
+function endCard(t, cam) {
+  // the key button grows past all four corners
+  if (t < 12.9) {
+    const b = dotState(Math.min(t, 12.4)), a = proj(cam, b.x - b.w / 2, b.y - b.h / 2), z = proj(cam, b.x + b.w / 2, b.y + b.h / 2);
+    const u = expoInOut(seg(t, 12.5, 12.8));
+    if (u > 0) {
+      const x0 = lerp(a[0], -300, u), y0 = lerp(a[1], -300, u), x1 = lerp(z[0], 2220, u), y1 = lerp(z[1], 1380, u);
+      RR(x0, y0, x1 - x0, y1 - y0, lerp(8 * cam.z, 0, u), ACC);
+    }
+    return;
+  }
+  const push = 1 + 0.04 * seg(t, 13.0, 15.0);
+  out.push(`<g transform="translate(${FX} 540) scale(${push.toFixed(5)}) translate(${-FX} -540)">`);
+  // the flood contracts into the dot at the bowl of the d
+  const k = expoInOut(seg(t, 12.9, 13.3)), R = lerp(1500, 15, k);
+  if (t < 13.3 + 0.001 || k < 1) CI(BOWL[0], BOWL[1], R, ACC);
+  // the dot opens into the ring, the logo follows it out
+  const ru = expoOut(seg(t, 13.3, 13.75)), outer = lerp(15, 7 * LS, ru), inner = 4 * LS * ru;
+  if (t >= 13.3) {
+    // the wordmark wipes out from behind the ring; the ring sits on top and turns from teal to black
+    const rev = lerp(7 * LS, 46 * LS, expoInOut(seg(t, 13.65, 14.1)));
+    if (t >= 13.65) { const c = clipRect(LOGO0[0], LOGO0[1] - 10, rev, 24 * LS + 20); out.push(`<g ${c}>`); logoMark(LOGO0[0], LOGO0[1], LS, INK); out.push("</g>"); }
+    const col = mixc(ACC, INK, expoInOut(seg(t, 13.7, 14.1)));
+    out.push(`<path d="M${f1(BOWL[0] - outer)} ${f1(BOWL[1])} a${f1(outer)} ${f1(outer)} 0 1 0 ${f1(outer * 2)} 0 a${f1(outer)} ${f1(outer)} 0 1 0 ${f1(-outer * 2)} 0 Z M${f1(BOWL[0] - inner)} ${f1(BOWL[1])} a${f1(inner)} ${f1(inner)} 0 1 1 ${f1(inner * 2)} 0 a${f1(inner)} ${f1(inner)} 0 1 1 ${f1(-inner * 2)} 0 Z" fill="${css(col)}" fill-rule="evenodd"/>`);
+  }
+  // the line: the key word takes the accent
+  const words = ["Turn", "clicks", "into", "revenue."], sz = 64; let x = 0; const ws = words.map((s) => { const w = tw(s, sz, 500); const r = x; x += w + tw(" ", sz, 500); return [s, r, w]; });
+  const total = x - tw(" ", sz, 500), left = FX - total / 2;
+  ws.forEach(([s, r, w], i) => {
+    const t0 = 14.0 + i * 0.1, rise = (1 - expoOut(seg(t, t0, t0 + 0.4))) * 84, c = clipRect(left + r - 10, 640 - 58, w + 20, 80);
+    if (seg(t, t0, t0 + 0.4) <= 0) return;
+    out.push(`<g ${c}>`); T(left + r, 640 + rise, s, sz, i === 3 ? ACC : INK, 500, blur(0, ((1 - expoOut(seg(t, t0, t0 + 0.4))) - (1 - expoOut(seg(t - DT, t0, t0 + 0.4)))) * 84 * 0.5)); out.push("</g>");
+  });
+  // the call to action
+  const pu = spring(t, 14.5, 16), pw = 244 * pu;
+  if (pu > 0.01) { RR(FX - pw / 2, 724, pw, 64, 14, INK); const c = clipRect(FX - pw / 2, 724, pw, 64); out.push(`<g ${c}>`); T(FX, 764, "Start for free", 20, WHITE, 600, 'text-anchor="middle"'); out.push("</g>"); }
+  out.push("</g>");
+}
+
+/* ======================= the frame ======================= */
+function seek(t) {
+  t = clamp(t, 0, 15);
+  out = []; defs = []; FIL = new Map(); clipN = 0;
+  RR(0, 0, W, H, 0, BG);
+  const cam = camAt(t);
+  if (t < 12.8) {
+    const c0 = camAt(t - DT), bx = Math.abs(cam.x - c0.x) * cam.z * 0.3 + Math.abs(Math.log(cam.z / c0.z)) * 300 * 0.5, by = Math.abs(cam.y - c0.y) * cam.z * 0.3 + Math.abs(Math.log(cam.z / c0.z)) * 180 * 0.5;
+    out.push(`<g ${camBlur(bx, by)}><g transform="translate(${FX} ${FY}) scale(${cam.z.toFixed(5)}) translate(${f1(-cam.x)} ${f1(-cam.y)})">`);
+    hook(t);
+    // pages: each opens from the dot in a circular reveal, on top of the one before
+    const iris = (cx, cy, t0, t1) => clipCircle(cx, cy, expoOut(seg(t, t0, t1)) * 1900);
+    if (t >= 2.0 && t < 4.7) { const o = expoOut(seg(t, 2.0, 2.6)); out.push(`<g ${clipCircle(F0[0], F0[1], o * 1500)}>`); modal(t); out.push("</g>"); }
+    if (t >= 4.0 && t < 6.7) { out.push(`<g ${iris(KNOB.on[0], KNOB.on[1], 4.0, 4.6)}>`); analytics(t); out.push("</g>"); }
+    if (t >= 6.0 && t < 8.7) { out.push(`<g ${iris(LEG[0], LEG[1], 6.0, 6.6)}>`); overview(t); out.push("</g>"); }
+    if (t >= 8.0) { out.push(`<g ${iris(BADGE[0], BADGE[1], 8.0, 8.6)}>`); payouts(t); out.push("</g>"); }
+    drawDot(t, cam);
+    out.push("</g></g>");
+    drawPill(t);
+    drawCursor(t, cam);
+  }
+  if (t >= 12.5) endCard(t, cam);
+  svg.innerHTML = `<defs>${[...FIL.values()].join("")}${defs.join("")}</defs>${out.join("")}`;
+}
+
+window.seek = seek;
+window.ready = (async () => {
+  await document.fonts.load('500 100px "Satoshi"'); await document.fonts.load('700 100px "Satoshi"'); await document.fonts.load('600 100px "Satoshi"'); await document.fonts.ready;
+  MC = document.createElement("canvas").getContext("2d");
+  layoutHook();
+  seek(0);
+})();
+})();
+</script>
+</body>
+</html>
