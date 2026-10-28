@@ -1,0 +1,579 @@
+<!doctype html>
+<!--
+  MSG Horizons, 15 s product film: "The live dot".
+  The through-line object is the blue dot the site already uses for "Operating now" and for the driver's live
+  location. It lands as the full stop of the hook, becomes the price slider's knob, the plan builder's step, the
+  driver's Approve button, the driver's live location, the Riyadh hub, and finally the arrow of the MSG mark.
+
+  The interface is rebuilt from msg-horizons.com (the preview build of the new brand) as vector layers; nothing is a
+  screenshot. Prices come from the site's own rate card (src/content/redsea.ts, src/components/hero/QuoteCard.tsx),
+  figures from src/content/facts.ts. 120 BPM, a beat every 0.5 s. Every pixel is computed from time inside
+  window.seek(t): no CSS animation, no timers, no state carried between frames. One typeface (Funnel Sans), one accent
+  (#009DF8) used only on the dot and the key word.
+-->
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face { font-family: "Funnel"; src: url("FunnelSans-Variable.woff2") format("woff2"); font-weight: 300 800; font-display: block; }
+  html, body { margin: 0; background: #142240; }
+  #stage { width: 1920px; height: 1080px; overflow: hidden; display: block; background: #142240; }
+  text { font-family: "Funnel"; }
+</style>
+</head>
+<body>
+<svg id="stage" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080"></svg>
+<script src="ksa.js"></script>
+<script src="lockup.js"></script>
+<script src="audio.js"></script>
+<script>
+(() => {
+const PITCH = "#142240", NAVY = "#1C2C51", INK = "#111A33", MUTED = "#556079", FAINT = "#8A93A6", LINE = "#E2E5EC", CARD = "#F4F6FA", SOFT = "#E7ECF4", WHITE = "#FFFFFF", SILVER = "#C5CCD8", ACC = "#009DF8";
+const W = 1920, H = 1080, FX = 960, FY = 470, DT = 1 / 180;
+const svg = document.getElementById("stage");
+
+/* ---------- time: every easing is a function of time ---------- */
+const clamp = (v, a = 0, b = 1) => (v < a ? a : v > b ? b : v);
+const lerp = (a, b, u) => a + (b - a) * u;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const expoOut = (u) => (u >= 1 ? 1 : 1 - Math.pow(2, -10 * u));
+const expoIn = (u) => (u <= 0 ? 0 : Math.pow(2, 10 * (u - 1)) - 0.001 * (1 - u));
+const expoInOut = (u) => (u <= 0 ? 0 : u >= 1 ? 1 : u < 0.5 ? Math.pow(2, 20 * u - 10) / 2 : (2 - Math.pow(2, -20 * u + 10)) / 2);
+/** a critically damped spring (no overshoot) */
+const spring = (t, t0, w = 18) => { const x = Math.max(0, t - t0); return 1 - (1 + w * x) * Math.exp(-w * x); };
+/** a lightly under-damped spring: zeta 0.72 overshoots by about 4%, the most the brief allows */
+const springO = (t, t0, w = 22, z = 0.72) => { const x = Math.max(0, t - t0); if (!x) return 0; const wd = w * Math.sqrt(1 - z * z); return 1 - Math.exp(-z * w * x) * (Math.cos(wd * x) + (z / Math.sqrt(1 - z * z)) * Math.sin(wd * x)); };
+const hash = (n) => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const lp2 = (a, b, u) => [lerp(a[0], b[0], u), lerp(a[1], b[1], u)];
+const lpa = (A, B, u) => A.map((p, i) => lp2(p, B[i], u));
+const bump = (t, t0, d) => (t < t0 || t > t0 + d ? 0 : Math.sin(((t - t0) / d) * Math.PI));
+const RGB = {};
+const rgb = (h) => RGB[h] || (RGB[h] = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16)));
+const mixc = (a, b, u) => { const A = typeof a === "string" ? rgb(a) : a, B = typeof b === "string" ? rgb(b) : b; return [lerp(A[0], B[0], u), lerp(A[1], B[1], u), lerp(A[2], B[2], u)]; };
+const css = (c) => (typeof c === "string" ? c : `rgb(${Math.round(c[0])},${Math.round(c[1])},${Math.round(c[2])})`);
+
+/* ---------- drawing: the frame is one SVG string ---------- */
+let out = [], defs = [], FIL = new Map(), clipN = 0;
+const f1 = (v) => (Math.round(v * 10) / 10).toString();
+const E = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+const T = (x, y, s, size, fill = INK, weight = 500, extra = "") => { if (s === "") return; out.push(`<text x="${f1(x)}" y="${f1(y)}" font-size="${size}" font-weight="${weight}" fill="${css(fill)}" ${extra}>${E(s)}</text>`); };
+const RR = (x, y, w, h, r, fill, stroke, sw = 1, extra = "") => { if (w <= 0 || h <= 0) return; out.push(`<rect x="${f1(x)}" y="${f1(y)}" width="${f1(w)}" height="${f1(h)}" rx="${f1(Math.min(r, w / 2, h / 2))}" fill="${fill ? css(fill) : "none"}" ${stroke ? `stroke="${css(stroke)}" stroke-width="${sw}"` : ""} ${extra}/>`); };
+const CI = (x, y, r, fill, extra = "") => { if (r > 0) out.push(`<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(r)}" fill="${fill ? css(fill) : "none"}" ${extra}/>`); };
+const LN = (x1, y1, x2, y2, stroke = LINE, sw = 1, extra = "") => out.push(`<line x1="${f1(x1)}" y1="${f1(y1)}" x2="${f1(x2)}" y2="${f1(y2)}" stroke="${css(stroke)}" stroke-width="${sw}" stroke-linecap="round" ${extra}/>`);
+const PL = (p, stroke, sw, extra = "") => p.length > 1 && out.push(`<polyline points="${p.map((q) => f1(q[0]) + "," + f1(q[1])).join(" ")}" fill="none" stroke="${css(stroke)}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" ${extra}/>`);
+const PG = (p, fill, extra = "") => out.push(`<polygon points="${p.map((q) => f1(q[0]) + "," + f1(q[1])).join(" ")}" fill="${css(fill)}" ${extra}/>`);
+const clipRect = (x, y, w, h) => { const id = "c" + clipN++; defs.push(`<clipPath id="${id}"><rect x="${f1(x)}" y="${f1(y)}" width="${f1(Math.max(0, w))}" height="${f1(Math.max(0, h))}"/></clipPath>`); return `clip-path="url(#${id})"`; };
+const clipCircle = (x, y, r) => { const id = "c" + clipN++; defs.push(`<clipPath id="${id}"><circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(Math.max(0, r))}"/></clipPath>`); return `clip-path="url(#${id})"`; };
+const blur = (sx, sy) => {
+  sx = Math.min(24, Math.abs(sx)); sy = Math.min(24, Math.abs(sy));
+  if (sx < 0.5 && sy < 0.5) return "";
+  const qx = Math.round(sx * 2) / 2, qy = Math.round(sy * 2) / 2, id = `b${qx * 2}_${qy * 2}`;
+  if (!FIL.has(id)) FIL.set(id, `<filter id="${id}" x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="${qx} ${qy}"/></filter>`);
+  return `filter="url(#${id})"`;
+};
+const camBlur = (sx, sy) => {
+  sx = Math.min(16, Math.abs(sx)); sy = Math.min(16, Math.abs(sy));
+  if (sx < 0.5 && sy < 0.5) return "";
+  const qx = Math.round(sx * 2) / 2, qy = Math.round(sy * 2) / 2, id = `k${qx * 2}_${qy * 2}`;
+  if (!FIL.has(id)) FIL.set(id, `<filter id="${id}" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="${qx} ${qy}"/></filter>`);
+  return `filter="url(#${id})"`;
+};
+
+/* ---------- icons (24-grid, stroked) ---------- */
+const ICONS = {
+  whatsapp: '<path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21"/><path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1a5 5 0 0 0 5 5h1a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1"/>',
+  check: '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+  box: '<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>',
+  user: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  rocket: '<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>',
+  cart: '<circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>',
+  building: '<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/>',
+  truck: '<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>',
+  pin: '<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
+  bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  stack: '<path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
+  arrowR: '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+  arrowL: '<path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>',
+  door: '<path d="M18 20V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14"/><path d="M2 20h20"/><path d="M14 12v.01"/>',
+};
+const IC = (name, x, y, size, color = MUTED, sw = 1.9, extra = "") => out.push(`<g transform="translate(${f1(x)} ${f1(y)}) scale(${(size / 24).toFixed(4)})" fill="none" stroke="${css(color)}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" ${extra}>${ICONS[name]}</g>`);
+
+/* ---------- the MSG mark (from the brand vector, centred on its hexagon) ---------- */
+const PA = [[4.69, -0.01], [-18.46, -31.6], [-36.67, 0.06], [-18.36, 31.66]];
+const CHEV = [[-7.34, -31.63], [18.36, -31.66], [36.67, -0.06], [18.46, 31.59], [-7.23, 31.63], [36.67, -0.06]];
+const place = (shape, s, x, y) => shape.map((p) => [x + p[0] * s, y + p[1] * s]);
+const miniMark = (x, y, s, fill = WHITE, chev = ACC) => { PG(place(PA, s, x, y), fill); PG(place(CHEV, s, x, y), chev); };
+
+/* ---------- measuring: type is measured at runtime ---------- */
+let MC = null;
+const tw = (s, size, weight = 500, track = 0) => { MC.font = `${weight} ${size}px Funnel`; return MC.measureText(s).width + track * Math.max(0, s.length - 1); };
+const fm = (v) => Math.round(v).toLocaleString("en-US");
+
+/* ======================= the rate card: MSG's own, as the site computes it ======================= */
+const RATE = { intra: { walkin: 33, t299: 21 }, inter: { walkin: 52, t299: 30 } }, TIER_FROM = 299;
+const QMIN = 20, QMAX = 3000;
+const toSlider = (n) => (Math.log(n / QMIN) / Math.log(QMAX / QMIN)) * 1000;
+const toOrders = (v) => Math.round((QMIN * Math.pow(QMAX / QMIN, v / 1000)) / 10) * 10 || QMIN;
+const rateFor = (lane, n) => (n >= TIER_FROM ? RATE[lane].t299 : RATE[lane].walkin);
+
+/* ======================= the camera: one, always moving ======================= */
+const KD = Math.log(1.04) / 2; // a 4% push every scene (2 s), continuous, so each scene starts where the last ended
+const CK = [
+  [0, 960, 470, 1.0, 0],
+  [2.3, 840, 470, 2.0, 0.55],   // onto the slider and the price it sets
+  [3.55, 960, 455, 1.45, 0.45], // the whole price card, for the lane
+  [4.6, 960, 500, 1.22, 0.6],   // the plan builder
+  [5.2, 700, 470, 1.75, 0.5],   // onto the step and the choices
+  [6.6, 700, 500, 1.55, 0.6],   // the driver's phone
+  [7.45, 1160, 480, 1.7, 0.45], // the tracker
+  [8.6, 1130, 480, 2.05, 0.6],  // following the driver
+  [9.7, 1270, 430, 2.3, 0.6],
+  [11.0, 1050, 430, 0.95, 1.0], // out to the Kingdom
+  [12.0, 1040, 440, 1.06, 0.5], // a push on the biggest beat
+].map(([t, x, y, z, d]) => ({ t, x, y, d, zl: Math.log(z / Math.exp(KD * t)) }));
+function camAt(t) {
+  let a = CK[0];
+  for (let i = 1; i < CK.length; i++) {
+    const b = CK[i];
+    if (t >= b.t) { a = b; continue; }
+    const u = expoInOut(seg(t, b.t - b.d, b.t));
+    return { x: lerp(a.x, b.x, u), y: lerp(a.y, b.y, u), z: Math.exp(lerp(a.zl, b.zl, u) + KD * t) };
+  }
+  return { x: a.x, y: a.y, z: Math.exp(a.zl + KD * t) };
+}
+const proj = (c, x, y) => [FX + (x - c.x) * c.z, FY + (y - c.y) * c.z];
+const camT = (c) => `translate(${FX} ${FY}) scale(${c.z.toFixed(5)}) translate(${f1(-c.x)} ${f1(-c.y)})`;
+
+/* ======================= scene 1 (0-2 s): the hook ======================= */
+const HFS = 168, HTR = -0.03 * HFS, HLH = 0.98 * HFS;
+const HK = {};
+function layoutHook() {
+  MC.font = `600 ${HFS}px Funnel`;
+  const cap = MC.measureText("H").actualBoundingBoxAscent, sp = MC.measureText(" ").width + HTR;
+  const word = (s, x0) => ({ s, x0, xs: [...s].map((_, i) => x0 + MC.measureText(s.slice(0, i)).width + HTR * i), w: MC.measureText(s).width + HTR * (s.length - 1) });
+  const a = word("You", 0), b = word("have", a.w + sp), c = word("something", 0), d = word("to", c.w + sp), e = word("sell", d.x0 + d.w + sp);
+  const bw = e.x0 + e.w + 0.05 * HFS + 32, left = FX - bw / 2;
+  const yb1 = FY + (cap - HLH) / 2 - 10, yb2 = yb1 + HLH;
+  [a, b, c, d, e].forEach((w) => { w.xs = w.xs.map((x) => x + left); w.x0 += left; });
+  Object.assign(HK, { cap, left, yb1, yb2, words: [[a, yb1, 0.0], [b, yb1, 0.08], [c, yb2, 0.5], [d, yb2, 1.0], [e, yb2, 1.08]], dot: [e.x0 + e.w + 0.05 * HFS + 16, yb2 - 16] });
+}
+function hook(t) {
+  if (t >= 2.05) return;
+  HK.words.forEach(([w, yb, t0], wi) => {
+    const clip = clipRect(w.x0 - 30, yb - HK.cap * 1.25, w.w + 60, HK.cap * 1.25 + 0.26 * HFS);
+    out.push(`<g ${clip}>`);
+    [...w.s].forEach((ch, i) => {
+      const f = (s) => (1 - expoOut(seg(s, t0 + 0.026 * i, t0 + 0.026 * i + 0.36))) * HK.cap * 1.35 + expoIn(seg(s, 1.7 + 0.018 * (i + wi * 4), 1.7 + 0.018 * (i + wi * 4) + 0.26)) * HK.cap * 1.5;
+      const y = yb + f(t);
+      if (y > yb + HK.cap * 1.34) return;
+      T(w.xs[i], y, ch, HFS, WHITE, 600, blur(0, (f(t) - f(t - DT)) * 0.5));
+    });
+    out.push("</g>");
+  });
+}
+
+/* ======================= world layout: every page, measured once ======================= */
+const QC = { x: 520, y: 290, w: 880, h: 360 };          // the price card
+const SL = { x0: 552, x1: 940, y: 512 };                 // its slider
+const knobX = (v) => SL.x0 + (v / 1000) * (SL.x1 - SL.x0);
+const V40 = toSlider(40), V300 = toSlider(300);
+const dragV = (t) => lerp(V40, V300, expoInOut(seg(t, 2.6, 3.2)));
+const PB = { x: 360, y: 230, w: 1200, h: 540 };          // the plan builder
+const NODES = [410, 560, 710, 860].map((x) => [x, 330]);
+const PH = { x: 520, y: 170, w: 340, h: 660 };           // the driver's phone
+const APPROVE = { x: 566, y: 566, w: 248, h: 46 };
+const APC = [APPROVE.x + APPROVE.w / 2, APPROVE.y + APPROVE.h / 2];
+const TR = { x: 920, y: 250, w: 480, h: 500 };           // the order tracker
+const MAP = { x: 944, y: 312, w: 432, h: 300 };
+// Olaya and Al Rawdah from the site's own coordinates (src/content/routeGeo.ts), at one scale for both axes
+const GEO = (lon, lat) => [1010 + (lon - 46.6845) * 3575, 560 - (lat - 24.6935) * 3937];
+const OLAYA = GEO(46.6845, 24.6935), RAWDAH = GEO(46.774, 24.736);
+const ROUTE = [OLAYA, [OLAYA[0], 520], [1090, 520], [1090, 472], [1192, 472], [1192, 432], [1290, 432], [1290, RAWDAH[1]], RAWDAH];
+// the Kingdom, placed so Riyadh sits exactly where the driver delivered
+const RIYM = [575.8, 387.2], MO = [RAWDAH[0] - RIYM[0], RAWDAH[1] - RIYM[1]];
+const MW = (p) => [MO[0] + p[0], MO[1] + p[1]];
+const LL = (lon, lat) => MW([(lon - 34.49) * 47.2, (32.15 - lat) * 51.9]);
+const CITIES = [[39.1728, 21.5433], [39.8579, 21.3891], [39.6111, 24.4672], [50.0888, 26.4207], [49.5876, 25.3648], [43.975, 26.326], [41.7208, 27.5114], [36.5662, 28.3838], [40.4183, 21.2854], [42.5053, 18.2164], [44.1322, 17.4917], [42.625, 17.149]].map(([a, b]) => LL(a, b));
+const RIYW = MW(RIYM), SABYAW = CITIES[11];
+const DOTS = window.KSA_DOTS.map((p, i) => ({ w: MW(p), dr: Math.hypot(p[0] - RIYM[0], p[1] - RIYM[1]), j: hash(i * 3.7) }));
+const DRMAX = Math.max(...DOTS.map((d) => d.dr));
+const OUTLINE = window.KSA_OUTLINE.map(MW);
+const bez = (a, c, b, u) => [(1 - u) * (1 - u) * a[0] + 2 * u * (1 - u) * c[0] + u * u * b[0], (1 - u) * (1 - u) * a[1] + 2 * u * (1 - u) * c[1] + u * u * b[1]];
+const ARCS = CITIES.map((c) => { const dx = c[0] - RIYW[0], dy = c[1] - RIYW[1], L = Math.hypot(dx, dy), ctl = [(RIYW[0] + c[0]) / 2 + (dy / L) * 0.18 * L, (RIYW[1] + c[1]) / 2 - (dx / L) * 0.18 * L]; return [...Array(30)].map((_, k) => bez(RIYW, ctl, c, k / 29)); });
+const lens = (p) => { const L = [0]; for (let i = 1; i < p.length; i++) L.push(L[i - 1] + Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1])); return L; };
+const polyAt = (p, u) => { const L = lens(p), d = u * L[L.length - 1]; let i = 1; while (i < p.length - 1 && L[i] < d) i++; return lp2(p[i - 1], p[i], (d - L[i - 1]) / (L[i] - L[i - 1] || 1)); };
+const polyTo = (p, u) => { const L = lens(p), d = u * L[L.length - 1], r = [p[0]]; for (let i = 1; i < p.length; i++) { if (L[i] <= d) r.push(p[i]); else { r.push(lp2(p[i - 1], p[i], (d - L[i - 1]) / (L[i] - L[i - 1]))); break; } } return r; };
+
+/* ======================= the live dot: one object, a new role in every scene ======================= */
+// world shapes, drawn under the camera; x, y is the centre
+function dotState(t) {
+  const S = (x, y, w, h, rx, extra = {}) => ({ x, y, w, h, rx, ...extra });
+  const C = (x, y, r, extra) => S(x, y, 2 * r, 2 * r, r, extra);
+  if (t < 1.5) return null;
+  const K40 = [knobX(V40), SL.y];
+  if (t < 1.8) { const s = springO(t, 1.5, 24); return C(HK.dot[0], lerp(HK.dot[1] - 360, HK.dot[1], s), 16); }
+  if (t < 2.02) { const u = expoInOut(seg(t, 1.8, 2.02)); const p = lp2(HK.dot, K40, u); return C(p[0], p[1], lerp(16, 12, u)); }
+  if (t < 4.0) return C(knobX(dragV(t)), SL.y, 12 * (1 + 0.12 * bump(t, 2.55, 0.12)), { ring: true });
+  const K300 = [knobX(V300), SL.y];
+  if (t < 4.35) { const u = expoInOut(seg(t, 4.0, 4.35)); const p = lp2(K300, NODES[0], u); return C(p[0], p[1], lerp(12, 14, u), { num: 1 }); }
+  if (t < 5.0) return C(NODES[0][0], NODES[0][1], 14, { num: 1 });
+  if (t < 6.0) { const u = expoInOut(seg(t, 5.0, 5.35)); return C(lerp(NODES[0][0], NODES[1][0], u), NODES[0][1], 14, { num: u < 0.5 ? 1 : 2 }); }
+  if (t < 6.35) { const u = expoInOut(seg(t, 6.0, 6.35)); const p = lp2(NODES[1], APC, u); return C(p[0], p[1], 14); }
+  if (t < 7.0) { const u = expoOut(seg(t, 6.35, 6.7)), w = lerp(28, APPROVE.w, u), h = lerp(28, APPROVE.h, u); return S(APC[0], APC[1], w, h, Math.min(lerp(14, 12, u), h / 2), { label: seg(t, 6.5, 6.75) }); }
+  if (t < 7.3) { const u = expoInOut(seg(t, 7.02, 7.3)), press = 1 - 0.05 * bump(t, 7.0, 0.14), w = lerp(APPROVE.w, 20, u) * press, h = lerp(APPROVE.h, 20, u) * press; return S(APC[0], APC[1], w, h, Math.min(12, h / 2), { label: 1 - seg(t, 7.0, 7.12) }); }
+  if (t < 7.6) { const u = expoInOut(seg(t, 7.3, 7.6)); const p = bez(APC, [880, 300], OLAYA, u); return C(p[0], p[1], 10, { ring: true }); }
+  if (t < 10.0) { const p = polyAt(ROUTE, expoInOut(seg(t, 7.6, 9.6))); return C(p[0], p[1], 10, { ring: true }); }
+  return C(RIYW[0], RIYW[1], lerp(10, 12, seg(t, 10.0, 10.4)), { ring: t < 10.4 });
+}
+function drawDot(t, cam) {
+  const d = dotState(t);
+  if (!d) return;
+  const q = dotState(t - DT) || d;
+  const b = blur(Math.abs(d.x - q.x) * cam.z * 0.5, Math.abs(d.y - q.y) * cam.z * 0.5);
+  out.push(`<g ${b}>`);
+  if (d.ring) CI(d.x, d.y, d.w / 2 + 3.5, WHITE);
+  RR(d.x - d.w / 2, d.y - d.h / 2, d.w, d.h, d.rx, ACC);
+  if (d.num) T(d.x, d.y + 5, String(d.num), 14, WHITE, 700, 'text-anchor="middle"');
+  if (d.label > 0) { const c = clipRect(d.x - d.w / 2, d.y - d.h / 2, d.w, d.h); out.push(`<g ${c}>`); T(d.x, d.y + 6 + (1 - expoOut(d.label)) * 30, "Approve", 16, WHITE, 600, 'text-anchor="middle"'); out.push("</g>"); }
+  out.push("</g>");
+}
+
+/* ======================= scene 2 (2-4 s): price a delivery in 10 seconds ======================= */
+const LANES = [["Same city", 556, 116], ["City to city", 676, 124], ["Sabya", 804, 132]];
+function priceCard(t) {
+  RR(QC.x, QC.y, QC.w, QC.h, 28, CARD);
+  T(552, 344, "Price a delivery in 10 seconds", 22, INK, 600);
+  // lane: the selection slides on beat 3.5
+  RR(552, 364, 388, 58, 29, SOFT);
+  const lu = expoInOut(seg(t, 3.5, 3.78)), sx = lerp(LANES[0][1], LANES[1][1], lu), swd = lerp(LANES[0][2], LANES[1][2], lu);
+  RR(sx, 368, swd, 50, 25, WHITE);
+  LANES.forEach(([s, x, w], i) => {
+    const on = i === 0 ? 1 - lu : i === 1 ? lu : 0, col = mixc(MUTED, INK, on);
+    if (i < 2) T(x + w / 2, 399, s, 15, col, on > 0.5 ? 600 : 500, 'text-anchor="middle"');
+    else { T(x + 30, 391, "Sabya", 14, col, 500); IC("arrowR", x + 76, 380, 13, col, 2); T(x + 40, 410, "cities", 14, col, 500); }
+  });
+  // orders a month: the slider is driven by the cursor, the numbers by MSG's rate card
+  const n = toOrders(dragV(t)), lane = t < 3.5 ? "intra" : "inter";
+  T(552, 478, "Orders a month", 16, MUTED, 500); T(940, 480, fm(n), 22, INK, 600, 'text-anchor="end"');
+  RR(SL.x0, SL.y - 2.5, SL.x1 - SL.x0, 5, 2.5, "#D5DBE6"); RR(SL.x0, SL.y - 2.5, knobX(dragV(t)) - SL.x0, 5, 2.5, NAVY);
+  // the result panel
+  RR(964, 318, 408, 120, 18, NAVY);
+  T(988, 352, "Approx. per order", 13.5, SILVER, 500); T(1184, 352, "Approx. per month", 13.5, SILVER, 500);
+  const per = rateFor(lane, n), per0 = rateFor("intra", n), month = per * n;
+  // the per-order figure rolls when it changes (the tier at 299, then the lane)
+  const roll = (tc, a, b, x, y, size) => { const u = expoInOut(seg(t, tc, tc + 0.24)); const c = clipRect(x - 4, y - size, 120, size * 1.25); out.push(`<g ${c}>`); if (u < 1) T(x, y - u * size * 1.2, String(a), size, WHITE, 600); if (u > 0) T(x, y + (1 - u) * size * 1.2, String(b), size, WHITE, 600); out.push("</g>"); };
+  T(988, 414, "≈ SAR", 15, WHITE, 500);
+  const tTier = 3.11; // the drag reaches 300 orders here
+  if (t < 3.5) roll(tTier, 33, per0, 1036, 418, 42); else roll(3.5, 21, 30, 1036, 418, 42);
+  T(1184, 412, "SAR", 15, SILVER, 500); T(1220, 412, fm(month), 28, WHITE, 600);
+  RR(964, 452, 408, 56, 14, NAVY); IC("whatsapp", 1048, 468, 22, WHITE, 1.8); T(1078, 487, "Get this quote on WhatsApp", 16, WHITE, 600);
+  T(552, 596, "1 kg, next-day, from MSG's rate card at your volume. Cash on delivery and returns are quoted with your plan.", 13, MUTED, 500);
+}
+
+/* ======================= scene 3 (4-6 s): the plan builder ======================= */
+const STEP1 = [["Individual seller", ["Selling from home, social media", "or a marketplace"], "user"], ["New startup", ["Launching or just launched", "online"], "rocket"], ["Growing e-commerce brand", ["Orders every day, customers", "across the Kingdom"], "cart"], ["Enterprise or retailer", ["Multi-site operations and", "complex supply chains"], "building"]];
+const STEP2 = [["Orders to customers", ["E-commerce parcels to", "the doorstep"], "box"], ["Shipments between sites", ["Stores, branches and", "cities"], "truck"], ["Heavy or bulk loads", ["Door-to-door road", "freight"], "stack"], ["Stock that needs a home", ["Warehousing and", "inventory"], "door"]];
+function optionGrid(list, x0, y0, sel, t) {
+  list.forEach(([ti, d, ic], i) => {
+    const x = x0 + (i % 2) * 276, y = y0 + Math.floor(i / 2) * 102, on = i === sel.i ? expoOut(seg(t, sel.t, sel.t + 0.22)) : 0;
+    RR(x, y, 262, 90, 14, on > 0 ? mixc(WHITE, "#EEF2F8", on) : WHITE, mixc(LINE, NAVY, on), 1 + on);
+    IC(ic, x + 16, y + 18, 20, mixc(MUTED, NAVY, on), 1.8); T(x + 46, y + 33, ti, 14.5, INK, 600);
+    T(x + 16, y + 60, d[0], 12, MUTED, 500); T(x + 16, y + 76, d[1], 12, MUTED, 500);
+    if (on > 0) { CI(x + 240, y + 24, 9 * on, NAVY); out.push(`<path d="M${x + 236} ${y + 24} l3 3 l5 -6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${on.toFixed(2)}"/>`); }
+  });
+}
+function planBuilder(t) {
+  RR(PB.x, PB.y, PB.w, PB.h, 20, WHITE);
+  // the console bar
+  out.push(`<path d="M${PB.x} ${PB.y + 44} V${PB.y + 20} a20 20 0 0 1 20 -20 H${PB.x + PB.w - 20} a20 20 0 0 1 20 20 V${PB.y + 44} Z" fill="${NAVY}"/>`);
+  [0, 1, 2].forEach((i) => CI(PB.x + 24 + i * 16, PB.y + 22, 5, "#3A4A73"));
+  T(PB.x + 84, PB.y + 27, "MSG Control · Plan builder", 13, SILVER, 500);
+  RR(PB.x + PB.w - 196, PB.y + 11, 86, 22, 11, "#2A3B66"); T(PB.x + PB.w - 153, PB.y + 26.5, "Draft plan", 11.5, WHITE, 500, 'text-anchor="middle"');
+  T(PB.x + PB.w - 24, PB.y + 27, "Riyadh", 12.5, SILVER, 500, 'text-anchor="end"');
+  // the stepper: the active node is the dot
+  const adv = expoInOut(seg(t, 5.0, 5.35));
+  LN(NODES[0][0], 330, NODES[3][0], 330, LINE, 2); LN(NODES[0][0], 330, lerp(NODES[0][0], NODES[1][0], adv), 330, NAVY, 2);
+  ["You", "Cargo", "Volume", "Priorities"].forEach((s, i) => {
+    const done = i === 0 && adv > 0.5;
+    if (done) { CI(NODES[i][0], 330, 14, NAVY); out.push(`<path d="M${NODES[i][0] - 5} 330 l3.5 3.5 l6 -7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`); }
+    else { CI(NODES[i][0], 330, 13, WHITE, `stroke="${LINE}" stroke-width="2"`); T(NODES[i][0], 335, String(i + 1), 13, FAINT, 600, 'text-anchor="middle"'); }
+    T(NODES[i][0], 368, s, 13, i === (adv > 0.5 ? 1 : 0) ? INK : FAINT, i === (adv > 0.5 ? 1 : 0) ? 600 : 500, 'text-anchor="middle"');
+  });
+  const stepN = adv > 0.5 ? 2 : 1;
+  T(940, 335, `Step ${stepN} of 4`, 12.5, FAINT, 500, 'text-anchor="end"');
+  // the question: outgoing slides out left before the next one slides in from the right
+  const outU = expoIn(seg(t, 5.0, 5.22)), inU = expoOut(seg(t, 5.24, 5.56));
+  const pane = clipRect(380, 386, 580, 370);
+  out.push(`<g ${pane}>`);
+  if (outU < 1) { out.push(`<g transform="translate(${f1(-outU * 600)} 0)">`); T(400, 428, "Who are you?", 28, INK, 600); T(400, 456, "Pick the one that fits best.", 15, MUTED, 500); optionGrid(STEP1, 400, 480, { i: 2, t: 4.55 }, t); out.push("</g>"); }
+  if (inU > 0) { out.push(`<g transform="translate(${f1((1 - inU) * 600)} 0)">`); T(400, 428, "What are you moving?", 28, INK, 600); T(400, 456, "Choose everything that applies.", 15, MUTED, 500); optionGrid(STEP2, 400, 480, { i: 0, t: 5.55 }, t); out.push("</g>"); }
+  out.push("</g>");
+  // the route: MSG's own modes
+  LN(960, 290, 960, 750, LINE, 1);
+  T(984, 316, "YOUR ROUTE", 11.5, FAINT, 600, 'letter-spacing="1.6"');
+  [["Door to door", 984, 120], ["One-point drop", 1112, 132], ["Drop at MSG", 1252, 116], ["End to end", 1376, 104]].forEach(([s, x, w], i) => { RR(x, 330, w, 34, 17, i === 0 ? NAVY : WHITE, i === 0 ? null : LINE); T(x + w / 2, 352, s, 12.5, i === 0 ? WHITE : INK, 500, 'text-anchor="middle"'); });
+  T(984, 396, "MSG courier collects from you in Riyadh", 14, INK, 500);
+  // city view
+  RR(984, 416, 556, 330, 14, NAVY);
+  T(1004, 442, "CITY VIEW · RIYADH", 11, SILVER, 600, 'letter-spacing="1.6"');
+  for (let i = 0; i < 9; i++) LN(1000 + i * 64, 456, 1030 + i * 58, 736, "#2C3D68", 1.4);
+  for (let j = 0; j < 5; j++) LN(990, 470 + j * 62, 1534, 488 + j * 58, "#2C3D68", 1.4);
+  PL([[1060, 690], [1060, 600], [1190, 600], [1190, 520], [1380, 520], [1380, 470]], "#5D6E99", 2.5);
+  CI(1060, 690, 6, WHITE); CI(1380, 470, 6, WHITE);
+}
+
+/* ======================= scene 4 (6-10 s): live from the moment your driver says yes ======================= */
+const wrap = (s, n) => { const w = s.split(" "), l = []; let c = ""; for (const x of w) { if ((c + " " + x).trim().length > n) { l.push(c.trim()); c = x; } else c += " " + x; } l.push(c.trim()); return l; };
+function phone(t) {
+  RR(PH.x, PH.y, PH.w, PH.h, 50, "#0B1326", "#2A3B66", 2);
+  RR(PH.x + 10, PH.y + 10, PH.w - 20, PH.h - 20, 41, WHITE);
+  RR(PH.x + 130, PH.y + 22, 80, 22, 11, "#0B1326");
+  miniMark(568, 246, 0.36, NAVY, NAVY);
+  T(588, 251, "MSG Driver", 16, INK, 600);
+  RR(766, 234, 70, 26, 13, "#EEF2F8"); CI(780, 247, 4, NAVY); T(790, 252, "Online", 12.5, INK, 500);
+  const live = expoOut(seg(t, 7.08, 7.4));
+  RR(548, 280, 284, 344, 20, CARD);
+  // the request, until the driver approves
+  if (live < 1) {
+    const c = clipRect(548, 280, 284, 344); out.push(`<g ${c}><g transform="translate(0 ${f1(-live * 360)})">`);
+    CI(584, 322, 18, "#E4EAF4"); IC("bell", 574, 312, 20, NAVY, 1.8);
+    T(612, 318, "New delivery", 17, INK, 600); T(612, 339, "request", 17, INK, 600);
+    CI(572, 382, 6, WHITE, `stroke="${NAVY}" stroke-width="2.5"`); LN(572, 390, 572, 432, LINE, 2); RR(566, 434, 12, 12, 3, NAVY);
+    T(590, 378, "Pickup", 12, MUTED, 500); T(590, 398, "Olaya", 16, INK, 600);
+    T(590, 434, "Drop-off", 12, MUTED, 500); T(590, 454, "Al Rawdah", 16, INK, 600);
+    wrap("Approve to share your live location with the sender for this delivery. Nothing is shared until you do.", 38).forEach((l, i) => T(566, 492 + i * 18, l, 12.5, MUTED, 500));
+    if (t < 6.35) RR(APPROVE.x, APPROVE.y, APPROVE.w, APPROVE.h, 12, "#E4EAF4");
+    out.push("</g></g>");
+  }
+  if (live > 0) {
+    const c = clipRect(548, 280, 284, 344); out.push(`<g ${c}><g transform="translate(0 ${f1((1 - live) * 360)})">`);
+    CI(584, 322, 18, NAVY); IC("pin", 574, 312, 20, WHITE, 1.9);
+    T(612, 318, "Live location", 17, INK, 600); T(612, 339, "is on", 17, INK, 600);
+    wrap("Sharing with the sender and their customer", 34).forEach((l, i) => T(566, 382 + i * 19, l, 13.5, MUTED, 500));
+    T(566, 446, "Seeing your live location", 12, FAINT, 500);
+    ["The sender", "Their customer"].forEach((s, i) => { RR(566, 460 + i * 48, 248, 40, 10, WHITE, LINE); IC("user", 578, 470 + i * 48, 18, NAVY, 1.8); T(606, 485 + i * 48, s, 14, INK, 500); });
+    out.push("</g></g>");
+  }
+  RR(PH.x + 120, PH.y + PH.h - 26, 100, 5, 2.5, "#D5DBE6");
+}
+function tracker(t) {
+  RR(TR.x, TR.y, TR.w, TR.h, 24, WHITE);
+  T(944, 290, "Order tracking", 17, INK, 600);
+  const live = expoOut(seg(t, 7.3, 7.55));
+  const chipW = lerp(140, 64, live);
+  RR(TR.x + TR.w - 24 - chipW, 272, chipW, 28, 14, mixc("#EEF2F8", NAVY, live));
+  const c = clipRect(TR.x + TR.w - 24 - chipW, 272, chipW, 28); out.push(`<g ${c}>`);
+  if (live < 1) T(TR.x + TR.w - 24 - chipW / 2, 291 - live * 26, "Waiting for driver", 12.5, INK, 500, 'text-anchor="middle"');
+  if (live > 0) T(TR.x + TR.w - 24 - chipW / 2, 291 + (1 - live) * 26, "Live", 12.5, WHITE, 600, 'text-anchor="middle"');
+  out.push("</g>");
+  // the map: streets, the two places, the route as the driver drives it
+  RR(MAP.x, MAP.y, MAP.w, MAP.h, 16, "#EEF2F8");
+  const mc = clipRect(MAP.x, MAP.y, MAP.w, MAP.h); out.push(`<g ${mc}>`);
+  [962, 1010, 1050, 1090, 1140, 1192, 1240, 1290, 1340].forEach((x) => LN(x, MAP.y, x, MAP.y + MAP.h, WHITE, 6));
+  [340, 400, 432, 472, 520, 560, 600].forEach((y) => LN(MAP.x, y, MAP.x + MAP.w, y, WHITE, 6));
+  const p = expoInOut(seg(t, 7.6, 9.6));
+  PL(ROUTE, "#C9D2E3", 4, 'stroke-dasharray="2 9"');
+  if (t >= 7.6) PL(polyTo(ROUTE, p), NAVY, 5);
+  out.push("</g>");
+  CI(OLAYA[0], OLAYA[1], 8, WHITE, `stroke="${NAVY}" stroke-width="3"`); T(OLAYA[0] + 14, OLAYA[1] + 22, "Pickup", 12, MUTED, 500);
+  out.push(`<g transform="translate(${RAWDAH[0] - 11} ${RAWDAH[1] - 30})"><path d="M11 0a11 11 0 0 1 11 11c0 8-11 19-11 19S0 19 0 11A11 11 0 0 1 11 0z" fill="${NAVY}"/><circle cx="11" cy="11" r="4" fill="#fff"/></g>`); T(RAWDAH[0] - 106, RAWDAH[1] - 20, "Delivery", 12, MUTED, 500);
+  // waiting overlay, until the driver approves
+  if (live < 1) { const u = 1 - live; const oc = clipRect(MAP.x + 56, 418, 320 * 1, 88 * u); out.push(`<g ${oc}>`); RR(MAP.x + 56, 418, 320, 88, 14, WHITE); T(MAP.x + 216, 452, "Live location starts when the driver approves", 13.5, INK, 600, 'text-anchor="middle"'); T(MAP.x + 216, 478, "Tap Approve on the driver's phone", 12.5, MUTED, 500, 'text-anchor="middle"'); out.push("</g>"); }
+  // the driver row
+  CI(964, 650, 18, "#E4EAF4"); IC("truck", 954, 640, 20, NAVY, 1.8);
+  T(994, 646, "Your MSG driver", 15, INK, 600);
+  const sub = live > 0.5 ? "Live location from the driver's phone" : "Not sharing yet"; T(994, 666, sub, 12.5, MUTED, 500);
+  // the rail: confirmed, on the way, delivered
+  const steps = ["Order confirmed", "On the way", "Delivered"], prog = t < 7.3 ? 0 : t < 9.6 ? 1 : 2, pu = t < 9.6 ? expoOut(seg(t, 7.3, 7.6)) : expoOut(seg(t, 9.6, 9.85));
+  LN(964, 706, 1356, 706, LINE, 3); if (prog) LN(964, 706, lerp(964 + (prog - 1) * 196, 964 + prog * 196, pu), 706, NAVY, 3);
+  steps.forEach((s, i) => { const x = 964 + i * 196, on = i <= prog; CI(x, 706, 6, on ? NAVY : WHITE, on ? "" : `stroke="${LINE}" stroke-width="2"`); T(x, 732, s, 12, on ? INK : FAINT, on ? 600 : 500, i === 0 ? "" : i === 2 ? 'text-anchor="end"' : 'text-anchor="middle"'); });
+}
+
+/* ======================= scene 5 (10-12.5 s): the network ======================= */
+function network(t) {
+  const fall = (dl) => expoIn(seg(t, 12.5 + dl, 12.5 + dl + 0.3));
+  const op = 1 - expoIn(seg(t, 12.5, 12.8));
+  // the outline draws itself from Riyadh's side, then retracts
+  const od = expoInOut(seg(t, 10.4, 11.1)) * (1 - expoInOut(seg(t, 12.5, 12.85)));
+  if (od > 0) PL(OUTLINE, WHITE, 1.6, `stroke-opacity="0.35" pathLength="1" stroke-dasharray="${od.toFixed(4)} 1"`);
+  // the Kingdom's dots open out from Riyadh, and fall back into it
+  const g = [];
+  for (const d of DOTS) {
+    const t0 = 10.35 + (d.dr / DRMAX) * 0.45 + d.j * 0.05, s = expoOut(seg(t, t0, t0 + 0.3)) * (1 - fall(0.22 * (1 - d.dr / DRMAX)));
+    if (s <= 0.01) continue;
+    g.push(`<circle cx="${f1(d.w[0])}" cy="${f1(d.w[1])}" r="${f1(3.4 * s)}"/>`);
+  }
+  out.push(`<g fill="#FFFFFF" fill-opacity="0.3">${g.join("")}</g>`);
+  // cities, then the routes: all twelve fire on the biggest beat
+  CITIES.forEach((c, i) => { const s = spring(t, 11.5 + i * 0.025, 20) * (1 - fall(0.1)); if (s > 0.01) CI(c[0], c[1], 5.5 * s, WHITE); });
+  ARCS.forEach((a, i) => {
+    const p = expoOut(seg(t, 12.0 + i * 0.012, 12.38 + i * 0.012)), r = expoIn(seg(t, 12.5, 12.78));
+    if (p <= 0 || r >= 1) return;
+    const pts = polyTo(a, p), keep = pts.slice(Math.floor(r * (pts.length - 1)));
+    PL(r > 0 ? keep : pts, WHITE, 2.4, 'stroke-opacity="0.85"');
+  });
+  // Sabya centre
+  const sb = spring(t, 11.0, 18) * (1 - fall(0));
+  if (sb > 0.01) CI(SABYAW[0], SABYAW[1], 11 * sb, null, `stroke="${WHITE}" stroke-width="2.5"`);
+  const lab = (x, y, s, t0) => { const u = expoOut(seg(t, t0, t0 + 0.34)) * (1 - expoIn(seg(t, 12.5, 12.7))); if (u <= 0) return; const c = clipRect(x - 4, y - 26, 300, 34); out.push(`<g ${c}>`); T(x, y + (1 - u) * 30, s, 20, WHITE, 600); out.push("</g>"); };
+  lab(RIYW[0] + 24, RIYW[1] + 7, "Riyadh hub", 11.0); lab(SABYAW[0] + 22, SABYAW[1] + 7, "Sabya centre", 11.1);
+  // the figures, from facts.ts: they land on the biggest beat
+  [["1,000+", "couriers"], ["100+", "vehicles"], ["24/7", "operations"]].forEach(([v, l], i) => {
+    const y = 260 + i * 190, u = springO(t, 12.0 + i * 0.06, 20), x = 290;
+    if (u <= 0) return;
+    const ex = expoIn(seg(t, 12.5 + i * 0.03, 12.75 + i * 0.03));
+    const c = clipRect(x - 10, y - 110, 600, 170); out.push(`<g ${c}><g transform="translate(0 ${f1((1 - u) * 120 + ex * 170)})">`);
+    T(x, y, v, 112, WHITE, 600, 'letter-spacing="-3"'); T(x + 4, y + 44, l, 26, SILVER, 500);
+    out.push("</g></g>");
+  });
+}
+
+/* ======================= the route rail: the site's own captions ======================= */
+const CHAPTERS = [["01", "Start", "Price a delivery in ten seconds"], ["02", "Why MSG"], ["03", "Your price"], ["04", "Your plan", "Four steps to a setup that fits"], ["05", "Live network", "1,000+ couriers, 100+ vehicles"], ["06", "Fleet & hubs"], ["07", "Company profile"], ["08", "Proof"], ["09", "Enterprise"], ["10", "Talk to MSG"]];
+const RAIL = { x: 400, y: 984, w: 1120, h: 64 };
+const RIW = 34, RGAP = 30;
+const railLayout = (a) => {
+  const cardW = 60 + tw(CHAPTERS[a][0] + "  " + CHAPTERS[a][1], 16, 600) + tw(CHAPTERS[a][2] || "", 14, 500);
+  const total = cardW + (CHAPTERS.length - 1) * RIW + (CHAPTERS.length - 1) * RGAP, x0 = RAIL.x + 92 + (RAIL.w - 184 - total) / 2;
+  const xs = []; let x = x0;
+  for (let i = 0; i < CHAPTERS.length; i++) { const w = i === a ? cardW : RIW; xs.push([x, w]); x += w + RGAP; }
+  return xs;
+};
+function drawRail(t) {
+  if (t < 2.0 || t > 12.35) return;
+  const inU = expoOut(seg(t, 2.0, 2.45)), outU = expoIn(seg(t, 12.0, 12.3)), dy = (1 - inU) * 100 + outU * 100;
+  const c = clipRect(RAIL.x - 10, RAIL.y - 8, RAIL.w + 20, RAIL.h + 16);
+  out.push(`<g ${c}><g transform="translate(0 ${f1(dy)})">`);
+  RR(RAIL.x, RAIL.y, RAIL.w, RAIL.h, 32, "#F8F9FB");
+  CI(RAIL.x + 32, RAIL.y + 32, 22, null); IC("arrowL", RAIL.x + 22, RAIL.y + 22, 20, FAINT, 2);
+  CI(RAIL.x + RAIL.w - 32, RAIL.y + 32, 24, NAVY); IC("arrowR", RAIL.x + RAIL.w - 42, RAIL.y + 22, 20, WHITE, 2);
+  const a = t < 4.0 ? 0 : t < 6.0 ? 3 : 4, prev = t < 4.0 ? 0 : t < 6.0 ? 0 : 3, tc = t < 4.0 ? 0 : t < 6.0 ? 4.0 : 6.0;
+  const u = tc ? expoInOut(seg(t, tc, tc + 0.45)) : 1;
+  const A = railLayout(a), P = railLayout(prev), cy = RAIL.y + 32;
+  const X = CHAPTERS.map((_, i) => [lerp(P[i][0], A[i][0], u), lerp(P[i][1], A[i][1], u)]);
+  for (let i = 0; i < CHAPTERS.length; i++) {
+    const [x, w] = X[i];
+    if (i) LN(X[i - 1][0] + X[i - 1][1] + 6, cy, x - 6, cy, i <= a ? NAVY : "#C9CFDB", 2);
+    if (w > RIW + 6) {
+      RR(x, cy - 22, w, 44, 22, NAVY);
+      const cc = clipRect(x, cy - 22, w, 44); out.push(`<g ${cc}>`);
+      const ch = CHAPTERS[i];
+      T(x + 18, cy + 5.5, ch[0], 15, SILVER, 600); T(x + 50, cy + 5.5, ch[1], 16, WHITE, 600);
+      if (ch[2]) T(x + 60 + tw(ch[1], 16, 600), cy + 5, ch[2], 14, SILVER, 500);
+      out.push("</g>");
+    } else { CI(x + 5, cy, 5, i <= a ? NAVY : WHITE, i <= a ? "" : `stroke="#C9CFDB" stroke-width="2"`); T(x + 15, cy + 5, CHAPTERS[i][0], 13, FAINT, 600); }
+  }
+  out.push("</g></g>");
+}
+
+/* ======================= the cursor: drives every interaction ======================= */
+const CL = [[2.3, 2.55, knobX(V40) + 4, SL.y + 4], [2.6, 3.2, knobX(V300) + 4, SL.y + 4], [3.3, 3.5, 740, 396], [3.75, 4.2, 1500, 760], [4.25, 4.55, 830, 560], [4.9, 5.55, 560, 520], [5.75, 6.2, 900, 860], [6.5, 7.0, 700, 592], [7.25, 7.7, 1500, 900]];
+const CLICKS = [2.55, 3.5, 4.55, 5.55, 7.0];
+const PRESS = [[2.55, 3.22]]; // held down for the drag
+function cursorAt(t) { let p = [1400, 760]; for (const [t0, t1, x, y] of CL) { if (t < t0) return p; if (t < t1) return lp2(p, [x, y], expoInOut(seg(t, t0, t1))); p = [x, y]; } return p; }
+function drawCursor(t, cam) {
+  if (t < 2.1 || t > 7.75) return;
+  const w = cursorAt(t), w0 = cursorAt(t - DT), s = proj(cam, w[0], w[1]), s0 = proj(cam, w0[0], w0[1]);
+  let k = 1;
+  for (const c of CLICKS) k -= 0.18 * bump(t, c - 0.04, 0.2);
+  for (const [a, b] of PRESS) if (t > a + 0.08 && t < b) k = Math.min(k, 0.88);
+  for (const c of CLICKS) { const u = seg(t, c, c + 0.4); if (u > 0 && u < 1) out.push(`<circle cx="${f1(s[0])}" cy="${f1(s[1])}" r="${f1(8 + 30 * expoOut(u))}" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-opacity="${(0.5 * (1 - u)).toFixed(2)}"/>`); }
+  const b = blur(Math.min(10, Math.abs(s[0] - s0[0]) * 0.4), Math.min(10, Math.abs(s[1] - s0[1]) * 0.4));
+  out.push(`<g ${b}><path transform="translate(${f1(s[0])} ${f1(s[1])}) scale(${(1.9 * k).toFixed(3)})" d="M0 0 L0 17 L4.4 13.2 L7.4 20 L10 18.9 L7.1 12.3 L12.6 12.3 Z" fill="${INK}" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></g>`);
+}
+
+/* ======================= the payoff: the dot becomes the arrow of the mark ======================= */
+const LSC = 3.35, LO = [FX - (268.406 * LSC) / 2, 400 - 26 * LSC]; // the lockup, centred, top at 313
+const LX = (x) => LO[0] + (x - 109) * LSC, LY = (y) => LO[1] + (y - 146.438) * LSC;
+const MARKC = [LX(138.9), LY(172.35)], MS = 0.788 * LSC;
+const CHEVS = place(CHEV, MS, MARKC[0], MARKC[1]);
+function resample(poly, N) {
+  const L = poly.map((p, i) => Math.hypot(poly[(i + 1) % poly.length][0] - p[0], poly[(i + 1) % poly.length][1] - p[1]));
+  const tot = L.reduce((a, b) => a + b, 0), r = []; let i = 0, acc = 0;
+  for (let k = 0; k < N; k++) { const d = (k / N) * tot; while (acc + L[i] < d) { acc += L[i]; i++; } r.push(lp2(poly[i], poly[(i + 1) % poly.length], (d - acc) / (L[i] || 1))); }
+  return r;
+}
+const N = 120, CHEVR = resample(CHEVS, N);
+const CHEVC = CHEVR.reduce((a, p) => [a[0] + p[0] / N, a[1] + p[1] / N], [0, 0]);
+function endCard(t) {
+  const push = 1 + 0.04 * seg(t, 12.6, 15.0);
+  out.push(`<g transform="translate(${FX} 540) scale(${push.toFixed(5)}) translate(${-FX} -540)">`);
+  // flight from the Riyadh hub, then the circle becomes the arrow
+  const c0 = camAt(12.5), start = proj(c0, RIYW[0], RIYW[1]), r0 = 12 * c0.z;
+  const fu = expoInOut(seg(t, 12.5, 12.95)), mu = expoInOut(seg(t, 12.8, 13.15));
+  const ctr = lp2(start, CHEVC, fu);
+  const a0 = Math.atan2(CHEVR[0][1] - CHEVC[1], CHEVR[0][0] - CHEVC[0]);
+  const circ = CHEVR.map((_, k) => [ctr[0] + r0 * Math.cos(a0 + (2 * Math.PI * k) / N), ctr[1] + r0 * Math.sin(a0 + (2 * Math.PI * k) / N)]);
+  const shape = lpa(circ, CHEVR.map((p) => [p[0] - CHEVC[0] + ctr[0], p[1] - CHEVC[1] + ctr[1]]), mu);
+  const prevC = lp2(start, CHEVC, expoInOut(seg(t - DT, 12.5, 12.95)));
+  if (t < 13.15) PG(shape, ACC, blur((ctr[0] - prevC[0]) * 0.5, (ctr[1] - prevC[1]) * 0.5));
+  // the lockup unfolds out of the arrow: the diamond to its left, the name to its right
+  if (t >= 13.1) {
+    const ru = expoInOut(seg(t, 13.1, 13.55)), xl = lerp(LX(133), LO[0] - 4, ru), xr = lerp(LX(168), LO[0] + 268.406 * LSC + 4, ru);
+    const c = clipRect(xl, LO[1] - 10, xr - xl, 52 * LSC + 20);
+    out.push(`<g ${c}><g transform="translate(${f1(LO[0])} ${f1(LO[1])}) scale(${LSC}) translate(-109 -146.438)">`);
+    window.LOCKUP.forEach((d, i) => out.push(`<path d="${d}" fill="${i === 1 || i === 2 ? ACC : WHITE}"/>`));
+    out.push("</g></g>");
+  }
+  // the line: the key word takes the accent
+  const words = ["We", "already", "have", "the", "drivers."], sz = 66, sp = tw(" ", sz, 600);
+  let x = 0; const ws = words.map((s) => { const w = tw(s, sz, 600, -1.5); const r = x; x += w + sp; return [s, r, w]; });
+  const left = FX - (x - sp) / 2;
+  ws.forEach(([s, r, w], i) => {
+    const t0 = 13.55 + i * 0.07, f = (q) => (1 - expoOut(seg(q, t0, t0 + 0.4))) * 90;
+    if (seg(t, t0, t0 + 0.4) <= 0) return;
+    const c = clipRect(left + r - 10, 630 - 62, w + 24, 84); out.push(`<g ${c}>`);
+    T(left + r, 630 + f(t), s, sz, i === 4 ? ACC : WHITE, 600, `letter-spacing="-1.5" ${blur(0, (f(t) - f(t - DT)) * 0.5)}`); out.push("</g>");
+  });
+  // the call to action: the site's own button, and its address
+  const pu = spring(t, 14.05, 16), pw = 236 * pu;
+  if (pu > 0.01) { RR(FX - pw / 2, 708, pw, 62, 31, WHITE); const c = clipRect(FX - pw / 2, 708, pw, 62); out.push(`<g ${c}>`); T(FX, 746, "Build my plan", 21, NAVY, 600, 'text-anchor="middle"'); out.push("</g>"); }
+  const uu = expoOut(seg(t, 14.25, 14.6));
+  if (uu > 0) { const c = clipRect(FX - 200, 790, 400, 40); out.push(`<g ${c}>`); T(FX, 818 + (1 - uu) * 34, "www.msg-horizons.com", 19, SILVER, 500, 'text-anchor="middle" letter-spacing="1.2"'); out.push("</g>"); }
+  out.push("</g>");
+}
+
+/* ======================= the frame ======================= */
+function seek(t) {
+  t = clamp(t, 0, 15);
+  out = []; defs = []; FIL = new Map(); clipN = 0;
+  RR(0, 0, W, H, 0, PITCH);
+  const cam = camAt(t);
+  if (t < 12.95) {
+    const c0 = camAt(t - DT), dl = Math.abs(Math.log(cam.z / c0.z));
+    const bx = Math.abs(cam.x - c0.x) * cam.z * 0.3 + dl * 150, by = Math.abs(cam.y - c0.y) * cam.z * 0.3 + dl * 90;
+    out.push(`<g ${camBlur(bx, by)}><g transform="${camT(cam)}">`);
+    hook(t);
+    // each page opens out of the dot in a circular reveal, on a ground of its own, over the page before
+    const d = dotState(t), dc = d ? [d.x, d.y] : [FX, FY];
+    const page = (t0, t1, fn, closeAt) => {
+      if (t < t0 || t >= t1) return;
+      let r = expoOut(seg(t, t0, t0 + 0.6)) * 2600;
+      if (closeAt && t > closeAt) r *= 1 - expoInOut(seg(t, closeAt, closeAt + 0.4));
+      out.push(`<g ${clipCircle(dc[0], dc[1], r)}>`); RR(-3000, -3000, 9000, 9000, 0, PITCH); fn(t); out.push("</g>");
+    };
+    page(2.0, 4.7, priceCard);
+    page(4.0, 6.7, planBuilder);
+    page(6.0, 10.45, (q) => { phone(q); tracker(q); }, 10.0);
+    if (t >= 10.3) network(t);
+    out.push("</g></g>");
+    if (t < 12.5) { out.push(`<g transform="${camT(cam)}">`); drawDot(t, cam); out.push("</g>"); }
+    drawRail(t);
+    drawCursor(t, cam);
+  }
+  if (t >= 12.5) endCard(t);
+  svg.innerHTML = `<defs>${[...FIL.values()].join("")}${defs.join("")}</defs>${out.join("")}`;
+}
+
+window.seek = seek;
+window.ready = (async () => {
+  for (const w of [500, 600, 700]) await document.fonts.load(`${w} 100px "Funnel"`);
+  await document.fonts.ready;
+  MC = document.createElement("canvas").getContext("2d");
+  layoutHook();
+  seek(0);
+})();
+})();
+</script>
+</body>
+</html>
