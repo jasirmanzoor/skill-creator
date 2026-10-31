@@ -1,0 +1,426 @@
+<!doctype html>
+<!--
+  MSG Horizons, 15 s showreel. "The parcel becomes the arrow becomes the Kingdom."
+  120 BPM, a beat every 0.5 s, 30 beats. Everything on screen is computed from time inside window.seek(t):
+  no CSS animation, no timers, no state carried between frames. Palette: navy #1C2C51, blue #009DF8, black, white.
+  One typeface (Funnel Sans Bold, the brand's English face). One camera: locked off and front-on, it only dollies and
+  tilts, and only on the beat.
+-->
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face { font-family: "Funnel"; src: url("fonts/FunnelSans-Bold.woff2") format("woff2"); font-weight: 700; font-display: block; }
+  html, body { margin: 0; background: #000; }
+  #stage { width: 1920px; height: 1080px; overflow: hidden; display: block; }
+  text { font-family: "Funnel"; font-weight: 700; }
+</style>
+</head>
+<body>
+<svg id="stage" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080"></svg>
+<script>
+(() => {
+const NAVY = "#1C2C51", BLUE = "#009DF8", WHITE = "#FFFFFF", BLACK = "#000000";
+const TINT = "#5B6680"; // navy lifted with white: the shaded side of a box
+const W = 1920, H = 1080, CX = 960, CY = 540, BEAT = 0.5;
+const svg = document.getElementById("stage");
+
+/* ---------- time helpers: all easing is a function of time ---------- */
+const clamp = (v, a = 0, b = 1) => (v < a ? a : v > b ? b : v);
+const lerp = (a, b, u) => a + (b - a) * u;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const expoOut = (u) => (u >= 1 ? 1 : 1 - Math.pow(2, -10 * u));
+const expoIn = (u) => (u <= 0 ? 0 : Math.pow(2, 10 * (u - 1)));
+const expoInOut = (u) => (u <= 0 ? 0 : u >= 1 ? 1 : u < 0.5 ? Math.pow(2, 20 * u - 10) / 2 : (2 - Math.pow(2, -20 * u + 10)) / 2);
+/** critically damped spring from 0 to 1 started at t0: never overshoots (no bounce) */
+const spring = (t, t0, w = 22) => { const x = Math.max(0, t - t0); return 1 - (1 + w * x) * Math.exp(-w * x); };
+const lp = (a, b, u) => a.map((p, i) => [lerp(p[0], b[i][0], u), lerp(p[1], b[i][1], u)]);
+const pts = (a) => a.map((p) => `${p[0].toFixed(2)},${p[1].toFixed(2)}`).join(" ");
+const place = (shape, s, x, y, r = 0) => shape.map(([px, py]) => { const c = Math.cos(r), n = Math.sin(r); return [x + s * (px * c - py * n), y + s * (px * n + py * c)]; });
+
+/* ---------- the mark, from the brand guidelines (height = 1, centred) ---------- */
+const DIAMOND = [[0.0741, 0], [-0.2916, -0.4992], [-0.5793, 0.0009], [-0.29, 0.5002]];
+const TOP = [[-0.116, -0.4997], [0.5793, -0.0009], [0.29, -0.5002]];
+const BOT = [[-0.1142, 0.4997], [0.5793, -0.0009], [0.2916, 0.4991]];
+const SQUARE = [[0.5, -0.5], [-0.5, -0.5], [-0.5, 0.5], [0.5, 0.5]]; // an upright square; its corners map onto the diamond's right, top, left and bottom points
+const S0 = 170; // the opening square, side length in px (also the last frame, so the reel loops)
+
+/* ---------- a tiny camera for the 2D-to-3D bar ---------- */
+function camera(cam) {
+  const ct = Math.cos(cam.yaw), st = Math.sin(cam.yaw), cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch);
+  return ([x, y, z]) => {
+    const vx = x - cam.tx, vy = y, vz = z - cam.tz;
+    const x1 = vx * ct - vz * st, z1 = vx * st + vz * ct;
+    const y2 = vy * cp - z1 * sp, z2 = vy * sp + z1 * cp; // z2: towards the viewer
+    const k = cam.f / (cam.d - z2);
+    return [cam.cx + k * x1, cam.cy - k * y2, z2];
+  };
+}
+const ISO = { yaw: Math.PI / 4, pitch: Math.atan(1 / Math.SQRT2), d: 60000, f: 60000 * 92, tx: 0, tz: 0, cx: CX, cy: CY };
+const GRID = [];
+const SP = 2.05; // space between boxes, so the field reads as a lattice, not a mass
+for (let i = -4; i <= 4; i++) for (let j = -4; j <= 4; j++) GRID.push({ i, j, x: i * SP, z: j * SP });
+const isoP = camera(ISO);
+for (const g of GRID) {
+  g.iso = isoP([g.x, 0.5, g.z]);
+  g.row = g.i + g.j; // cells with the same row sit on one screen line in the isometric view
+  // the cube's silhouette in the iso view: a regular hexagon, vertices from the top, clockwise
+  const c = 0.5, P = (a, b, d) => isoP([g.x + a * c, 0.5 + b * c, g.z + d * c]);
+  g.hex = [P(-1, 1, -1), P(1, 1, -1), P(1, -1, -1), P(1, -1, 1), P(-1, -1, 1), P(-1, 1, 1)].map((p) => [p[0] - g.iso[0], p[1] - g.iso[1]]);
+}
+const ROW0 = GRID.filter((g) => g.row === 0 && Math.abs(g.i) <= 3).sort((a, b) => a.iso[0] - b.iso[0]); // the 7 cells DELIVER lands in
+const HEXR = Math.hypot(...GRID[0].hex[0]);
+
+/* ---------- type ---------- */
+const WORDS = ["PICK", "PACK", "SHIP", "DELIVER"];
+const FS = 230, BASE = 650; // font size and baseline of the kinetic type
+let ADV = {}; // per-letter advances, measured once the font is loaded
+let PADV = () => 46;
+function measure() {
+  const c = document.createElement("canvas").getContext("2d");
+  c.font = `700 ${FS}px Funnel`;
+  for (const w of WORDS) {
+    const xs = [];
+    let x = 0;
+    for (const ch of w) { const a = c.measureText(ch).width; xs.push([x, a]); x += a - FS * 0.02; }
+    ADV[w] = { xs, width: x };
+  }
+  const p = document.createElement("canvas").getContext("2d");
+  p.font = "700 84px Funnel";
+  PADV = (ch) => p.measureText(ch).width - 1.5;
+}
+const letterX = (w, k) => CX - ADV[w].width / 2 + ADV[w].xs[k][0];
+const letterC = (w, k) => letterX(w, k) + ADV[w].xs[k][1] / 2;
+
+/* ---------- the lockup for the end title (real vector paths from the brand guidelines) ---------- */
+let LOCKUP = "";
+const LK = { mark: { cx: 138.9, cy: 172.35, h: 49.9 }, right: 376.4 };
+
+/* ---------- drawing ---------- */
+let out = [];
+const poly = (p, fill, extra = "") => out.push(`<polygon points="${pts(p)}" fill="${fill}" ${extra}/>`);
+const blurId = (sx, sy) => {
+  sx = Math.min(24, Math.abs(sx)); sy = Math.min(24, Math.abs(sy));
+  if (sx < 0.4 && sy < 0.4) return "";
+  const id = `b${Math.round(sx * 4)}_${Math.round(sy * 4)}`;
+  if (!FILTERS.has(id)) FILTERS.set(id, `<filter id="${id}" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${(Math.round(sx * 4) / 4).toFixed(2)} ${(Math.round(sy * 4) / 4).toFixed(2)}"/></filter>`);
+  return `filter="url(#${id})"`;
+};
+let FILTERS = new Map();
+/** blur that follows speed and direction: sample a position function a 1/180 s apart */
+const motion = (fn, t, k = 0.5) => { const a = fn(t), b = fn(t - 1 / 180); return blurId((a[0] - b[0]) * k, (a[1] - b[1]) * k); };
+
+function mark(t, x, y, h, opts = {}) {
+  const { diamond = WHITE, chevron = BLUE, rot = 0 } = opts;
+  poly(place(DIAMOND, h, x, y, rot), diamond);
+  poly(place(TOP, h, x, y, rot), chevron);
+  poly(place(BOT, h, x, y, rot), chevron);
+}
+
+/* ======================= the scenes ======================= */
+
+/* bar 1 (0-2 s), the hook: a parcel becomes the mark, and the arrow fires */
+function bar1(t) {
+  const u1 = expoInOut(seg(t, 0, 0.42));                     // beat 1: the square turns into the mark's diamond
+  const h = lerp(S0, 300, u1);
+  const d = lp(place(SQUARE, S0, CX, CY), place(DIAMOND, 300, CX + 30, CY), u1);
+  const u2 = expoOut(seg(t, 0.5, 0.9));                       // beat 2: the arrow slides out of the diamond
+  const sep = spring(t, 1.0, 18) * 60;                        // beat 3: parcel and arrow part
+  const fire = expoIn(seg(t, 1.5, 1.95));                     // beat 4: the arrow fires right
+  const ax = CX + 30 + sep + fire * 1500, dx = CX + 30 - sep - expoInOut(seg(t, 1.5, 2.0)) * (CX + 30 - 230);
+  const ds = lerp(300, 70, expoInOut(seg(t, 1.5, 2.0)));
+  const dPoly = t < 1.5 ? lp(d, place(DIAMOND, 300, dx, CY), seg(t, 1.0, 1.0001)) : place(DIAMOND, ds, dx, CY + (BASE - 40 - CY) * expoInOut(seg(t, 1.5, 2.0)));
+  const chev = t < 1.0 ? WHITE : BLUE;                        // on beat 3 the arrow takes the brand blue
+  if (t >= 0.5) {
+    const ay = lerp(CY, BASE - 40, expoInOut(seg(t, 1.5, 1.8)));
+    const top = lp(place(TOP.map(() => DIAMOND[0]), 300, CX + 30, CY), place(TOP, 300, ax, ay), u2);
+    const bot = lp(place(BOT.map(() => DIAMOND[0]), 300, CX + 30, CY), place(BOT, 300, ax, ay), u2);
+    const fb = motion((s) => [CX + 30 + expoIn(seg(s, 1.5, 1.95)) * 1500, 0], t);
+    out.push(`<g ${fb}>`); poly(top, chev); poly(bot, chev); out.push("</g>");
+    if (t >= 1.5) { // the trail it leaves becomes the baseline for the type
+      const x1 = Math.min(W + 40, ax + 50);
+      out.push(`<rect x="${dx}" y="${BASE - 3}" width="${Math.max(0, x1 - dx)}" height="6" fill="${BLUE}" transform="scale(1 ${expoOut(seg(t, 1.5, 1.7)).toFixed(3)})" transform-origin="0 ${BASE}"/>`);
+    }
+  }
+  poly(t < 0.5 ? d : dPoly, WHITE, t >= 1.5 ? motion((s) => [CX + 30 - expoInOut(seg(s, 1.5, 2.0)) * (CX + 30 - 230), 0], t, 0.35) : "");
+}
+
+/* bar 2 (2-4 s), kinetic type: PICK, PACK, SHIP, DELIVER stamp onto the line, one per beat */
+function bar2(t) {
+  out.push(`<rect x="230" y="${BASE - 3}" width="${W - 230}" height="6" fill="${BLUE}"/>`);
+  out.push(`<clipPath id="ticker"><rect x="0" y="${BASE - FS * 0.95}" width="${W}" height="${FS * 0.95 + 4}"/></clipPath>`);
+  out.push(`<g clip-path="url(#ticker)">`);
+  WORDS.forEach((w, n) => {
+    const tin = 2 + n * BEAT, tout = n < 3 ? tin + BEAT : 99;
+    if (t < tin || t > tout + 0.25) return;
+    const letters = [...w];
+    const vy = (s, k) => { const a = n === 0 ? 1 : expoOut(seg(s, tin + 0.07 + k * 0.022, tin + 0.07 + k * 0.022 + 0.3)); const b = expoIn(seg(s, tout + k * 0.012, tout + k * 0.012 + 0.12)); return FS * 1.1 * (1 - a) - FS * 1.1 * b; };
+    letters.forEach((ch, k) => {
+      const y = n === 0 ? FS * 1.1 * (1 - expoOut(seg(t, 2.0 + k * 0.022, 2.3 + k * 0.022))) - FS * 1.1 * expoIn(seg(t, tout + k * 0.012, tout + k * 0.012 + 0.12)) : vy(t, k), fb = blurId(0, (y - vy(t - 1 / 180, k)) * 0.35);
+      out.push(`<text x="${letterX(w, k).toFixed(1)}" y="${(BASE - 6 + y).toFixed(1)}" font-size="${FS}" fill="${WHITE}" ${fb}>${ch}</text>`);
+    });
+  });
+  out.push("</g>");
+  // the diamond rides the start of the line and turns a quarter on every beat
+  const turn = [0, 1, 2, 3].reduce((a, n) => a + expoOut(seg(t, 2 + n * BEAT, 2 + n * BEAT + 0.3)), 0) * (Math.PI / 2);
+  poly(place(DIAMOND, 70, 230, BASE - 40, turn), WHITE);
+}
+
+/* bar 3 (4-6 s), shape morph: the mark sweeps the word; letters become squares, squares hexagons, hexagons a field */
+function bar3(t) {
+  const sweepX = lerp(-260, W + 420, expoInOut(seg(t, 4.0, 4.46)));
+  const w = "DELIVER";
+  const capY = BASE - 6 - FS * 0.36;
+  if (sweepX < 230 + 120) poly(place(DIAMOND, 70, 230, BASE - 40, 2 * Math.PI), WHITE);
+  // the line is gathered up behind the mark
+  if (t < 4.46) out.push(`<rect x="${Math.max(230, sweepX)}" y="${BASE - 3}" width="${Math.max(0, W - Math.max(230, sweepX))}" height="6" fill="${BLUE}"/>`);
+  [...w].forEach((ch, k) => {
+    const lx = letterC(w, k), passed = sweepX - 120 > lx;
+    const tp = 4.0 + 0.46 * invExpoInOut((lx + 120 + 260) / (W + 420 + 260)); // when the mark's back edge passes this letter
+    const cell = ROW0[k];
+    if (!passed) { out.push(`<text x="${letterX(w, k).toFixed(1)}" y="${BASE - 6}" font-size="${FS}" fill="${WHITE}">${ch}</text>`); return; }
+    // square, then hexagon (beat 10), then into the field (beat 11)
+    const grow = expoOut(seg(t, tp, tp + 0.16));
+    const toHex = expoInOut(seg(t, 4.5, 4.9));
+    const toCell = expoInOut(seg(t, 5.0, 5.42));
+    const x = lerp(lx, cell.iso[0], toCell), y = lerp(capY, cell.iso[1], toCell);
+    const sq = [[0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1]].map(([a, b]) => [a * 62, b * 62]); // a square with six vertices, to morph into the hexagon
+    const hx = cell.hex.map(([a, b]) => [a * lerp(62 / HEXR * 1.1, 1, toCell), b * lerp(62 / HEXR * 1.1, 1, toCell)]);
+    const shape = lp(sq, hx, toHex).map(([a, b]) => [x + a * grow, y + b * grow]);
+    poly(shape, WHITE, motion((s) => [lerp(lx, cell.iso[0], expoInOut(seg(s, 5.0, 5.42))), lerp(capY, cell.iso[1], expoInOut(seg(s, 5.0, 5.42)))], t, 0.3));
+  });
+  // the mark that does the sweeping
+  const mb = motion((s) => [lerp(-260, W + 420, expoInOut(seg(s, 4.0, 4.46))), 0], t, 0.4);
+  if (t < 4.5) { out.push(`<g ${mb}>`); mark(t, sweepX, capY, 300); out.push("</g>"); }
+  // cell division: the field fills from the middle row outwards, a row on each of beats 11 and 12
+  for (const g of GRID) {
+    if (g.row === 0 && Math.abs(g.i) <= 3) continue;
+    const ring = Math.abs(g.row);
+    const t0 = ring <= 2 ? 5.0 + ring * 0.08 : 5.5 + (ring - 3) * 0.025;
+    if (t < t0) continue;
+    const parent = ROW0.reduce((a, b) => (Math.abs(b.iso[0] - g.iso[0]) < Math.abs(a.iso[0] - g.iso[0]) ? b : a));
+    const u = expoOut(seg(t, t0, t0 + 0.38));
+    const x = lerp(parent.iso[0], g.iso[0], u), y = lerp(parent.iso[1], g.iso[1], u);
+    poly(g.hex.map(([a, b]) => [x + a * lerp(0.5, 1, u), y + b * lerp(0.5, 1, u)]), WHITE);
+  }
+}
+function invExpoInOut(y) { y = clamp(y); let a = 0, b = 1; for (let i = 0; i < 30; i++) { const m = (a + b) / 2; if (expoInOut(m) < y) a = m; else b = m; } return (a + b) / 2; }
+
+/* bars 4-5 (6-10 s): the field is a floor of boxes. 2D to 3D, then from above it is a network (data / UI) */
+function camAt(t) {
+  const c = { ...ISO };
+  // beat 14 the camera starts to tilt and swing; beat 16 it dollies in; bar 5 it rises to look straight down
+  const tilt = expoInOut(seg(t, 6.5, 7.5)), dolly = expoInOut(seg(t, 7.5, 8.0)), rise = expoInOut(seg(t, 8.0, 8.5));
+  c.pitch = lerp(lerp(ISO.pitch, 0.42, tilt), Math.PI / 2 - 0.0001, rise);
+  c.yaw = lerp(lerp(Math.PI / 4, Math.PI / 4 - 0.38, tilt), 0, rise);
+  const d = lerp(lerp(60000, 2600, tilt), 1300, dolly);
+  c.d = lerp(d, 60000, rise);
+  c.f = lerp(lerp(lerp(92 * 60000, 92 * 2600 * 0.95, tilt), 92 * 1300 * 1.75, dolly), 62 * 60000, rise);
+  const shift = expoInOut(seg(t, 9.0, 9.4)); // room for the panel on the right
+  c.cx = CX - 260 * shift;
+  return c;
+}
+function boxes(t) {
+  const cam = camAt(t), P = camera(cam);
+  const shade = expoOut(seg(t, 6.0, 6.18));          // beat 13: the flat hexagons turn out to be boxes
+  const flat = expoInOut(seg(t, 8.0, 8.5));           // bar 5: from above, boxes become tiles
+  const dot = expoInOut(seg(t, 8.5, 8.9));            // beat 18: tiles become nodes
+  const list = [];
+  for (const g of GRID) {
+    // beat 15: rows rise into stacks, one row after another
+    const stack = 1 + ((g.i * 7 + g.j * 13 + 40) % 3);
+    const up = expoOut(seg(t, 7.0 + (g.i + 4) * 0.035, 7.0 + (g.i + 4) * 0.035 + 0.4));
+    const hgt = lerp(lerp(1, stack, up), 0.04, flat);
+    const c = 0.5 * lerp(1, 0.18, dot);
+    const corners = (yy) => [[-c, yy, -c], [c, yy, -c], [c, yy, c], [-c, yy, c]].map(([a, b, d]) => P([g.x + a, b, g.z + d]));
+    const bottom = corners(0), top = corners(hgt);
+    const depth = P([g.x, hgt / 2, g.z])[2];
+    list.push({ g, bottom, top, depth });
+  }
+  list.sort((a, b) => a.depth - b.depth);
+  for (const b of list) {
+    const T = b.top.map((p) => [p[0], p[1]]), B = b.bottom.map((p) => [p[0], p[1]]);
+    const area = (q) => q.reduce((a, p, k) => { const n = q[(k + 1) % q.length]; return a + p[0] * n[1] - n[0] * p[1]; }, 0);
+    const side = (i, j, fill) => { const q = [T[i], T[j], B[j], B[i]]; if (area(q) > 0) poly(q, fill); };
+    // before beat 13 every face is white, so from the iso view each box is a flat hexagon
+    const lit = (c) => (shade < 0.5 ? WHITE : c);
+    // the two faces towards the viewer and the top
+    side(3, 2, lit(BLUE));
+    side(2, 1, lit(TINT));
+    side(0, 3, lit(BLUE));
+    side(1, 0, lit(TINT));
+    poly(T, WHITE);
+  }
+  return { cam, P };
+}
+
+/* the network: from above, the nodes are joined to the hub by routes, and the panel counts MSG's scale */
+const ROUTES = [[0, 0, 3, 0], [0, 0, -3, 1], [0, 0, 2, -3], [0, 0, -2, -2], [0, 0, 1, 3], [0, 0, 4, 2], [0, 0, -4, -1], [0, 0, -1, 4], [0, 0, 3, -2], [0, 0, -3, 3]];
+function network(t, P, routesOnly = false) {
+  const node = (i, j) => P([i * SP, 0.04, j * SP]);
+  ROUTES.forEach(([a, b, i, j], n) => {
+    const s = node(a, b), m = node(i, b), e = node(i, j);
+    const len = Math.hypot(m[0] - s[0], m[1] - s[1]) + Math.hypot(e[0] - m[0], e[1] - m[1]);
+    const u = expoOut(seg(t, 8.6 + n * 0.045, 8.6 + n * 0.045 + 0.45));
+    const d = `M${s[0].toFixed(1)},${s[1].toFixed(1)} L${m[0].toFixed(1)},${m[1].toFixed(1)} L${e[0].toFixed(1)},${e[1].toFixed(1)}`;
+    out.push(`<path d="${d}" fill="none" stroke="${BLUE}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${len.toFixed(1)}" stroke-dashoffset="${(len * (1 - u)).toFixed(1)}"/>`);
+  });
+  if (routesOnly) return;
+  const hub = node(0, 0);
+  const hs = expoOut(seg(t, 8.5, 8.8));
+  if (hs > 0) mark(t, hub[0], hub[1], 90 * hs);
+}
+const PANEL = [
+  { n: "1,000+", l: "COURIERS", at: 9.0 },
+  { n: "100+", l: "VEHICLES", at: 9.5 },
+  { n: "24/7", l: "OPERATIONS", at: 9.5 + BEAT },
+];
+function panel(t, collapse) {
+  const x0 = lerp(W + 40, 1290, expoOut(seg(t, 8.9, 9.3)));
+  const h = lerp(420, 6, collapse), y0 = lerp(330, BASE - 3, collapse);
+  const fb = motion((s) => [lerp(W + 40, 1290, expoOut(seg(s, 8.9, 9.3))), 0], t, 0.35);
+  out.push(`<g ${fb}>`);
+  out.push(`<rect x="${x0.toFixed(1)}" y="${y0.toFixed(1)}" width="540" height="${h.toFixed(1)}" rx="${lerp(22, 0, collapse).toFixed(1)}" fill="${WHITE}"/>`);
+  if (collapse < 0.6) {
+    out.push(`<clipPath id="pan"><rect x="${x0}" y="${y0}" width="540" height="${h}"/></clipPath><g clip-path="url(#pan)">`);
+    PANEL.forEach((r, k) => {
+      const y = y0 + 40 + k * 128;
+      const roll = expoOut(seg(t, r.at, r.at + 0.42)); // the figure rolls up into place, odometer style
+      out.push(`<text x="${x0 + 42}" y="${y + 28}" font-size="26" letter-spacing="4" fill="${NAVY}" opacity="0.7">${r.l}</text>`);
+      out.push(`<clipPath id="r${k}"><rect x="${x0}" y="${y + 34}" width="540" height="84"/></clipPath><g clip-path="url(#r${k})">`);
+      let cx = x0 + 40;
+      [...r.n].forEach((ch, c) => {
+        const dy = (1 - expoOut(seg(t, r.at + c * 0.04, r.at + c * 0.04 + 0.38))) * 110;
+        out.push(`<text x="${cx.toFixed(1)}" y="${(y + 104 + dy).toFixed(1)}" font-size="84" fill="${NAVY}">${ch}</text>`);
+        cx += PADV(ch);
+      });
+      out.push("</g>");
+      out.push(`<rect x="${x0 + 42}" y="${y + 120}" width="${(456 * roll).toFixed(1)}" height="3" fill="${BLUE}"/>`);
+    });
+    out.push("</g>");
+  }
+  out.push("</g>");
+}
+
+/* bar 6 (10-12 s): everything converges onto one line, and the line picks up speed (the riser) */
+function bar6(t) {
+  const P = camera(camAt(9.99));
+  const fall = expoInOut(seg(t, 10.0, 10.42));     // beat 21: the network drops onto the line
+  const merge = expoInOut(seg(t, 10.5, 10.9));     // beat 22: the nodes run together into it
+  // the line
+  out.push(`<rect x="0" y="${BASE - 3}" width="${W}" height="6" fill="${WHITE}" transform="scale(${(lerp(0, 0.4, fall) + 0.6 * merge).toFixed(3)} 1)" transform-origin="${CX} ${BASE}"/>`);
+  out.push(`<g transform="translate(0 ${(BASE * fall).toFixed(2)}) scale(1 ${(1 - fall).toFixed(4)})">`);
+  network(9.99, P, true);
+  out.push("</g>");
+  GRID.forEach((g) => {
+    const p = P([g.x, 0.04, g.z]);
+    const x = lerp(p[0], CX + (p[0] - CX) * 1.6, merge), y = lerp(p[1], BASE, fall);
+    const r = 6.5 * (1 - merge);
+    if (r > 0.3) out.push(`<rect x="${(x - r).toFixed(1)}" y="${(y - r).toFixed(1)}" width="${(2 * r).toFixed(1)}" height="${(2 * r).toFixed(1)}" fill="${WHITE}"/>`);
+  });
+  panel(9.99, fall);
+  // beats 23-24: dashes race along the line, faster on every beat
+  const speed = t < 11 ? 0 : t < 11.5 ? 1 : 2.2;
+  const travel = (s) => (s < 11 ? 0 : s < 11.5 ? (s - 11) * 2400 : 1200 + (s - 11.5) * 5400);
+  const fb = motion((s) => [travel(s), 0], t, 0.5);
+  if (speed > 0) {
+    out.push(`<g ${fb}>`);
+    for (let k = -4; k < 14; k++) {
+      const x = ((k * 260 + travel(t)) % (W + 520)) - 260;
+      out.push(`<rect x="${x.toFixed(1)}" y="${BASE - 9}" width="150" height="18" fill="${BLUE}"/>`);
+    }
+    out.push("</g>");
+  }
+  // the hub mark sits on the line and grows with the riser
+  const grow = 1 + 0.5 * expoOut(seg(t, 11.0, 11.3)) + 0.7 * expoOut(seg(t, 11.5, 11.8));
+  const hubY = lerp(P([0, 0.04, 0])[1], BASE, fall), hubX = lerp(P([0, 0.04, 0])[0], CX, merge);
+  mark(t, hubX, hubY, 90 * grow);
+}
+
+/* bar 7 (12-14 s), the strongest moment: the line folds into the arrow, the light wipes, the parcel lands */
+const GIANT = 1500, GX = CX - 90;
+function bar7(t) {
+  const fold = expoInOut(seg(t, 12.0, 12.36));      // beat 25: the line folds into the arrow
+  const fill = expoOut(seg(t, 12.5, 12.82));        // beat 26: the arrow fills in, and white wipes across
+  const slam = expoOut(seg(t, 13.0, 13.3));         // beat 27: the parcel slams in
+  const pull = expoInOut(seg(t, 13.5, 14.0));       // beat 28: the camera pulls back to the mark
+  const h = lerp(GIANT, 300, pull), x = lerp(GX, CX, pull);
+  // the white field, wiped in diagonally (from the top right) and wiped out the same way
+  const wipeIn = expoInOut(seg(t, 12.5, 12.9)), wipeOut = expoInOut(seg(t, 13.5, 13.68));
+  const a = lerp(2400, -600, wipeIn), b = lerp(2400, -600, wipeOut);
+  const field = [[a, 0], [W + 800, 0], [W + 800, H], [a - 700, H]];
+  const back = [[b, 0], [W + 800, 0], [W + 800, H], [b - 700, H]];
+  const white = wipeIn > 0 ? (wipeOut > 0 ? [[a, 0], [b, 0], [b - 700, H], [a - 700, H]] : field) : null;
+  out.push(`<clipPath id="lit">${white ? `<polygon points="${pts(white)}"/>` : ""}</clipPath>`);
+  out.push(`<mask id="dark"><rect width="${W}" height="${H}" fill="#fff"/>${white ? `<polygon points="${pts(white)}" fill="#000"/>` : ""}</mask>`);
+  if (white) poly(white, WHITE);
+  const T = place(TOP, h, x, CY), B = place(BOT, h, x, CY);
+  // the line, folded: one straight edge per arrow piece, then each piece opens into its triangle
+  const line = [[-120, BASE], [CX, BASE], [W + 120, BASE]];
+  const chevLine = [T[0], T[1], B[0]];
+  const L = lp(line, chevLine, fold);
+  if (fill < 0.02) {
+    out.push(`<polyline points="${pts(L)}" fill="none" stroke="${t < 12.5 ? WHITE : BLUE}" stroke-width="${lerp(6, 18, fold).toFixed(1)}" stroke-linejoin="miter"/>`);
+  } else {
+    const tri = (P3, edgeA, edgeB) => [P3[0], P3[1], [lerp((P3[0][0] + P3[1][0]) / 2, P3[2][0], fill), lerp((P3[0][1] + P3[1][1]) / 2, P3[2][1], fill)]];
+    poly(tri(T), BLUE); poly(tri(B), BLUE);
+  }
+  // the parcel (diamond), from off frame left
+  if (slam > 0) {
+    const dx = lerp(-2200, 0, slam);
+    const D = place(DIAMOND, h, x + dx, CY);
+    const fb = motion((s) => [lerp(-2200, 0, expoOut(seg(s, 13.0, 13.3))), 0], t, 0.45);
+    out.push(`<g ${fb}><g mask="url(#dark)">`); poly(D, WHITE); out.push(`</g><g clip-path="url(#lit)">`); poly(D, NAVY); out.push("</g></g>");
+  }
+  // the hub mark from bar 6 rides into the tip of the arrow as the line folds
+  if (fold < 1) { const tip = lerp(CX, T[1][0], fold); mark(t, tip, lerp(BASE, CY, fold), 90 * 2.2 * (1 - fold) + 0.5); }
+}
+
+/* the end (14-15 s): the lockup, then the mark folds back into the square the reel began with */
+function end(t) {
+  const open = expoOut(seg(t, 14.0, 14.36)), shut = expoInOut(seg(t, 14.5, 14.72));
+  const slide = open * (1 - shut);
+  const s = 300 / LK.mark.h;
+  const markX = lerp(CX, CX - ((LK.right - LK.mark.cx) * s - (LK.mark.cx - 110) * s) / 2, slide);
+  // wordmark: the real lockup's letters, revealed from behind the mark
+  const reveal = (LK.right - LK.mark.cx) * s * slide;
+  out.push(`<clipPath id="wm"><rect x="${(markX + 0.62 * 300).toFixed(1)}" y="0" width="${Math.max(0, reveal - 0.62 * 300).toFixed(1)}" height="${H}"/></clipPath>`);
+  out.push(`<g clip-path="url(#wm)"><g transform="translate(${(markX - LK.mark.cx * s).toFixed(2)} ${(CY - LK.mark.cy * s).toFixed(2)}) scale(${s.toFixed(4)})" fill="${WHITE}">${LOCKUP}</g></g>`);
+  // the arrow folds back into the diamond, the diamond back into the square
+  const tuck = expoInOut(seg(t, 14.62, 14.84)), sq = expoInOut(seg(t, 14.74, 15.0));
+  const T = lp(place(TOP, 300, markX, CY), place(TOP.map(() => DIAMOND[0]), 300, markX, CY), tuck);
+  const B = lp(place(BOT, 300, markX, CY), place(BOT.map(() => DIAMOND[0]), 300, markX, CY), tuck);
+  if (tuck < 1) { poly(T, BLUE); poly(B, BLUE); }
+  poly(lp(place(DIAMOND, 300, markX, CY), place(SQUARE, S0, CX, CY), sq), WHITE);
+}
+
+/* ======================= seek ======================= */
+window.seek = (t) => {
+  t = ((t % 15) + 15) % 15;
+  out = [];
+  FILTERS = new Map();
+  out.push(`<rect width="${W}" height="${H}" fill="${NAVY}"/>`);
+  if (t < 2) bar1(t);
+  else if (t < 4) bar2(t);
+  else if (t < 6) bar3(t);
+  else if (t < 10) { const { P } = boxes(t); if (t >= 8.4) network(t, P); if (t >= 8.9) panel(t, 0); }
+  else if (t < 12) bar6(t);
+  else if (t < 14) bar7(t);
+  else end(t);
+  svg.innerHTML = `<defs>${[...FILTERS.values()].join("")}</defs>` + out.join("");
+};
+
+window.ready = (async () => {
+  await document.fonts.load('700 100px "Funnel"');
+  await document.fonts.ready;
+  measure();
+  const lockup = await (await fetch("lockup.svg")).text();
+  LOCKUP = [...lockup.matchAll(/<path d="([^"]*)"\s*\/>/g)].slice(3).map((m) => `<path d="${m[1]}"/>`).join("");
+  window.seek(0);
+  return true;
+})();
+})();
+</script>
+<script src="audio.js"></script>
+</body>
+</html>

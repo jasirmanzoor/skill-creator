@@ -3,16 +3,17 @@ import RaysBackdrop from "@/components/fx/RaysBackdrop";
 import PerfGovernor from "@/components/fx/PerfGovernor";
 import { notFound } from "next/navigation";
 import Script from "next/script";
-import { IBM_Plex_Sans_Arabic, Inter, Inter_Tight } from "next/font/google";
+import { Funnel_Sans, Readex_Pro } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { LOCALES, dirOf, getDictionary, isLocale, type Locale } from "@/content/i18n";
 import { SITE_URL, facts } from "@/content/facts";
 import "../globals.css";
 
-const display = Inter_Tight({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-display-latin", display: "swap" });
-const sans = Inter({ subsets: ["latin"], variable: "--font-sans-latin", display: "swap" });
-const arabic = IBM_Plex_Sans_Arabic({
+// The brand typefaces (2026 brand guidelines): Funnel Sans for English, Readex Pro for Arabic
+const display = Funnel_Sans({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-display-latin", display: "swap" });
+const sans = Funnel_Sans({ subsets: ["latin"], variable: "--font-sans-latin", display: "swap" });
+const arabic = Readex_Pro({
   subsets: ["arabic"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-arabic",
@@ -60,7 +61,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 }
 
 export const viewport: Viewport = {
-  themeColor: "#fafaf7",
+  themeColor: "#f8f9fb",
   colorScheme: "light",
   width: "device-width",
   initialScale: 1,
@@ -79,7 +80,7 @@ function jsonLd(lang: Locale) {
         legalName: facts.legalName,
         alternateName: facts.nameAr,
         url: SITE_URL,
-        logo: `${SITE_URL}/icon.svg`,
+        logo: `${SITE_URL}/brand/msg-icon-512.png`,
         email: facts.contact.email,
         telephone: facts.contact.phoneE164,
         taxID: facts.corporate.taxId,

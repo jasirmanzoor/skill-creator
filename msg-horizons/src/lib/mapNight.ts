@@ -11,15 +11,15 @@ export const NIGHT = {
   street: "#0e1524",
   streetLit: "#22324f",
   water: "#081426",
-  green: "#0b1a1c",
+  green: "#0d1a33",
   label: "#8fa3c0",
   light: "#bcd7ff",
   // flow colours, lifted so they read on the dark ground (same order as the day palette)
-  parcel: "#4fd1c5",
+  parcel: "#7fcbfb",
   you: "#9bd1ff",
   cash: "#f2c14e",
   back: "#ff7a5c",
-  door: "#34d399",
+  door: "#4db8fa",
 } as const;
 
 type Paint = Record<string, unknown>;

@@ -103,13 +103,13 @@ export default function TrackerCard({ c, live, reduce }: { c: LiveCopy; live: bo
       </div>
 
       {/* map */}
-      <div ref={box} className="relative aspect-[16/10] w-full overflow-hidden bg-[#e6f1ef]">
+      <div ref={box} className="relative aspect-[16/10] w-full overflow-hidden bg-[#e5f0fb]">
         <svg
           viewBox={`0 0 ${VB.w} ${VB.h}`}
           className={`absolute inset-0 size-full transition-opacity duration-200 ${live ? "opacity-100" : "opacity-60"}`}
           aria-hidden="true"
         >
-          <rect width={VB.w} height={VB.h} fill="#e6f1ef" />
+          <rect width={VB.w} height={VB.h} fill="#e5f0fb" />
           {PARKS.map((d, i) => <path key={i} d={d} fill="#cfe8d8" />)}
           {BLOCKS.map(([x, y, w, h], i) => <rect key={i} x={x} y={y} width={w} height={h} rx="7" fill="#f4faf9" opacity="0.8" />)}
           {ROADS.map((r, i) => <path key={`c${i}`} d={r.d} fill="none" stroke={r.art ? "#e3d6a8" : "#cddcd9"} strokeWidth={r.w + 3} strokeLinecap="round" />)}
@@ -126,7 +126,7 @@ export default function TrackerCard({ c, live, reduce }: { c: LiveCopy; live: bo
             strokeWidth="5.5"
             strokeLinecap="round"
             strokeDasharray="0 9999"
-            style={{ opacity: 0, filter: "drop-shadow(0 0 5px rgba(11,125,54,0.55))" }}
+            style={{ opacity: 0, filter: "drop-shadow(0 0 5px rgba(0,107,182,0.55))" }}
           />
 
           {/* pickup and delivery */}
@@ -153,13 +153,13 @@ export default function TrackerCard({ c, live, reduce }: { c: LiveCopy; live: bo
         </svg>
 
         <span
-          className="absolute -translate-x-1/2 translate-y-3 whitespace-nowrap rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-teal-deep shadow-[0_6px_16px_-8px_rgba(11,58,64,0.6)]"
+          className="absolute -translate-x-1/2 translate-y-3 whitespace-nowrap rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-teal-deep shadow-[0_6px_16px_-8px_rgba(28,44,81,0.6)]"
           style={{ left: pct(START.x, VB.w), top: pct(START.y, VB.h) }}
         >
           {tr.mapPickup}
         </span>
         <span
-          className="absolute -translate-x-1/2 translate-y-3.5 whitespace-nowrap rounded-full bg-brand px-2 py-0.5 text-[11px] font-semibold text-white shadow-[0_6px_16px_-8px_rgba(11,125,54,0.8)]"
+          className="absolute -translate-x-1/2 translate-y-3.5 whitespace-nowrap rounded-full bg-brand px-2 py-0.5 text-[11px] font-semibold text-white shadow-[0_6px_16px_-8px_rgba(0,107,182,0.8)]"
           style={{ left: pct(END.x, VB.w), top: pct(END.y, VB.h) }}
         >
           {tr.mapDrop}
@@ -176,7 +176,7 @@ export default function TrackerCard({ c, live, reduce }: { c: LiveCopy; live: bo
               transition={swap}
             >
               <div className="max-w-[17rem] text-center">
-                <span className="relative mx-auto grid size-11 place-items-center rounded-full bg-white text-teal shadow-[0_10px_24px_-12px_rgba(11,58,64,0.6)]">
+                <span className="relative mx-auto grid size-11 place-items-center rounded-full bg-white text-teal shadow-[0_10px_24px_-12px_rgba(28,44,81,0.6)]">
                   <span className="plan-ping absolute inset-0 rounded-full bg-teal/30 motion-reduce:hidden" aria-hidden="true" />
                   <VanGlyph className="relative size-5" />
                 </span>

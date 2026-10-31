@@ -100,7 +100,7 @@ function Segmented<T extends string>({
             aria-checked={value === o}
             onClick={() => onChange(o)}
             className={`rounded-md px-2 py-2 text-sm leading-tight transition-ui duration-200 ${
-              value === o ? "bg-surface font-medium text-ink shadow-[0_1px_3px_rgba(12,14,17,0.12)]" : "text-muted hover:text-ink"
+              value === o ? "bg-surface font-medium text-ink shadow-[0_1px_3px_rgba(17,26,51,0.12)]" : "text-muted hover:text-ink"
             }`}
           >
             {labels[o]}

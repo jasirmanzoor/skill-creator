@@ -7,12 +7,7 @@ import Planner from "@/components/sections/Planner";
 import TrustBar from "@/components/sections/TrustBar";
 import LiveTracking from "@/components/live/LiveTracking";
 import Pitch from "@/components/pitch/Pitch";
-import NetworkBand from "@/components/sections/NetworkBand";
-import GrowthBand from "@/components/sections/GrowthBand";
-import { hasPublicFile } from "@/lib/photo-slot";
-import LaunchSequence from "@/components/launch/LaunchSequence";
 import EstimatorSection from "@/components/estimator/EstimatorSection";
-import Partners from "@/components/sections/Partners";
 import Services from "@/components/sections/Services";
 import Fleet from "@/components/sections/Fleet";
 import Enterprise from "@/components/sections/Enterprise";
@@ -29,7 +24,7 @@ import Chapter from "@/components/book/Chapter";
 import RouteBook from "@/components/book/RouteBook";
 import RouteRail from "@/components/book/RouteRail";
 import Stage from "@/components/book/Stage";
-import TechHeadings from "@/components/fx/TechHeadings";
+import MaskedHeadings from "@/components/fx/MaskedHeadings";
 
 export default async function Home({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
@@ -37,7 +32,8 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
   const t = getDictionary(lang);
 
   // The page is a book of chapters (content/chapters.ts): one open at a time, turned like pages and steered from the
-  // route rail. The order follows the visitor's decision: who MSG is, the price, the plan, then the proof, then MSG.
+  // route rail. The order follows the visitor's decision: who MSG is, the price, the plan, the network and fleet, the
+  // company itself (its profile, a second cover), the proof, then MSG.
   const c = (n: number, children: React.ReactNode) => <Chapter n={n} lang={lang}>{children}</Chapter>;
   return (
     <PlanProvider>
@@ -54,24 +50,18 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         </>)}
         {c(2, <Depth><EstimatorSection t={t} lang={lang} /></Depth>)}
         {c(3, <Stage><Planner t={t} lang={lang} /></Stage>)}
-        {c(4, <>
-          <Stage><LiveTracking lang={lang} /></Stage>
-          <Depth><NetworkBand lang={lang} coastPhoto={hasPublicFile("coast.jpg")} /></Depth>
-          <Depth><LaunchSequence t={t} lang={lang} /></Depth>
-        </>)}
+        {c(4, <Stage><LiveTracking lang={lang} /></Stage>)}
         {c(5, <>
           <Depth><Fleet t={t} lang={lang} /></Depth>
-          <Depth><GrowthBand lang={lang} warehousePhoto={hasPublicFile("warehouse.jpg")} /></Depth>
           <Depth><Gallery t={t} lang={lang} /></Depth>
         </>)}
-        {c(6, <>
+        {c(6, <ProfileBook t={t} lang={lang} />)}
+        {c(7, <>
           <Depth><Proof t={t} /></Depth>
-          <Depth><ProfileBook t={t} lang={lang} /></Depth>
-          <Depth><Partners lang={lang} /></Depth>
           <Depth><Perfmix lang={lang} /></Depth>
         </>)}
-        {c(7, <Depth><Enterprise t={t} lang={lang} /></Depth>)}
-        {c(8, <Depth><Contact t={t} lang={lang} /></Depth>)}
+        {c(8, <Depth><Enterprise t={t} lang={lang} /></Depth>)}
+        {c(9, <Depth><Contact t={t} lang={lang} /></Depth>)}
       </main>
       <div className="book-footer">
         <Footer t={t} lang={lang} />
@@ -79,7 +69,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       <MobileBar t={t} />
       <RouteRail lang={lang} />
       <RouteBook lang={lang} />
-      <TechHeadings lang={lang} />
+      <MaskedHeadings lang={lang} />
     </PlanProvider>
   );
 }

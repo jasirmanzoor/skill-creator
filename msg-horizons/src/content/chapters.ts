@@ -19,6 +19,7 @@ export const CHAPTERS: Chapter[] = [
   { id: "planner", title: { en: "Your plan", ar: "خطتك" }, hint: { en: "Four steps to a setup that fits", ar: "أربع خطوات إلى منظومة تناسبك" } },
   { id: "live-tracking", title: { en: "Live network", ar: "الشبكة المباشرة" }, hint: { en: "1,000+ couriers, 100+ vehicles", ar: "+1,000 مندوب و+100 مركبة" } },
   { id: "fleet", title: { en: "Fleet & hubs", ar: "الأسطول والمراكز" }, hint: { en: "Always ready. Always moving.", ar: "جاهزون دائمًا. في حركة دائمة." } },
+  { id: "profile", title: { en: "Company profile", ar: "الملف التعريفي" }, hint: { en: "Flip through MSG", ar: "تصفّح ام اس جي" } },
   { id: "proof", title: { en: "Proof", ar: "الإثبات" }, hint: { en: "Scale you can see, standards you can trust", ar: "حجم تراه ومعايير تثق بها" } },
   { id: "enterprise", title: { en: "Enterprise", ar: "للشركات الكبرى" }, hint: { en: "Capability you can inspect", ar: "قدرات يمكنك فحصها" } },
   { id: "contact", title: { en: "Talk to MSG", ar: "تحدث مع ام اس جي" }, hint: { en: "Let's move what matters", ar: "لننقل ما يهمك" } },

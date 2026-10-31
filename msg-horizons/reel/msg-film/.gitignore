@@ -1,0 +1,5 @@
+# captures of the site taken while researching, and the scratch scripts that took them
+research/
+research*.mjs
+fonts.mjs
+.tier.mjs

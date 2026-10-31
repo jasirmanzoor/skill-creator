@@ -40,7 +40,7 @@ export default function ServicesList({ t, lang }: { t: Dictionary; lang: Locale 
                   {/* the open row's highlight slides from row to row */}
                   {isOpen ? (
                     <motion.span layoutId="svc-open" transition={{ type: "spring", stiffness: 380, damping: 36 }}
-                      className="absolute inset-0 rounded-2xl bg-surface shadow-[0_18px_40px_-24px_rgba(11,58,64,0.5)] ring-1 ring-line" />
+                      className="absolute inset-0 rounded-2xl bg-surface shadow-[0_18px_40px_-24px_rgba(28,44,81,0.5)] ring-1 ring-line" />
                   ) : null}
                   <button
                     type="button"
@@ -50,7 +50,7 @@ export default function ServicesList({ t, lang }: { t: Dictionary; lang: Locale 
                     data-press="soft"
                     className="group relative flex w-full items-center gap-4 rounded-2xl px-4 py-4 text-start transition-colors duration-200 hover:bg-surface/60"
                   >
-                    <span className={`inline-flex size-10 shrink-0 items-center justify-center rounded-xl transition-[background-color,color,transform] duration-300 ease-[cubic-bezier(.23,1,.32,1)] group-hover:scale-105 ${isOpen ? "bg-brand text-white shadow-[0_10px_20px_-10px_rgba(11,125,54,0.8)]" : "bg-subtle text-ink group-hover:bg-ink group-hover:text-white"}`}>
+                    <span className={`inline-flex size-10 shrink-0 items-center justify-center rounded-xl transition-[background-color,color,transform] duration-300 ease-[cubic-bezier(.23,1,.32,1)] group-hover:scale-105 ${isOpen ? "bg-brand text-white shadow-[0_10px_20px_-10px_rgba(0,107,182,0.8)]" : "bg-subtle text-ink group-hover:bg-ink group-hover:text-white"}`}>
                       <ServiceIcon id={id} className="size-[18px]" />
                     </span>
                     <span className={`flex-1 font-display text-xl tracking-[-0.015em] transition-[color,translate] duration-300 ease-[cubic-bezier(.23,1,.32,1)] sm:text-2xl rtl:tracking-normal ${isOpen ? "font-semibold text-ink" : "font-medium text-muted group-hover:translate-x-1 group-hover:text-ink rtl:group-hover:-translate-x-1"}`}>

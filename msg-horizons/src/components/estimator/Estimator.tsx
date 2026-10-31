@@ -85,7 +85,7 @@ export default function Estimator({
               </div>
 
               {/* live read-out */}
-              <motion.div layout className="relative self-start rounded-2xl border border-white bg-sea-100/80 p-5 shadow-[0_24px_48px_-28px_rgba(19,113,121,0.5)] backdrop-blur-md">
+              <motion.div layout className="relative self-start rounded-2xl border border-white bg-sea-100/80 p-5 shadow-[0_24px_48px_-28px_rgba(10,90,153,0.5)] backdrop-blur-md">
                 <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-teal rtl:tracking-normal">
                   <span className="relative inline-flex size-2"><span className="absolute inset-0 animate-ping rounded-full bg-teal/60 motion-reduce:hidden" /><span className="relative size-2 rounded-full bg-teal" /></span>
                   {t.planner.result.models[operatingModel({ persona, cargo: [], volume: volumeBand(net.orders), priorities: [] })].name}
@@ -95,7 +95,7 @@ export default function Estimator({
                 <button
                   type="button"
                   onClick={() => { setPhase("plan"); track("planner_complete", { model: "roadmap_estimator", modules: segment }); document.getElementById("estimator")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" }); }}
-                  className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-3.5 font-semibold text-ink shadow-[0_18px_40px_-18px_rgba(76,201,122,0.9)] transition-transform hover:-translate-y-0.5"
+                  className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-3.5 font-semibold text-ink shadow-[0_18px_40px_-18px_rgba(0,157,248,0.9)] transition-transform hover:-translate-y-0.5"
                 >
                   {e.build}
                 </button>

@@ -1,0 +1,661 @@
+<!doctype html>
+<!--
+  MSG Horizons, 15 s showreel: "One Line".
+  One blue point is drawn into everything: it splits the screen, writes the type, folds into the MSG hexagon, rises
+  into a 3D district, reads as live data, becomes the Kingdom's network, and closes back into the point. The last
+  frame is the first, so it loops.
+
+  120 BPM, a beat every 0.5 s, 30 beats, one technique per bar. Every pixel is computed from time inside
+  window.seek(t): no CSS animation, no timers, no state carried between frames. Palette: navy #1C2C51, blue #009DF8,
+  sand #F2B45A, black, white. One typeface (Funnel Sans Bold, the brand's English face). One camera: a single
+  perspective camera (focal length 1400 px) that looks straight down on the 2D scenes, so they are the ground plane
+  seen from above, and tilts, orbits and dollies on exponential moves, always on the beat.
+-->
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face { font-family: "Funnel"; src: url("fonts/FunnelSans-Bold.woff2") format("woff2"); font-weight: 700; font-display: block; }
+  html, body { margin: 0; background: #000; }
+  #stage { width: 1920px; height: 1080px; overflow: hidden; display: block; background: #000; }
+  text { font-family: "Funnel"; font-weight: 700; }
+</style>
+</head>
+<body>
+<svg id="stage" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080"></svg>
+<script src="ksa.js"></script>
+<script src="audio.js"></script>
+<script>
+(() => {
+const NAVY = "#1C2C51", BLUE = "#009DF8", SAND = "#F2B45A", WHITE = "#FFFFFF", BLACK = "#000000";
+const W = 1920, H = 1080, CX = 960, CY = 540, F = 1400, DEG = Math.PI / 180, TAU = Math.PI * 2, SQ3 = Math.sqrt(3);
+const svg = document.getElementById("stage");
+
+/* ---------- time: every easing is a function of time ---------- */
+const clamp = (v, a = 0, b = 1) => (v < a ? a : v > b ? b : v);
+const lerp = (a, b, u) => a + (b - a) * u;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const expoOut = (u) => (u >= 1 ? 1 : 1 - Math.pow(2, -10 * u));
+const expoIn = (u) => (u <= 0 ? 0 : Math.pow(2, 10 * (u - 1)) - 0.001 * (1 - u));
+const expoInOut = (u) => (u <= 0 ? 0 : u >= 1 ? 1 : u < 0.5 ? Math.pow(2, 20 * u - 10) / 2 : (2 - Math.pow(2, -20 * u + 10)) / 2);
+/** critically damped spring from 0 to 1 released at t0: it settles without overshoot, so it never bounces */
+const spring = (t, t0, w = 16) => { const x = Math.max(0, t - t0); return 1 - (1 + w * x) * Math.exp(-w * x); };
+const hash = (n) => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const lp2 = (a, b, u) => [lerp(a[0], b[0], u), lerp(a[1], b[1], u)];
+const lp3 = (a, b, u) => [lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u)];
+const lpa = (A, B, u) => A.map((p, i) => lp2(p, B[i], u));
+const DT = 1 / 180; // one subframe: blur is sized from how far a thing moved in it
+
+/* ---------- colour ---------- */
+const RGB = {};
+const rgb = (h) => RGB[h] || (RGB[h] = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16)));
+const mixc = (a, b, u) => { const A = typeof a === "string" ? rgb(a) : a, B = typeof b === "string" ? rgb(b) : b; return [lerp(A[0], B[0], u), lerp(A[1], B[1], u), lerp(A[2], B[2], u)]; };
+const css = (c) => (typeof c === "string" ? c : `rgb(${Math.round(c[0])},${Math.round(c[1])},${Math.round(c[2])})`);
+
+/* ---------- drawing: the frame is one SVG string ---------- */
+let out = [], defs = [], FIL = new Map();
+const f1 = (v) => (Math.round(v * 10) / 10).toString();
+const P2 = (p) => `${f1(p[0])},${f1(p[1])}`;
+const poly = (p, fill, extra = "") => out.push(`<polygon points="${p.map(P2).join(" ")}" fill="${css(fill)}" ${extra}/>`);
+const rect = (x, y, w, h, fill, extra = "") => out.push(`<rect x="${f1(x)}" y="${f1(y)}" width="${f1(Math.max(0, w))}" height="${f1(Math.max(0, h))}" fill="${css(fill)}" ${extra}/>`);
+const circle = (x, y, r, fill, extra = "") => out.push(`<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(Math.max(0, r))}" fill="${css(fill)}" ${extra}/>`);
+const pline = (p, stroke, w, extra = "") => p.length > 1 && out.push(`<polyline points="${p.map(P2).join(" ")}" fill="none" stroke="${css(stroke)}" stroke-width="${f1(w)}" stroke-linecap="round" stroke-linejoin="round" ${extra}/>`);
+const text = (x, y, s, size, fill, extra = "") => out.push(`<text x="${f1(x)}" y="${f1(y)}" font-size="${size}" fill="${css(fill)}" ${extra}>${s}</text>`);
+let clipN = 0;
+const clipRect = (x, y, w, h) => { const id = `c${clipN++}`; defs.push(`<clipPath id="${id}"><rect x="${f1(x)}" y="${f1(y)}" width="${f1(Math.max(0, w))}" height="${f1(Math.max(0, h))}"/></clipPath>`); return `clip-path="url(#${id})"`; };
+/** a directional blur, quantised so a frame reuses a handful of filters */
+const blur = (sx, sy) => {
+  sx = Math.min(28, Math.abs(sx)); sy = Math.min(28, Math.abs(sy));
+  if (sx < 0.5 && sy < 0.5) return "";
+  const qx = Math.round(sx * 2) / 2, qy = Math.round(sy * 2) / 2, id = `b${qx * 2}_${qy * 2}`;
+  if (!FIL.has(id)) FIL.set(id, `<filter id="${id}" x="-60%" y="-60%" width="220%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="${qx} ${qy}"/></filter>`);
+  return `filter="url(#${id})"`;
+};
+/** blur that follows speed and direction: fn(t) gives a position, sampled one subframe apart */
+const mblur = (fn, t, k = 0.55) => { const a = fn(t), b = fn(t - DT); return blur((a[0] - b[0]) * k, (a[1] - b[1]) * k); };
+
+/* ---------- the camera: one perspective camera for the whole reel ---------- */
+function camera(T, yaw, pitch, D) {
+  const cp = Math.cos(pitch), sp = Math.sin(pitch), cy = Math.cos(yaw), sy = Math.sin(yaw);
+  const C = [T[0] - D * sy * cp, T[1] + D * sp, T[2] - D * cy * cp];
+  const f = [sy * cp, -sp, cy * cp], r = [cy, 0, -sy];
+  const u = [f[1] * r[2] - f[2] * r[1], f[2] * r[0] - f[0] * r[2], f[0] * r[1] - f[1] * r[0]];
+  const depth = (p) => (p[0] - C[0]) * f[0] + (p[1] - C[1]) * f[1] + (p[2] - C[2]) * f[2];
+  const P = (p) => {
+    const d0 = p[0] - C[0], d1 = p[1] - C[1], d2 = p[2] - C[2];
+    const z = d0 * f[0] + d1 * f[1] + d2 * f[2];
+    return [CX + (F * (d0 * r[0] + d1 * r[1] + d2 * r[2])) / z, CY - (F * (d0 * u[0] + d1 * u[1] + d2 * u[2])) / z, z];
+  };
+  return { C, f, P, depth };
+}
+// looking straight down from F away, the ground plane (x, 0, z) lands on the screen 1:1 at (CX + x, CY - z)
+const LIGHT = (() => { const l = [0.32, 0.62, -0.72], n = Math.hypot(...l); return l.map((v) => v / n); })();
+const lambert = (n) => Math.max(0, n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2]);
+const facing = (cam, p, n) => (p[0] - cam.C[0]) * n[0] + (p[1] - cam.C[1]) * n[1] + (p[2] - cam.C[2]) * n[2] < 0;
+
+/* ---------- the MSG mark, from the brand vector (centred on the hexagon) ---------- */
+const HEX = [[-36.67, 0.06], [-18.46, -31.6], [18.36, -31.66], [36.67, -0.06], [18.46, 31.59], [-18.36, 31.66]];
+const PA = [[4.69, -0.01], [-18.46, -31.6], [-36.67, 0.06], [-18.36, 31.66]];
+const PB = [[-7.23, 31.63], [18.46, 31.59], [36.67, -0.06]];
+const PC = [[-7.34, -31.63], [36.67, -0.06], [18.36, -31.66]];
+const CHEV = [[-7.34, -31.63], [18.36, -31.66], [36.67, -0.06], [18.46, 31.59], [-7.23, 31.63], [36.67, -0.06]];
+const GAP = [[-18.46, -31.6], [-7.34, -31.63], [36.67, -0.06], [-7.23, 31.63], [-18.36, 31.66], [4.69, 0]];
+const m1 = [-12.9, -31.6], m3 = [20.68, -0.03], m2 = [-12.8, 31.645];
+const GAP0 = [m1, m1, m3, m2, m2, m3]; // the cut before it opens: a line down the middle of the gap
+const place = (shape, s, x = CX, y = CY) => shape.map((p) => [x + p[0] * s, y + p[1] * s]);
+const MK = 5;  // the mark in bar 3
+const SL = 2.4; // the mark in the end title
+
+/* ---------- the hex district ---------- */
+const R = 40, RD = 35;
+const H7 = [150, 205, 185, 255, 235, 320, 395]; // the seven blue cells: towers, then the bars of the chart
+const CELLS = [], CELL = {};
+for (let c = -24; c <= 24; c++) for (let r = -17; r <= 17; r++) {
+  const x = c * 1.5 * R, z = (r + (Math.abs(c) % 2 ? 0.5 : 0)) * SQ3 * R, d = Math.hypot(x, z);
+  if (d > 1190) continue;
+  const blue = r === 0 && c % 2 === 0 && Math.abs(c) <= 6 ? c / 2 + 3 : -1;
+  const n1 = hash(c * 31.7 + r * 7.3), n2 = hash(c * 3.1 - r * 17.9 + 5);
+  const h = blue < 0 && n1 > 0.4 ? (24 + 150 * Math.pow(n2, 1.5)) * (1 - 0.6 * d / 1190) : 0;
+  const cell = { c, r, x, z, d, blue, h, route: -1 };
+  CELLS.push(cell); CELL[`${c},${r}`] = cell;
+}
+// a street through the district: adjacent cells, following a gentle curve below the blue row
+{
+  const zt = (c) => (-3.3 + 1.9 * Math.sin(c * 0.24 + 0.5)) * SQ3 * R;
+  const route = [];
+  let cur = null;
+  for (let c = -20; c <= 20; c++) {
+    const col = CELLS.filter((k) => k.c === c && (!cur || Math.abs(k.z - cur.z) < SQ3 * R * 0.6));
+    if (!col.length) continue;
+    cur = col.reduce((a, b) => (Math.abs(b.z - zt(c)) < Math.abs(a.z - zt(c)) ? b : a));
+    route.push(cur);
+  }
+  route.forEach((k, j) => { k.route = j / (route.length - 1); k.h = 0; });
+}
+const BLUECELLS = CELLS.filter((k) => k.blue >= 0).sort((a, b) => a.blue - b.blue);
+const hexV = (x, z, rr) => [0, 1, 2, 3, 4, 5].map((k) => [x + rr * Math.cos(k * 60 * DEG), z + rr * Math.sin(k * 60 * DEG)]);
+const SIDE_N = [0, 1, 2, 3, 4, 5].map((k) => [Math.cos((k * 60 + 30) * DEG), 0, Math.sin((k * 60 + 30) * DEG)]);
+/** a hex cell on screen in 2D, vertex order matching CHEV (Cl, Cr, Tip, Br, Bl, Tip) */
+const hexMorph = (x, y, rr) => [240, 300, 0, 60, 120, 180].map((a) => [x + rr * Math.cos(a * DEG), y + rr * Math.sin(a * DEG)]);
+
+/* ---------- the Kingdom: dots, outline and six routes from Riyadh ---------- */
+const MW = (p) => [p[0] - 500, 0, 400 - p[1]]; // map point (1000 x 820 frame) to the ground plane
+const RIY = [575.8, 387.2], RW = MW(RIY);
+const CITIES = [["TABUK", [98, 196]], ["MADINAH", [242, 399]], ["JEDDAH", [221, 551]], ["HAIL", [339.8, 240.3]], ["SABYA", [384, 778]], ["DAMMAM", [737, 297]]];
+const DOTS = window.KSA_DOTS.map((p, i) => ({ w: MW(p), mx: p[0], dr: Math.hypot(p[0] - RIY[0], p[1] - RIY[1]), bar: i % 7, hx: 0.12 + 0.76 * hash(i * 1.37), hy: 0.08 + 0.84 * hash(i * 2.11 + 9), j: hash(i * 5.3) }));
+const DRMAX = Math.max(...DOTS.map((d) => d.dr));
+const OUTLINE = window.KSA_OUTLINE.map(MW);
+const NR = 40;
+const ROUTES = CITIES.map(([name, p]) => {
+  const dx = p[0] - RIY[0], dy = p[1] - RIY[1], len = Math.hypot(dx, dy);
+  const ctl = [(RIY[0] + p[0]) / 2 - (dy / len) * 0.2 * len, (RIY[1] + p[1]) / 2 + (dx / len) * 0.2 * len];
+  const g = [];
+  for (let k = 0; k < NR; k++) {
+    const s = k / (NR - 1), a = (1 - s) * (1 - s), b = 2 * s * (1 - s), c = s * s;
+    g.push(MW([a * RIY[0] + b * ctl[0] + c * p[0], a * RIY[1] + b * ctl[1] + c * p[1]]));
+  }
+  return { name, p, len, g, ang: Math.atan2(-dy, dx) };
+});
+// each route sweeps into the hexagon edge that faces the same way
+{
+  const em = HEX.map((v, k) => { const w = HEX[(k + 1) % 6]; return Math.atan2(-(v[1] + w[1]) / 2, (v[0] + w[0]) / 2); });
+  const ri = ROUTES.map((_, i) => i).sort((a, b) => ((ROUTES[a].ang + TAU) % TAU) - ((ROUTES[b].ang + TAU) % TAU));
+  const ei = em.map((_, i) => i).sort((a, b) => ((em[a] + TAU) % TAU) - ((em[b] + TAU) % TAU));
+  let best = 0, bc = Infinity;
+  for (let o = 0; o < 6; o++) {
+    let cost = 0;
+    ri.forEach((r, k) => { const d = Math.abs(((ROUTES[r].ang - em[ei[(k + o) % 6]]) + 3 * Math.PI) % TAU - Math.PI); cost += d; });
+    if (cost < bc) { bc = cost; best = o; }
+  }
+  ri.forEach((r, k) => (ROUTES[r].edge = ei[(k + best) % 6]));
+}
+const MK3 = 6, YM = 300, ZF = RW[2] - 30; // the 3D mark: scale, height, and its front plane
+const hexW = (k, s = MK3) => [RW[0] + s * HEX[k % 6][0], YM - s * HEX[k % 6][1], ZF];
+
+/* ---------- type ---------- */
+const FS = 300, PR = 21;
+let CAP = 214, BASE = CY + 107, ROLL = FS;
+const LAY = {};
+let measureCtx = null;
+const mtext = (s, size, track = 0) => { measureCtx.font = `700 ${size}px Funnel`; return measureCtx.measureText(s).width + track * Math.max(0, s.length - 1); };
+function layoutWords() {
+  measureCtx = document.createElement("canvas").getContext("2d");
+  measureCtx.font = `700 ${FS}px Funnel`;
+  CAP = measureCtx.measureText("H").actualBoundingBoxAscent;
+  BASE = CY + CAP / 2; ROLL = CAP + 70;
+  for (const w of ["MOVE", "WHAT", "MATTERS"]) {
+    const tr = -0.02 * FS, xs = [];
+    let x = 0;
+    for (const ch of w) { xs.push(x); x += measureCtx.measureText(ch).width + tr; }
+    const width = x - tr, gap = 0.04 * FS, total = width + gap + 2 * PR, left = CX - total / 2;
+    LAY[w] = { w, xs: xs.map((v) => left + v), left, width, px: left + width + gap + PR, cx: left + width / 2 };
+  }
+}
+const letter = (ch, x, y, fill, extra = "") => text(x, y, ch, FS, fill, extra);
+
+/* ======================= bar 1 (0-2) the hook, and bar 2 (2-4) kinetic type ======================= */
+function sceneType(t) {
+  // beat 1: the point moves off centre; beat 2: it shoots across and leaves a white line
+  if (t < 1.0) {
+    if (t < 0.5) {
+      const xf = (s) => [lerp(CX, 250, expoInOut(seg(s, 0.04, 0.46))), CY];
+      const p = xf(t);
+      circle(p[0], p[1], 12, BLUE, mblur(xf, t));
+    } else {
+      const Lf = (s) => lerp(250, -40, expoOut(seg(s, 0.5, 0.92)));
+      const Rf = (s) => lerp(250, W + 80, expoOut(seg(s, 0.5, 0.86)));
+      rect(Lf(t), CY - 1.5, Rf(t) - Lf(t), 3, WHITE);
+      const xf = (s) => [Rf(s), CY];
+      circle(Rf(t), CY, 12, BLUE, mblur(xf, t));
+    }
+    return;
+  }
+  // the type: MOVE rises in the seam, rolls to WHAT, rolls to MATTERS
+  if (t < 3.0) {
+    const band = clipRect(0, BASE - CAP - 36, W, CAP + 72);
+    const drawLetters = (lay, dy, fill = WHITE) => lay.w.split("").forEach((ch, k) => {
+      const y = BASE + dy(k, t);
+      if (Math.abs(y - BASE) > ROLL - 1) return;
+      const b = blur(0, (dy(k, t) - dy(k, t - DT)) * 0.5);
+      letter(ch, lay.xs[k], y, fill, b);
+    });
+    out.push(`<g ${band}>`);
+    if (t < 2.0) {
+      drawLetters(LAY.MOVE, (k, s) => ROLL * (1 - expoOut(seg(s, 1.06 + 0.04 * k, 1.5 + 0.04 * k))));
+    } else {
+      const [A, B, t0] = t < 2.5 ? [LAY.MOVE, LAY.WHAT, 2.0] : [LAY.WHAT, LAY.MATTERS, 2.5];
+      const p = (k, s) => expoInOut(seg(s, t0 + 0.025 * k, t0 + 0.025 * k + 0.3));
+      drawLetters(A, (k, s) => -ROLL * p(k, s));
+      drawLetters(B, (k, s) => ROLL * (1 - p(k, s)));
+    }
+    out.push("</g>");
+  } else {
+    // bar 2, beat 3: MATTERS stacks into seven rows; beat 4: the rows crush into a white square
+    const L = LAY.MATTERS, P = CAP + 34;
+    const off = (k, s) => k * P * expoOut(seg(s, 3.0 + 0.03 * Math.abs(k), 3.42 + 0.03 * Math.abs(k))) - 64 * expoOut(seg(s, 3.0, 3.6));
+    const u = (s) => expoInOut(seg(s, 3.5, 3.86));
+    const SQ = 300, rowH = SQ / 7;
+    const cy0 = BASE - CAP / 2;
+    const fill = expoOut(seg(t, 3.66, 3.92));
+    if (t >= 3.92) rect(CX - SQ / 2, CY - SQ / 2, SQ, SQ, WHITE);
+    else for (let k = -3; k <= 3; k++) {
+      const yc = (s) => lerp(cy0 + off(k, Math.min(s, 3.5)), CY + k * rowH, u(s));
+      const sx = lerp(1, SQ / L.width, u(t)), sy = lerp(1, rowH / CAP, u(t)), xc = lerp(L.cx, CX, u(t));
+      const outline = Math.abs(k) % 2 === 1;
+      const b = blur(0, (yc(t) - yc(t - DT)) * 0.5);
+      out.push(`<g ${b}><g transform="translate(${f1(xc)} ${f1(yc(t))}) scale(${sx.toFixed(4)} ${sy.toFixed(4)}) translate(${f1(-L.cx)} ${f1(-cy0)})">`);
+      L.w.split("").forEach((ch, i) => letter(ch, L.xs[i], BASE, outline ? "none" : WHITE, outline ? `stroke="${BLUE}" stroke-width="3" vector-effect="non-scaling-stroke"` : ""));
+      out.push("</g>");
+      if (fill > 0) rect(xc - (L.width * sx) / 2 - 0.5, yc(t) - (CAP * sy * fill) / 2 - 0.5, L.width * sx + 1, CAP * sy * fill + 1, WHITE);
+      out.push("</g>");
+    }
+  }
+  // bar 1, beat 3: the line becomes a seam and the black splits open onto navy; beat 4: the halves leave
+  if (t < 1.95) {
+    const gf = (s) => 440 * expoInOut(seg(s, 1.0, 1.42)) + 760 * expoInOut(seg(s, 1.5, 1.92));
+    const g = gf(t), b = blur(0, (gf(t) - gf(t - DT)) * 0.25);
+    out.push(`<g ${b}>`);
+    rect(0, -10, W, CY - g / 2 + 10, BLACK); rect(0, CY + g / 2, W, H, BLACK);
+    rect(0, CY - g / 2 - 1.5, W, 3, WHITE); rect(0, CY + g / 2 - 1.5, W, 3, WHITE);
+    out.push("</g>");
+  }
+  // the point flies back in as MOVE's full stop, and rides the end of each word
+  if (t >= 1.5 && t < 3.3) {
+    const pf = (s) => {
+      if (s < 2.0) { const e = expoOut(seg(s, 1.5, 1.86)); return [lerp(W + 40, LAY.MOVE.px, e), lerp(CY, BASE - PR, e), lerp(12, PR, e)]; }
+      const e1 = expoInOut(seg(s, 2.0, 2.36)), e2 = expoInOut(seg(s, 2.5, 2.86));
+      return [lerp(lerp(LAY.MOVE.px, LAY.WHAT.px, e1), LAY.MATTERS.px, e2) - 64 * expoOut(seg(s, 3.0, 3.6)), BASE - PR - 64 * expoOut(seg(s, 3.0, 3.6)), PR * (1 - expoIn(seg(s, 3.0, 3.28)))];
+    };
+    const p = pf(t);
+    circle(p[0], p[1], p[2], BLUE, mblur(pf, t));
+  }
+}
+
+/* ======================= bar 3 (4-6) shape morphing ======================= */
+function ray(poly, th) {
+  const dx = Math.cos(th), dy = Math.sin(th);
+  let best = Infinity;
+  for (let i = 0; i < poly.length; i++) {
+    const a = poly[i], b = poly[(i + 1) % poly.length], ex = b[0] - a[0], ey = b[1] - a[1], den = dx * ey - dy * ex;
+    if (Math.abs(den) < 1e-9) continue;
+    const tt = (a[0] * ey - a[1] * ex) / den, s = (a[0] * dy - a[1] * dx) / den;
+    if (s >= -1e-6 && s <= 1 + 1e-6 && tt > 0) best = Math.min(best, tt);
+  }
+  return [dx * best, dy * best];
+}
+const SQUARE = [[150, -150], [150, 150], [-150, 150], [-150, -150]];
+const HEXMK = HEX.map((p) => [p[0] * MK, p[1] * MK]);
+function sceneMark(t) {
+  if (t < 4.5) {
+    // beat 1: the square turns a quarter and becomes the hexagon
+    const u = expoInOut(seg(t, 4.0, 4.42)), rot = (1 - u) * Math.PI / 2, N = 96, pts = [];
+    for (let i = 0; i < N; i++) {
+      const th = (TAU * i) / N, s = ray(SQUARE, th), h = ray(HEXMK, th);
+      const sr = [s[0] * Math.cos(rot) - s[1] * Math.sin(rot), s[0] * Math.sin(rot) + s[1] * Math.cos(rot)];
+      pts.push([CX + lerp(sr[0], h[0], u), CY + lerp(sr[1], h[1], u)]);
+    }
+    poly(pts, WHITE);
+  } else if (t < 5.0) {
+    // beat 2: the hexagon is cut into the mark, and the arrow takes the blue from its tip
+    const u = expoInOut(seg(t, 4.5, 4.84));
+    poly(place(HEX, MK), WHITE);
+    poly(place(lpa(GAP0, GAP, u), MK), NAVY);
+    const xw = lerp(CX + 38 * MK, CX - 8 * MK, expoInOut(seg(t, 4.56, 4.95)));
+    poly(place(CHEV, MK), BLUE, clipRect(xw, 0, W, H));
+  } else {
+    // beat 3: the left piece leaves, the arrow multiplies into a row of seven
+    const af = (s) => [CX - 1500 * expoIn(seg(s, 5.0, 5.34)), CY];
+    if (t < 5.34) poly(place(PA, MK, af(t)[0]), WHITE, mblur(af, t));
+    const v = (s) => expoInOut(seg(s, 5.04, 5.46)), sc = lerp(MK, 2, v(t));
+    for (const i of [0, 6, 1, 5, 2, 4, 3]) {
+      const xf = (s) => [CX + (i - 3) * 120 * v(s), CY];
+      poly(place(CHEV, sc, xf(t)[0]), BLUE, i === 3 ? "" : mblur(xf, t, 0.4));
+    }
+  }
+}
+
+/* ======================= bars 3-4 (5.5-8) the district: 2D to 3D ======================= */
+function cityCam(t) {
+  const p1 = expoInOut(seg(t, 6.0, 6.46)), p2 = expoInOut(seg(t, 7.0, 7.46)), p3 = expoInOut(seg(t, 7.5, 7.98));
+  const pitch = lerp(lerp(lerp(90, 52, p1), 34, p2), 0, p3) * DEG;
+  const yaw = lerp(lerp(0, 30, p2), 0, p3) * DEG;
+  return camera([0, 240 * p3, 0], yaw, pitch, F);
+}
+function prism(cam, x, z, rr, h, top, side, list) {
+  const V = hexV(x, z, rr), faces = [];
+  if (h > 0.8) for (let k = 0; k < 6; k++) {
+    const a = V[k], b = V[(k + 1) % 6], n = SIDE_N[k], mid = [(a[0] + b[0]) / 2, h / 2, (a[1] + b[1]) / 2];
+    if (!facing(cam, mid, n)) continue;
+    faces.push([[cam.P([a[0], 0, a[1]]), cam.P([b[0], 0, b[1]]), cam.P([b[0], h, b[1]]), cam.P([a[0], h, a[1]])], side(lambert(n))]);
+  }
+  if (cam.C[1] > h) faces.push([V.map((v) => cam.P([v[0], h, v[1]])), top]);
+  for (const [p, c] of faces) list.push(`<polygon points="${p.map(P2).join(" ")}" fill="${css(c)}"/>`);
+}
+function sceneCity(t) {
+  const cam = cityCam(t), items = [];
+  const kBlue = expoInOut(seg(t, 7.6, 7.98));
+  const morphing = t < 5.9;
+  for (const k of CELLS) {
+    const ext = spring(t, 6.5 + k.d * 0.00028, 13);
+    let g, h, top, side;
+    if (k.blue >= 0) {
+      if (morphing) continue;
+      g = 1; h = H7[k.blue] * ext;
+      top = BLUE;
+      side = (lam) => mixc(mixc(NAVY, BLUE, 0.42 + 0.58 * lam), BLUE, kBlue);
+    } else {
+      const dl = 0.14 * (1 - k.d / 1190), ret = 1 - expoIn(seg(t, 7.5 + dl, 7.8 + dl));
+      g = spring(t, 5.52 + k.d * 0.00034, 14) * ret;
+      if (g < 0.02) continue;
+      h = k.h * ext * ret;
+      top = k.route >= 0 && t >= 7.0 + 0.44 * k.route ? SAND : mixc(NAVY, WHITE, 0.13 + 0.8 * clamp(h / 150));
+      side = (lam) => mixc(NAVY, WHITE, 0.1 + 0.42 * lam);
+    }
+    const dep = cam.depth([k.x, h / 2, k.z]);
+    if (dep < 90) continue;
+    const sc = cam.P([k.x, 0, k.z]);
+    if (sc[0] < -400 || sc[0] > W + 400 || sc[1] < -500 || sc[1] > H + 400) continue;
+    items.push({ dep, k, g, h, top, side });
+  }
+  items.sort((a, b) => b.dep - a.dep);
+  const list = [];
+  for (const it of items) prism(cam, it.k.x, it.k.z, RD * it.g, it.h, it.top, it.side, list);
+  out.push(list.join(""));
+  if (morphing) {
+    // bar 3, beat 4: the seven arrows fold into seven hex cells, and the district grows out around them
+    const m = expoInOut(seg(t, 5.5, 5.88));
+    for (let i = 0; i < 7; i++) {
+      const x = CX + (i - 3) * 120;
+      poly(lpa(place(CHEV, 2, x), hexMorph(x, CY, RD), m), BLUE);
+    }
+  }
+}
+let BR = null; // the seven bars as the chart sees them: the blue towers seen front-on at 8 s
+function barRects() {
+  if (BR) return BR;
+  const cam = cityCam(8.0);
+  BR = BLUECELLS.map((k) => {
+    const ps = hexV(k.x, k.z, RD).flatMap((v) => [cam.P([v[0], 0, v[1]]), cam.P([v[0], H7[k.blue], v[1]])]);
+    return { x0: Math.min(...ps.map((p) => p[0])), x1: Math.max(...ps.map((p) => p[0])), y0: Math.min(...ps.map((p) => p[1])), y1: Math.max(...ps.map((p) => p[1])) };
+  });
+  const base = Math.max(...BR.map((b) => b.y1));
+  BR.forEach((b) => (b.y1 = base));
+  return BR;
+}
+
+/* ======================= bar 5 (8-10) data and UI ======================= */
+const chartOff = (t) => { const e = expoInOut(seg(t, 9.0, 9.42)); return [-280 * e, 16 * e]; };
+const pushZ = (t) => 1 + 0.06 * expoInOut(seg(t, 9.5, 10.0));
+const pushP = (p, t) => { const z = pushZ(t); return [CX + (p[0] - CX) * z, CY + (p[1] - CY) * z]; };
+const barTop = (i, t) => { const b = barRects()[i], o = chartOff(t); return [(b.x0 + b.x1) / 2 + o[0], b.y0 + o[1]]; };
+/** a line of type that rises into place through a slot, and drops back out of it */
+function slotText(x, y, s, size, fill, inP, outP = 0, extra = "") {
+  if (inP <= 0 || outP >= 1) return;
+  const dy = (1 - inP) * size * 1.15 + outP * size * 1.15;
+  const c = clipRect(x - 20, y - size * 1.0, W, size * 1.3);
+  out.push(`<g ${c}>`); text(x, y + dy, s, size, fill, extra); out.push("</g>");
+}
+const fmt = (n) => n.toLocaleString("en-US");
+function sceneData(t) {
+  const B = barRects(), base = B[0].y1, o = chartOff(t), z = pushZ(t);
+  const gone = expoIn(seg(t, 10.0, 10.3));
+  out.push(`<g transform="translate(${f1(CX)} ${f1(CY)}) scale(${z.toFixed(4)}) translate(${f1(-CX)} ${f1(-CY)})">`);
+  // beat 3 (9 s): the main card draws itself around the chart
+  const card = { x: 180, y: 220, w: 1000, h: 640 };
+  const cg = expoOut(seg(t, 9.0, 9.45)) * (1 - gone);
+  if (cg > 0) {
+    rect(card.x, card.y + card.h * (1 - cg), card.w, card.h * cg, WHITE, `fill-opacity="0.045"`);
+    out.push(`<rect x="${card.x}" y="${card.y}" width="${card.w}" height="${card.h}" rx="18" fill="none" stroke="${WHITE}" stroke-opacity="0.22" stroke-width="2" pathLength="1" stroke-dasharray="${cg.toFixed(4)} 1"/>`);
+  }
+  // beat 1 (8 s): the axis and the gridlines draw out from the centre
+  const gx0 = lerp(150, card.x + 40, expoInOut(seg(t, 9.0, 9.42))), gx1 = lerp(1770, card.x + card.w - 40, expoInOut(seg(t, 9.0, 9.42)));
+  const gm = (gx0 + gx1) / 2;
+  for (let k = 0; k <= 4; k++) {
+    const e = expoOut(seg(t, 8.0 + 0.05 * k, 8.4 + 0.05 * k)) * (1 - expoIn(seg(t, 10.0 + 0.02 * k, 10.28 + 0.02 * k)));
+    if (e <= 0) continue;
+    const y = base + o[1] - 100 * k, half = ((gx1 - gx0) / 2) * e;
+    rect(gm - half, y - (k ? 0.75 : 1.25), half * 2, k ? 1.5 : 2.5, WHITE, k ? `fill-opacity="0.16"` : "");
+  }
+  // the bars: the blue towers, now data; the cursor lights the one it crosses
+  const cur = (s) => lerp(B[0].x0 - 30, B[6].x1 + 30, expoInOut(seg(s, 9.5, 9.98))) + o[0];
+  B.forEach((b, i) => {
+    const y0 = lerp(b.y0, base, expoIn(seg(t, 10.0, 10.32)));
+    const lit = t >= 9.5 && t < 10.0 && Math.abs(cur(t) - ((b.x0 + b.x1) / 2 + o[0])) < (b.x1 - b.x0) / 2 + 6;
+    rect(b.x0 + o[0], y0 + o[1], b.x1 - b.x0, base - y0, lit ? WHITE : BLUE);
+  });
+  // beat 2 (8.5 s): a sand line runs through the tops, and the courier count counts up
+  if (t >= 8.5 && t < 10.0) {
+    const p = expoInOut(seg(t, 8.5, 8.92)), tops = B.map((_, i) => barTop(i, t));
+    const n = p * 6, pts = tops.slice(0, Math.floor(n) + 1);
+    if (n < 6) pts.push(lp2(tops[Math.floor(n)], tops[Math.floor(n) + 1], n - Math.floor(n)));
+    pline(pts.map((q) => [q[0], q[1] - 22]), SAND, 3.5);
+    tops.forEach((q, i) => { const e = spring(t, 8.5 + (i / 6) * 0.36, 20); if (e > 0.01) circle(q[0], q[1] - 22, 7 * e, SAND); });
+  }
+  const tx = 230 - 760 * gone;
+  const cnt = Math.round(1000 * expoOut(seg(t, 8.5, 9.3)));
+  slotText(tx, 350, `${fmt(cnt)}+`, 120, WHITE, expoOut(seg(t, 8.5, 8.85)));
+  slotText(tx + 4, 398, "COURIERS ON THE NETWORK", 19, WHITE, expoOut(seg(t, 8.58, 8.93)), 0, `fill-opacity="0.72" letter-spacing="4.6"`);
+  // beat 4 (9.5 s): a live cursor scrubs the chart while the camera pushes in
+  if (t >= 9.5 && t < 10.2) {
+    const x = cur(t), e = 1 - expoIn(seg(t, 10.0, 10.2));
+    const b = mblur((s) => [cur(s), 0], t, 0.4);
+    out.push(`<g ${b}>`);
+    const yb = base + o[1];
+    rect(x - 1, yb - (yb - 430) * e, 2, (yb - 430) * e, WHITE);
+    if (e > 0.5) {
+      out.push(`<rect x="${f1(x - 42)}" y="${f1(yb + 12)}" width="84" height="34" rx="17" fill="${BLUE}"/>`);
+      circle(x - 22, yb + 29, 5, WHITE);
+      text(x - 11, yb + 36, "LIVE", 18, WHITE, `letter-spacing="2"`);
+    }
+    out.push("</g>");
+  }
+  // beat 3: two cards slide in beside it
+  [["100+", "VEHICLES", 220, 9.08], ["24/7", "LIVE OPERATIONS", 560, 9.16]].forEach(([big, label, y, t0]) => {
+    const xf = (s) => [1240 + 760 * (1 - expoOut(seg(s, t0, t0 + 0.42))) + 900 * expoIn(seg(s, 10.0, 10.3)), 0];
+    if (t < t0) return;
+    const x = xf(t)[0];
+    out.push(`<g ${mblur(xf, t)}>`);
+    out.push(`<rect x="${f1(x)}" y="${y}" width="500" height="300" rx="18" fill="${WHITE}" fill-opacity="0.045" stroke="${WHITE}" stroke-opacity="0.22" stroke-width="2"/>`);
+    text(x + 44, y + 176, big, 120, WHITE);
+    text(x + 48, y + 226, label, 19, WHITE, `fill-opacity="0.72" letter-spacing="4.6"`);
+    rect(x + 44, y + 52, 46, 5, label === "VEHICLES" ? SAND : BLUE);
+    out.push("</g>");
+  });
+  out.push("</g>");
+}
+
+/* ======================= bars 6-7 (10-14) the network, then the mark in 3D ======================= */
+function mapCam(t) {
+  const a = expoInOut(seg(t, 11.5, 11.96)), b = expoInOut(seg(t, 12.0, 12.4)), c = expoInOut(seg(t, 12.4, 12.84));
+  const pitch = lerp(lerp(lerp(90, 58, a), 38, b), 0, c) * DEG;
+  const yaw = lerp(lerp(lerp(0, -12, a), -36, b), 0, c) * DEG;
+  const T = lp3(lp3([0, 0, 0], [RW[0], 0, RW[2]], a), [RW[0], YM, RW[2]], c);
+  return camera(T, yaw, pitch, lerp(lerp(F, 1540, b), F + 30, c));
+}
+function routePts(j, t) {
+  const r = ROUTES[j], lift = expoInOut(seg(t, 12.0, 12.36));
+  const m = expoInOut(seg(t, 12.4 + 0.025 * j, 12.76 + 0.025 * j));
+  return r.g.map((p, k) => {
+    const s = k / (NR - 1), a = [p[0], lift * 4 * s * (1 - s) * r.len * 0.42, p[2]];
+    return m > 0 ? lp3(a, lp3(hexW(r.edge), hexW(r.edge + 1), s), m) : a;
+  });
+}
+function mark3D(cam, t, alpha, s, depth, grow) {
+  const ca = Math.cos(alpha), sa = Math.sin(alpha), zp = ZF + depth / 2;
+  const W3 = (lx, ly, lz) => [RW[0] + lx * ca + lz * sa, YM + ly, zp - lx * sa + lz * ca];
+  const N3 = (n) => [n[0] * ca + n[2] * sa, n[1], -n[0] * sa + n[2] * ca];
+  const faces = [];
+  const pieces = [[PA, WHITE, BLUE, (l) => mixc(NAVY, WHITE, 0.3 + 0.5 * l)], [PB, BLUE, WHITE, (l) => mixc(NAVY, BLUE, 0.35 + 0.6 * l)], [PC, BLUE, WHITE, (l) => mixc(NAVY, BLUE, 0.35 + 0.6 * l)]];
+  const sg = s * grow;
+  for (const [shape, front, back, side] of pieces) {
+    const L = shape.map((p) => [p[0] * sg, -p[1] * sg]);
+    const area = L.reduce((a, p, i) => { const q = L[(i + 1) % L.length]; return a + p[0] * q[1] - q[0] * p[1]; }, 0);
+    const fz = -depth / 2, bz = depth / 2;
+    const fr = L.map((p) => W3(p[0], p[1], fz)), bk = L.map((p) => W3(p[0], p[1], bz));
+    const ctr = (P) => P.reduce((a, p) => [a[0] + p[0] / P.length, a[1] + p[1] / P.length, a[2] + p[2] / P.length], [0, 0, 0]);
+    const nf = N3([0, 0, -1]), nb = N3([0, 0, 1]);
+    if (depth < 0.5) { faces.push([fr, front, 0]); continue; }
+    if (facing(cam, ctr(fr), nf)) faces.push([fr, front]);
+    if (facing(cam, ctr(bk), nb)) faces.push([bk, back]);
+    for (let i = 0; i < L.length; i++) {
+      const a = L[i], b = L[(i + 1) % L.length], ex = b[0] - a[0], ey = b[1] - a[1], el = Math.hypot(ex, ey) || 1;
+      const nl = area > 0 ? [ey / el, -ex / el, 0] : [-ey / el, ex / el, 0], n = N3(nl);
+      const q = [fr[i], fr[(i + 1) % L.length], bk[(i + 1) % L.length], bk[i]];
+      if (facing(cam, ctr(q), n)) faces.push([q, side(lambert(n))]);
+    }
+  }
+  faces.forEach((fc) => (fc[2] = fc[2] === 0 ? 0 : cam.depth(fc[0].reduce((a, p) => [a[0] + p[0] / fc[0].length, a[1] + p[1] / fc[0].length, a[2] + p[2] / fc[0].length], [0, 0, 0]))));
+  faces.sort((a, b) => b[2] - a[2]);
+  for (const [q, c] of faces) poly(q.map((p) => cam.P(p)), c);
+}
+function sceneMap(t) {
+  const cam = mapCam(t), riyS = cam.P(RW);
+  // beat 1 (10 s): the sand line collapses into Riyadh
+  if (t < 10.42) {
+    const e = expoInOut(seg(t, 10.0, 10.38));
+    const pts = BLUECELLS.map((_, i) => lp2(pushP([barTop(i, 10.0)[0], barTop(i, 10.0)[1] - 22], 10.0), riyS, e));
+    pline(pts, SAND, 3.5 * pushZ(10));
+  }
+  // the outline of the Kingdom draws itself, and drops away in bar 7
+  const od = 620 * expoIn(seg(t, 12.0, 12.36));
+  if (t >= 10.15 && od < 600) {
+    const p = expoInOut(seg(t, 10.15, 10.8));
+    pline(OUTLINE.map((w) => cam.P([w[0], -od, w[2]])), WHITE, 1.6, `stroke-opacity="0.5" pathLength="1" stroke-dasharray="${p.toFixed(4)} 1"`);
+  }
+  // the bars dissolve into the Kingdom's dots, west to east; in bar 7 they fall away, the far ones first
+  const src = BLUECELLS.map((_, i) => { const b = barRects()[i], o = chartOff(10); return { x0: b.x0 + o[0], x1: b.x1 + o[0], y0: b.y0 + o[1], y1: b.y1 + o[1] }; });
+  const dots = [];
+  for (const d of DOTS) {
+    const t0 = 10.0 + 0.28 * (d.mx / 1000) + 0.04 * d.j;
+    const s = expoInOut(seg(t, t0, t0 + 0.44));
+    if (s <= 0) continue;
+    const dl = 12.0 + 0.24 * (1 - d.dr / DRMAX), fall = seg(t, dl, dl + 0.34);
+    if (fall >= 1) continue;
+    const q = cam.P([d.w[0], -620 * expoIn(fall), d.w[2]]);
+    let x = q[0], y = q[1], r = (4.3 * F) / q[2];
+    if (s < 1) { const b = src[d.bar], a = pushP([lerp(b.x0, b.x1, d.hx), lerp(b.y0, b.y1, d.hy)], 10.0); x = lerp(a[0], x, s); y = lerp(a[1], y, s); r = 4.3; }
+    dots.push(`<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(r)}"/>`);
+  }
+  out.push(`<g fill="${BLUE}">${dots.join("")}</g>`);
+  // beat 2 (10.5 s): six routes run out of Riyadh; in bar 7 they lift into arcs, then sweep into the hexagon
+  const sw = 3.6 * (1 - expoIn(seg(t, 12.9, 13.14)));
+  if (t >= 10.38 && t < 10.5) circle(riyS[0], riyS[1], 7, SAND);
+  if (t >= 10.5 && sw > 0.05) ROUTES.forEach((r, j) => {
+    const p = expoInOut(seg(t, 10.5 + 0.05 * j, 10.92 + 0.05 * j));
+    if (p <= 0) return;
+    const W3 = routePts(j, t), n = p * (NR - 1), pts = W3.slice(0, Math.floor(n) + 1);
+    if (n < NR - 1) pts.push(lp3(W3[Math.floor(n)], W3[Math.floor(n) + 1], n - Math.floor(n)));
+    pline(pts.map((w) => cam.P(w)), SAND, sw);
+  });
+  // beat 3 (11 s): hex nodes on the cities, and their names
+  if (t >= 10.5 && t < 12.3) {
+    const shrink = 1 - expoIn(seg(t, 12.0, 12.26));
+    const node = (w, rr, fill, extra = "") => poly(hexV(w[0], w[2], rr).map((v) => cam.P([v[0], 0, v[1]])), fill, extra);
+    ROUTES.forEach((r, j) => {
+      const g = spring(t, 11.0 + 0.04 * j, 18) * shrink;
+      const w = r.g[NR - 1];
+      if (g > 0.01) node(w, 10 * g, WHITE);
+      const q = cam.P(w);
+      slotText(q[0] + 20, q[1] + 7, r.name, 18, WHITE, expoOut(seg(t, 11.06 + 0.04 * j, 11.4 + 0.04 * j)), expoIn(seg(t, 12.0, 12.2)), `letter-spacing="3.6"`);
+    });
+    const g = Math.max(spring(t, 10.98, 18), t < 11 ? 0 : 0) * shrink;
+    if (t < 10.98) circle(riyS[0], riyS[1], 7, SAND);
+    else if (g > 0.01) node(RW, 17 * g, BLUE, `stroke="${WHITE}" stroke-width="2.5"`);
+    slotText(riyS[0] + 26, riyS[1] + 7, "RIYADH", 18, SAND, expoOut(seg(t, 11.02, 11.36)), expoIn(seg(t, 12.0, 12.2)), `letter-spacing="3.6"`);
+  }
+  // bar 7: the mark fills the hexagon, extrudes, spins a full turn and lands at logo size
+  if (t >= 12.72) {
+    const grow = spring(t, 12.74, 15);
+    const depth = 60 * spring(t, 12.82, 13) * (1 - expoInOut(seg(t, 13.72, 13.97)));
+    const af = (s) => TAU * expoInOut(seg(s, 13.0, 13.95)), alpha = af(t);
+    const s = lerp(MK3, SL, expoInOut(seg(t, 13.5, 13.95)));
+    // beat 4 (13.5 s): a chevron-edged black wipe takes the navy away, right to left
+    out.push(`<g ${blur(Math.abs(af(t) - af(t - DT)) * s * 36 * 0.5, 0)}>`);
+    mark3D(cam, t, alpha, s, depth, grow);
+    out.push("</g>");
+  }
+}
+
+/* ======================= end title (14-15) and back to the point ======================= */
+let LOCK = null;
+function lockup() {
+  if (LOCK) return LOCK;
+  const tw = mtext("MSG Horizons", 104), gw = mtext("INTEGRATED LOGISTICS · KINGDOM OF SAUDI ARABIA", 18, 5.6);
+  const mw = 73.34 * SL, gap = 46, total = mw + gap + Math.max(tw, gw), left = CX - total / 2;
+  LOCK = { mx: left + mw / 2, tx: left + mw + gap, tw, gw };
+  return LOCK;
+}
+function resample(poly, N) {
+  const L = poly.map((p, i) => Math.hypot(poly[(i + 1) % poly.length][0] - p[0], poly[(i + 1) % poly.length][1] - p[1]));
+  const tot = L.reduce((a, b) => a + b, 0), out2 = [];
+  let i = 0, acc = 0;
+  for (let k = 0; k < N; k++) {
+    const d = (k / N) * tot;
+    while (acc + L[i] < d) { acc += L[i]; i++; }
+    out2.push(lp2(poly[i], poly[(i + 1) % poly.length], (d - acc) / (L[i] || 1)));
+  }
+  return out2;
+}
+function toCircle(poly, cx, cy, r, N = 120) {
+  const pts = resample(poly, N), c = pts.reduce((a, p) => [a[0] + p[0] / N, a[1] + p[1] / N], [0, 0]);
+  const area = pts.reduce((a, p, i) => { const q = pts[(i + 1) % N]; return a + p[0] * q[1] - q[0] * p[1]; }, 0);
+  const a0 = Math.atan2(pts[0][1] - c[1], pts[0][0] - c[0]), dir = area > 0 ? 1 : -1;
+  return { pts, circ: pts.map((_, k) => [cx + r * Math.cos(a0 + (dir * TAU * k) / N), cy + r * Math.sin(a0 + (dir * TAU * k) / N)]) };
+}
+function sceneEnd(t) {
+  if (t >= 14.95) { circle(CX, CY, 12, BLUE); return; }
+  const Lk = lockup();
+  const mxf = (s) => [lerp(lerp(CX, Lk.mx, expoInOut(seg(s, 14.0, 14.28))), CX, expoInOut(seg(s, 14.55, 14.9))), CY];
+  const mx = mxf(t)[0], edge = mx + 36.67 * SL + 14;
+  // beat 1 (14 s): the name slides out from behind the mark; beat 2 (14.5 s): it slides back in
+  const slide = (s, d) => -(Lk.gw + 80) * (1 - expoOut(seg(s, 14.03 + d, 14.38 + d))) - (Lk.gw + 120) * expoIn(seg(s, 14.5 + d * 0.5, 14.76 + d * 0.5));
+  if (t < 14.78) {
+    const c = clipRect(edge, 0, W, H);
+    const tf = (s) => [Lk.tx + slide(s, 0), 0], gf = (s) => [Lk.tx + 2 + slide(s, 0.05), 0];
+    out.push(`<g ${c}>`);
+    out.push(`<g ${mblur(tf, t, 0.4)}>`); text(tf(t)[0], CY + 10, "MSG Horizons", 104, WHITE, `letter-spacing="-1.5"`); out.push("</g>");
+    out.push(`<g ${mblur(gf, t, 0.4)}>`); text(gf(t)[0], CY + 56, "INTEGRATED LOGISTICS · KINGDOM OF SAUDI ARABIA", 18, WHITE, `fill-opacity="0.72" letter-spacing="5.6"`); out.push("</g>");
+    out.push("</g>");
+  }
+  const m = expoInOut(seg(t, 14.6, 14.95)), b = mblur(mxf, t, 0.4);
+  out.push(`<g ${b}>`);
+  const A = toCircle(place(PA, SL, mx), CX, CY, 10.5), Cv = toCircle(place(CHEV, SL, mx), CX, CY, 12);
+  poly(m > 0 ? lpa(A.pts, A.circ, m) : place(PA, SL, mx), WHITE);
+  poly(m > 0 ? lpa(Cv.pts, Cv.circ, m) : place(CHEV, SL, mx), BLUE);
+  out.push("</g>");
+}
+
+/* ======================= the frame ======================= */
+function seek(t) {
+  t = clamp(t, 0, 15);
+  out = []; defs = []; FIL = new Map(); clipN = 0;
+  rect(0, 0, W, H, BLACK);
+  // the navy ground: open from the seam at 1 s, taken away by the chevron wipe at 13.5 s
+  if (t >= 1.0 && t < 13.98) {
+    if (t < 13.5) rect(0, 0, W, H, NAVY);
+    else {
+      const wf = (s) => [lerp(W + 330, -330, expoInOut(seg(s, 13.5, 13.98))), 0], x = wf(t)[0];
+      poly([[-40, -40], [x, -40], [x - 300, CY], [x, H + 40], [-40, H + 40]], NAVY, mblur(wf, t, 0.35));
+    }
+  }
+  if (t < 4.0) sceneType(t);
+  else if (t < 5.5) sceneMark(t);
+  else if (t < 8.0) sceneCity(t);
+  if (t >= 8.0 && t < 10.4) sceneData(t);
+  if (t >= 10.0 && t < 14.0) sceneMap(t);
+  if (t >= 14.0) sceneEnd(t);
+  svg.innerHTML = `<defs>${[...FIL.values()].join("")}${defs.join("")}</defs>${out.join("")}`;
+}
+
+window.seek = seek;
+window.ready = (async () => {
+  await document.fonts.load('700 100px "Funnel"');
+  await document.fonts.ready;
+  layoutWords();
+  barRects();
+  seek(0);
+})();
+})();
+</script>
+</body>
+</html>

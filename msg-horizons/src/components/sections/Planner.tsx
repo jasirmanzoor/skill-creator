@@ -204,7 +204,7 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
                                 className={`group flex flex-col items-center gap-1.5 text-[11px] font-semibold transition-colors duration-300 sm:text-xs ${here ? "text-ink" : done ? "text-brand hover:text-brand-strong" : "text-muted"}`}
                               >
                                 <span className={`relative grid size-6 place-items-center rounded-full text-[11px] transition-[background-color,box-shadow,color] duration-300 ${
-                                  here ? "bg-ink text-white shadow-[0_0_0_4px_rgba(12,14,17,0.08)]" : done ? "bg-brand text-white" : "bg-surface text-muted ring-2 ring-line"
+                                  here ? "bg-ink text-white shadow-[0_0_0_4px_rgba(17,26,51,0.08)]" : done ? "bg-brand text-white" : "bg-surface text-muted ring-2 ring-line"
                                 }`}>
                                   {here ? <span aria-hidden="true" className="plan-ping absolute inset-0 rounded-full bg-ink/30" /> : null}
                                   <span className="relative">{done ? <CheckIcon className="size-3" /> : <span className="num">{i + 1}</span>}</span>
@@ -371,11 +371,11 @@ function Option({
       title={desc || undefined}
       className={`group relative isolate flex min-h-[3.5rem] items-center gap-2.5 overflow-hidden rounded-xl border bg-surface px-2.5 py-2 text-start transition-ui duration-200 sm:gap-3 sm:px-3 ${
         checked
-          ? "border-brand bg-brand-soft/60 shadow-[0_0_0_1px_var(--color-brand),0_16px_32px_-22px_rgba(11,125,54,0.7)]"
+          ? "border-brand bg-brand-soft/60 shadow-[0_0_0_1px_var(--color-brand),0_16px_32px_-22px_rgba(0,107,182,0.7)]"
           : "border-line-strong/70 hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-[var(--shadow-card)]"
       }`}
     >
-      <span aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-300 [background:radial-gradient(140px_circle_at_var(--mx,50%)_var(--my,50%),rgba(19,113,121,0.13),transparent_70%)] group-hover:opacity-100" />
+      <span aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-300 [background:radial-gradient(140px_circle_at_var(--mx,50%)_var(--my,50%),rgba(10,90,153,0.13),transparent_70%)] group-hover:opacity-100" />
       <span className={`inline-flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors ${
         checked ? "bg-brand text-white" : "bg-subtle text-ink-3 group-hover:bg-ink group-hover:text-white"
       }`}>
@@ -449,7 +449,7 @@ function Result({
             onClick={() => setTab(id)}
             className={`relative min-w-0 flex-1 rounded-full px-2 py-2 text-xs font-semibold leading-tight transition-colors sm:text-sm ${tab === id ? "text-ink" : "text-muted hover:text-ink"}`}
           >
-            {tab === id ? <motion.span layoutId="plan-tab" transition={{ type: "spring", stiffness: 420, damping: 34 }} className="absolute inset-0 rounded-full bg-surface shadow-[0_1px_3px_rgba(12,14,17,0.15)]" /> : null}
+            {tab === id ? <motion.span layoutId="plan-tab" transition={{ type: "spring", stiffness: 420, damping: 34 }} className="absolute inset-0 rounded-full bg-surface shadow-[0_1px_3px_rgba(17,26,51,0.15)]" /> : null}
             <span className="relative">{k.tabs[id]}</span>
           </button>
         ))}

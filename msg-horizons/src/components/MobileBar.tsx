@@ -6,6 +6,7 @@ import { whatsappLink } from "@/content/facts";
 import { bookState, onBookState } from "@/lib/book";
 import type { Dictionary } from "@/content/i18n";
 import { WhatsAppIcon } from "./ui/icons";
+import Glass, { useGlass } from "./fx/Glass";
 
 /** where the route's progress button docks while the bar is showing (components/journey) */
 export const ROUTE_SLOT_ID = "route-slot";
@@ -34,13 +35,15 @@ export default function MobileBar({ t }: { t: Dictionary }) {
     document.documentElement.toggleAttribute(MOBILE_BAR_ATTR, show);
     window.dispatchEvent(new Event(MOBILE_BAR_EVENT));
   }, [show]);
+  const glass = useGlass();
   return (
     <div
-      className={`mobile-bar push-shift fixed inset-x-3 bottom-3 z-40 flex items-center gap-2 rounded-2xl border border-line bg-surface/95 p-2 shadow-[var(--shadow-float)] backdrop-blur transition-ui duration-[240ms] lg:hidden ${
+      className={`mobile-bar push-shift fixed inset-x-3 bottom-3 z-40 flex items-center gap-2 rounded-2xl border border-line p-2 shadow-[var(--shadow-float)] ${glass ? "bg-surface/75" : "bg-surface/95 backdrop-blur"} transition-ui duration-[240ms] lg:hidden ${
         show ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-[calc(100%+0.75rem)] opacity-0"
       }`}
       aria-hidden={!show}
     >
+      <Glass radius={16} />
       <div id={ROUTE_SLOT_ID} className="contents" />
       <a href="#planner" tabIndex={show ? 0 : -1} onClick={() => track("cta_click", { cta: "plan", location: "mobile_bar" })}
         className="btn-primary min-h-12 flex-1 px-5 py-3">

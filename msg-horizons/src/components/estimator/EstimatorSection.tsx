@@ -1,5 +1,6 @@
 "use client";
 
+import Logo from "../ui/Logo";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { accessCopy } from "@/content/access";
@@ -92,9 +93,9 @@ export default function EstimatorSection({ t, lang }: { t: Dictionary; lang: Loc
               transition={{ duration: 0.45, ease: EASE_OUT }}
               className="overflow-hidden"
             >
-              <div role="status" className="mt-8 flex flex-col gap-4 rounded-2xl bg-teal-deep p-5 text-white shadow-[0_30px_60px_-30px_rgba(11,58,64,0.8)] sm:flex-row sm:items-center sm:justify-between sm:p-6">
+              <div role="status" className="mt-8 flex flex-col gap-4 rounded-2xl bg-teal-deep p-5 text-white shadow-[0_30px_60px_-30px_rgba(28,44,81,0.8)] sm:flex-row sm:items-center sm:justify-between sm:p-6">
                 <div className="flex items-start gap-3">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-brand-bright text-sm font-bold text-pitch">MSG</span>
+                  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-deep ring-1 ring-white/20"><Logo inverted variant="mark" height={16} /></span>
                   <div>
                     <p className="font-display text-lg font-semibold">{fmt(c.welcome.hello, { name: who.name.split(" ")[0] })}</p>
                     <p className="mt-0.5 text-white/75">{answer === "yes" ? c.welcome.thanks : answer === "no" ? c.welcome.later : c.welcome.ask}</p>
@@ -196,7 +197,7 @@ function Gate({ lang, onIn }: { lang: Locale; onIn: (v: Visitor) => void }) {
       onSubmit={submit}
       noValidate
       aria-labelledby="est-gate-title"
-      className="w-full max-w-md rounded-3xl bg-white p-6 shadow-[0_50px_100px_-40px_rgba(11,58,64,0.75)] ring-1 ring-teal/10 sm:p-8"
+      className="w-full max-w-md rounded-3xl bg-white p-6 shadow-[0_50px_100px_-40px_rgba(28,44,81,0.75)] ring-1 ring-teal/10 sm:p-8"
     >
       <span className="grid size-11 place-items-center rounded-2xl bg-gradient-to-br from-teal to-teal-deep text-white">
         <svg viewBox="0 0 24 24" className="size-5" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>

@@ -3,13 +3,13 @@
 type Tone = "teal" | "forest" | "sand";
 
 const BASE: Record<Tone, string> = {
-  teal: "linear-gradient(160deg,#0b3a40 0%,#137179 55%,#6cc3c3 100%)",
-  forest: "linear-gradient(160deg,#04110a 0%,#0b3a26 50%,#0f9641 100%)",
-  sand: "linear-gradient(160deg,#5a3a12 0%,#b98a45 55%,#f3dfb6 100%)",
+  teal: "linear-gradient(160deg,#1c2c51 0%,#0a5a99 55%,#5fb3ec 100%)",
+  forest: "linear-gradient(160deg,#04110a 0%,#1c2c51 50%,#009df8 100%)",
+  sand: "linear-gradient(160deg,#5a3a12 0%,#b98a45 55%,#dcebfa 100%)",
 };
 const SHEEN: Record<Tone, string> = {
   teal: "radial-gradient(70% 60% at 75% 20%,rgba(226,244,243,0.55),transparent 70%)",
-  forest: "radial-gradient(70% 60% at 75% 20%,rgba(76,201,122,0.35),transparent 70%)",
+  forest: "radial-gradient(70% 60% at 75% 20%,rgba(0,157,248,0.35),transparent 70%)",
   sand: "radial-gradient(70% 60% at 75% 20%,rgba(255,246,220,0.6),transparent 70%)",
 };
 const MASK: Record<"all" | "bottom" | "start" | "end" | "soft" | "none", string | undefined> = {

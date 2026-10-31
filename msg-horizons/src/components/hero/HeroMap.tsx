@@ -112,9 +112,9 @@ type Parcel = { route: Route; t: number; speed: number; kind: Kind; ping: boolea
 type Ping = { p: P; age: number; label: string; tone: Kind };
 
 const TONE: Record<Kind, { fill: string; glow: string; trail: string }> = {
-  parcel: { fill: "#0b7d36", glow: "rgba(76,201,122,0.9)", trail: "11,125,54" },
-  coin: { fill: "#c9962e", glow: "rgba(232,190,96,0.95)", trail: "201,150,46" },
-  return: { fill: "#137179", glow: "rgba(108,195,195,0.9)", trail: "19,113,121" },
+  parcel: { fill: "#006bb6", glow: "rgba(0,157,248,0.9)", trail: "11,125,54" },
+  coin: { fill: "#4db8fa", glow: "rgba(232,190,96,0.95)", trail: "201,150,46" },
+  return: { fill: "#0a5a99", glow: "rgba(108,195,195,0.9)", trail: "19,113,121" },
 };
 
 export default function HeroMap({ lang, lane, stage = -1 }: { lang: Locale; lane: HeroLane; stage?: number }) {
@@ -178,7 +178,7 @@ export default function HeroMap({ lang, lane, stage = -1 }: { lang: Locale; lane
       ctx.setLineDash([]);
     };
     /** a white label pill pinned to a point on the map, kept inside the frame */
-    const pill = (text: string, at: { x: number; y: number }, alpha: number, dot = "#137179", dy = -24) => {
+    const pill = (text: string, at: { x: number; y: number }, alpha: number, dot = "#0a5a99", dy = -24) => {
       if (alpha < 0.02 || view.w < 300) return;
       ctx.font = font(600, 11);
       const tw = ctx.measureText(text).width + 30;
@@ -186,7 +186,7 @@ export default function HeroMap({ lang, lane, stage = -1 }: { lang: Locale; lane
       const y = Math.min(view.h - 16, Math.max(16, at.y + dy));
       ctx.globalAlpha = alpha;
       ctx.fillStyle = "rgba(255,255,255,0.96)";
-      ctx.shadowColor = "rgba(11,58,64,0.22)";
+      ctx.shadowColor = "rgba(28,44,81,0.22)";
       ctx.shadowBlur = 14;
       ctx.beginPath();
       ctx.roundRect(x - tw / 2, y - 11, tw, 22, 11);
@@ -196,7 +196,7 @@ export default function HeroMap({ lang, lane, stage = -1 }: { lang: Locale; lane
       ctx.beginPath();
       ctx.arc(x - tw / 2 + 12, y, 3.5, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = "#0b3a40";
+      ctx.fillStyle = "#1c2c51";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(text, x + 7, y + 0.5);
@@ -232,7 +232,7 @@ export default function HeroMap({ lang, lane, stage = -1 }: { lang: Locale; lane
       g.addColorStop(1, "rgba(226,244,243,0.25)");
       ctx.fillStyle = g;
       ctx.fill();
-      ctx.strokeStyle = "rgba(19,113,121,0.35)";
+      ctx.strokeStyle = "rgba(10,90,153,0.35)";
       ctx.lineWidth = 1.2;
       ctx.stroke();
       ctx.restore();
@@ -242,7 +242,7 @@ export default function HeroMap({ lang, lane, stage = -1 }: { lang: Locale; lane
         const q = S(d);
         if (q.x < -4 || q.y < -4 || q.x > view.w + 4 || q.y > view.h + 4) continue;
         const near = Math.max(0, 1 - Math.hypot(q.x - hub.x, q.y - hub.y) / reach);
-        ctx.fillStyle = `rgba(19,113,121,${0.16 + near * 0.32})`;
+        ctx.fillStyle = `rgba(10,90,153,${0.16 + near * 0.32})`;
         ctx.beginPath();
         ctx.arc(q.x, q.y, Math.max(0.9, view.s * 1.9 * zs), 0, Math.PI * 2);
         ctx.fill();
@@ -335,17 +335,17 @@ export default function HeroMap({ lang, lane, stage = -1 }: { lang: Locale; lane
         for (const o of ORIGINS) {
           const q = S(o);
           ctx.fillStyle = "#fff";
-          ctx.strokeStyle = "#137179";
+          ctx.strokeStyle = "#0a5a99";
           ctx.lineWidth = 1.6;
           ctx.beginPath();
           ctx.roundRect(q.x - 6, q.y - 6, 12, 12, 3);
           ctx.fill();
           ctx.stroke();
-          ctx.fillStyle = "#137179";
+          ctx.fillStyle = "#0a5a99";
           ctx.fillRect(q.x - 3, q.y - 1, 6, 1.6);
         }
         const from = S(ABROAD_FROM);
-        ctx.fillStyle = "#137179";
+        ctx.fillStyle = "#0a5a99";
         ctx.beginPath();
         ctx.arc(Math.max(10, from.x), from.y, 4, 0, Math.PI * 2);
         ctx.fill();
@@ -360,7 +360,7 @@ export default function HeroMap({ lang, lane, stage = -1 }: { lang: Locale; lane
         const x0 = Math.min(view.w - rw - 18, q.x + 26), y0 = Math.max(40, q.y - rh - 34);
         ctx.globalAlpha = oStore;
         ctx.fillStyle = "rgba(255,255,255,0.92)";
-        ctx.shadowColor = "rgba(11,58,64,0.25)";
+        ctx.shadowColor = "rgba(28,44,81,0.25)";
         ctx.shadowBlur = 16;
         ctx.beginPath();
         ctx.roundRect(x0 - 9, y0 - 9, rw + 18, rh + 18, 10);
@@ -369,12 +369,12 @@ export default function HeroMap({ lang, lane, stage = -1 }: { lang: Locale; lane
         for (let i = 0; i < cols * rows; i++) {
           const cx = x0 + (i % cols) * (cell + gap), cy = y0 + Math.floor(i / cols) * (cell + gap);
           const full = (clock * 1.3 + i * 0.83) % 7 < 5.4;
-          ctx.fillStyle = !full ? "#c4e9e7" : i % 5 === 3 ? "rgba(201,150,46,0.85)" : "#137179";
+          ctx.fillStyle = !full ? "#c2dff6" : i % 5 === 3 ? "rgba(0,157,248,0.85)" : "#0a5a99";
           ctx.beginPath();
           ctx.roundRect(cx, cy, cell, cell, 2.5);
           ctx.fill();
         }
-        ctx.strokeStyle = "rgba(19,113,121,0.35)";
+        ctx.strokeStyle = "rgba(10,90,153,0.35)";
         ctx.lineWidth = 1;
         ctx.setLineDash([2, 3]);
         ctx.beginPath();
@@ -383,13 +383,13 @@ export default function HeroMap({ lang, lane, stage = -1 }: { lang: Locale; lane
         ctx.stroke();
         ctx.setLineDash([]);
         const pulse = (Math.sin(clock * 2) + 1) / 2;
-        ctx.strokeStyle = `rgba(19,113,121,${0.25 + pulse * 0.2})`;
+        ctx.strokeStyle = `rgba(10,90,153,${0.25 + pulse * 0.2})`;
         ctx.lineWidth = 1.4;
         ctx.beginPath();
         ctx.arc(q.x, q.y, 26 + pulse * 10, 0, Math.PI * 2);
         ctx.stroke();
         ctx.globalAlpha = 1;
-        pill(c.kingdom.callouts.shelf, { x: x0 + rw / 2, y: y0 }, oStore, "#137179", -26);
+        pill(c.kingdom.callouts.shelf, { x: x0 + rw / 2, y: y0 }, oStore, "#0a5a99", -26);
       }
 
       // settle: the seller's account
@@ -397,12 +397,12 @@ export default function HeroMap({ lang, lane, stage = -1 }: { lang: Locale; lane
         const q = S(YOU);
         const pulse = (Math.sin(clock * 3) + 1) / 2;
         ctx.globalAlpha = oSettle;
-        ctx.fillStyle = `rgba(201,150,46,${0.15 + pulse * 0.15})`;
+        ctx.fillStyle = `rgba(0,157,248,${0.15 + pulse * 0.15})`;
         ctx.beginPath();
         ctx.arc(q.x, q.y, 14 + pulse * 6, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = "#fff";
-        ctx.strokeStyle = "#c9962e";
+        ctx.strokeStyle = "#4db8fa";
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.arc(q.x, q.y, 7, 0, Math.PI * 2);
@@ -418,13 +418,13 @@ export default function HeroMap({ lang, lane, stage = -1 }: { lang: Locale; lane
         const isHub = id === "riyadh" || id === "sabya";
         if (isHub) {
           const pulse = (Math.sin(clock * 2.4 + (id === "sabya" ? 1.5 : 0)) + 1) / 2;
-          ctx.fillStyle = `rgba(19,113,121,${0.12 + pulse * 0.1})`;
+          ctx.fillStyle = `rgba(10,90,153,${0.12 + pulse * 0.1})`;
           ctx.beginPath();
           ctx.arc(q.x, q.y, 14 + pulse * 8, 0, Math.PI * 2);
           ctx.fill();
         }
-        ctx.fillStyle = isHub ? "#137179" : "#fff";
-        ctx.strokeStyle = "#137179";
+        ctx.fillStyle = isHub ? "#0a5a99" : "#fff";
+        ctx.strokeStyle = "#0a5a99";
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.arc(q.x, q.y, isHub ? 6 : 3.6, 0, Math.PI * 2);
@@ -434,7 +434,7 @@ export default function HeroMap({ lang, lane, stage = -1 }: { lang: Locale; lane
           const label = id === "riyadh" ? c.map.hub : id === "sabya" ? c.map.sabya : c.cities[id];
           ctx.font = font(isHub ? 600 : 500, isHub ? 12 : 11);
           ctx.textAlign = "center";
-          ctx.fillStyle = isHub ? "#0b3a40" : "rgba(11,58,64,0.7)";
+          ctx.fillStyle = isHub ? "#1c2c51" : "rgba(28,44,81,0.7)";
           ctx.fillText(label, q.x, q.y + (isHub ? 22 : 17));
         }
       }
@@ -458,13 +458,13 @@ export default function HeroMap({ lang, lane, stage = -1 }: { lang: Locale; lane
           const y = q.y - 22 - pg.age * 10;
           ctx.globalAlpha = Math.min(1, (1.4 - pg.age) * 2.5);
           ctx.fillStyle = "rgba(255,255,255,0.95)";
-          ctx.shadowColor = "rgba(11,58,64,0.2)";
+          ctx.shadowColor = "rgba(28,44,81,0.2)";
           ctx.shadowBlur = 10;
           ctx.beginPath();
           ctx.roundRect(q.x - tw / 2, y - 10, tw, 20, 10);
           ctx.fill();
           ctx.shadowBlur = 0;
-          ctx.fillStyle = "#0b7d36";
+          ctx.fillStyle = "#006bb6";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.fillText(text, q.x, y);
@@ -475,14 +475,14 @@ export default function HeroMap({ lang, lane, stage = -1 }: { lang: Locale; lane
 
       // what each stage is doing, pinned where it happens
       const k1 = c.kingdom.callouts;
-      pill(k1.pickups, S(ORIGINS[0]), oSetup, "#137179", -22);
-      pill(k1.abroad, S(bez(ABROAD, 0.35)), oSetup, "#137179", -20);
-      pill(k1.packed, S(HUB), oSetup, "#0b7d36", 34);
-      pill(k1.haul, S(bez(ROUTES.inter[2], 0.5)), oDeliver, "#137179", -18);
-      pill(k1.pod, S(CITY.dammam), oDeliver, "#0b7d36", 30);
-      pill(k1.you, S(YOU), oSettle, "#c9962e", -22);
-      pill(k1.cash, S(HUB), oSettle, "#c9962e", 34);
-      pill(k1.returns, S(CITY.jeddah), oSettle, "#137179", -22);
+      pill(k1.pickups, S(ORIGINS[0]), oSetup, "#0a5a99", -22);
+      pill(k1.abroad, S(bez(ABROAD, 0.35)), oSetup, "#0a5a99", -20);
+      pill(k1.packed, S(HUB), oSetup, "#006bb6", 34);
+      pill(k1.haul, S(bez(ROUTES.inter[2], 0.5)), oDeliver, "#0a5a99", -18);
+      pill(k1.pod, S(CITY.dammam), oDeliver, "#006bb6", 30);
+      pill(k1.you, S(YOU), oSettle, "#4db8fa", -22);
+      pill(k1.cash, S(HUB), oSettle, "#4db8fa", 34);
+      pill(k1.returns, S(CITY.jeddah), oSettle, "#0a5a99", -22);
     }
 
     let raf = 0, last = performance.now();

@@ -8,15 +8,15 @@ import { serviceHud } from "@/content/serviceHud";
 import { EASE_OUT, SPRING_SMOOTH } from "@/lib/motion";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
-/** the photo for each service: MSG's own (2026 company profile) and MSG-branded fleet imagery */
+/** the photo for each service: everyday scenes of the work itself, and the long-haul truck in MSG's livery */
 export const PHOTO: Record<ServiceId, { src: string; pos: string }> = {
-  "last-mile": { src: "/media/msg/van-road-wide.webp", pos: "90% 62%" },
-  warehousing: { src: "/media/msg/hub-racks.webp", pos: "50% 52%" },
+  "last-mile": { src: "/media/photos/lastmile.webp", pos: "55% 50%" },
+  warehousing: { src: "/media/photos/warehousing.webp", pos: "55% 50%" },
   "land-freight": { src: "/media/msg/land-freight-truck.webp", pos: "40% 55%" },
-  fleet: { src: "/media/msg/fleet-hiace-close.webp", pos: "62% 62%" },
-  manpower: { src: "/media/msg/hub-team.webp", pos: "60% 55%" },
-  tracking: { src: "/media/msg/hub-sorting.webp", pos: "50% 55%" },
-  account: { src: "/media/msg/hub-room.webp", pos: "45% 58%" },
+  fleet: { src: "/media/photos/fleet-depot.webp", pos: "55% 60%" },
+  manpower: { src: "/media/photos/manpower.webp", pos: "50% 45%" },
+  tracking: { src: "/media/photos/courier-route.webp", pos: "30% 55%" },
+  account: { src: "/media/photos/account.webp", pos: "50% 50%" },
 };
 
 type Props = {
@@ -55,7 +55,7 @@ export default function ServiceView({ id, index, total, lang, name, fact, href }
         onPointerMove={onMove}
         onPointerLeave={() => { mx.set(0); my.set(0); }}
         style={reduce ? undefined : { rotateX, rotateY }}
-        className="group/card relative overflow-hidden rounded-[1.4rem] bg-surface shadow-[0_40px_80px_-40px_rgba(11,58,64,0.55)] ring-1 ring-line"
+        className="group/card relative overflow-hidden rounded-[1.4rem] bg-surface shadow-[0_40px_80px_-40px_rgba(28,44,81,0.55)] ring-1 ring-line"
       >
         {/* the photo: each service wipes in over the last, under a slow push */}
         <div className="relative aspect-[4/3] overflow-hidden bg-deep">
@@ -79,7 +79,7 @@ export default function ServiceView({ id, index, total, lang, name, fact, href }
               />
             </motion.div>
           </AnimatePresence>
-          <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(3,14,16,0.45)_0%,rgba(3,14,16,0)_28%,rgba(3,14,16,0)_50%,rgba(3,14,16,0.7)_100%)]" />
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(11,19,38,0.45)_0%,rgba(11,19,38,0)_28%,rgba(11,19,38,0)_50%,rgba(11,19,38,0.7)_100%)]" />
           {/* light that follows the pointer */}
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-0 mix-blend-soft-light transition-opacity duration-300 [background:radial-gradient(320px_circle_at_var(--sx,50%)_var(--sy,30%),rgba(255,255,255,0.55),transparent_65%)] group-hover/card:opacity-100" />
 
@@ -168,11 +168,11 @@ function Hud({ id, c }: { id: ServiceId; c: H }) {
         <>
           <Head title={c.title} />
           <svg viewBox="0 0 210 64" className="mt-2 h-12 w-full" aria-hidden="true">
-            <path d={ROUTE} fill="none" stroke="#c4e9e7" strokeWidth="3" strokeLinecap="round" />
-            <path d={ROUTE} pathLength={1} fill="none" stroke="#0f9641" strokeWidth="3" strokeLinecap="round" className="svc-draw" />
-            <circle cx="14" cy="52" r="5" fill="#0b3a40" />
-            <g transform="translate(196 24)"><circle r="9" fill="#0f9641" className="svc-land" /><path d="M-3.5 0l2.5 2.5 4.5-5" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></g>
-            <circle r="4" fill="#0f9641" className="motion-reduce:hidden"><animateMotion dur="4s" repeatCount="indefinite" path={ROUTE} keyPoints="0;1;1" keyTimes="0;0.55;1" calcMode="linear" /></circle>
+            <path d={ROUTE} fill="none" stroke="#c2dff6" strokeWidth="3" strokeLinecap="round" />
+            <path d={ROUTE} pathLength={1} fill="none" stroke="#009df8" strokeWidth="3" strokeLinecap="round" className="svc-draw" />
+            <circle cx="14" cy="52" r="5" fill="#1c2c51" />
+            <g transform="translate(196 24)"><circle r="9" fill="#009df8" className="svc-land" /><path d="M-3.5 0l2.5 2.5 4.5-5" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></g>
+            <circle r="4" fill="#009df8" className="motion-reduce:hidden"><animateMotion dur="4s" repeatCount="indefinite" path={ROUTE} keyPoints="0;1;1" keyTimes="0;0.55;1" calcMode="linear" /></circle>
           </svg>
           <Swap a={c.a} b={c.b} />
         </>
@@ -194,10 +194,10 @@ function Hud({ id, c }: { id: ServiceId; c: H }) {
         <>
           <Head title={c.title} />
           <svg viewBox="0 0 210 60" className="mt-1 h-12 w-full" aria-hidden="true">
-            <path d="M18 44 Q 105 -6 192 40" fill="none" stroke="#c4e9e7" strokeWidth="3" strokeDasharray="4 5" strokeLinecap="round" className="motion-safe:animate-[hero-flow_1.2s_linear_infinite]" />
-            <circle cx="18" cy="44" r="6" fill="#0b3a40" />
-            <circle cx="192" cy="40" r="6" fill="#fff" stroke="#0b3a40" strokeWidth="2.5" />
-            <rect x="-7" y="-5" width="14" height="10" rx="2.5" fill="#0f9641" className="motion-reduce:hidden"><animateMotion dur="3.6s" repeatCount="indefinite" rotate="auto" path="M18 44 Q 105 -6 192 40" /></rect>
+            <path d="M18 44 Q 105 -6 192 40" fill="none" stroke="#c2dff6" strokeWidth="3" strokeDasharray="4 5" strokeLinecap="round" className="motion-safe:animate-[hero-flow_1.2s_linear_infinite]" />
+            <circle cx="18" cy="44" r="6" fill="#1c2c51" />
+            <circle cx="192" cy="40" r="6" fill="#fff" stroke="#1c2c51" strokeWidth="2.5" />
+            <rect x="-7" y="-5" width="14" height="10" rx="2.5" fill="#009df8" className="motion-reduce:hidden"><animateMotion dur="3.6s" repeatCount="indefinite" rotate="auto" path="M18 44 Q 105 -6 192 40" /></rect>
           </svg>
           <p className="flex justify-between text-[11px] font-semibold text-teal-deep/80" dir="ltr"><span>{c.a}</span><span>{c.b}</span></p>
         </>
@@ -208,8 +208,8 @@ function Hud({ id, c }: { id: ServiceId; c: H }) {
           <Head title={c.title} />
           <div className="mt-2 flex items-center gap-3">
             <svg viewBox="0 0 48 30" className="h-10 w-16 shrink-0" aria-hidden="true">
-              <path d="M6 26 A18 18 0 0 1 42 26" fill="none" stroke="#e2f4f3" strokeWidth="5" strokeLinecap="round" />
-              <path d="M6 26 A18 18 0 0 1 42 26" pathLength={1} fill="none" stroke="#0f9641" strokeWidth="5" strokeLinecap="round" className="svc-gauge" />
+              <path d="M6 26 A18 18 0 0 1 42 26" fill="none" stroke="#e1effb" strokeWidth="5" strokeLinecap="round" />
+              <path d="M6 26 A18 18 0 0 1 42 26" pathLength={1} fill="none" stroke="#009df8" strokeWidth="5" strokeLinecap="round" className="svc-gauge" />
             </svg>
             <ul className="space-y-1 text-[11px]">
               {[c.a, c.b].map((x, i) => (

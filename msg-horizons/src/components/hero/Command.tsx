@@ -30,7 +30,7 @@ export function CommandBackdrop({ stars = true }: { stars?: boolean }) {
       <div className="absolute inset-0 motion-safe:animate-[hero-breathe_24s_var(--ease-ambient)_infinite_alternate]">
         <Image src="/media/msg/hub-aerial.webp" alt="" fill priority sizes="100vw" className="object-cover object-[50%_40%] opacity-[0.22] [filter:grayscale(1)_contrast(1.15)]" />
       </div>
-      <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_72%_42%,rgba(201,150,46,0.20),transparent_70%),radial-gradient(50%_40%_at_10%_100%,rgba(11,125,54,0.16),transparent_70%),linear-gradient(180deg,rgba(8,11,16,0.7)_0%,rgba(8,11,16,0.35)_40%,rgba(8,11,16,0.92)_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_72%_42%,rgba(0,157,248,0.20),transparent_70%),radial-gradient(50%_40%_at_10%_100%,rgba(0,107,182,0.16),transparent_70%),linear-gradient(180deg,rgba(8,11,16,0.7)_0%,rgba(8,11,16,0.35)_40%,rgba(8,11,16,0.92)_100%)]" />
       {stars ? <StarfieldBackground particleCount={420} interactionRadius={170} particleColor="#6ee79a" activeColor="#e6fff0" speed={0.5} className="mix-blend-screen" /> : null}
       {/* the floor: lines run toward the viewer, the network never stops */}
       <div className="absolute inset-x-[-30%] bottom-0 h-[55%] origin-bottom [transform:perspective(520px)_rotateX(62deg)] [mask-image:linear-gradient(0deg,#000_10%,transparent_85%)]">
@@ -148,11 +148,11 @@ export function ConsoleWindow({
         <span className="truncate text-[12px] font-semibold text-white/85">{title}</span>
         <span className="ms-auto"><RiyadhClock label={c.command.clock} /></span>
       </div>
-      <div className="relative overflow-hidden rounded-[20px] bg-[radial-gradient(80%_70%_at_70%_20%,#d6f0ee_0%,rgba(214,240,238,0)_70%),linear-gradient(180deg,#f3fbfb,#e6f5f4)]">
+      <div className="relative overflow-hidden rounded-[20px] bg-[radial-gradient(80%_70%_at_70%_20%,#d6f0ee_0%,rgba(214,240,238,0)_70%),linear-gradient(180deg,#f1f7fd,#e6f5f4)]">
         <div className="relative aspect-[1100/850]">
           {map ? <HeroMap lang={lang} lane={lane} stage={stage} /> : null}
           {/* the scan: the picture is refreshed, not printed */}
-          <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-1/4 bg-[linear-gradient(180deg,transparent,rgba(19,113,121,0.08)_70%,rgba(19,113,121,0.22))] motion-safe:animate-[cmd-scan_6s_var(--ease-in-out)_infinite] motion-reduce:hidden" />
+          <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-1/4 bg-[linear-gradient(180deg,transparent,rgba(10,90,153,0.08)_70%,rgba(10,90,153,0.22))] motion-safe:animate-[cmd-scan_6s_var(--ease-in-out)_infinite] motion-reduce:hidden" />
           <p className="absolute bottom-2 start-3 text-[10px] text-teal-deep/70">{c.map.caption}</p>
         </div>
       </div>

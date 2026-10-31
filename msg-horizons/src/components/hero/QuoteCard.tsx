@@ -42,7 +42,7 @@ export default function QuoteCard({
               <button key={k} type="button" role="radio" aria-checked={lane === k}
                 onClick={() => { onLane(k); track("planner_step", { step: "hero_quote", value: k }); }}
                 className="tap relative rounded-full px-2 py-2 text-[12px] font-semibold leading-tight">
-                {lane === k ? <motion.span layoutId={`${id}-lane`} transition={{ type: "spring", ...SPRING_UI }} className="absolute inset-0 rounded-full bg-white shadow-[0_4px_14px_-6px_rgba(11,58,64,0.5)]" /> : null}
+                {lane === k ? <motion.span layoutId={`${id}-lane`} transition={{ type: "spring", ...SPRING_UI }} className="absolute inset-0 rounded-full bg-white shadow-[0_4px_14px_-6px_rgba(28,44,81,0.5)]" /> : null}
                 <span className={`relative ${lane === k ? "text-teal-deep" : "text-teal-deep/70"}`}>{c.quote.lanes[k]}</span>
               </button>
             ))}

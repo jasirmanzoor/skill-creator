@@ -17,13 +17,8 @@ export type MediaItem = {
 };
 
 export const media: Record<"fleet" | "warehouse" | "operations" | "team", MediaItem[]> = {
-  fleet: [
-    {
-      src: "/media/msg/van-road.webp", width: 1200, height: 1600,
-      alt: { en: "An MSG delivery van on the road under a cloudy sky", ar: "شاحنة توصيل تابعة لـ ام اس جي على الطريق تحت سماء غائمة" },
-      caption: { en: "On the road", ar: "على الطريق" },
-    },
-  ],
+  // MSG's own van photo carried the old logo (Oct 2026 rebrand); add new fleet photography here
+  fleet: [],
   warehouse: [
     {
       src: "/media/msg/hub-open.webp", width: 1448, height: 1086,

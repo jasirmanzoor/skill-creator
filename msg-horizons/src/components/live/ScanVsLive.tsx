@@ -44,7 +44,7 @@ export default function ScanVsLive({ c }: { c: LiveCopy }) {
             <span key={i} className="absolute top-1/2 -ms-1 size-2 -translate-y-1/2 rounded-full bg-white/70" style={{ insetInlineStart: CELL(i) }} />
           ))}
           <span className="live-run pointer-events-none absolute inset-y-0 start-[12.5%] w-[75%] motion-reduce:translate-x-2/3 motion-reduce:[animation:none] rtl:motion-reduce:-translate-x-2/3">
-            <span className="absolute start-0 top-1/2 -ms-2 size-4 -translate-y-1/2 rounded-full bg-brand-bright shadow-[0_0_0_6px_rgba(76,201,122,0.25)]" />
+            <span className="absolute start-0 top-1/2 -ms-2 size-4 -translate-y-1/2 rounded-full bg-brand-bright shadow-[0_0_0_6px_rgba(0,157,248,0.25)]" />
           </span>
         </div>
       </div>

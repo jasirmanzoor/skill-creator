@@ -30,10 +30,10 @@ const readCapability = (): "real" | "canvas" => {
 };
 const noopSubscribe = () => () => {};
 
-const TEAL = "#137179";
-const DEEP = "#0b3a40";
-const GREEN = "#0b7d36";
-const GOLD = "#c9962e";
+const TEAL = "#0a5a99";
+const DEEP = "#1c2c51";
+const GREEN = "#006bb6";
+const GOLD = "#4db8fa";
 const CORAL = "#d0573f";
 
 /** the planner's answers suggest a starting model until the visitor picks one */
@@ -265,7 +265,7 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
       const w = ctx.measureText(text).width + 14;
       const cx = Math.min(view.w - w / 2 - 4, Math.max(w / 2 + 4, x));
       ctx.save();
-      ctx.shadowColor = "rgba(11,58,64,0.2)";
+      ctx.shadowColor = "rgba(28,44,81,0.2)";
       ctx.shadowBlur = 8;
       ctx.fillStyle = bg;
       ctx.beginPath(); ctx.roundRect(cx - w / 2, y - 10, w, 20, 10); ctx.fill();
@@ -277,7 +277,7 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
     }
     function pin(x: number, y: number, fill: string, r: number, glyph: (gx: number, gy: number) => void) {
       ctx.save();
-      ctx.shadowColor = "rgba(11,58,64,0.35)";
+      ctx.shadowColor = "rgba(28,44,81,0.35)";
       ctx.shadowBlur = 10;
       ctx.shadowOffsetY = 3;
       ctx.fillStyle = fill;
@@ -478,7 +478,7 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
         const r = now ? 12 : 10.5;
         ctx.save();
         if (next) ctx.globalAlpha = 0.75;
-        ctx.shadowColor = "rgba(11,58,64,0.3)";
+        ctx.shadowColor = "rgba(28,44,81,0.3)";
         ctx.shadowBlur = 6;
         ctx.shadowOffsetY = 2;
         ctx.fillStyle = "#fff";
@@ -510,7 +510,7 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
           ctx.save();
           ctx.translate(q.x, q.y);
           ctx.scale(1.25, 1.25);
-          ctx.shadowColor = "rgba(11,58,64,0.35)";
+          ctx.shadowColor = "rgba(28,44,81,0.35)";
           ctx.shadowBlur = 8;
           ctx.shadowOffsetY = 2;
           ctx.fillStyle = "rgba(255,255,255,0.92)";
@@ -634,7 +634,7 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
   const running = playing && !reduce;
 
   return (
-    <div className={`relative overflow-hidden bg-[linear-gradient(180deg,#f3fbfb,#ffffff)] text-teal-deep ${compact ? "flex h-full flex-col" : ""}`}>
+    <div className={`relative overflow-hidden bg-[linear-gradient(180deg,#f1f7fd,#ffffff)] text-teal-deep ${compact ? "flex h-full flex-col" : ""}`}>
       {/* working models */}
       <div role="radiogroup" aria-label={c.title} className={compact ? "flex gap-1.5 overflow-x-auto border-b border-teal/10 p-2.5" : "flex snap-x gap-2 overflow-x-auto border-b border-teal/10 p-3 sm:grid sm:grid-cols-2 sm:overflow-visible sm:p-4 xl:grid-cols-4"}>
         {MODELS.map((m) => {
@@ -646,7 +646,7 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
               role="radio"
               aria-checked={on}
               onClick={() => { setPicked(m); setPlaying(true); }}
-              className={`flex shrink-0 snap-start items-start gap-3 text-start ring-1 transition-ui ${compact ? "items-center gap-2 rounded-full py-1.5 pe-3.5 ps-1.5" : "min-w-[220px] rounded-2xl p-3 sm:min-w-0"} ${on ? "bg-teal-deep text-white shadow-[0_16px_30px_-18px_rgba(11,58,64,0.8)] ring-teal-deep" : "bg-white ring-teal/15 hover:ring-teal/40"}`}
+              className={`flex shrink-0 snap-start items-start gap-3 text-start ring-1 transition-ui ${compact ? "items-center gap-2 rounded-full py-1.5 pe-3.5 ps-1.5" : "min-w-[220px] rounded-2xl p-3 sm:min-w-0"} ${on ? "bg-teal-deep text-white shadow-[0_16px_30px_-18px_rgba(28,44,81,0.8)] ring-teal-deep" : "bg-white ring-teal/15 hover:ring-teal/40"}`}
             >
               <span className={`grid shrink-0 place-items-center ${compact ? "size-7 rounded-full" : "size-9 rounded-xl"} ${on ? "bg-white/15" : "bg-sea-50 text-teal"}`}>
                 <ModelIcon m={m} />
@@ -661,7 +661,7 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
       </div>
 
       {/* the route, compact: one row of numbered stops over the map, the playing step's words on one line above it */}
-      <div className="relative z-10 border-b border-teal/15 bg-white px-3 pb-2.5 pt-2.5 shadow-[0_10px_24px_-18px_rgba(11,58,64,0.55)] sm:px-5">
+      <div className="relative z-10 border-b border-teal/15 bg-white px-3 pb-2.5 pt-2.5 shadow-[0_10px_24px_-18px_rgba(28,44,81,0.55)] sm:px-5">
         <p className="flex items-baseline gap-2 text-xs text-teal-deep" aria-live="polite">
           <span className="shrink-0 font-semibold uppercase tracking-[0.12em] text-teal rtl:tracking-normal">{c.route}</span>
           <span className="min-w-0 flex-1 truncate">
@@ -726,14 +726,14 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
           </div>
           {mode !== "canvas" && !mapReady ? (
             <div aria-hidden="true" className="absolute inset-0 grid place-items-center bg-[radial-gradient(70%_60%_at_50%_40%,#121c30,#070b14)]">
-              <span className="size-9 animate-spin rounded-full border-[3px] border-[#bcd7ff]/15 border-t-[#4fd1c5] motion-reduce:animate-none" />
+              <span className="size-9 animate-spin rounded-full border-[3px] border-[#bcd7ff]/15 border-t-[#7fcbfb] motion-reduce:animate-none" />
             </div>
           ) : null}
           <div className="absolute start-3 top-3 flex flex-wrap items-center gap-2 sm:start-4 sm:top-4">
             <button
               type="button"
               onClick={() => { if (clock.current >= total) clock.current = 0; setPlaying((p) => !p); }}
-              className="inline-flex items-center gap-1.5 rounded-full bg-teal-deep px-3 py-1.5 text-xs font-semibold text-white shadow-[0_10px_24px_-14px_rgba(11,58,64,0.9)]"
+              className="inline-flex items-center gap-1.5 rounded-full bg-teal-deep px-3 py-1.5 text-xs font-semibold text-white shadow-[0_10px_24px_-14px_rgba(28,44,81,0.9)]"
             >
               {running ? <PauseGlyph /> : <PlayGlyph />}
               {running ? c.pause : c.play}
@@ -753,16 +753,16 @@ export default function NetworkConsole({ locale, cfg, compact = false }: { local
           <Legend c={c} className="absolute end-4 top-4 hidden sm:block" dark />
           {beat ? (
             <div className="absolute bottom-4 start-4 hidden w-[min(24rem,60%)] overflow-hidden rounded-2xl bg-[#0b1220]/85 px-3.5 pb-3 pt-2.5 text-[#e6eefc] shadow-[0_12px_30px_-16px_rgba(0,0,0,0.8)] ring-1 ring-white/10 backdrop-blur sm:block sm:px-4 sm:pt-3">
-              <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#34d399] rtl:tracking-normal">
+              <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#4db8fa] rtl:tracking-normal">
                 <span className="relative inline-flex size-2">
-                  <span className="plan-ping absolute inset-0 rounded-full bg-[#34d399]" />
-                  <span className="relative size-2 rounded-full bg-[#34d399]" />
+                  <span className="plan-ping absolute inset-0 rounded-full bg-[#4db8fa]" />
+                  <span className="relative size-2 rounded-full bg-[#4db8fa]" />
                 </span>
                 <span className="num" dir="ltr">{active + 1}/{plan.beats.length}</span> · {c.who[beat.who]}
               </p>
               <p className="mt-0.5 font-display text-sm font-semibold leading-snug sm:text-base" aria-live="polite">{fmt(beat)}</p>
               <span aria-hidden="true" className="mt-2.5 block h-1 overflow-hidden rounded-full bg-white/10">
-                <span ref={progBar} className="block h-full origin-left rounded-full bg-[#34d399] shadow-[0_0_10px_#34d399] rtl:origin-right" style={{ transform: "scaleX(0)" }} />
+                <span ref={progBar} className="block h-full origin-left rounded-full bg-[#4db8fa] shadow-[0_0_10px_#4db8fa] rtl:origin-right" style={{ transform: "scaleX(0)" }} />
               </span>
             </div>
           ) : null}
@@ -842,7 +842,7 @@ function Legend({ c, className = "", flat = false, dark = false }: { c: (typeof 
     ? ([["parcel", NIGHT.parcel], ["you", NIGHT.you], ["cash", NIGHT.cash], ["back", NIGHT.back]] as const)
     : ([["parcel", TEAL], ["you", DEEP], ["cash", GOLD], ["back", CORAL]] as const);
   return (
-    <ul className={`${className} grid gap-x-4 gap-y-1.5 rounded-xl p-2.5 text-[11px] font-medium ${dark ? "bg-[#0b1220]/80 text-[#d7e3f7] ring-1 ring-white/10 backdrop-blur" : flat ? "grid-cols-2 bg-sea-50/70 text-teal-deep/85 ring-1 ring-teal/10" : "bg-white/92 text-teal-deep/85 shadow-[0_10px_26px_-16px_rgba(11,58,64,0.6)] ring-1 ring-teal/10 backdrop-blur"}`}>
+    <ul className={`${className} grid gap-x-4 gap-y-1.5 rounded-xl p-2.5 text-[11px] font-medium ${dark ? "bg-[#0b1220]/80 text-[#d7e3f7] ring-1 ring-white/10 backdrop-blur" : flat ? "grid-cols-2 bg-sea-50/70 text-teal-deep/85 ring-1 ring-teal/10" : "bg-white/92 text-teal-deep/85 shadow-[0_10px_26px_-16px_rgba(28,44,81,0.6)] ring-1 ring-teal/10 backdrop-blur"}`}>
       {keys.map(([k, col]) => (
         <li key={k} className="flex items-center gap-2">
           <span aria-hidden="true" className="h-1.5 w-5 shrink-0 rounded-full" style={{ background: col }} />

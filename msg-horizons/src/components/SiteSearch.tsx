@@ -93,7 +93,7 @@ export default function SiteSearch({
             role="dialog"
             aria-modal="true"
             aria-label={t.search.label}
-            className="w-full max-w-xl overflow-hidden rounded-xl border border-line bg-paper shadow-[0_24px_80px_-24px_rgba(12,14,17,0.45)]"
+            className="w-full max-w-xl overflow-hidden rounded-xl border border-line bg-paper shadow-[0_24px_80px_-24px_rgba(17,26,51,0.45)]"
           >
             <form
               role="search"

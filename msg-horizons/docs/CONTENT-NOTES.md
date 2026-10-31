@@ -177,3 +177,40 @@ so it cannot be iframed: `components/sections/Perfmix.tsx` is a native set of th
 Facts used: name, URL, category links (`facts.ownStore`). Deliberately not repeated: the store's free-shipping banner and promo
 code, prices, and any claim about its delivery. The copy "We sell online ourselves, so we know what a seller needs" is an
 inference from MSG's own statement and should be confirmed by MSG.
+
+## Rebrand, brand film and new section photos (27 Oct 2026)
+- **Brand identity** from MSG's 2026 brand guidelines (PDF supplied by MSG): the parcel-and-arrow mark and the
+  "MSG Horizons LOGISTICS" lockups were taken from the PDF's own vector paths into `public/brand/` (navy and white).
+  Colours: navy `#1C2C51`, blue `#009DF8`, white; `--color-brand` is the blue deepened to `#006BB6` for AA small text.
+  Fonts: Funnel Sans (English), Readex Pro (Arabic). Not changed: the legal name in `facts.ts` (the guidelines' stamp
+  reads "MSG Horizons Logistics Co.") and the contact email/phone (the guidelines show mock-up details); confirm first.
+- **Brand film** (`reel/`): a 15 s motion piece built from the mark, rendered from code (Playwright, 60 fps, 3-subframe
+  motion blur, Web Audio soundtrack). It opens the site and fills the headings (two recoloured "fill" cuts).
+- **Section photos** in `public/media/photos/` are generated photographs (Figma image generation), made to look like
+  ordinary photos of each section's work: no logos, no readable text. They are not MSG's own photos and stay out of
+  `content/media.ts`. The "Your price" plate is `seller.webp` (an online seller packing an order at home, Figma, 28 Oct).
+  Replaced 27 Oct at MSG's request: `sorting.webp` (Enterprise plate: MSG's earlier plate photo, edited in Canva to a
+  small crew at one row of sorting tables, no conveyor, no back row). `van-desert.webp` (Live network plate) is MSG's own
+  supplied image, with the old green livery replaced by the new lockup. Rule from MSG: no one in a shemagh or thobe shown
+  doing labour on the warehouse floor; keep crews small and everything at true scale. `dispatch.webp` (fleet strip, "Out
+  for dispatch") and `courier-route.webp` (live tracking) are MSG's own on-ground photographs from Riyadh last-mile hubs
+  (Drive, 27 Oct), recomposed and lightly enhanced in Canva, with other companies' names and number plates removed.
+  Not used from those folders: two phone screenshots (one a private chat) and one candid photo of a resting worker.
+- **Retired** (they carried the old logo): the Toyota Hiace renders and the van photo with the old livery. The real
+  hub photographs (warehouse, sorting, team, aerial, outlet) are unchanged and still used in the gallery and profile.
+- **Removed sections** at MSG's request ("discard the sections that are not very necessary"): the network photo band,
+  the 7-step launch sequence, the Red Sea growth band and the partner constellation (the partner logos remain in the
+  strip under the opening). The company profile is now its own chapter.
+
+## Company profile (27 Oct 2026)
+
+- **One page** at `/[lang]/company-profile` (components/profile), built on the "Selene" landing template MSG supplied:
+  the dawn over Riyadh (HORIZONS; sky photograph generated in Canva, skyline, hub door and floor drawn in code, MSG's
+  own van cut out from its photo), a day at the hub as a reel of stills, the network from Riyadh to the Sabya hub,
+  three ways to work with MSG and the seven services, the scale, and the first conversation (a WhatsApp hand-off).
+  Every word is in `content/profile.ts`, curated from the dictionaries; every figure comes from `facts.ts`.
+- **Flip-book deck** at `/[lang]/company-profile/deck`: ten 1920 × 1080 pages with 3D page turns. `?print` lays them
+  out for the PDFs in `public/media/profile/` (regenerate with `reel/profile-pdf.mjs`, then
+  `reel/profile-pdf-shrink.py`). Linked from the site's company-profile chapter.
+- Not used from MSG's Drive photo folders: two phone screenshots (one a private chat) and a candid photo of a resting
+  worker. Other companies' names and number plates are removed from anything derived from those photos.

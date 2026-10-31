@@ -46,47 +46,35 @@ export const dispatchDay = {
 };
 
 /**
- * HIACE FLEET — renders of MSG's own Toyota Hiace vans (facts.sabyaHub.fleet) in MSG livery at the Sabya hub, supplied
- * by MSG (26 Oct 2026) and shown without a badge at MSG's request. They stay out of the real-photo gallery in
- * content/media.ts; swap in fleet photography when it arrives.
+ * FLEET AT WORK: everyday scenes of a delivery fleet in Riyadh (generated photographs, 27 Oct 2026; vans without
+ * livery) and the long-haul truck in MSG's new livery. They stay out of the real-photo gallery in content/media.ts.
  */
 export const hiaceFleet = {
-  title: { en: "MSG’s own Hiace vans, ready at the Sabya hub.", ar: "شاحنات هايس المملوكة لـ ام اس جي، جاهزة في مركز صبيا." },
-  badge: dispatchDay.badge,
-  note: {
-    en: "Illustrative renders of MSG’s Toyota Hiace vans at the Sabya hub, not photographs.",
-    ar: "صور توضيحية لشاحنات تويوتا هايس التابعة لـ ام اس جي في مركز صبيا، وليست صوراً فوتوغرافية.",
-  },
+  title: { en: "The fleet at work, every day.", ar: "الأسطول في العمل، كل يوم." },
   scenes: [
     {
-      src: "/media/msg/fleet-hiace-dusk.webp",
-      pos: "70% 92%",
-      alt: { en: "A line of white MSG-branded Toyota Hiace vans outside the Sabya hub at sunset", ar: "صف من شاحنات تويوتا هايس البيضاء بشعار ام اس جي أمام مركز صبيا عند الغروب" },
-      caption: { en: "Lined up for the evening run", ar: "مصطفّة لجولة المساء" },
+      src: "/media/photos/fleet-depot.webp",
+      pos: "55% 62%",
+      alt: { en: "A row of white delivery vans at a depot yard, a driver loading the nearest one", ar: "صف من شاحنات التوصيل البيضاء في ساحة المستودع، وسائق يحمّل أقربها" },
+      caption: { en: "Loaded at the depot before the first run", ar: "التحميل في المستودع قبل أول رحلة" },
     },
     {
-      src: "/media/msg/fleet-hiace-close.webp",
-      pos: "68% 84%",
-      alt: { en: "An MSG-branded Toyota Hiace van parked in front of the open hub doors", ar: "شاحنة تويوتا هايس بشعار ام اس جي متوقفة أمام أبواب المركز المفتوحة" },
-      caption: { en: "MSG-owned, tracked on every run", ar: "مملوكة لـ ام اس جي ومتتبَّعة في كل رحلة" },
+      src: "/media/photos/dispatch.webp",
+      pos: "40% 55%",
+      alt: { en: "A worker pulling a pallet jack with a wrapped pallet up to a loaded box truck at the dock", ar: "عامل يسحب رافعة طبالي يدوية عليها طبلية مغلّفة نحو شاحنة صندوقية محمّلة عند الرصيف" },
+      caption: { en: "Out for dispatch", ar: "في طريقها للتوزيع" },
     },
     {
-      src: "/media/msg/fleet-hiace-row.webp",
-      pos: "75% 78%",
-      alt: { en: "A row of MSG Hiace vans angled outside the hub", ar: "صف من شاحنات هايس التابعة لـ ام اس جي أمام المركز" },
-      caption: { en: "The fleet, parked and ready", ar: "الأسطول متوقف وجاهز" },
+      src: "/media/photos/van-road.webp",
+      pos: "40% 60%",
+      alt: { en: "A white delivery van on a wide Riyadh road at golden hour", ar: "شاحنة توصيل بيضاء على طريق واسع في الرياض وقت الغروب" },
+      caption: { en: "On the road across the city", ar: "على الطريق عبر المدينة" },
     },
     {
-      src: "/media/msg/fleet-hiace-line.webp",
-      pos: "50% 84%",
-      alt: { en: "Five MSG Hiace vans facing out from the hub entrance", ar: "خمس شاحنات هايس تابعة لـ ام اس جي متجهة للخارج عند مدخل المركز" },
-      caption: { en: "Facing out, first run of the day", ar: "باتجاه الطريق، أول رحلة في اليوم" },
-    },
-    {
-      src: "/media/msg/fleet-hiace-yard.webp",
-      pos: "45% 88%",
-      alt: { en: "An MSG Hiace van in the hub yard with the fleet behind it", ar: "شاحنة هايس تابعة لـ ام اس جي في ساحة المركز والأسطول خلفها" },
-      caption: { en: "From the yard to the route", ar: "من الساحة إلى المسار" },
+      src: "/media/msg/land-freight-truck.webp",
+      pos: "40% 55%",
+      alt: { en: "A long-haul truck in MSG livery on a mountain highway", ar: "شاحنة نقل طويل بشعار ام اس جي على طريق جبلي" },
+      caption: { en: "Long haul, between regions", ar: "النقل الطويل بين المناطق" },
     },
   ] satisfies Scene[],
 };

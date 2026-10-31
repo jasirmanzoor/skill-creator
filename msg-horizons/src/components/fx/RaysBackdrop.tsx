@@ -29,7 +29,7 @@ export default function RaysBackdrop() {
       {covered ? null : <LightRays
         key={`${dark ? "night" : "day"}${still ? "-still" : ""}`}
         raysOrigin="top-left"
-        raysColor="#FFD39A"
+        raysColor="#bfe3ff"
         raysSpeed={still ? 0 : 1}
         lightSpread={1}
         rayLength={3}

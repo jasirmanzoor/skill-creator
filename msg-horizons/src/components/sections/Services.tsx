@@ -9,7 +9,7 @@ import { ServiceIcon } from "../ui/icons";
 import { PHOTO, ServiceHud } from "../services/ServiceView";
 import ServicesList from "../services/ServicesList";
 import ScrollExpand from "../fx/ScrollExpand";
-import TechWord from "../fx/TechWord";
+import MaskWord from "../fx/MaskWord";
 
 const IDS = facts.services;
 const N = IDS.length;
@@ -24,7 +24,7 @@ const hintCopy: Record<Locale, string> = { en: "Scroll to open", ar: "مرّر �
 
 /**
  * The seven services as seven stages, one after another (React Bits' ScrollExpand): each service arrives as a framed
- * photograph with its name drawn in light (components/fx/TechWord), and as the page scrolls the frame opens to the
+ * photograph with its name cut out of the brand film (components/fx/MaskWord), and as the page scrolls the frame opens to the
  * whole screen, the name lifts away and the service's story, key figure and live panel take the stage. The next
  * service waits framed below. Under reduced motion the services are a plain list with one view beside it.
  */
@@ -55,6 +55,7 @@ function Stages({ t, lang }: { t: Dictionary; lang: Locale }) {
             startHeight={56}
             mobileStart={[86, 46]}
             startRadius={28}
+            shape="hex"
             mediaZoom={1.3}
             scrollDistance={0.8}
             holdDistance={0.3}
@@ -62,7 +63,7 @@ function Stages({ t, lang }: { t: Dictionary; lang: Locale }) {
             title={
               <div className="w-[min(86vw,46rem)] text-center">
                 <p className="num mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-brand-mint rtl:tracking-normal">{n(i + 1)} / {n(N)}</p>
-                <TechWord text={svc.name} lang={lang} className="h-[clamp(6rem,22vh,12rem)] w-full font-display text-white" fallbackClassName="block font-display text-[clamp(2rem,6vw,4.5rem)] font-semibold leading-[1.25] text-white" />
+                <MaskWord text={svc.name} lang={lang} scale={0.085} className="w-full font-display text-white" fallbackClassName="block font-display text-[clamp(2rem,6vw,4.5rem)] font-semibold leading-[1.25] text-white" />
               </div>
             }
           >

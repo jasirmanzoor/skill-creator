@@ -63,7 +63,7 @@ export default function ServicePageView({ t, lang, slug }: { t: Dictionary; lang
               </a>
             </div>
           </div>
-          <div className="overflow-hidden rounded-2xl border border-line shadow-[0_40px_80px_-40px_rgba(12,14,17,0.45)]">
+          <div className="overflow-hidden rounded-2xl border border-line shadow-[0_40px_80px_-40px_rgba(17,26,51,0.45)]">
             <ServiceScene id={pg.scene} />
           </div>
         </section>
