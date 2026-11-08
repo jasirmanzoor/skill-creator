@@ -405,14 +405,17 @@ export default function HeroMap({ lang, lane, stage = -1 }: { lang: Locale; lane
         ctx.stroke();
       });
       ctx.setLineDash([]);
+      // the glow is layered strokes (a canvas blur here would cost every frame)
       coast();
-      ctx.save();
-      ctx.shadowColor = "rgba(0,170,255,0.9)";
-      ctx.shadowBlur = 14;
-      ctx.strokeStyle = "rgba(90,205,255,0.85)";
-      ctx.lineWidth = 1.3;
+      ctx.lineJoin = "round";
+      for (const [w, a] of [[9, 0.06], [5, 0.12], [2.6, 0.3]] as const) {
+        ctx.strokeStyle = `rgba(0,170,255,${a})`;
+        ctx.lineWidth = w;
+        ctx.stroke();
+      }
+      ctx.strokeStyle = "rgba(120,215,255,0.9)";
+      ctx.lineWidth = 1.2;
       ctx.stroke();
-      ctx.restore();
 
       // the dot field: brighter near the busy hub, and a pulse rolling out from it
       const hubP = st < 0 && active === "sabya" ? CITY.sabya : HUB;
@@ -420,6 +423,9 @@ export default function HeroMap({ lang, lane, stage = -1 }: { lang: Locale; lane
       const reach = view.s * cam.z * (st === 1 ? 120 : 260);
       const wave = reduce ? -1 : ((clock % 3.4) / 3.4) * reach * 1.9;
       const dr = Math.max(0.8, view.s * 1.6 * zs);
+      // the dots go out in a few batches by brightness: one fill per batch, not one per dot
+      const LV = 6;
+      const bins: number[][] = Array.from({ length: LV }, () => []);
       for (const d of DOTS) {
         const q = S(d);
         if (q.x < -4 || q.y < -4 || q.x > view.w + 4 || q.y > view.h + 4) continue;
@@ -427,9 +433,16 @@ export default function HeroMap({ lang, lane, stage = -1 }: { lang: Locale; lane
         const near = Math.max(0, 1 - dist / reach);
         const ring = wave < 0 ? 0 : Math.max(0, 1 - Math.abs(dist - wave) / 16) * (1 - wave / (reach * 1.9));
         const heat = Math.min(1, near * 0.85 + ring);
-        ctx.fillStyle = `rgba(${Math.round(60 + heat * 60)},${Math.round(140 + heat * 90)},255,${0.2 + heat * 0.65})`;
-        ctx.fillRect(q.x - dr, q.y - dr, dr * 2, dr * 2);
+        bins[Math.min(LV - 1, Math.round(heat * (LV - 1)))].push(q.x, q.y);
       }
+      bins.forEach((pts, lv) => {
+        if (!pts.length) return;
+        const heat = lv / (LV - 1);
+        ctx.fillStyle = `rgba(${Math.round(60 + heat * 60)},${Math.round(140 + heat * 90)},255,${0.2 + heat * 0.65})`;
+        ctx.beginPath();
+        for (let j = 0; j < pts.length; j += 2) ctx.rect(pts[j] - dr, pts[j + 1] - dr, dr * 2, dr * 2);
+        ctx.fill();
+      });
 
       // the lane's routes (overview), the line-haul web (deliver) and the money's way home (settle)
       (Object.keys(ROUTES) as HeroLane[]).forEach((l) => {
