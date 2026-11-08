@@ -222,7 +222,9 @@ await test("one order on the map: the stage rail moves the hero through set up â
   await rail.waitFor();
   await page.locator('#hero [aria-current="step"]').waitFor({ timeout: 5000 });
   assert.match(await page.locator('#hero [aria-current="step"]').innerText(), /Set up/);
-  await rail.getByRole("button", { name: /Settle/ }).click();
+  // pressed from the keyboard (as keyboard visitors do): the hero keeps moving under a loaded test browser
+  await rail.getByRole("button", { name: /Settle/ }).focus();
+  await page.keyboard.press("Enter");
   await page.waitForFunction(() => document.querySelector('#hero [aria-current="step"]')?.textContent?.includes("Settle"), null, { timeout: 5000 });
   assert.deepEqual(errors, []);
   await ctx.close();
