@@ -1,14 +1,11 @@
-import Image from "next/image";
 import Reveal from "../ui/Reveal";
 import OpsClock from "../fleet/OpsClock";
-import { media } from "@/content/media";
 import { dispatchDay, hiaceFleet } from "@/content/scenes";
-import HoverExpand from "../ui/hover-expand";
+import ScrollSync from "../ui/ScrollSync";
 import type { Dictionary, Locale } from "@/content/i18n";
 
 export default function Fleet({ t, lang }: { t: Dictionary; lang: Locale }) {
   const f = t.fleet;
-  const photo = media.fleet[0];
   return (
     <section id="fleet" aria-labelledby="fleet-title" className="scroll-mt-16 border-t border-line bg-surface/[0.62] sec">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
@@ -24,28 +21,16 @@ export default function Fleet({ t, lang }: { t: Dictionary; lang: Locale }) {
           </Reveal>
         </div>
 
+        {/* the fleet and a dispatch day, one sharp photo at a time, in step with the captions (ui/ScrollSync) */}
         <div className="mt-16">
-          <h3 className="text-xl font-semibold text-ink">{hiaceFleet.title[lang]}</h3>
-          <HoverExpand
-            className="mt-6"
-            items={hiaceFleet.scenes.map((x) => ({ src: x.src, pos: x.pos, alt: x.alt[lang], caption: x.caption[lang] }))}
+          <ScrollSync
+            label={`${hiaceFleet.title[lang]} ${dispatchDay.title[lang]}`}
+            items={[
+              ...hiaceFleet.scenes.map((x) => ({ src: x.src, pos: x.pos, alt: x.alt[lang], title: x.caption[lang], group: hiaceFleet.title[lang] })),
+              ...dispatchDay.scenes.map((x) => ({ src: x.src, pos: x.pos, alt: x.alt[lang], title: x.caption[lang], group: dispatchDay.title[lang] })),
+            ]}
           />
         </div>
-
-        <div className="mt-16">
-          <h3 className="text-xl font-semibold text-ink">{dispatchDay.title[lang]}</h3>
-          <HoverExpand
-            className="mt-6"
-            items={dispatchDay.scenes.map((x) => ({ src: x.src, pos: x.pos, alt: x.alt[lang], caption: x.caption[lang] }))}
-          />
-        </div>
-
-        {photo ? (
-          <figure className="mt-16 overflow-hidden rounded-xl border border-line">
-            <Image src={photo.src} width={photo.width} height={photo.height} alt={photo.alt[lang]} className="aspect-[4/5] w-full object-cover sm:aspect-[21/9]" style={{ objectPosition: "72% 64%" }} sizes="(min-width:1280px) 1216px, 100vw" />
-            {photo.caption ? <figcaption className="p-4 text-sm text-muted">{photo.caption[lang]}</figcaption> : null}
-          </figure>
-        ) : null}
 
         <dl className="mt-16 grid border-t border-line lg:grid-cols-2 lg:gap-x-16">
           {f.features.map((x) => (
