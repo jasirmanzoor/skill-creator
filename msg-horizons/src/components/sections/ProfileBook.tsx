@@ -122,10 +122,11 @@ function LicencePage({ id, k, total, lang, n }: { id: (typeof LICENCES)[number][
       <div className="relative mt-5 flex-1 overflow-hidden rounded-2xl border border-[#e2e5ec] bg-white p-2 shadow-[0_20px_40px_-24px_rgba(17,26,51,0.45)]">
         <img src={`/media/licences/${id}.webp`} alt={it.name} draggable={false} loading="lazy" className="h-full w-full object-contain" />
       </div>
-      <dl className="mt-4 grid grid-cols-3 gap-2 text-[11px]">
+      <dl className="mt-4 grid grid-cols-2 gap-x-3 gap-y-2 text-[11px]">
         <div><dt className="text-[#8a93a6]">{lc.number}</dt><dd className="mt-0.5 font-semibold tabular-nums" dir="ltr">{l.number}</dd></div>
-        <div><dt className="text-[#8a93a6]">{"validTo" in l ? lc.validTo : lc.issued}</dt><dd className="mt-0.5 font-semibold tabular-nums" dir="ltr">{"validTo" in l ? l.validTo : l.issued}</dd></div>
-        <div><dt className="text-[#8a93a6]">&nbsp;</dt><dd className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-[#e5f3fe] px-2 py-0.5 font-semibold text-[#006bb6]">✓ {lc.active}</dd></div>
+        <div><dt className="text-[#8a93a6]">{lc.issued}</dt><dd className="mt-0.5 font-semibold tabular-nums" dir="ltr">{l.issued}</dd></div>
+        {l.validTo ? <div><dt className="text-[#8a93a6]">{lc.validTo}</dt><dd className="mt-0.5 font-semibold tabular-nums" dir="ltr">{l.validTo}</dd></div> : null}
+        {l.active ? <div className="self-end"><dd className="inline-flex items-center gap-1 rounded-full bg-[#e5f3fe] px-2 py-0.5 font-semibold text-[#006bb6]">✓ {lc.active}</dd></div> : null}
       </dl>
       <Folio n={n} />
     </div>
@@ -191,7 +192,7 @@ export default function ProfileBook({ t, lang }: { t: Dictionary; lang: Locale }
     // 4 · couriers
     <FigurePage key="couriers" value={couriers.value} what={couriers.label} d={couriers.d} n={4} />,
     // 5 · the fleet
-    <PhotoPage key="fleet" src="/media/photos/fleet-depot.webp" pos="60% 55%" title={c.fleet} sub={c.fleetSub} n={5} />,
+    <PhotoPage key="fleet" src="/media/msg/fleet-yard.webp" pos="40% 55%" title={c.fleet} sub={c.fleetSub} n={5} />,
     // 6 · vehicles
     <FigurePage key="vehicles" value={vehicles.value} what={vehicles.label} d={vehicles.d} n={6} tone="navy" />,
     // 7 · the team
@@ -247,7 +248,7 @@ export default function ProfileBook({ t, lang }: { t: Dictionary; lang: Locale }
       </ul>
       <Folio n={11} />
     </div>,
-    // 12–14 · the licences, one to a page
+    // the licences and certificates, one to a page
     ...LICENCES.map((l, k) => <LicencePage key={`lic-${l.id}`} id={l.id} k={k + 1} total={LICENCES.length} lang={lang} n={12 + k} />),
     // back cover
     <div key="back" className={`${PAGE} flex flex-col justify-end bg-[#1c2c51] p-9 text-white`}>

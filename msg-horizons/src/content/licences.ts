@@ -13,6 +13,11 @@ export const licenceCopy: Record<Locale, {
       cr: { name: "Commercial Registration", issuer: "Ministry of Commerce" },
       vat: { name: "VAT Registration", issuer: "Zakat, Tax and Customs Authority (ZATCA)" },
       chamber: { name: "Chamber of Commerce membership", issuer: "Riyadh Chamber" },
+      extract: { name: "Commercial Registration extract", issuer: "Ministry of Commerce" },
+      gosi: { name: "GOSI certificate", issuer: "General Organization for Social Insurance" },
+      nitaqat: { name: "Saudization certificate (Nitaqat)", issuer: "Ministry of Human Resources and Social Development" },
+      transport: { name: "Light goods transport licence", issuer: "Transport General Authority" },
+      address: { name: "National Address proof", issuer: "Saudi Post · National Address" },
     },
   },
   ar: {
@@ -22,8 +27,15 @@ export const licenceCopy: Record<Locale, {
       cr: { name: "السجل التجاري", issuer: "وزارة التجارة" },
       vat: { name: "شهادة التسجيل في ضريبة القيمة المضافة", issuer: "هيئة الزكاة والضريبة والجمارك" },
       chamber: { name: "عضوية الغرفة التجارية", issuer: "غرفة الرياض" },
+      extract: { name: "مستخرج السجل التجاري", issuer: "وزارة التجارة" },
+      gosi: { name: "شهادة التأمينات الاجتماعية", issuer: "المؤسسة العامة للتأمينات الاجتماعية" },
+      nitaqat: { name: "شهادة التوطين (نطاقات)", issuer: "وزارة الموارد البشرية والتنمية الاجتماعية" },
+      transport: { name: "ترخيص النقل الخفيف للبضائع", issuer: "الهيئة العامة للنقل" },
+      address: { name: "إثبات العنوان الوطني", issuer: "سبل · العنوان الوطني" },
     },
   },
 };
 
 export const LICENCES = facts.licences;
+/** the ones valid today, for places that say \"Active\" */
+export const ACTIVE_LICENCES = facts.licences.filter((l) => l.active);

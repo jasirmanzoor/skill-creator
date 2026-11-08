@@ -19,7 +19,7 @@ export const provenCopy: Record<Locale, {
     label: "What MSG already runs",
     prev: "Previous", next: "Next",
     items: [
-      { id: "fleet", ...P("/media/photos/fleet-depot.webp", "55% 60%"), label: "Own fleet", figure: m.vehicles.display, text: "Vehicles in MSG's own fleet: our vans and in-house drivers, not a pool of strangers.", note: "Owned and run by MSG" },
+      { id: "fleet", ...P("/media/msg/fleet-hub.webp", "50% 60%"), label: "Own fleet", figure: m.vehicles.display, text: "Vehicles in MSG's own fleet: our vans and in-house drivers, not a pool of strangers.", note: "Owned and run by MSG" },
       { id: "couriers", ...P("/media/photos/lastmile.webp", "55% 45%"), label: "Couriers", figure: m.couriers.display, text: "Couriers behind every delivery, from city streets to remote villages." },
       { id: "hub", ...P("/media/msg/hub-racks.webp"), label: "Sabya hub", figure: `${facts.sabyaHub.areaM2.toLocaleString("en-US")} m²`, text: "Our own hub in Sabya: racks for your stock, cages for sorting and a floor ready for dispatch." },
       { id: "ops", ...P("/media/msg/hub-team.webp", "60% 55%"), label: "Operations", figure: m.operations.display, text: "Operations that never close, with one accountable team on every order." },
@@ -34,7 +34,7 @@ export const provenCopy: Record<Locale, {
     label: "ما تديره ام اس جي اليوم",
     prev: "السابق", next: "التالي",
     items: [
-      { id: "fleet", ...P("/media/photos/fleet-depot.webp", "55% 60%"), label: "أسطولنا", figure: m.vehicles.display, text: "مركبات في أسطول ام اس جي: مركباتنا ومناديبنا من داخل الشركة، لا مقاولون مجهولون.", note: "ملك ام اس جي وبإدارتها" },
+      { id: "fleet", ...P("/media/msg/fleet-hub.webp", "50% 60%"), label: "أسطولنا", figure: m.vehicles.display, text: "مركبات في أسطول ام اس جي: مركباتنا ومناديبنا من داخل الشركة، لا مقاولون مجهولون.", note: "ملك ام اس جي وبإدارتها" },
       { id: "couriers", ...P("/media/photos/lastmile.webp", "55% 45%"), label: "المناديب", figure: m.couriers.display, text: "مندوب خلف كل توصيلة، من شوارع المدن إلى القرى النائية." },
       { id: "hub", ...P("/media/msg/hub-racks.webp"), label: "مركز صبيا", figure: `${facts.sabyaHub.areaM2.toLocaleString("en-US")} م²`, text: "مركزنا في صبيا: رفوف لمخزونك، وأقفاص للفرز، وأرضية جاهزة للشحن." },
       { id: "ops", ...P("/media/msg/hub-team.webp", "60% 55%"), label: "العمليات", figure: m.operations.display, text: "عمليات لا تتوقف، وفريق واحد مسؤول عن كل طلب." },

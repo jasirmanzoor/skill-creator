@@ -46,17 +46,23 @@ export const dispatchDay = {
 };
 
 /**
- * FLEET AT WORK: everyday scenes of a delivery fleet in Riyadh (generated photographs, 27 Oct 2026; vans without
- * livery) and the long-haul truck in MSG's new livery. They stay out of the real-photo gallery in content/media.ts.
+ * FLEET AT WORK: MSG's own fleet (photographs supplied by MSG, 8 Nov 2026; plates blurred), everyday scenes of the
+ * fleet at work (generated photographs; vans without livery) and the long-haul truck in MSG's new livery. They stay out of the real-photo gallery in content/media.ts.
  */
 export const hiaceFleet = {
   title: { en: "The fleet at work, every day.", ar: "الأسطول في العمل، كل يوم." },
   scenes: [
     {
-      src: "/media/photos/fleet-depot.webp",
-      pos: "55% 62%",
-      alt: { en: "A row of white delivery vans at a depot yard, a driver loading the nearest one", ar: "صف من شاحنات التوصيل البيضاء في ساحة المستودع، وسائق يحمّل أقربها" },
-      caption: { en: "Loaded at the depot before the first run", ar: "التحميل في المستودع قبل أول رحلة" },
+      src: "/media/msg/fleet-yard.webp",
+      pos: "45% 55%",
+      alt: { en: "An MSG Horizons Toyota Hiace van in a covered fleet yard, more of the fleet lined up behind it", ar: "مركبة تويوتا هايس من أسطول ام اس جي هورايزونز في ساحة مظللة، وبقية الأسطول مصطفة خلفها" },
+      caption: { en: "MSG's own vans, ready before the first run", ar: "مركبات ام اس جي جاهزة قبل أول رحلة" },
+    },
+    {
+      src: "/media/msg/fleet-hub.webp",
+      pos: "50% 60%",
+      alt: { en: "MSG Horizons refrigerated vans parked in front of the MSG hub", ar: "مركبات ام اس جي هورايزونز المبرّدة أمام مركز ام اس جي" },
+      caption: { en: "The fleet at MSG's hub", ar: "الأسطول أمام مركز ام اس جي" },
     },
     {
       src: "/media/photos/dispatch.webp",

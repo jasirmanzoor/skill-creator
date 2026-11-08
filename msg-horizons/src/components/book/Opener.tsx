@@ -5,9 +5,9 @@ import MaskWord from "../fx/MaskWord";
 import ReelBackdrop from "../fx/ReelBackdrop";
 
 /** each chapter's opening plate: one of MSG's own photographs (public/media/msg) */
-export const PLATE: Record<string, { src: string; pos: string }> = {
+export const PLATE: Record<string, { src: string; pos: string; srcAr?: string }> = {
   why: { src: "/media/msg/hub-open.webp", pos: "50% 55%" },
-  estimate: { src: "/media/photos/seller.webp", pos: "45% 50%" },
+  estimate: { src: "/media/photos/price-en.webp", srcAr: "/media/photos/price-ar.webp", pos: "50% 50%" }, // MSG's rate set against SMSA, Aramex and iMile (names only)
   planner: { src: "/media/photos/plan-room.webp", pos: "50% 50%" }, // MSG control room over Riyadh, the Kingdom on the wall
   "live-tracking": { src: "/media/photos/van-desert.webp", pos: "74% 62%" }, // the van in the new livery, on the road out of town
   fleet: { src: "/media/msg/hub-aerial.webp", pos: "50% 50%" },
@@ -29,7 +29,7 @@ export default function Opener({ n, lang }: { n: number; lang: Locale }) {
   const label = fmt(c.chapter, { n: n + 1, total: CHAPTERS.length });
   return (
     <ScrollExpand
-      src={plate.src}
+      src={lang === "ar" && plate.srcAr ? plate.srcAr : plate.src}
       mediaPosition={plate.pos}
       startWidth={50}
       startHeight={58}
