@@ -47,7 +47,7 @@ export default async function ServicesIndex({ params }: Props) {
           <a href={`/${lang}`} className="rounded" aria-label="MSG Horizons"><Logo /></a>
           <nav className="flex items-center gap-2 sm:gap-4">
             <a href={`/${other}/services`} hrefLang={other} className="rounded px-2 py-1 text-sm text-muted hover:text-ink">{c.langSwitch}</a>
-            <a href={`/${lang}#planner`} className="rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink-3">{t.nav.cta}</a>
+            <a href={`/${lang}?build=1#planner`} className="rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink-3">{t.nav.cta}</a>
           </nav>
         </div>
       </header>

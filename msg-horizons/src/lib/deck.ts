@@ -11,3 +11,9 @@ export function focusPanel(id: DeckPanel, immediate = false, _force = false) {
   void _force;
   goTo(id, { immediate });
 }
+
+/** the plan builder opens in its own window over the page (components/sections/Planner) */
+export const PLAN_OPEN = "msg-plan-open";
+export function openPlanner() {
+  window.dispatchEvent(new Event(PLAN_OPEN));
+}

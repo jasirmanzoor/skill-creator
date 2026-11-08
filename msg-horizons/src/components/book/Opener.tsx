@@ -4,10 +4,10 @@ import ScrollExpand from "../fx/ScrollExpand";
 import MaskWord from "../fx/MaskWord";
 
 /** each chapter's opening plate: one of MSG's own photographs (public/media/msg) */
-const PLATE: Record<string, { src: string; pos: string }> = {
+export const PLATE: Record<string, { src: string; pos: string }> = {
   why: { src: "/media/msg/hub-open.webp", pos: "50% 55%" },
   estimate: { src: "/media/photos/seller.webp", pos: "45% 50%" },
-  planner: { src: "/media/photos/planner.webp", pos: "45% 45%" },
+  planner: { src: "/media/photos/plan-room.webp", pos: "50% 50%" }, // MSG control room over Riyadh, the Kingdom on the wall
   "live-tracking": { src: "/media/photos/van-desert.webp", pos: "74% 62%" }, // the van in the new livery, on the road out of town
   fleet: { src: "/media/msg/hub-aerial.webp", pos: "50% 50%" },
   proof: { src: "/media/msg/hub-team.webp", pos: "60% 55%" },

@@ -13,6 +13,10 @@ export const cockpitCopy: Record<Locale, {
   draft: string;
   /** the approximate price, once the volume is in */
   estimate: string;
+  /** the plan builder's own window: the button that opens it, closing it, and the launcher's line */
+  open: string;
+  close: string;
+  launch: string;
 }> = {
   en: {
     steps: ["You", "Cargo", "Volume", "Priorities"],
@@ -23,6 +27,9 @@ export const cockpitCopy: Record<Locale, {
     built: "{n}% built",
     draft: "Draft plan",
     estimate: "Your price so far",
+    open: "Start building my plan",
+    close: "Close the plan builder",
+    launch: "Or start by telling us who you are",
   },
   ar: {
     steps: ["أنت", "شحنتك", "الحجم", "الأولويات"],
@@ -33,6 +40,9 @@ export const cockpitCopy: Record<Locale, {
     built: "اكتملت {n}%",
     draft: "خطة أولية",
     estimate: "سعرك حتى الآن",
+    open: "ابدأ بناء خطتي",
+    close: "إغلاق منشئ الخطة",
+    launch: "أو ابدأ بإخبارنا من أنت",
   },
 };
 

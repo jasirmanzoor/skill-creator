@@ -122,6 +122,7 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
           </a>
           <a
             href="#planner"
+            data-plan-open
             onClick={() => track("cta_click", { cta: "plan", location: "header" })}
             className={`btn-primary hidden px-4 py-2 text-sm md:inline-flex ${ink ? "" : "on-dark"}`}
           >

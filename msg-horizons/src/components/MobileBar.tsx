@@ -45,7 +45,7 @@ export default function MobileBar({ t }: { t: Dictionary }) {
     >
       <Glass radius={16} />
       <div id={ROUTE_SLOT_ID} className="contents" />
-      <a href="#planner" tabIndex={show ? 0 : -1} onClick={() => track("cta_click", { cta: "plan", location: "mobile_bar" })}
+      <a href="#planner" data-plan-open tabIndex={show ? 0 : -1} onClick={() => track("cta_click", { cta: "plan", location: "mobile_bar" })}
         className="btn-primary min-h-12 flex-1 px-5 py-3">
         {t.mobileBar.plan}
       </a>

@@ -110,7 +110,7 @@ export default function RouteBook({ lang }: { lang: Locale }) {
 
     // arriving: a #link, a shared plan, or a service page's "build a plan" link opens on its chapter
     const q = new URLSearchParams(location.search);
-    const arrive = resolve(decodeURIComponent(location.hash.slice(1))) ?? (q.has("plan") || q.has("persona") ? resolve("planner") : null);
+    const arrive = resolve(decodeURIComponent(location.hash.slice(1))) ?? (q.has("plan") || q.has("persona") || q.has("build") ? resolve("planner") : null);
     // once the page has laid itself out (pictures and pinned scenes change its length), land on the place asked for
     if (arrive && (arrive.n > 0 || arrive.el !== pages[0])) window.setTimeout(() => go(arrive.n, arrive.el, { immediate: true, focus: false, push: false }), 120);
     measure();

@@ -863,3 +863,4 @@ html[data-film] .pf-root [data-reveal] { transition: none; }
 html[data-film] .pf-root .animate-bounce, html[data-film] .pf-root [class*="pf-leg-in"] { animation: none; }
 html[data-film] .pf-root * { transition-duration: 0s !important; }
 html[data-film] { scroll-behavior: auto !important; }
+@keyframes orbit-progress { to { stroke-dashoffset: 0; } }

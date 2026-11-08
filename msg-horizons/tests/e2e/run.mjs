@@ -99,16 +99,18 @@ await test("no forbidden claims in rendered copy", async () => {
   }
 });
 
-// the plan builder sits on the sideways deck: open its panel first
+// the plan builder opens in its own window from its chapter's launcher
 async function toPlan(page) {
   await reach(page, "planner");
-  await page.waitForTimeout(900);
+  await page.locator("#planner").getByRole("button", { name: /Start building my plan/ }).click();
+  await page.locator("#plan-window").waitFor();
+  await page.waitForTimeout(400);
 }
 // the result keeps its detail in tabs; read them all
 async function resultText(page) {
   let all = "";
   for (const name of ["Your quote", "We handle", "Services", "Next steps"]) {
-    await page.locator("#planner").getByRole("tab", { name }).click();
+    await page.locator("#plan-window").getByRole("tab", { name }).click();
     all += "\n" + (await page.locator("#plan-tabpanel").innerText());
   }
   return all;
@@ -124,7 +126,7 @@ await test("planner: build a plan, share it, carry it into the contact form", as
   assert.ok(await page.locator("aside[aria-label='Your configuration, live']").getByText("Warehousing & Inventory").isVisible());
   await page.getByRole("button", { name: /Continue/ }).click();
   // step 3: the network sizer — ~730 orders a day lands in the "scaling" band
-  await page.locator("#planner input[type=range]").first().fill("600");
+  await page.locator("#plan-window input[type=range]").first().fill("600");
   await page.getByRole("button", { name: /Continue/ }).click();
   await page.getByRole("checkbox", { name: /Live tracking/ }).click();
   await page.getByRole("checkbox", { name: /Handling peaks/ }).click();
@@ -134,7 +136,7 @@ await test("planner: build a plan, share it, carry it into the contact form", as
   for (const s of ["Shipping & Last-Mile Delivery", "Warehousing & Inventory", "Real-Time Tracking & Support", "Manpower & Peak Support", "Dedicated Account Management", "Price quote", "Proof of delivery", "Live tracking", "Cash on delivery, on time", "ZATCA", "Licences"])
     assert.ok(result.includes(s), `missing ${s}`);
   assert.ok(!/Daily routes|Couriers on|peak-only|1 courier, every day/i.test(result), "no operating matrix in the client's result");
-  assert.ok(await page.locator("#planner [data-rate-card]").count() >= 0);
+  assert.ok(await page.locator("#plan-window [data-rate-card]").count() >= 0);
   assert.match(decodeURIComponent(page.url()), /[?&]plan=ecommerce~parcels\.storage~scaling~visibility\.peaks/);
   const wa = await page.getByRole("link", { name: /Send on WhatsApp/ }).getAttribute("href");
   assert.match(wa, /^https:\/\/wa\.me\/966578061556\?text=/);
@@ -156,7 +158,7 @@ await test("planner: priorities are capped at three", async () => {
   await page.getByRole("button", { name: /Continue/ }).click();
   for (const n of ["Fast execution", "On-time delivery", "Live tracking"])
     await page.getByRole("checkbox", { name: n }).click();
-  assert.equal(await page.locator('#planner [role=checkbox][aria-checked="true"]').count(), 3);
+  assert.equal(await page.locator('#plan-window [role=checkbox][aria-checked="true"]').count(), 3);
   assert.equal(await page.getByRole("checkbox", { name: "Shipment security" }).getAttribute("aria-disabled"), "true");
   await ctx.close();
 });
@@ -164,19 +166,19 @@ await test("planner: priorities are capped at three", async () => {
 await test("volume step: the quote follows the numbers, and no operating matrix is shown", async () => {
   const { page, ctx, errors } = await open("/en?persona=seller#planner");
   await page.getByRole("button", { name: /Continue/ }).click();
-  const quote = page.locator("#planner aside[data-rate-card]:visible");
+  const quote = page.locator("#plan-window aside[data-rate-card]:visible");
   await quote.waitFor();
   const before = await quote.innerText();
-  await page.locator("#planner").getByRole("radio", { name: "Across the Kingdom" }).click();
+  await page.locator("#plan-window").getByRole("radio", { name: "Across the Kingdom" }).click();
   assert.notEqual(await quote.innerText(), before, "the quote changes with where the orders go");
-  const text = await page.locator("#planner").innerText();
+  const text = await page.locator("#plan-window").innerText();
   const hit = text.match(/Daily routes|Couriers on|Peak-only|Calculated live/i);
   assert.ok(!hit, `routes and courier counts are not shown to the client (${hit})`);
   for (const s of ["Price quote", "Proof of delivery", "Live tracking", "Cash on delivery, on time"]) assert.ok(text.includes(s), `missing ${s}`);
   await page.getByRole("button", { name: /Continue/ }).click();
   await page.getByRole("button", { name: /Build my plan/ }).last().click();
-  await page.locator("#planner").getByRole("tab", { name: "Services" }).click();
-  assert.ok(await page.locator("#planner").getByText("Land Freight", { exact: true }).first().isVisible());
+  await page.locator("#plan-window").getByRole("tab", { name: "Services" }).click();
+  assert.ok(await page.locator("#plan-window").getByText("Land Freight", { exact: true }).first().isVisible());
   assert.deepEqual(errors, []);
   await ctx.close();
 });
@@ -349,21 +351,21 @@ await test("reduced motion: hero renders final state immediately", async () => {
 
 // Scroll until the route console is close enough for its lazy-loaded map to start.
 async function toConsole(page) {
-  await reach(page, "planner");
+  await page.locator("#plan-window").waitFor();
   for (let k = 0; k < 12; k++) {
-    if (await page.locator("#planner .maplibregl-canvas, #planner canvas[role=img]").count()) break;
-    await page.evaluate(() => window.scrollBy(0, 450));
+    if (await page.locator("#plan-window .maplibregl-canvas, #plan-window canvas[role=img]").count()) break;
+    await page.evaluate(() => document.querySelector("#plan-window [data-lenis-prevent]").scrollBy(0, 450));
     await page.waitForTimeout(400);
   }
   // the map only animates while it is on screen, so bring it fully into view
-  await page.locator("#planner .maplibregl-canvas, #planner canvas[role=img]").first().scrollIntoViewIfNeeded();
+  await page.locator("#plan-window .maplibregl-canvas, #plan-window canvas[role=img]").first().scrollIntoViewIfNeeded();
   await page.waitForTimeout(500);
 }
 
 await test("route console: the camera flies the route on a real map (stand-in map services)", async () => {
-  const { page, ctx, errors } = await open("/en#planner", {}, installFakeMap);
+  const { page, ctx, errors } = await open("/en?build=1#planner", {}, installFakeMap);
   await toConsole(page);
-  const host = page.locator("#planner [data-cam]");
+  const host = page.locator("#plan-window [data-cam]");
   await host.waitFor({ state: "attached", timeout: 20000 });
   const read = async () => {
     const [lng, lat, zoom, bearing, pitch, beat] = (await host.getAttribute("data-cam")).split(",").map(Number);
@@ -375,10 +377,10 @@ await test("route console: the camera flies the route on a real map (stand-in ma
   assert.ok(Math.hypot(b.lng - a.lng, b.lat - a.lat) > 0.002, "the camera travels along the route");
   assert.ok(b.pitch >= 45, `tilted like a chase camera (pitch ${b.pitch})`);
   assert.ok(b.zoom > 13 && b.zoom < 17.5, `street-level zoom (${b.zoom})`);
-  const h = await page.locator("#planner .maplibregl-canvas").evaluate((c) => c.clientHeight);
+  const h = await page.locator("#plan-window .maplibregl-canvas").evaluate((c) => c.clientHeight);
   assert.ok(h > 330, `the map fills its box (${h}px tall)`);
   // choosing a step in the strip flies to it
-  await page.locator("#planner [data-beats] button").nth(2).click();
+  await page.locator("#plan-window [data-beats] button").nth(2).click();
   await page.waitForTimeout(1200);
   assert.equal((await read()).beat, 2);
   assert.ok(errors.filter((e) => !/GPU stall/.test(e)).length === 0, errors.join("\n"));
@@ -391,12 +393,12 @@ await test("route console: falls back to the flat map when the map services cann
   const page = await ctx.newPage();
   const crashed = [];
   page.on("pageerror", (e) => crashed.push(e.message));
-  await page.goto(BASE + "/en#planner", { waitUntil: "networkidle" });
+  await page.goto(BASE + "/en?build=1#planner", { waitUntil: "networkidle" });
   await toConsole(page);
-  await page.locator("#planner canvas[role=img]").waitFor({ state: "attached", timeout: 25000 });
-  assert.equal(await page.locator("#planner .maplibregl-canvas").count(), 0, "no broken map left behind");
-  await page.locator("#planner [data-beats] button").nth(1).click();
-  assert.equal(await page.locator("#planner [data-beats] button[aria-current=step]").count(), 1, "the steps still work");
+  await page.locator("#plan-window canvas[role=img]").waitFor({ state: "attached", timeout: 25000 });
+  assert.equal(await page.locator("#plan-window .maplibregl-canvas").count(), 0, "no broken map left behind");
+  await page.locator("#plan-window [data-beats] button").nth(1).click();
+  assert.equal(await page.locator("#plan-window [data-beats] button[aria-current=step]").count(), 1, "the steps still work");
   assert.deepEqual(crashed, []);
   await ctx.close();
 });

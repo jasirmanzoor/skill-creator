@@ -11,12 +11,23 @@
  * moves in, Tab stays inside, Esc or the scrim closes it and focus returns to the button. Reduced motion skips the
  * travel. The page is pushed through `.push-shift` (main, footer, header) so fixed rails stay where they are.
  */
-import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import { STOPS } from "@/content/journey";
+import { CHAPTERS } from "@/content/chapters";
+import { PLATE as OPENER_PLATE } from "./book/Opener";
+
+/** the site map's card: each chapter's opening photo, plus the two chapters that open without one */
+const PLATE: Record<string, { src: string; pos: string }> = {
+  ...OPENER_PLATE,
+  hero: { src: "/media/msg/interior.jpg", pos: "50% 45%" },
+  profile: { src: "/media/msg/facade-sky.jpg", pos: "50% 50%" },
+};
+import Image from "next/image";
+import { AnimatePresence, motion } from "motion/react";
 import { facts, whatsappLink } from "@/content/facts";
 import type { Dictionary, Locale } from "@/content/i18n";
 import { goTo } from "@/lib/book";
+import { openPlanner } from "@/lib/deck";
 import { lockScroll } from "@/lib/scroller";
 import { track } from "@/lib/analytics";
 import { useActiveSection } from "@/lib/use-active-section";
@@ -51,7 +62,12 @@ export function MenuButton({ open, onClick, label, ink, controls = true }: { ope
 
 export default function PushMenu({ t, lang, open, onClose }: { t: Dictionary; lang: Locale; open: boolean; onClose: () => void }) {
   const reduce = useReducedMotion();
-  const active = useActiveSection();
+  const section = useActiveSection();
+  // the chapter the visitor is in, read when the map opens
+  const [here, setHere] = useState<string | null>(null);
+  const active = here ?? section;
+  const [preview, setPreview] = useState<number | null>(null);
+  const list = useRef<HTMLOListElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   const opener = useRef<HTMLElement | null>(null);
   // the portal needs document.body: false while rendering on the server, true in the browser
@@ -64,6 +80,18 @@ export default function PushMenu({ t, lang, open, onClose }: { t: Dictionary; la
     opener.current = document.activeElement as HTMLElement | null;
     root.classList.add("push-open");
     lockScroll(true);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- read the page once, as the map opens
+    setHere(document.querySelector<HTMLElement>("[data-chapter][data-current]")?.dataset.chapter ?? null);
+    setPreview(null);
+    // on a touch screen the card follows the chapter crossing the middle of the panel as the list scrolls
+    let io: IntersectionObserver | null = null;
+    if (!window.matchMedia("(hover: hover)").matches && panel.current && list.current) {
+      io = new IntersectionObserver(
+        (es) => { for (const e of es) if (e.isIntersecting) setPreview(Number((e.target as HTMLElement).dataset.i)); },
+        { root: panel.current, rootMargin: "-55% 0px -35% 0px" },
+      );
+      list.current.querySelectorAll("li").forEach((li) => io!.observe(li));
+    }
     const first = panel.current?.querySelector<HTMLElement>("a,button");
     const id = window.setTimeout(() => first?.focus({ preventScroll: true }), reduce ? 0 : 120);
     const onKey = (e: KeyboardEvent) => {
@@ -78,6 +106,7 @@ export default function PushMenu({ t, lang, open, onClose }: { t: Dictionary; la
     document.addEventListener("keydown", onKey);
     return () => {
       window.clearTimeout(id);
+      io?.disconnect();
       document.removeEventListener("keydown", onKey);
       lockScroll(false);
       root.classList.remove("push-open");
@@ -93,7 +122,7 @@ export default function PushMenu({ t, lang, open, onClose }: { t: Dictionary; la
   }, [onClose, reduce]);
 
   if (!mounted) return null;
-  const n = STOPS.length;
+  const n = CHAPTERS.length;
   const other = lang === "en" ? "ar" : "en";
   const row = (i: number) => ({
     transitionProperty: "transform, opacity",
@@ -130,13 +159,42 @@ export default function PushMenu({ t, lang, open, onClose }: { t: Dictionary; la
           <MenuButton open={open} onClick={onClose} label={t.nav.close} ink={false} controls={false} />
         </div>
 
+        {/* the chapter card (after Framer's "Brand Logo Images"): the photo of the chapter under the pointer, or the one you are in */}
+        {(() => {
+          const k = preview ?? Math.max(0, CHAPTERS.findIndex((c) => c.id === active));
+          const ch = CHAPTERS[k];
+          const pl = PLATE[ch.id] ?? PLATE.hero;
+          return (
+            <div aria-hidden="true" className="sticky top-0 z-10 bg-pitch px-6 pb-4 sm:px-8">
+              <div className="relative aspect-[16/9] overflow-hidden rounded-[1.25rem] bg-white/5 ring-1 ring-white/10">
+                <AnimatePresence initial={false} mode="popLayout">
+                  <motion.div key={ch.id} className="absolute inset-0"
+                    initial={reduce ? false : { opacity: 0, scale: 1.06, filter: "blur(10px)" }}
+                    animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, scale: 0.98, filter: "blur(6px)" }}
+                    transition={{ type: "spring", bounce: 0.25, duration: 0.35 }}>
+                    <Image src={pl.src} alt="" fill sizes="420px" className="object-cover" style={{ objectPosition: pl.pos }} />
+                  </motion.div>
+                </AnimatePresence>
+                <span className="absolute inset-x-0 bottom-0 h-1/2 bg-[linear-gradient(0deg,rgba(6,16,32,0.85),transparent)]" />
+                <p className="absolute bottom-3 start-4 end-4 flex items-baseline gap-3 font-mono text-[11px] uppercase tracking-[0.16em] text-white/80 rtl:font-sans rtl:tracking-normal">
+                  <span className="tabular-nums text-[#a8dcff]" dir="ltr">{String(k + 1).padStart(2, "0")} / {String(CHAPTERS.length).padStart(2, "0")}</span>
+                  <span className="truncate">{ch.title[lang]}</span>
+                </p>
+              </div>
+            </div>
+          );
+        })()}
+
         <nav aria-label={t.nav.siteMap} className="flex-1 px-6 pb-6 sm:px-8">
-          <ol className="border-t border-white/10">
-            {STOPS.map((s, i) => {
+          <ol ref={list} onPointerLeave={() => setPreview(null)} className="border-t border-white/10">
+            {CHAPTERS.map((s, i) => {
               const here = active === s.id;
               return (
-                <li key={s.id} className="overflow-hidden border-b border-white/10">
+                <li key={s.id} data-i={i} className="overflow-hidden border-b border-white/10"
+                  onPointerEnter={(e) => { if (e.pointerType === "mouse") setPreview(i); }}>
                   <a
+                    onFocus={() => setPreview(i)}
                     href={`#${s.id}`}
                     onClick={(e) => { e.preventDefault(); land(s.id); }}
                     aria-current={here ? "location" : undefined}
@@ -158,7 +216,7 @@ export default function PushMenu({ t, lang, open, onClose }: { t: Dictionary; la
 
         <div className="grid gap-5 border-t border-white/10 px-6 py-6 sm:px-8" style={{ ...row(n), transform: open ? "translateY(0)" : "translateY(16px)", opacity: open ? 1 : 0 }}>
           <div className="grid grid-cols-2 gap-2.5">
-            <a href="#planner" onClick={(e) => { e.preventDefault(); land("planner"); track("cta_click", { cta: "plan", location: "site_map" }); }} className="rounded-full bg-white px-4 py-3 text-center text-sm font-semibold text-teal-deep">
+            <a href="#planner" onClick={(e) => { e.preventDefault(); onClose(); track("cta_click", { cta: "plan", location: "site_map" }); window.setTimeout(openPlanner, 60); }} className="rounded-full bg-white px-4 py-3 text-center text-sm font-semibold text-teal-deep">
               {t.nav.ctaShort}
             </a>
             <a href={whatsappLink(t.wa.general)} target="_blank" rel="noopener noreferrer" onClick={() => track("whatsapp_click", { location: "site_map" })} className="rounded-full px-4 py-3 text-center text-sm font-semibold text-white ring-1 ring-white/25">

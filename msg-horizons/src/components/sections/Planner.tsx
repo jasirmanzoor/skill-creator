@@ -8,6 +8,9 @@ import { approxCost } from "@/lib/estimate";
 import { RiyadhClock } from "../hero/Command";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { lockScroll } from "@/lib/scroller";
+import { PLAN_OPEN } from "@/lib/deck";
 import {
   CARGO, PERSONAS, PRIORITIES, buildPlan, decodePlan, encodePlan,
   type Cargo, type Persona, type PlanInput, type Priority,
@@ -53,6 +56,11 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const firstRender = useRef(true);
   const reduce = useReducedMotion();
+  // the builder runs in its own window over the page; the chapter only launches it
+  const [open, setOpen] = useState(false);
+  const scroller = useRef<HTMLDivElement>(null);
+  const opener = useRef<HTMLElement | null>(null);
+  const show = () => { opener.current = document.activeElement as HTMLElement | null; setOpen(true); };
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -66,10 +74,14 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
       if (shared.net) { setNet(shared.net); setNetTouched(true); }
       setPriorities(shared.priorities);
       setStep(4);
+      setOpen(true);
     } else if (start && (PERSONAS as readonly string[]).includes(start)) {
       setPersona(start as Persona);
       setNet({ ...DEFAULT_SIZER, ...PRESET[start as Persona] });
       setStep(1);
+      setOpen(true);
+    } else if (params.has("build")) {
+      setOpen(true);
     }
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
@@ -80,13 +92,45 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
     setPersona(seed.persona);
     if (!netTouched) setNet({ ...DEFAULT_SIZER, ...PRESET[seed.persona] });
     setStep(1);
+    setOpen(true);
     track("planner_step", { step: 1, value: seed.persona });
   }
 
+  // "Build my plan" anywhere on the page opens the window (buttons marked data-plan-open, or the PLAN_OPEN signal)
+  useEffect(() => {
+    const onSignal = () => show();
+    const onClick = (e: MouseEvent) => {
+      const a = (e.target as HTMLElement | null)?.closest?.("[data-plan-open]");
+      if (!a) return;
+      e.preventDefault();
+      e.stopPropagation();
+      show();
+    };
+    window.addEventListener(PLAN_OPEN, onSignal);
+    document.addEventListener("click", onClick, true);
+    return () => { window.removeEventListener(PLAN_OPEN, onSignal); document.removeEventListener("click", onClick, true); };
+  }, []);
+
+  // while the window is open the page behind it stays still; Escape closes it and focus goes back where it was
+  useEffect(() => {
+    if (!open) return;
+    lockScroll(true);
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    window.addEventListener("keydown", onKey);
+    window.setTimeout(() => headingRef.current?.focus({ preventScroll: true }), 50);
+    return () => {
+      lockScroll(false);
+      window.removeEventListener("keydown", onKey);
+      opener.current?.focus?.({ preventScroll: true });
+    };
+  }, [open]);
+
+  // every step, and the finished plan, starts at the top of the window: nothing arrives out of sight
   useEffect(() => {
     if (firstRender.current) { firstRender.current = false; return; }
+    scroller.current?.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
     headingRef.current?.focus({ preventScroll: true });
-  }, [step]);
+  }, [step, reduce]);
 
   const input: PlanInput | null = persona && volume ? { persona, cargo, volume, priorities, net } : null;
   const liveInput: PlanInput | null = persona
@@ -123,6 +167,7 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
     if (!input) return;
     setPlan(input);
     track("plan_share", { channel: "form" });
+    setOpen(false);
     goTo("contact");
     window.setTimeout(() => document.getElementById("lead-name")?.focus({ preventScroll: true }), 700);
   };
@@ -153,21 +198,10 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
   // the four answers so far: who you are, what you move (once past it), your numbers, what matters
   const answered = (persona ? 1 : 0) + (step > 1 || cargo.length ? 1 : 0) + (step > 2 || netTouched ? 1 : 0) + (priorities.length ? 1 : 0);
 
-  return (
-    <section id="planner" aria-labelledby="planner-title" className="relative scroll-mt-16 py-8 text-white lg:py-10">
-      <div className="mx-auto max-w-[88rem] px-5 lg:px-8">
-        <div className="grid gap-4 lg:grid-cols-[1fr_1fr] lg:items-end">
-          <div>
-            <span className="label on-dark">{p.eyebrow}</span>
-            <h2 id="planner-title" className="mt-2 font-display text-3xl font-semibold tracking-[-0.03em] text-balance sm:text-4xl rtl:leading-[1.3] rtl:tracking-normal">
-              {p.title}
-            </h2>
-          </div>
-          <p className="max-w-xl text-lg text-white/75 text-pretty lg:justify-self-end">{p.lead}</p>
-        </div>
-
+  const win = (
+    <>
         {/* the plan builder as MSG's console: a light runs round its edge while it waits for answers */}
-        <div className="relative mt-6 rounded-[2.25rem] p-px shadow-[0_50px_140px_-50px_rgba(0,0,0,0.85)]">
+        <div className="relative rounded-[2.25rem] p-px shadow-[0_50px_140px_-50px_rgba(0,0,0,0.85)]">
           <div aria-hidden="true" className="plan-glow absolute inset-0 rounded-[2.25rem]" />
           <div className="relative rounded-[calc(2.25rem-1px)] bg-[linear-gradient(160deg,#123d44,#0a2629)] p-1.5 ring-1 ring-white/10 sm:p-2">
             <div className="flex items-center gap-3 px-3 pb-2 pt-1 text-white">
@@ -347,7 +381,84 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
         </div>
           </div>
         </div>
+    </>
+  );
+
+  return (
+    <section id="planner" aria-labelledby="planner-title" className="relative scroll-mt-16 py-8 text-white lg:py-10">
+      <div className="mx-auto max-w-[88rem] px-5 lg:px-8">
+        <div className="grid gap-4 lg:grid-cols-[1fr_1fr] lg:items-end">
+          <div>
+            <span className="label on-dark">{p.eyebrow}</span>
+            <h2 id="planner-title" className="mt-2 font-display text-3xl font-semibold tracking-[-0.03em] text-balance sm:text-4xl rtl:leading-[1.3] rtl:tracking-normal">
+              {p.title}
+            </h2>
+          </div>
+          <p className="max-w-xl text-lg text-white/75 text-pretty lg:justify-self-end">{p.lead}</p>
+        </div>
+
+        {/* the launcher: the four steps at a glance, and two ways in; the builder itself opens in its own window */}
+        <div className="mt-8 rounded-[2rem] bg-white/[0.05] p-5 ring-1 ring-white/10 sm:p-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <ol aria-label={p.steps.persona.q} className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:flex-1">
+              {k.steps.map((label, i) => (
+                <li key={label} className="flex items-center gap-3 rounded-2xl bg-white/[0.05] px-3 py-3 ring-1 ring-white/10">
+                  <span className="num grid size-8 shrink-0 place-items-center rounded-full bg-brand-bright/15 text-sm font-semibold text-brand-bright ring-1 ring-brand-bright/30">{i + 1}</span>
+                  <span className="text-sm font-semibold text-white">{label}</span>
+                </li>
+              ))}
+            </ol>
+            <button type="button" onClick={() => { track("cta_click", { cta: "plan", location: "planner_launch" }); show(); }} className="btn-primary on-dark shrink-0 justify-center px-6 py-3.5 text-base">
+              {plan && step === 4 ? t.planner.result.models[plan.model].name : k.open} <ArrowIcon />
+            </button>
+          </div>
+          <p className="mt-8 text-sm font-semibold text-white/75">{k.launch}</p>
+          <div role="group" aria-label={p.steps.persona.q} className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+            {PERSONAS.map((k2) => (
+              <button
+                key={k2}
+                type="button"
+                onClick={() => {
+                  setPersona(k2);
+                  if (!netTouched) setNet({ ...DEFAULT_SIZER, ...PRESET[k2] });
+                  go(1, k2);
+                  show();
+                }}
+                className="group flex min-h-14 items-center gap-3 rounded-2xl bg-white/[0.06] px-3.5 py-3 text-start ring-1 ring-white/12 transition-colors hover:bg-white/[0.12] hover:ring-brand-bright/50"
+              >
+                <span aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-xl bg-brand-bright/15 text-brand-bright [&_svg]:size-[18px]"><OptionIcon id={k2} /></span>
+                <span className="text-sm font-semibold leading-tight text-white">{p.steps.persona.options[k2].t}</span>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
+      {open && typeof document !== "undefined"
+        ? createPortal(
+            <div id="plan-window" role="dialog" aria-modal="true" aria-labelledby="plan-window-title" className="fixed inset-0 z-[100] bg-[#030b16]/85 backdrop-blur-md">
+              <motion.div
+                ref={scroller}
+                data-lenis-prevent
+                className="h-full overflow-y-auto overscroll-contain"
+                initial={reduce ? false : { opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, ease: EASE_OUT }}
+              >
+                <div className="mx-auto max-w-[88rem] px-2 pb-6 pt-2 sm:px-6 sm:pb-10 sm:pt-5">
+                  <div className="mb-2 flex items-center justify-between gap-3 px-2 text-white sm:mb-3">
+                    <p id="plan-window-title" className="truncate font-display text-lg font-semibold sm:text-xl">{p.title}</p>
+                    <button type="button" onClick={() => setOpen(false)} aria-label={k.close} title={k.close}
+                      className="grid size-11 shrink-0 place-items-center rounded-full bg-white/10 text-white ring-1 ring-white/20 transition-colors hover:bg-white/20">
+                      <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+                    </button>
+                  </div>
+                  {win}
+                </div>
+              </motion.div>
+            </div>,
+            document.body,
+          )
+        : null}
     </section>
   );
 }

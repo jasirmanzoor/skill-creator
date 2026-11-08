@@ -251,7 +251,8 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   const zoom = useTransform(() => 1 + 1.8 * zk.get() ** 3);
   // no filter at all until the walk-in begins: a standing blur(0px) keeps this full-screen layer on the slow filter path
   const facadeFx = useTransform(p, (v) => {
-    if (v <= 0.3) return "none";
+    // and none again once the veil has covered the film: a hidden full-screen blur still costs every frame
+    if (v <= 0.3 || v >= 0.44) return "none";
     const k = Math.min(1, (v - 0.3) / 0.13);
     return `blur(${10 * k}px) brightness(${1 - 0.7 * k})`;
   });
