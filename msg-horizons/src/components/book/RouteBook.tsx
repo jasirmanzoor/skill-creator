@@ -12,16 +12,12 @@ const QUERY = "(prefers-reduced-motion: reduce)";
 const TYPING = "input, textarea, select, [contenteditable=''], [contenteditable='true']";
 
 /**
- * The book's spine. The homepage's chapters (components/book/Chapter) are all in the HTML, so search engines and
- * visitors without JavaScript read the whole page; with JavaScript one chapter is open at a time and the others wait
- * (`html.book [data-chapter]:not([data-current])` in globals.css).
- *
- * Turning a page: the open chapter lifts off its spine and turns away in 3D, uncovering the next one underneath
- * (View Transitions; see `[data-turn]` in globals.css). Back turns it over again. In Arabic the book opens from the
- * right. Browsers without View Transitions, and visitors who prefer reduced motion, get a soft cross-fade.
+ * The book's spine. The homepage's chapters (components/book/Chapter) sit one after another on a single page that
+ * scrolls one way only, down. Nothing turns sideways: the open chapter is simply the one you have scrolled into, and
+ * the route rail, the mobile bar and the backdrop follow it.
  *
  * Every way of asking for a place lands through here: any #link on the page (header, menu, buttons, the rail), goTo()
- * from code, the ] and [ keys, the browser's back button (each chapter is a history entry), and a shared link.
+ * from code, the ] and [ keys, the browser's back button, and a shared link. Each glides down (or up) the same page.
  */
 export default function RouteBook({ lang }: { lang: Locale }) {
   const c = bookCopy[lang];
@@ -31,60 +27,46 @@ export default function RouteBook({ lang }: { lang: Locale }) {
     const root = document.documentElement;
     const pages = [...document.querySelectorAll<HTMLElement>("[data-chapter]")];
     if (!pages.length) return;
-    root.classList.add("book");
+    root.classList.add("scroll-book");
     const total = pages.length;
     const idOf = (i: number) => pages[i].dataset.chapter ?? "";
-    let index = Math.max(0, pages.findIndex((p) => p.hasAttribute("data-current")));
+    let index = -1;
     const reduce = () => window.matchMedia(QUERY).matches;
 
+    // the open chapter is the last one whose top has passed the upper third of the screen
+    const current = () => {
+      const line = window.innerHeight * 0.34;
+      let n = 0;
+      for (let i = 0; i < total; i++) if (pages[i].getBoundingClientRect().top <= line) n = i;
+      return n;
+    };
     const measure = () => {
-      const max = root.scrollHeight - window.innerHeight;
-      const f = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+      const n = current();
+      const r = pages[n].getBoundingClientRect();
+      const span = Math.max(1, r.height - window.innerHeight);
+      const f = Math.min(1, Math.max(0, -r.top / span));
       chapterProgress.set(f);
-      bookTime.set(total > 1 ? Math.min(1, (index + f * 0.7) / (total - 1)) : 0);
-    };
-    const publish = () => {
-      root.dataset.openChapter = idOf(index);
-      publishState({ index, total, id: idOf(index) });
-      measure();
+      bookTime.set(total > 1 ? Math.min(1, (n + f * 0.7) / (total - 1)) : 0);
+      if (n !== index) {
+        index = n;
+        root.dataset.openChapter = idOf(n);
+        pages.forEach((p, i) => p.toggleAttribute("data-current", i === n));
+        publishState({ index: n, total, id: idOf(n) });
+      }
     };
 
-    const jump = (y: number) => window.scrollTo({ top: Math.max(0, Math.round(y)), behavior: "instant" });
-    const targetY = (target: HTMLElement | null) => (target && !pages.includes(target) && target.id !== idOf(index) ? pageTop(target) - 64 : 0);
-
-    const show = (n: number) => {
-      pages.forEach((p, i) => p.toggleAttribute("data-current", i === n));
-      index = n;
-    };
+    // where to land: a chapter lands on its first screen, anything inside one lands just under the header
+    const yOf = (el: HTMLElement) => (pages.includes(el) ? pageTop(el) : pageTop(el) - 64);
 
     const go = (to: number, target: HTMLElement | null, { immediate = false, focus = true, push = true }: GoOptions & { push?: boolean } = {}) => {
       const n = Math.max(0, Math.min(total - 1, to));
-      if (n === index) {
-        // already open: travel within the page
-        scrollToY(target ? targetY(target) : 0, { immediate: immediate || reduce(), force: true });
-        return;
-      }
-      const dir = n > index ? "next" : "prev";
-      const hash = target && target.id && target.id !== idOf(n) ? target.id : idOf(n);
-      if (push) history.pushState({ chapter: n }, "", n === 0 && hash === idOf(0) ? location.pathname + location.search : `#${hash}`);
-      const swap = () => {
-        show(n);
-        jump(targetY(target));
-        publish();
-        // maps, canvases and observers in the newly opened chapter measure themselves again
-        window.dispatchEvent(new Event("resize"));
-        if (focus) pages[n].focus({ preventScroll: true });
-      };
+      const el = target ?? pages[n];
+      const hash = el.id && el.id !== idOf(0) ? el.id : n === 0 ? "" : idOf(n);
+      if (push) history.pushState({ chapter: n }, "", hash ? `#${hash}` : location.pathname + location.search);
       setSaid(fmt(c.opened, { n: n + 1, total, title: CHAPTERS[n]?.title[lang] ?? "" }));
       track("cta_click", { cta: "chapter", location: idOf(n) });
-      if (immediate || reduce() || typeof document.startViewTransition !== "function") {
-        swap();
-        if (!immediate) pages[n].animate([{ opacity: 0 }, { opacity: 1 }], { duration: reduce() ? 0 : 380, easing: "cubic-bezier(0.23, 1, 0.32, 1)" });
-        return;
-      }
-      root.dataset.turn = dir;
-      const t = document.startViewTransition(swap);
-      t.finished.finally(() => { if (root.dataset.turn === dir) delete root.dataset.turn; });
+      scrollToY(n === 0 && !target ? 0 : yOf(el), { immediate: immediate || reduce(), duration: 1.3, force: true });
+      if (focus) pages[n].focus({ preventScroll: true });
     };
 
     // where an element lives: the chapter that holds it
@@ -116,16 +98,10 @@ export default function RouteBook({ lang }: { lang: Locale }) {
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
       if ((e.target as HTMLElement | null)?.closest?.(TYPING)) return;
       if (document.documentElement.classList.contains("push-open")) return;
-      const onPage = document.activeElement === document.body || pages.includes(document.activeElement as HTMLElement);
-      const rtl = root.dir === "rtl";
-      let step = 0;
-      if (e.key === "]") step = 1;
-      else if (e.key === "[") step = -1;
-      else if (onPage && e.key === "ArrowRight") step = rtl ? -1 : 1;
-      else if (onPage && e.key === "ArrowLeft") step = rtl ? 1 : -1;
+      const step = e.key === "]" ? 1 : e.key === "[" ? -1 : 0;
       if (!step) return;
       e.preventDefault();
-      go(index + step, null);
+      go(current() + step, null);
     };
     const onPop = () => {
       const hit = resolve(decodeURIComponent(location.hash.slice(1)));
@@ -135,9 +111,9 @@ export default function RouteBook({ lang }: { lang: Locale }) {
     // arriving: a #link, a shared plan, or a service page's "build a plan" link opens on its chapter
     const q = new URLSearchParams(location.search);
     const arrive = resolve(decodeURIComponent(location.hash.slice(1))) ?? (q.has("plan") || q.has("persona") ? resolve("planner") : null);
-    if (arrive && arrive.n !== index) go(arrive.n, arrive.el, { immediate: true, focus: false, push: false });
-    else if (arrive?.el) requestAnimationFrame(() => jump(targetY(arrive.el)));
-    publish();
+    // once the page has laid itself out (pictures and pinned scenes change its length), land on the place asked for
+    if (arrive && (arrive.n > 0 || arrive.el !== pages[0])) window.setTimeout(() => go(arrive.n, arrive.el, { immediate: true, focus: false, push: false }), 120);
+    measure();
 
     let raf = 0;
     const onScroll = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; measure(); }); };
@@ -155,6 +131,7 @@ export default function RouteBook({ lang }: { lang: Locale }) {
       window.removeEventListener("popstate", onPop);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
+      root.classList.remove("scroll-book");
     };
   }, [c.opened, lang]);
 

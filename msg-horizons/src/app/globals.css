@@ -556,6 +556,8 @@ html[dir="rtl"].push-open .push-shift { translate: var(--push-w) 0; }
 /* ---------- The book: one chapter open at a time (components/book) ---------- */
 /* Without JavaScript there is no .book class and every chapter stacks into one long page. */
 html.book [data-chapter]:not([data-current]) { display: none; }
+/* the first-visit guide above the rail: a mouse's wheel rolling down */
+@keyframes guide-wheel { 0% { transform: translateY(0); opacity: 1; } 70% { transform: translateY(9px); opacity: 0; } 100% { transform: translateY(0); opacity: 0; } }
 [data-chapter]:focus { outline: none; }
 html.book:not([data-open-chapter="contact"]) .book-footer { display: none; }
 

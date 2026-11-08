@@ -36,6 +36,9 @@ type UI = {
   opened: string; // {n} {total} {title}
   keys: string;
   backToStart: string;
+  /** the first-visit guide above the rail */
+  guide: string;
+  guideTap: string;
 };
 
 export const bookCopy: Record<Locale, UI> = {
@@ -46,8 +49,10 @@ export const bookCopy: Record<Locale, UI> = {
     turn: "Turn to {title}",
     rail: "Chapters",
     opened: "Chapter {n} of {total}: {title}",
-    keys: "Tip: press ] and [ to turn the page.",
+    keys: "Tip: press ] and [ to jump between chapters.",
     backToStart: "Back to the start",
+    guide: "Scroll down to explore",
+    guideTap: "or tap a chapter to jump to it",
   },
   ar: {
     chapter: "الفصل {n} من {total}",
@@ -56,7 +61,9 @@ export const bookCopy: Record<Locale, UI> = {
     turn: "انتقل إلى {title}",
     rail: "الفصول",
     opened: "الفصل {n} من {total}: {title}",
-    keys: "تلميح: اضغط ] و [ لتقليب الصفحات.",
+    keys: "تلميح: اضغط ] و [ للتنقل بين الفصول.",
     backToStart: "العودة إلى البداية",
+    guide: "مرّر للأسفل للاستكشاف",
+    guideTap: "أو اضغط على فصل للانتقال إليه",
   },
 };

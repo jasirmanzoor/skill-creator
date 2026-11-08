@@ -94,7 +94,8 @@ export default function MaskedHeadings({ lang }: { lang: Locale }) {
       host.setAttribute("data-mask-host", "");
       host.setAttribute("aria-hidden", "true");
       host.className = "mask-host";
-      const text = (el.textContent ?? "").replace(/\s+/g, " ").trim();
+      // innerText keeps the break between a heading's lines (two block spans) as a space; textContent would glue them
+      const text = (el.innerText || el.textContent || "").replace(/\s+/g, " ").trim();
       el.appendChild(host);
       known.set(el, { id: ids++, el, host, text, props: {}, live: false });
       view.observe(el);
