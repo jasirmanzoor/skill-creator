@@ -84,7 +84,7 @@ export default function ExpandList({ items, label, rtl = false }: { items: Expan
             />
 
             <div className="grid grid-cols-[2.75rem_1fr_auto] items-start gap-x-4 py-6 sm:grid-cols-[4rem_1fr_auto] sm:gap-x-8 lg:grid-cols-[4.5rem_1fr_17.5rem_auto] lg:gap-x-10 lg:py-8">
-              <span aria-hidden="true" dir="ltr" className={`pt-2 font-mono text-sm tabular-nums transition-colors duration-300 sm:text-base ${on ? "text-brand-bright" : "text-white/30"}`}>
+              <span aria-hidden="true" dir="ltr" className={`pt-2 font-mono text-sm tabular-nums transition-colors duration-300 sm:text-base ${on ? "text-brand-bright" : "text-white/60"}`}>
                 {pad(i + 1)}
               </span>
 
@@ -97,10 +97,10 @@ export default function ExpandList({ items, label, rtl = false }: { items: Expan
                     aria-controls={`xl-${it.id}`}
                     onClick={() => choose(i)}
                     onFocus={() => choose(i)}
-                    className={`flex items-center gap-3 text-start font-display text-[clamp(1.55rem,3.2vw,2.75rem)] font-semibold leading-[1.08] tracking-[-0.03em] transition-colors duration-300 rtl:leading-[1.35] rtl:tracking-normal ${on ? "text-white" : "text-white/35 hover:text-white/60"}`}
+                    className={`flex items-center gap-3 text-start font-display text-[clamp(1.55rem,3.2vw,2.75rem)] font-semibold leading-[1.08] tracking-[-0.03em] transition-colors duration-300 rtl:leading-[1.35] rtl:tracking-normal ${on ? "text-white" : "text-white/60 hover:text-white/85"}`}
                   >
                     {it.icon ? (
-                      <span aria-hidden="true" className={`hidden size-10 shrink-0 place-items-center rounded-xl ring-1 transition-colors duration-300 sm:grid [&_svg]:size-5 ${on ? "bg-brand-bright/15 text-brand-bright ring-brand-bright/35" : "text-white/30 ring-white/15"}`}>{it.icon}</span>
+                      <span aria-hidden="true" className={`hidden size-10 shrink-0 place-items-center rounded-xl ring-1 transition-colors duration-300 sm:grid [&_svg]:size-5 ${on ? "bg-brand-bright/15 text-brand-bright ring-brand-bright/35" : "text-white/60 ring-white/15"}`}>{it.icon}</span>
                     ) : null}
                     {it.title}
                   </button>

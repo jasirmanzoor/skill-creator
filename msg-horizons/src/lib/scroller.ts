@@ -10,9 +10,9 @@ export const registerScroller = (l: Lenis | null) => { lenis = l; };
 const easeOutQuart = (t: number) => 1 - (1 - t) ** 4;
 
 /** `force` scrolls even while momentum scrolling is paused (a closing overlay may not have released it yet) */
-export function scrollToY(y: number, { immediate = false, duration = 1.15, force = false }: { immediate?: boolean; duration?: number; force?: boolean } = {}) {
+export function scrollToY(y: number, { immediate = false, duration = 1.15, force = false, easing = easeOutQuart }: { immediate?: boolean; duration?: number; force?: boolean; easing?: (t: number) => number } = {}) {
   const top = Math.max(0, Math.round(y));
-  if (lenis) lenis.scrollTo(top, { immediate, duration, easing: easeOutQuart, force });
+  if (lenis) lenis.scrollTo(top, { immediate, duration, easing, force });
   else window.scrollTo({ top, behavior: immediate ? "auto" : "smooth" });
 }
 

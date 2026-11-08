@@ -78,13 +78,13 @@ export default function ScrollSync({ items, label }: { items: SyncItem[]; label:
       <ol className="pb-[30svh] lg:py-[18svh]">
         {items.map((x, i) => (
           <li key={x.src} ref={(el) => { rows.current[i] = el; }} data-i={i} className="flex min-h-[34svh] flex-col justify-center border-t border-line py-8 first:border-t-0 lg:min-h-[58svh] lg:py-10">
-            <span className={`font-display text-sm font-semibold tabular-nums transition-colors duration-300 ${i === active ? "text-brand" : "text-faint"}`} dir="ltr">
+            <span className={`font-display text-sm font-semibold tabular-nums transition-colors duration-300 ${i === active ? "text-brand" : "text-muted"}`} dir="ltr">
               {pad(i + 1)}
             </span>
-            <p className={`mt-3 max-w-md font-display text-[clamp(1.6rem,3.2vw,2.6rem)] font-semibold leading-[1.08] tracking-[-0.03em] transition-colors duration-300 text-balance rtl:tracking-normal ${i === active ? "text-ink" : "text-ink/30"}`}>
+            <p className={`mt-3 max-w-md font-display text-[clamp(1.6rem,3.2vw,2.6rem)] font-semibold leading-[1.08] tracking-[-0.03em] transition-colors duration-300 text-balance rtl:tracking-normal ${i === active ? "text-ink" : "text-ink/55"}`}>
               {x.title}
             </p>
-            {x.group ? <p className={`mt-3 text-sm transition-opacity duration-300 ${i === active ? "text-muted" : "text-muted opacity-40"}`}>{x.group}</p> : null}
+            {x.group ? <p className="mt-3 text-sm text-muted">{x.group}</p> : null}
             {/* what the photo shows, for screen readers (the card above is decoration) */}
             <span className="sr-only">{x.alt}</span>
           </li>

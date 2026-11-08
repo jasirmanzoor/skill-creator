@@ -38,7 +38,7 @@ export default function Services({ t, lang }: { t: Dictionary; lang: Locale }) {
   });
 
   return (
-    <section id="services" aria-labelledby="services-title" data-theme="dark" className="relative scroll-mt-16 bg-deep/[0.88] pb-24 pt-24 text-white lg:pb-32 lg:pt-28">
+    <section id="services" aria-labelledby="services-title" data-theme="dark" className="relative scroll-mt-16 bg-deep pb-24 pt-24 text-white lg:pb-32 lg:pt-28">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-bright rtl:tracking-normal">{s.eyebrow}</p>
         <div className="mt-3 grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">

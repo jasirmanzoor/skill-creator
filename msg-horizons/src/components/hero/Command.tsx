@@ -8,7 +8,7 @@ import { heroCopy, type HeroLane } from "@/content/hero";
 import { facts } from "@/content/facts";
 import type { Locale } from "@/content/i18n";
 import { EASE_OUT, SPRING_UI } from "@/lib/motion";
-import HeroMap from "./HeroMap";
+import HeroMap, { TONE_CSS } from "./HeroMap";
 import { StarfieldBackground } from "../ui/starfield-hero";
 
 /*
@@ -148,12 +148,19 @@ export function ConsoleWindow({
         <span className="truncate text-[12px] font-semibold text-white/85">{title}</span>
         <span className="ms-auto"><RiyadhClock label={c.command.clock} /></span>
       </div>
-      <div className="relative overflow-hidden rounded-[20px] bg-[radial-gradient(80%_70%_at_70%_20%,#d6f0ee_0%,rgba(214,240,238,0)_70%),linear-gradient(180deg,#f1f7fd,#e6f5f4)]">
+      <div className="relative overflow-hidden rounded-[20px] bg-[radial-gradient(90%_80%_at_62%_38%,#0c2c55_0%,#06142a_55%,#030914_100%)] ring-1 ring-[#5fd6ff]/15">
         <div className="relative aspect-[1100/850]">
+          {/* the screen's own grid, under the map */}
+          <span aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(95,214,255,0.05)_1px,transparent_1px),linear-gradient(0deg,rgba(95,214,255,0.05)_1px,transparent_1px)] bg-[size:28px_28px]" />
           {map ? <HeroMap lang={lang} lane={lane} stage={stage} /> : null}
-          {/* the scan: the picture is refreshed, not printed */}
-          <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-1/4 bg-[linear-gradient(180deg,transparent,rgba(10,90,153,0.08)_70%,rgba(10,90,153,0.22))] motion-safe:animate-[cmd-scan_6s_var(--ease-in-out)_infinite] motion-reduce:hidden" />
-          <p className="absolute bottom-2 start-3 text-[10px] text-teal-deep/70">{c.map.caption}</p>
+          {/* the scan: a line of light refreshing the picture */}
+          <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-1/4 border-b border-[#5fd6ff]/35 bg-[linear-gradient(180deg,transparent,rgba(0,157,248,0.07))] motion-safe:animate-[cmd-scan_6s_var(--ease-in-out)_infinite] motion-reduce:hidden" />
+          {/* corner brackets */}
+          {["start-2.5 top-2.5 border-s border-t", "end-2.5 top-2.5 border-e border-t", "bottom-2.5 start-2.5 border-b border-s", "bottom-2.5 end-2.5 border-b border-e"].map((k) => (
+            <span key={k} aria-hidden="true" className={`pointer-events-none absolute size-3.5 border-[#5fd6ff]/70 ${k}`} />
+          ))}
+          <HudReadout c={c} lane={lane} stage={stage} />
+          <p className="absolute bottom-3 start-4 text-[10px] font-medium text-[#9fdcff]/75">{c.map.caption}</p>
         </div>
       </div>
       {/* the lane switch sits clear of the order card that overlaps the console's lower corner */}
@@ -166,6 +173,25 @@ export function ConsoleWindow({
         ))}
       </div>
     </div>
+  );
+}
+
+/** what the screen is showing (top start), and the colour key for its traffic (top end) */
+function HudReadout({ c, lane, stage }: { c: C; lane: HeroLane; stage: number }) {
+  const h = c.map.hud;
+  const key: [string, string][] = [[h.parcels, TONE_CSS.parcel], [h.cash, TONE_CSS.coin], [h.returns, TONE_CSS.return]];
+  return (
+    <>
+      <p className="pointer-events-none absolute start-4 top-6 flex items-center gap-2 rounded-md bg-[#04101f]/80 px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-[#bfeaff] ring-1 ring-[#5fd6ff]/25 max-sm:hidden rtl:font-sans rtl:tracking-normal">
+        <span className="relative flex size-1.5"><span className="absolute inset-0 rounded-full bg-[#38ceff] motion-safe:animate-ping" /><span className="relative size-1.5 rounded-full bg-[#38ceff]" /></span>
+        {stage < 0 ? <>{h.network} · {c.quote.lanes[lane]}</> : <>{h.order} · <span dir="ltr">{String(stage + 1).padStart(2, "0")}/04</span></>}
+      </p>
+      <ul aria-hidden="true" className="pointer-events-none absolute end-4 top-6 flex gap-3 rounded-md bg-[#04101f]/80 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-[#bfeaff]/85 ring-1 ring-[#5fd6ff]/25 max-sm:hidden rtl:font-sans rtl:tracking-normal">
+        {key.map(([t, col]) => (
+          <li key={t} className="flex items-center gap-1.5"><span className="size-1.5 rounded-full" style={{ background: col, boxShadow: `0 0 6px ${col}` }} />{t}</li>
+        ))}
+      </ul>
+    </>
   );
 }
 

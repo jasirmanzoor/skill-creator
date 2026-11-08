@@ -39,7 +39,10 @@ const WALK = 0.36, HOLD = 0.1, STEP = (1 - WALK - HOLD) / STAGE_COUNT;
  * so a visitor never has to guess how far to scroll for the scene to change.
  */
 const RESTS = [0, 0.62 * WALK, WALK + 0.015];
-const GLIDE = 1.15;
+/** each glide's length (s): into the hub gets longer, so the push, the dark and the lights all play */
+const GLIDE_IN = 1.7, GLIDE_OUT = 1.35;
+/** a cinematic ease: it moves off at once, travels and settles softly, instead of jumping at the start */
+const easeInOut = (t: number) => -(Math.cos(Math.PI * t) - 1) / 2;
 const stageAt = (v: number) => (v < WALK + HOLD ? -1 : Math.min(STAGE_COUNT - 1, Math.floor((v - WALK - HOLD) / STEP)));
 /** the console's resting tilt toward the visitor (degrees); it eases to about half while an order plays */
 const TILT = { x: 9, y: 13 };
@@ -129,12 +132,14 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
     const hold = (e: Event) => { if (e.cancelable) e.preventDefault(); e.stopImmediatePropagation(); };
     const opts = { capture: true, passive: false } as const;
     for (const t of ["wheel", "touchmove"]) window.addEventListener(t, hold, opts);
-    scrollToY(top + (el.offsetHeight - window.innerHeight) * to, { duration: GLIDE });
+    const from = scrollYProgress.get();
+    const leg = Math.min(from, to) < RESTS[1] - 0.004 ? GLIDE_IN : GLIDE_OUT;
+    scrollToY(top + (el.offsetHeight - window.innerHeight) * to, { duration: leg, easing: easeInOut });
     window.setTimeout(() => {
       for (const t of ["wheel", "touchmove"]) window.removeEventListener(t, hold, opts);
       Object.assign(g, { on: false, until: performance.now() + 650, last: scrollYProgress.get(), to, ended: performance.now() });
       later();
-    }, GLIDE * 1000 + 60);
+    }, leg * 1000 + 60);
   }
   // once the page has come to a stop (no finger on the screen, no momentum left), it never stays part-way through the
   // walk-in: it glides on to a resting place
@@ -243,12 +248,12 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
 
   // the push into the film
   const zk = useTransform(p, [0.1, 0.43], [0, 1], { clamp: true });
-  const zoom = useTransform(() => 1 + 0.35 * zk.get() ** 2);
+  const zoom = useTransform(() => 1 + 1.8 * zk.get() ** 3);
   // no filter at all until the walk-in begins: a standing blur(0px) keeps this full-screen layer on the slow filter path
   const facadeFx = useTransform(p, (v) => {
     if (v <= 0.3) return "none";
     const k = Math.min(1, (v - 0.3) / 0.13);
-    return `brightness(${1 - 0.7 * k})`;
+    return `blur(${10 * k}px) brightness(${1 - 0.7 * k})`;
   });
   const veil = useTransform(p, [0.33, 0.43], [0, 1]);
   const uiOut = useTransform(p, [0, 0.08, 0.18], [1, 1, 0]);

@@ -420,44 +420,48 @@ await test("live tracking: nothing is live until the driver approves, then the t
   }
 });
 
-await test("book: one chapter open; the rail, #links, ] and [ and the back button turn the pages (en + ar)", async () => {
+await test("book: one continuous page; the rail, #links, ] and [ and the back button move between chapters (en + ar)", async () => {
   for (const [lang, rail] of [["en", "Chapters"], ["ar", "الفصول"]]) {
     const { page, ctx, errors } = await open(`/${lang}`, { reducedMotion: "reduce" });
     const opened = () => page.evaluate(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter);
+    const topOf = (sel) => page.locator(sel).evaluate((el) => el.getBoundingClientRect().top);
     assert.equal(await page.locator("[data-chapter]").count(), 10, `${lang}: ten chapters in the HTML`);
-    assert.equal(await opened(), "hero", `${lang}: opens on the cover`);
-    assert.ok(!(await page.locator("#contact").isVisible()), `${lang}: later chapters wait`);
+    assert.equal(await opened(), "hero", `${lang}: opens at the start`);
+    // one vertical page: every chapter is laid out, one under the other
+    const tops = await page.$$eval("[data-chapter]", (els) => els.map((e) => e.getBoundingClientRect().top + scrollY));
+    assert.ok(tops.every((t, i) => i === 0 || t > tops[i - 1]), `${lang}: chapters follow one another down the page`);
     const nav = page.getByRole("navigation", { name: rail });
     await nav.locator('a[href="#estimate"]').click();
     await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "estimate");
-    assert.equal(await nav.locator('[aria-current="step"]').getAttribute("href"), "#estimate", `${lang}: the rail lights the open chapter`);
-    assert.ok((await page.evaluate(() => scrollY)) <= 1, `${lang}: a new chapter opens at its top`);
+    assert.equal(await nav.locator('[aria-current="step"]').getAttribute("href"), "#estimate", `${lang}: the rail lights the current chapter`);
+    assert.ok(Math.abs((await topOf("#estimate")) - 64) < 90, `${lang}: lands at the chapter's top`);
     await page.keyboard.press("]");
     await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "planner");
     await page.keyboard.press("[");
     await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "estimate");
-    // a #link to a section deep in another chapter turns there and lands on the section
+    // a #link to a section deep in another chapter lands on the section
     await page.evaluate(() => { const a = document.createElement("a"); a.href = "#perfmix"; a.id = "t-link"; a.textContent = "x"; document.querySelector("[data-current]").prepend(a); });
     await page.evaluate(() => document.getElementById("t-link").click());
     await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "proof");
-    await page.waitForTimeout(200);
-    const top = await page.locator("#perfmix").evaluate((el) => el.getBoundingClientRect().top);
+    await page.waitForTimeout(400);
+    const top = await topOf("#perfmix");
     assert.ok(Math.abs(top - 64) < 80, `${lang}: landed on the section (${top})`);
     await page.goBack();
     await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "estimate");
-    // the turn card at the end of a chapter goes on to the next
-    await page.locator('[data-current] .turn-card').click();
-    await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "planner");
     assert.deepEqual(errors, []);
     await ctx.close();
   }
 });
 
-await test("book: a shared link opens on its chapter, and the footer only closes the book", async () => {
+await test("book: a shared link opens on its chapter, and the footer closes the page", async () => {
   const { page, ctx, errors } = await open("/en#fleet", { reducedMotion: "reduce" });
-  assert.equal(await page.evaluate(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter), "fleet");
-  assert.ok(!(await page.locator("footer").isVisible()), "no footer mid-book");
+  await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "fleet");
+  assert.ok(Math.abs((await page.locator("#fleet").evaluate((el) => el.getBoundingClientRect().top)) - 64) < 90, "opens at the chapter");
+  const [contactBottom, footerTop] = await page.evaluate(() => [document.getElementById("contact").getBoundingClientRect().bottom, document.querySelector("footer").getBoundingClientRect().top]);
+  assert.ok(footerTop >= contactBottom - 1, "the footer comes after the last chapter");
   await reach(page, "contact");
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await page.waitForTimeout(300);
   assert.ok(await page.locator("footer").isVisible(), "footer at the end");
   assert.deepEqual(errors, []);
   await ctx.close();

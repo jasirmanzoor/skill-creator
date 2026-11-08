@@ -24,7 +24,11 @@ type Copy = {
     full: string;
     wa: string;
   };
-  map: { label: string; hub: string; sabya: string; delivered: string; caption: string };
+  map: {
+    label: string; hub: string; sabya: string; delivered: string; caption: string;
+    /** the console's readouts: what the screen is showing, the colour key, the scale bar */
+    hud: { network: string; order: string; parcels: string; cash: string; returns: string; km: string };
+  };
   /** the warehouse walk-in: real MSG photos (public/media/msg, see docs/CONTENT-NOTES.md) */
   facade: { alt: string; hint: string };
   inside: { eyebrow: string; title: string; lead: string; alt: string; spots: { storage: string; sorting: string; dispatch: string } };
@@ -91,7 +95,8 @@ export const heroCopy: Record<Locale, Copy> = {
       hub: "Riyadh hub",
       sabya: "Sabya centre",
       delivered: "Delivered",
-      caption: "Illustrative network view",
+      caption: "How an order moves through MSG's network",
+      hud: { network: "Network", order: "One order", parcels: "Parcels", cash: "Cash", returns: "Returns", km: "km" },
     },
     command: {
       title: ["The Kingdom's delivery network.", "Already running."],
@@ -189,7 +194,8 @@ export const heroCopy: Record<Locale, Copy> = {
       hub: "محطة الرياض",
       sabya: "مركز صبيا",
       delivered: "تم التسليم",
-      caption: "عرض توضيحي للشبكة",
+      caption: "كيف يتحرك الطلب عبر شبكة ام اس جي",
+      hud: { network: "الشبكة", order: "طلب واحد", parcels: "طرود", cash: "نقد", returns: "مرتجعات", km: "كم" },
     },
     command: {
       title: ["شبكة التوصيل في المملكة.", "تعمل الآن."],
