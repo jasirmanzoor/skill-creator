@@ -1,7 +1,7 @@
 import Reveal from "../ui/Reveal";
 import OpsClock from "../fleet/OpsClock";
-import { dispatchDay, hiaceFleet } from "@/content/scenes";
-import ScrollSync from "../ui/ScrollSync";
+import { msgFleet } from "@/content/scenes";
+import HelixSpiral from "../ui/HelixSpiral";
 import type { Dictionary, Locale } from "@/content/i18n";
 
 export default function Fleet({ t, lang }: { t: Dictionary; lang: Locale }) {
@@ -21,14 +21,12 @@ export default function Fleet({ t, lang }: { t: Dictionary; lang: Locale }) {
           </Reveal>
         </div>
 
-        {/* the fleet and a dispatch day, one sharp photo at a time, in step with the captions (ui/ScrollSync) */}
+        {/* MSG's own fleet and sites on a helix (ui/HelixSpiral, after Framer's Helix Spiral) */}
         <div className="mt-16">
-          <ScrollSync
-            label={`${hiaceFleet.title[lang]} ${dispatchDay.title[lang]}`}
-            items={[
-              ...hiaceFleet.scenes.map((x) => ({ src: x.src, pos: x.pos, alt: x.alt[lang], title: x.caption[lang], group: hiaceFleet.title[lang] })),
-              ...dispatchDay.scenes.map((x) => ({ src: x.src, pos: x.pos, alt: x.alt[lang], title: x.caption[lang], group: dispatchDay.title[lang] })),
-            ]}
+          <HelixSpiral
+            label={msgFleet.title[lang]}
+            labels={{ prev: msgFleet.prev[lang], next: msgFleet.next[lang] }}
+            items={msgFleet.scenes.map((x) => ({ src: x.src, pos: x.pos, alt: x.alt[lang], caption: x.caption[lang] }))}
           />
         </div>
 

@@ -84,3 +84,20 @@ export const hiaceFleet = {
     },
   ] satisfies Scene[],
 };
+
+/** MSG's own fleet and sites, photographed by MSG (supplied 8 Nov 2026; number plates blurred). For the fleet helix. */
+export const msgFleet = {
+  title: { en: "MSG's fleet and sites", ar: "أسطول ام اس جي ومواقعها" },
+  prev: { en: "Previous photo", ar: "الصورة السابقة" },
+  next: { en: "Next photo", ar: "الصورة التالية" },
+  scenes: [
+    { src: "/media/msg/fleet-hub-front.webp", pos: "50% 60%", alt: { en: "Five MSG Horizons refrigerated vans lined up in front of the MSG hub", ar: "خمس مركبات مبرّدة من ام اس جي هورايزونز أمام مركز ام اس جي" }, caption: { en: "Five vans, ready at the hub", ar: "خمس مركبات جاهزة أمام المركز" } },
+    { src: "/media/msg/fleet-hub-side.webp", pos: "45% 60%", alt: { en: "An MSG Horizons van at the hub entrance with the fleet lined up behind it", ar: "مركبة ام اس جي هورايزونز عند مدخل المركز والأسطول مصطف خلفها" }, caption: { en: "At the hub entrance", ar: "عند مدخل المركز" } },
+    { src: "/media/msg/fleet-hub-row.webp", pos: "55% 60%", alt: { en: "An MSG Horizons van in front of a row of MSG vans at the hub", ar: "مركبة ام اس جي هورايزونز أمام صف من مركبات ام اس جي عند المركز" }, caption: { en: "The fleet, lined up", ar: "الأسطول مصطفاً" } },
+    { src: "/media/msg/fleet-hub.webp", pos: "50% 60%", alt: { en: "MSG Horizons refrigerated vans parked at the MSG hub", ar: "مركبات ام اس جي هورايزونز المبرّدة عند مركز ام اس جي" }, caption: { en: "Refrigerated vans at the hub", ar: "المركبات المبرّدة عند المركز" } },
+    { src: "/media/msg/fleet-yard.webp", pos: "45% 55%", alt: { en: "An MSG Horizons Toyota Hiace in a covered yard, the fleet behind it", ar: "مركبة تويوتا هايس من ام اس جي هورايزونز في ساحة مظللة والأسطول خلفها" }, caption: { en: "In the covered yard", ar: "في الساحة المظللة" } },
+    { src: "/media/msg/hub-facade-day.webp", pos: "50% 50%", alt: { en: "The front of the MSG Horizons hub in Sabya", ar: "واجهة مركز ام اس جي هورايزونز في صبيا" }, caption: { en: "The Sabya hub", ar: "مركز صبيا" } },
+    { src: "/media/msg/hub-team-scan.webp", pos: "50% 45%", alt: { en: "MSG Horizons staff scanning parcels between the racks", ar: "فريق ام اس جي هورايزونز يمسح الطرود بين الرفوف" }, caption: { en: "Scanned on the racks", ar: "المسح على الرفوف" } },
+    { src: "/media/msg/outlet-counter.webp", pos: "50% 50%", alt: { en: "The MSG Horizons outlet counter with its framed licences", ar: "كاونتر منفذ ام اس جي هورايزونز وتراخيصه المؤطرة" }, caption: { en: "The MSG outlet", ar: "منفذ ام اس جي" } },
+  ],
+};
