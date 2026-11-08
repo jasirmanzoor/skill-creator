@@ -31,9 +31,9 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
   if (!isLocale(lang)) notFound();
   const t = getDictionary(lang);
 
-  // The page is a book of chapters (content/chapters.ts): one open at a time, turned like pages and steered from the
-  // route rail. The order follows the visitor's decision: who MSG is, the price, the plan, the network and fleet, the
-  // company itself (its profile, a second cover), the proof, then MSG.
+  // The page is a run of chapters (content/chapters.ts), one after another down a single page, steered from the route
+  // rail. The order follows the visitor's decision: who MSG is, live tracking (MSG's difference), why MSG, the price,
+  // the plan, the fleet and hubs, the proof, then MSG.
   const c = (n: number, children: React.ReactNode) => <Chapter n={n} lang={lang}>{children}</Chapter>;
   return (
     <PlanProvider>
@@ -44,18 +44,18 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
           <Hero t={t} lang={lang} />
           <TrustBar t={t} lang={lang} />
         </>)}
-        {c(1, <>
+        {c(1, <ProfileBook t={t} lang={lang} />)}
+        {c(2, <Stage><LiveTracking lang={lang} /></Stage>)}
+        {c(3, <>
           <Pitch t={t} lang={lang} />
           <Depth><Services t={t} lang={lang} /></Depth>
         </>)}
-        {c(2, <Depth><EstimatorSection t={t} lang={lang} /></Depth>)}
-        {c(3, <Stage><Planner t={t} lang={lang} /></Stage>)}
-        {c(4, <Stage><LiveTracking lang={lang} /></Stage>)}
-        {c(5, <>
+        {c(4, <Depth><EstimatorSection t={t} lang={lang} /></Depth>)}
+        {c(5, <Stage><Planner t={t} lang={lang} /></Stage>)}
+        {c(6, <>
           <Depth><Fleet t={t} lang={lang} /></Depth>
           <Depth><Gallery t={t} lang={lang} /></Depth>
         </>)}
-        {c(6, <ProfileBook t={t} lang={lang} />)}
         {c(7, <>
           <Depth><Proof t={t} /></Depth>
           <Depth><Perfmix lang={lang} /></Depth>

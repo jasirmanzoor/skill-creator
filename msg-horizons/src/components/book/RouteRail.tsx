@@ -67,7 +67,8 @@ export default function RouteRail({ lang }: { lang: Locale }) {
       off();
     };
     const onScroll = () => { if (shown && window.scrollY > window.innerHeight * 1.2) close(); };
-    const show = window.setTimeout(() => { shown = true; setGuide(true); }, 1600);
+    // a visitor who is already scrolling through the page has found how it works: no guide for them
+    const show = window.setTimeout(() => { if (window.scrollY > window.innerHeight * 1.2) return close(); shown = true; setGuide(true); }, 1600);
     const hide = window.setTimeout(close, 14000);
     const off = () => { window.clearTimeout(show); window.clearTimeout(hide); window.removeEventListener("scroll", onScroll); window.removeEventListener("pointerdown", onTap); };
     const onTap = (e: PointerEvent) => { if ((e.target as HTMLElement | null)?.closest?.(".route-rail")) close(); };
