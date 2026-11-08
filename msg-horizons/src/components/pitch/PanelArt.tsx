@@ -106,24 +106,13 @@ export function WinArt({ i, lang, bg }: { i: number; lang: Locale; bg: string })
   if (i === 4) {
     const lc = licenceCopy[lang];
     return (
-      <div className="w-full max-w-[26rem] space-y-2 lg:max-w-[34rem] lg:space-y-3">
-        {LICENCES.slice(0, 4).map((l, k) => {
-          const it = lc.items[l.id];
-          return (
-            <div key={l.id} className="flex items-center gap-3 rounded-2xl bg-current/[0.08] p-3 ring-1 ring-current/25 backdrop-blur-sm lg:gap-4 lg:p-4" style={{ transform: `translateX(${(lang === "ar" ? -1 : 1) * k * 10}px)` }}>
-              <span aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-xl bg-current/15">
-                <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M7 3h7l4 4v14H7z" /><path d="M14 3v4h4M10 12h5M10 16h5" /></svg>
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-[13px] font-semibold leading-tight sm:text-sm lg:text-base">{it.name}</span>
-                <span className="block truncate text-[11px] opacity-75">{it.issuer}</span>
-              </span>
-              <span className="shrink-0 text-end">
-                <span className="num block font-mono text-[11px] font-semibold" dir="ltr">{l.number}</span>
-              </span>
-            </div>
-          );
-        })}
+      <div className="grid w-full max-w-[26rem] grid-cols-4 gap-2 lg:max-w-[34rem] lg:gap-3">
+        {LICENCES.map((l) => (
+          <div key={l.id} className="grid aspect-[3/4] place-items-center overflow-hidden rounded-lg bg-white p-1 shadow-[0_10px_24px_-12px_rgba(17,26,51,0.45)] ring-1 ring-current/20">
+            {/* eslint-disable-next-line @next/next/no-img-element -- small document scans, already sized */}
+            <img src={`/media/licences/${l.id}.webp`} alt={lc.items[l.id].name} loading="lazy" className="max-h-full max-w-full object-contain" />
+          </div>
+        ))}
       </div>
     );
   }

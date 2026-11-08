@@ -109,24 +109,11 @@ function PhotoPage({ src, pos = "50% 50%", title, sub, n }: { src: string; pos?:
   );
 }
 
-/** a licence page: the certificate itself, with its name, issuer, number and dates */
-function LicencePage({ id, k, total, lang, n }: { id: (typeof LICENCES)[number]["id"]; k: number; total: number; lang: "en" | "ar"; n: number }) {
-  const lc = licenceCopy[lang];
-  const l = LICENCES.find((x) => x.id === id)!;
-  const it = lc.items[id];
+/** a licence page: the document itself, nothing else */
+function LicencePage({ id, lang, n }: { id: (typeof LICENCES)[number]["id"]; lang: "en" | "ar"; n: number }) {
   return (
-    <div className={`${PAGE} flex flex-col bg-[#f8f9fb] p-9 text-[#111a33]`}>
-      <span className={`${label} text-[#006bb6]`}>{lc.title} · <span dir="ltr">{k} / {total}</span></span>
-      <span className="mt-3 font-display text-[26px] font-semibold leading-[1.1] tracking-[-0.02em] rtl:tracking-normal">{it.name}</span>
-      <span className="mt-1 text-[13px] text-[#556079]">{it.issuer}</span>
-      <div className="relative mt-5 flex-1 overflow-hidden rounded-2xl border border-[#e2e5ec] bg-white p-2 shadow-[0_20px_40px_-24px_rgba(17,26,51,0.45)]">
-        <img src={`/media/licences/${id}.webp`} alt={it.name} draggable={false} loading="lazy" className="h-full w-full object-contain" />
-      </div>
-      <dl className="mt-4 grid grid-cols-2 gap-x-3 gap-y-2 text-[11px]">
-        <div><dt className="text-[#8a93a6]">{lc.number}</dt><dd className="mt-0.5 font-semibold tabular-nums" dir="ltr">{l.number}</dd></div>
-        <div><dt className="text-[#8a93a6]">{lc.issued}</dt><dd className="mt-0.5 font-semibold tabular-nums" dir="ltr">{l.issued}</dd></div>
-        {l.validTo ? <div><dt className="text-[#8a93a6]">{lc.validTo}</dt><dd className="mt-0.5 font-semibold tabular-nums" dir="ltr">{l.validTo}</dd></div> : null}
-      </dl>
+    <div className={`${PAGE} grid place-items-center bg-white p-5`}>
+      <img src={`/media/licences/${id}.webp`} alt={licenceCopy[lang].items[id].name} draggable={false} loading="lazy" className="max-h-full max-w-full object-contain" />
       <Folio n={n} />
     </div>
   );
@@ -248,7 +235,7 @@ export default function ProfileBook({ t, lang }: { t: Dictionary; lang: Locale }
       <Folio n={11} />
     </div>,
     // the licences and certificates, one to a page
-    ...LICENCES.map((l, k) => <LicencePage key={`lic-${l.id}`} id={l.id} k={k + 1} total={LICENCES.length} lang={lang} n={12 + k} />),
+    ...LICENCES.map((l, k) => <LicencePage key={`lic-${l.id}`} id={l.id} lang={lang} n={12 + k} />),
     // back cover
     <div key="back" className={`${PAGE} flex flex-col justify-end bg-[#1c2c51] p-9 text-white`}>
       <span aria-hidden="true" className="absolute -start-[30%] -top-[10%] h-[70%] w-[82%] bg-[#009df8]/90 [clip-path:polygon(0_0,40%_0,100%_100%)] rtl:-scale-x-100" />
