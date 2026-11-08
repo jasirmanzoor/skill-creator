@@ -33,6 +33,13 @@ import { Chip, CommandBackdrop, ConsoleWindow, Depth, fadeUp, OrderTicker, Partn
  * played inside the same console. The section's height keeps the walk-in over the distance it always had.
  */
 const WALK = 0.36, HOLD = 0.1, STEP = (1 - WALK - HOLD) / STAGE_COUNT;
+/*
+ * The walk-in has three resting places: the opening, inside the hub (its copy fully in), and the network console.
+ * Between them the scroll does not scrub: a small scroll either way glides to the next resting place in a set time,
+ * so a visitor never has to guess how far to scroll for the scene to change.
+ */
+const RESTS = [0, 0.62 * WALK, WALK + 0.015];
+const GLIDE = 1.15;
 const stageAt = (v: number) => (v < WALK + HOLD ? -1 : Math.min(STAGE_COUNT - 1, Math.floor((v - WALK - HOLD) / STEP)));
 /** the console's resting tilt toward the visitor (degrees); it eases to about half while an order plays */
 const TILT = { x: 9, y: 13 };
@@ -100,7 +107,32 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   const p = useMotionValue(0);
   // how far through the four stages the scroll is (0 → 1), for the stage rail's fill
   const sp = useMotionValue(0);
+  const glide = useRef({ on: false, until: 0, last: 0 });
+  // between two resting places of the walk-in, a scroll in either direction carries on to the next one by itself
+  function snap(v: number) {
+    const g = glide.current, el = section.current;
+    const dv = v - g.last;
+    g.last = v;
+    if (!staged || !el || g.on || performance.now() < g.until || Math.abs(dv) < 1e-5) return;
+    const i = RESTS.findIndex((r, k) => k < RESTS.length - 1 && v > r + 0.004 && v < RESTS[k + 1] - 0.004);
+    if (i < 0) return;
+    const to = dv > 0 ? RESTS[i + 1] : RESTS[i];
+    const top = el.getBoundingClientRect().top + window.scrollY;
+    g.on = true;
+    // while it glides, the visitor's own wheel, finger and trackpad momentum are held back (before the smooth
+    // scroller sees them), so nothing fights the glide
+    const hold = (e: Event) => { e.preventDefault(); e.stopImmediatePropagation(); };
+    const opts = { capture: true, passive: false } as const;
+    for (const t of ["wheel", "touchmove"]) window.addEventListener(t, hold, opts);
+    scrollToY(top + (el.offsetHeight - window.innerHeight) * to, { duration: GLIDE });
+    window.setTimeout(() => {
+      for (const t of ["wheel", "touchmove"]) window.removeEventListener(t, hold, opts);
+      g.on = false; g.until = performance.now() + 650; g.last = scrollYProgress.get();
+    }, GLIDE * 1000 + 60);
+  }
+
   useMotionValueEvent(scrollYProgress, "change", (v) => {
+    snap(v);
     const w = Math.min(1, v / WALK);
     p.set(w);
     const b = w < 0.2 ? 1 : w < 0.8 ? 2 : 3;
@@ -161,12 +193,12 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
 
   // the push into the film
   const zk = useTransform(p, [0.1, 0.43], [0, 1], { clamp: true });
-  const zoom = useTransform(() => 1 + 1.8 * zk.get() ** 3);
+  const zoom = useTransform(() => 1 + 0.35 * zk.get() ** 2);
   // no filter at all until the walk-in begins: a standing blur(0px) keeps this full-screen layer on the slow filter path
   const facadeFx = useTransform(p, (v) => {
     if (v <= 0.3) return "none";
     const k = Math.min(1, (v - 0.3) / 0.13);
-    return `blur(${10 * k}px) brightness(${1 - 0.7 * k})`;
+    return `brightness(${1 - 0.7 * k})`;
   });
   const veil = useTransform(p, [0.33, 0.43], [0, 1]);
   const uiOut = useTransform(p, [0, 0.08, 0.18], [1, 1, 0]);
@@ -258,7 +290,8 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
         <span className="relative flex size-2"><span className="absolute inset-0 animate-ping rounded-full bg-brand-bright/70 motion-reduce:hidden" /><span className="relative size-2 rounded-full bg-brand-bright" /></span>
         {c.command.eyebrow}
       </p>
-      <h2 className="mt-3 font-display text-[clamp(1.9rem,min(4vw,7svh),3.7rem)] font-semibold leading-[1.02] tracking-[-0.035em] text-balance sm:mt-4 rtl:leading-[1.25] rtl:tracking-normal">
+      {/* the second line types itself, so the film-filled heading effect leaves this one alone (it would freeze the words) */}
+      <h2 data-mask-skip className="mt-3 font-display text-[clamp(1.9rem,min(4vw,7svh),3.7rem)] font-semibold leading-[1.02] tracking-[-0.035em] text-balance sm:mt-4 rtl:leading-[1.25] rtl:tracking-normal">
         <span className="block">{c.command.title[0]}</span>
         <span className="block bg-[linear-gradient(90deg,#a8dcff,#5fb3ec)] bg-clip-text text-transparent rtl:bg-[linear-gradient(270deg,#a8dcff,#5fb3ec)]"><Typewriter words={c.command.typed} cursorClassName="bg-[#a8dcff]" /></span>
       </h2>
