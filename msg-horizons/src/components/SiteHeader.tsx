@@ -23,6 +23,12 @@ export default function SiteHeader({ t, lang }: { t: Dictionary; lang: Locale })
   const [scrolled, setScrolled] = useState(false);
   const [overDark, setOverDark] = useState(false);
   const [open, setOpen] = useState(false);
+  // the side site map (components/SideMap) opens this panel on phones
+  useEffect(() => {
+    const on = () => setOpen(true);
+    window.addEventListener("msg-sitemap-open", on);
+    return () => window.removeEventListener("msg-sitemap-open", on);
+  }, []);
   const active = useActiveSection();
 
   useEffect(() => {

@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element -- pages of a book, drawn at a fixed design size and scaled as one; the photos are already sized for it */
 "use client";
 
+import { LICENCES, licenceCopy } from "@/content/licences";
 import { facts, whatsappLink } from "@/content/facts";
 import type { Dictionary, Locale } from "@/content/i18n";
 import { liveCopy } from "@/content/liveTracking";
@@ -104,6 +105,29 @@ function PhotoPage({ src, pos = "50% 50%", title, sub, n }: { src: string; pos?:
         <p className="mt-2 text-[14px] leading-snug text-white/80">{sub}</p>
       </div>
       <Folio n={n} dark />
+    </div>
+  );
+}
+
+/** a licence page: the certificate itself, with its name, issuer, number and dates */
+function LicencePage({ id, k, total, lang, n }: { id: (typeof LICENCES)[number]["id"]; k: number; total: number; lang: "en" | "ar"; n: number }) {
+  const lc = licenceCopy[lang];
+  const l = LICENCES.find((x) => x.id === id)!;
+  const it = lc.items[id];
+  return (
+    <div className={`${PAGE} flex flex-col bg-[#f8f9fb] p-9 text-[#111a33]`}>
+      <span className={`${label} text-[#006bb6]`}>{lc.title} · <span dir="ltr">{k} / {total}</span></span>
+      <span className="mt-3 font-display text-[26px] font-semibold leading-[1.1] tracking-[-0.02em] rtl:tracking-normal">{it.name}</span>
+      <span className="mt-1 text-[13px] text-[#556079]">{it.issuer}</span>
+      <div className="relative mt-5 flex-1 overflow-hidden rounded-2xl border border-[#e2e5ec] bg-white p-2 shadow-[0_20px_40px_-24px_rgba(17,26,51,0.45)]">
+        <img src={`/media/licences/${id}.webp`} alt={it.name} draggable={false} loading="lazy" className="h-full w-full object-contain" />
+      </div>
+      <dl className="mt-4 grid grid-cols-3 gap-2 text-[11px]">
+        <div><dt className="text-[#8a93a6]">{lc.number}</dt><dd className="mt-0.5 font-semibold tabular-nums" dir="ltr">{l.number}</dd></div>
+        <div><dt className="text-[#8a93a6]">{"validTo" in l ? lc.validTo : lc.issued}</dt><dd className="mt-0.5 font-semibold tabular-nums" dir="ltr">{"validTo" in l ? l.validTo : l.issued}</dd></div>
+        <div><dt className="text-[#8a93a6]">&nbsp;</dt><dd className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-[#e5f3fe] px-2 py-0.5 font-semibold text-[#006bb6]">✓ {lc.active}</dd></div>
+      </dl>
+      <Folio n={n} />
     </div>
   );
 }
@@ -223,7 +247,9 @@ export default function ProfileBook({ t, lang }: { t: Dictionary; lang: Locale }
       </ul>
       <Folio n={11} />
     </div>,
-    // 12 · back cover
+    // 12–14 · the licences, one to a page
+    ...LICENCES.map((l, k) => <LicencePage key={`lic-${l.id}`} id={l.id} k={k + 1} total={LICENCES.length} lang={lang} n={12 + k} />),
+    // back cover
     <div key="back" className={`${PAGE} flex flex-col justify-end bg-[#1c2c51] p-9 text-white`}>
       <span aria-hidden="true" className="absolute -start-[30%] -top-[10%] h-[70%] w-[82%] bg-[#009df8]/90 [clip-path:polygon(0_0,40%_0,100%_100%)] rtl:-scale-x-100" />
       <Logo inverted variant="mark" height={46} className="relative mb-auto" />

@@ -22,6 +22,7 @@ import Depth from "@/components/spatial/Depth";
 import Perfmix from "@/components/sections/Perfmix";
 import Chapter from "@/components/book/Chapter";
 import RouteBook from "@/components/book/RouteBook";
+import SideMap from "@/components/SideMap";
 import RouteRail from "@/components/book/RouteRail";
 import Stage from "@/components/book/Stage";
 import MaskedHeadings from "@/components/fx/MaskedHeadings";
@@ -68,6 +69,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       </div>
       <MobileBar t={t} />
       <RouteRail lang={lang} />
+      <SideMap lang={lang} />
       <RouteBook lang={lang} />
       <MaskedHeadings lang={lang} />
     </PlanProvider>

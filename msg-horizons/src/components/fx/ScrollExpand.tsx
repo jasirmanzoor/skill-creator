@@ -29,6 +29,8 @@ type Props = {
   overlayScrim?: number;
   enabled?: boolean;
   className?: string;
+  /** a layer behind the frame, filling the stage (e.g. the brand film) */
+  backdrop?: React.ReactNode;
   children?: React.ReactNode;
 };
 
@@ -58,6 +60,7 @@ export default function ScrollExpand({
   overlayScrim = 0.45,
   enabled = true,
   className = "",
+  backdrop,
   children,
 }: Props) {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -184,6 +187,7 @@ export default function ScrollExpand({
     <div className={`scroll-expand ${className}`}>
       <div ref={trackRef} className="scroll-expand__track">
         <div ref={stageRef} className="scroll-expand__stage">
+          {backdrop}
           <div ref={frameRef} className="scroll-expand__frame">
             {/* eslint-disable-next-line @next/next/no-img-element -- transformed every frame; next/image adds nothing here */}
             <img ref={mediaRef} className="scroll-expand__media" src={src} alt={alt} draggable={false} loading="lazy" decoding="async" style={{ objectPosition: mediaPosition }} />

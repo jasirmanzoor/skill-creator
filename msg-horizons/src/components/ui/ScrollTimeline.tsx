@@ -16,6 +16,8 @@ export type TimelinePanel = {
   fg: string;
   /** a seam of light runs along the wipe as this panel arrives */
   glow?: boolean;
+  /** a picture for the panel's open space: beside the text on wide screens, between the text and the big word on phones */
+  art?: ReactNode;
 };
 
 /** the original's feel: a firm spring toward the scroll position */
@@ -120,6 +122,9 @@ export default function ScrollTimeline({ panels, rtl = false, label, step = 50 }
                 </p>
                 <p className="mt-3 font-display text-[clamp(1.15rem,2.1vw,1.6rem)] font-medium leading-[1.4] text-pretty">{p.desc}</p>
               </div>
+              {p.art ? (
+                <div className="flex min-h-0 flex-1 items-center justify-start py-4 lg:absolute lg:bottom-[calc(min(15cqw,13rem)+4rem)] lg:start-12 lg:top-12 lg:w-[min(48%,36rem)] lg:py-0">{p.art}</div>
+              ) : null}
               <p
                 ref={(el) => { words.current[i] = el; }}
                 aria-hidden="true"

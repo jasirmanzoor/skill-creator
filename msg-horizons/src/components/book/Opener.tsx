@@ -2,6 +2,7 @@ import { fmt, type Locale } from "@/content/i18n";
 import { bookCopy, CHAPTERS } from "@/content/chapters";
 import ScrollExpand from "../fx/ScrollExpand";
 import MaskWord from "../fx/MaskWord";
+import ReelBackdrop from "../fx/ReelBackdrop";
 
 /** each chapter's opening plate: one of MSG's own photographs (public/media/msg) */
 export const PLATE: Record<string, { src: string; pos: string }> = {
@@ -40,6 +41,7 @@ export default function Opener({ n, lang }: { n: number; lang: Locale }) {
       holdDistance={0.08}
       overlayScrim={0.5}
       className="chapter-plate"
+      backdrop={<ReelBackdrop />}
       title={
         <div className="w-[min(86vw,44rem)] text-center text-white">
           <p className="num mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-brand-mint rtl:tracking-normal">{label}</p>

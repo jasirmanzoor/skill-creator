@@ -17,9 +17,9 @@ import { CHAPTERS } from "@/content/chapters";
 import { PLATE as OPENER_PLATE } from "./book/Opener";
 
 /** the site map's card: each chapter's opening photo, plus the two chapters that open without one */
-const PLATE: Record<string, { src: string; pos: string }> = {
+export const PLATE: Record<string, { src: string; pos: string }> = {
   ...OPENER_PLATE,
-  hero: { src: "/media/msg/interior.jpg", pos: "50% 45%" },
+  hero: { src: "/media/msg/hub-open.webp", pos: "50% 55%" },
   profile: { src: "/media/msg/facade-sky.jpg", pos: "50% 50%" },
 };
 import Image from "next/image";

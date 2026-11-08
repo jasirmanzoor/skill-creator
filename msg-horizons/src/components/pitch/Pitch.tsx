@@ -6,6 +6,7 @@ import { whatsappLink } from "@/content/facts";
 import TrackedLink from "../ui/TrackedLink";
 import ScrollTimeline, { type TimelinePanel } from "../ui/ScrollTimeline";
 import { CheckIcon, WhatsAppIcon } from "../ui/icons";
+import { OwnArt, WinArt } from "./PanelArt";
 
 /** on your own: one charcoal ground; with MSG: the brand's own colours, in turn */
 const OWN = { bg: "#16191f", fg: "#ece7e1" };
@@ -39,8 +40,8 @@ export default function Pitch({ t, lang }: { t: Dictionary; lang: Locale }) {
     // the count stays "01 / 06" in Arabic too (isolated left to right)
     const n = `\u2066${String(i + 1).padStart(2, "0")} / ${total}\u2069`;
     return [
-      { eyebrow: `${n} · ${c.toggle[0]}`, mark: cross, desc: r.pain, big: r.own, ...OWN },
-      { eyebrow: `${n} · ${c.toggle[1]}`, mark: check, desc: r.fix, big: r.win, glow: true, ...WIN[i % WIN.length] },
+      { eyebrow: `${n} · ${c.toggle[0]}`, mark: cross, desc: r.pain, big: r.own, art: <OwnArt i={i} />, ...OWN },
+      { eyebrow: `${n} · ${c.toggle[1]}`, mark: check, desc: r.fix, big: r.win, glow: true, art: <WinArt i={i} lang={lang} bg={WIN[i % WIN.length].bg} />, ...WIN[i % WIN.length] },
     ];
   });
 

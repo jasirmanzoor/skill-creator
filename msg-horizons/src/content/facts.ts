@@ -62,6 +62,18 @@ export const facts = {
     categories: { mens: "https://perfmix.com/category/yNaZwD", unisex: "https://perfmix.com/category/voGnjo", alternatives: "https://perfmix.com/category/XRyxnY" },
   },
   partners: ["AJEX", "Keeta", "iMile", "Logistiq", "J&T Express", "Naqel", "Landmark"],
+  /**
+   * Official registrations, from the certificates MSG supplied on 8 Nov 2026 (only those valid on that date).
+   * Held back until renewed or confirmed: the light goods transport licence 60/00017336 (expired 03/10/2026), the
+   * Saudization (Nitaqat) certificate (expired 27/07/2026), the National Address proof (expired 17/10/2026), the GOSI
+   * certificate (shows no registered subscribers) and the CR extract (lists owners' and managers' personal details).
+   */
+  licences: [
+    { id: "cr", number: "7052688707", issued: "24/11/2025", status: "active" as const },
+    { id: "vat", number: "314432187500003", issued: "01/12/2025", status: "active" as const },
+    { id: "chamber", number: "1219759", issued: "24/11/2025", validTo: "23/11/2026", status: "active" as const },
+  ],
+
 
   /** Services promoted on the website. Customs Clearance is excluded by project instruction. */
   services: [

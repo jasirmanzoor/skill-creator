@@ -3,7 +3,6 @@
 import RaysLayer from "../fx/RaysLayer";
 import { SPRING_SMOOTH } from "@/lib/motion";
 import NumberFlow from "@number-flow/react";
-import Image from "next/image";
 import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { heroCopy, type HeroLane } from "@/content/hero";
@@ -24,59 +23,20 @@ import Typewriter from "../ui/typewriter";
 import { Chip, CommandBackdrop, ConsoleWindow, Depth, fadeUp, OrderTicker, PartnerLine, Strengths, VanIcon } from "./Command";
 
 /*
- * Geometry of the hub's interior photos (public/media/msg), as fractions of each image. Everything drawn on top
- * of a photo (the lamps, the hotspots) is placed in these coordinates, so it stays on the right pixel at any size.
- */
-/*
- * The scroll through the hero: the walk-in (the film, inside, out to the network) takes the first WALK of it, the
+ * The scroll through the hero: the walk-in (the film pushing out to the network) takes the first WALK of it, the
  * network console holds for HOLD, then one order's four stages (set up, store, deliver, settle) share the rest,
- * played inside the same console. The section's height keeps the walk-in over the distance it always had.
+ * played inside the same console. It is plain scroll: nothing snaps or glides on its own.
  */
-const WALK = 0.36, HOLD = 0.1, STEP = (1 - WALK - HOLD) / STAGE_COUNT;
-/*
- * The walk-in has three resting places: the opening, inside the hub (its copy fully in), and the network console.
- * Between them the scroll does not scrub: a small scroll either way glides to the next resting place in a set time,
- * so a visitor never has to guess how far to scroll for the scene to change.
- */
-const RESTS = [0, 0.62 * WALK, WALK + 0.015];
-/** each glide's length (s): into the hub gets longer, so the push, the dark and the lights all play */
-const GLIDE_IN = 1.7, GLIDE_OUT = 1.35;
-/** a cinematic ease: it moves off at once, travels and settles softly, instead of jumping at the start */
-const easeInOut = (t: number) => -(Math.cos(Math.PI * t) - 1) / 2;
+const WALK = 0.213, HOLD = 0.123, STEP = (1 - WALK - HOLD) / STAGE_COUNT;
 const stageAt = (v: number) => (v < WALK + HOLD ? -1 : Math.min(STAGE_COUNT - 1, Math.floor((v - WALK - HOLD) / STEP)));
 /** the console's resting tilt toward the visitor (degrees); it eases to about half while an order plays */
 const TILT = { x: 9, y: 13 };
 const RATE_LANE: Record<HeroLane, Lane> = { intra: "intra", inter: "inter", sabya: "sabyaMajor" };
-type Pt = { x: number; y: number };
-type Inside = { src: string; ar: number; lamps: Pt[]; spots: Record<"storage" | "sorting" | "dispatch", Pt> };
-const INSIDE_WIDE: Inside = {
-  src: "/media/msg/interior.jpg",
-  ar: 1260 / 950,
-  lamps: [{ x: 0.37, y: 0.241 }, { x: 0.784, y: 0.253 }, { x: 0.787, y: 0.37 }],
-  spots: { storage: { x: 0.33, y: 0.47 }, sorting: { x: 0.45, y: 0.62 }, dispatch: { x: 0.79, y: 0.6 } },
-};
-const INSIDE_TALL: Inside = {
-  src: "/media/msg/interior-portrait.jpg",
-  ar: 1086 / 1448,
-  lamps: [{ x: 0.2145, y: 0.163 }, { x: 0.5737, y: 0.168 }, { x: 0.812, y: 0.197 }],
-  spots: { storage: { x: 0.3, y: 0.32 }, sorting: { x: 0.505, y: 0.4 }, dispatch: { x: 0.7, y: 0.36 } },
-};
-
-
-/** a box with the photo's proportions that always covers the frame, keeping (ax, ay) as central as it can; `drop` sets it lower */
-const cover = (ar: number, ax: number, ay: number, drop = 0): React.CSSProperties => ({
-  ["--W" as string]: `max(100cqw, calc(100cqh * ${ar}))`,
-  width: "var(--W)",
-  height: `calc(var(--W) / ${ar})`,
-  left: `clamp(calc(100cqw - var(--W)), calc(50cqw - ${ax} * var(--W)), 0px)`,
-  top: `calc(clamp(calc(100cqh - var(--W) / ${ar}), calc(50cqh - ${ay} * var(--W) / ${ar}), 0px) + ${drop * 100}cqh)`,
-});
-const at = (p: Pt) => ({ left: `${p.x * 100}%`, top: `${p.y * 100}%` });
 
 
 /**
- * First screen: MSG's brand film (Reel), behind the promise. Scrolling pushes the camera into the film, into the hub
- * where the lights come on, and the view pulls out to MSG's network as a control console: the network
+ * First screen: MSG's brand film (Reel), behind the promise. Scrolling pushes the camera into the film, and the view
+ * pulls out to MSG's network as a control console: the network
  * live on the map, one order walking through every step MSG owns, the price from MSG's own rate card and the
  * verified figures under it. Scrolling on, the same console plays one order through set up, store, deliver and
  * settle: the map's camera goes where each stage happens, the stage's card comes forward, its answers take the
@@ -110,87 +70,11 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   const p = useMotionValue(0);
   // how far through the four stages the scroll is (0 → 1), for the stage rail's fill
   const sp = useMotionValue(0);
-  const glide = useRef({ on: false, until: 0, last: 0, dir: 0, touching: false, settle: 0, to: -1, ended: 0, input: 0 });
-  // where the walk-in should come to rest from v: the next resting place in the direction of travel, or straight back
-  // to the one a glide has just reached when momentum carried the page a little past it (momentum only: a new wheel or
-  // touch after the glide is the visitor choosing to move on)
-  function restFor(v: number) {
-    const g = glide.current;
-    const i = RESTS.findIndex((r, k) => k < RESTS.length - 1 && v > r + 0.004 && v < RESTS[k + 1] - 0.004);
-    if (i < 0) return null;
-    if (g.to >= 0 && g.input < g.ended && performance.now() - g.ended < 1400 && Math.abs(v - g.to) < 0.04) return g.to;
-    const a = RESTS[i], b = RESTS[i + 1];
-    return g.dir > 0 ? b : g.dir < 0 ? a : v - a < b - v ? a : b;
-  }
-  function glideTo(to: number) {
-    const g = glide.current, el = section.current;
-    if (!el) return;
-    const top = el.getBoundingClientRect().top + window.scrollY;
-    g.on = true;
-    // while it glides, the visitor's own wheel, finger and trackpad momentum are held back (before the smooth
-    // scroller sees them), so nothing fights the glide
-    const hold = (e: Event) => { if (e.cancelable) e.preventDefault(); e.stopImmediatePropagation(); };
-    const opts = { capture: true, passive: false } as const;
-    for (const t of ["wheel", "touchmove"]) window.addEventListener(t, hold, opts);
-    const from = scrollYProgress.get();
-    const leg = Math.min(from, to) < RESTS[1] - 0.004 ? GLIDE_IN : GLIDE_OUT;
-    scrollToY(top + (el.offsetHeight - window.innerHeight) * to, { duration: leg, easing: easeInOut });
-    window.setTimeout(() => {
-      for (const t of ["wheel", "touchmove"]) window.removeEventListener(t, hold, opts);
-      Object.assign(g, { on: false, until: performance.now() + 650, last: scrollYProgress.get(), to, ended: performance.now() });
-      later();
-    }, leg * 1000 + 60);
-  }
-  // once the page has come to a stop (no finger on the screen, no momentum left), it never stays part-way through the
-  // walk-in: it glides on to a resting place
-  function settle() {
-    const g = glide.current;
-    if (!staged || g.on || g.touching) return;
-    const to = restFor(scrollYProgress.get());
-    if (to !== null) glideTo(to);
-  }
-  function later() {
-    const g = glide.current;
-    window.clearTimeout(g.settle);
-    g.settle = window.setTimeout(settle, 170);
-  }
-  // a wheel or trackpad starts the glide at once; a finger is followed until it lifts and the page stops coasting
-  function snap(v: number) {
-    const g = glide.current;
-    const dv = v - g.last;
-    g.last = v;
-    if (Math.abs(dv) > 1e-5) g.dir = Math.sign(dv);
-    if (!staged || g.on) return;
-    later();
-    // only a wheel the visitor has just turned starts it at once; a long scroll from code (a chapter link, the scroll bar,
-    // the End key) passes straight through, and the settle check catches anything that stops part-way
-    if (g.touching || performance.now() < g.until || performance.now() - g.input > 300 || Math.abs(dv) < 1e-5) return;
-    const to = restFor(v);
-    if (to !== null) glideTo(to);
-  }
-  useEffect(() => {
-    const g = glide.current;
-    const down = () => { g.touching = true; g.input = performance.now(); window.clearTimeout(g.settle); };
-    const wheel = () => { g.input = performance.now(); };
-    const up = () => { g.touching = false; g.until = 0; later(); };
-    window.addEventListener("touchstart", down, { passive: true });
-    window.addEventListener("touchend", up, { passive: true });
-    window.addEventListener("touchcancel", up, { passive: true });
-    window.addEventListener("wheel", wheel, { passive: true, capture: true });
-    return () => {
-      window.removeEventListener("wheel", wheel, { capture: true });
-      window.removeEventListener("touchstart", down);
-      window.removeEventListener("touchend", up);
-      window.removeEventListener("touchcancel", up);
-      window.clearTimeout(g.settle);
-    };
-  });
 
   useMotionValueEvent(scrollYProgress, "change", (v) => {
-    snap(v);
     const w = Math.min(1, v / WALK);
     p.set(w);
-    const b = w < 0.2 ? 1 : w < 0.8 ? 2 : 3;
+    const b = w < 0.2 ? 1 : w < 0.4 ? 2 : 3;
     setBeat((x) => (x === b ? x : b));
     const s = stageAt(v);
     setStage((x) => (x === s ? x : s));
@@ -247,37 +131,30 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   };
 
   // the push into the film
-  const zk = useTransform(p, [0.1, 0.43], [0, 1], { clamp: true });
+  const zk = useTransform(p, [0.05, 0.6], [0, 1], { clamp: true });
   const zoom = useTransform(() => 1 + 1.8 * zk.get() ** 3);
   // no filter at all until the walk-in begins: a standing blur(0px) keeps this full-screen layer on the slow filter path
   const facadeFx = useTransform(p, (v) => {
     // and none again once the veil has covered the film: a hidden full-screen blur still costs every frame
-    if (v <= 0.3 || v >= 0.44) return "none";
-    const k = Math.min(1, (v - 0.3) / 0.13);
+    if (v <= 0.15 || v >= 0.6) return "none";
+    const k = Math.min(1, (v - 0.15) / 0.35);
     return `blur(${10 * k}px) brightness(${1 - 0.7 * k})`;
   });
-  const veil = useTransform(p, [0.33, 0.43], [0, 1]);
-  const uiOut = useTransform(p, [0, 0.08, 0.18], [1, 1, 0]);
-  const uiY = useTransform(p, [0, 0.18], [0, -70]);
+  const veil = useTransform(p, [0.3, 0.55], [0, 1]);
+  const uiOut = useTransform(p, [0, 0.06, 0.2], [1, 1, 0]);
+  const uiY = useTransform(p, [0, 0.2], [0, -70]);
   const hint = useTransform(p, [0, 0.05], [1, 0]);
 
-  // inside: the lights flicker on, then the camera settles
-  const inOpacity = useTransform(p, [0.42, 0.46, 0.77, 0.85], [0, 1, 1, 0]);
-  const inDark = useTransform(p, [0.44, 0.465, 0.48, 0.5, 0.53], [0.94, 0.4, 0.78, 0.15, 0]);
-  const inScale = useTransform(p, [0.43, 0.8, 0.86], [1.22, 1, 0.92]);
-  const lamps = useTransform(p, [0.465, 0.49, 0.53], [0, 1, 0.8]);
-  const inCopy = useTransform(p, [0.52, 0.57, 0.72, 0.78], [0, 1, 1, 0]);
-  const inCopyY = useTransform(p, [0.52, 0.57], [30, 0]);
 
   // out to the network: the console rises out of the night and settles, tilted toward the visitor
-  const cO = useTransform(p, [0.78, 0.9], [0, 1]);
-  const cBack = useTransform(p, [0.76, 0.86], [0, 1]);
-  const cLift = useTransform(p, [0.78, 1], [70, 0]);
-  const cScale = useTransform(p, [0.78, 1], [0.9, 1]);
+  const cO = useTransform(p, [0.4, 0.75], [0, 1]);
+  const cBack = useTransform(p, [0.3, 0.55], [0, 1]);
+  const cLift = useTransform(p, [0.4, 1], [70, 0]);
+  const cScale = useTransform(p, [0.4, 1], [0.9, 1]);
   const tiltTo = useMotionValue(1);
   useEffect(() => { tiltTo.set(inStage ? 0.45 : 1); }, [inStage, tiltTo]);
   const tiltK = useSpring(tiltTo, { stiffness: 60, damping: 18 });
-  const rise = useTransform(p, [0.78, 1], [1.8, 1]); // the console comes in steeper and settles to its lean
+  const rise = useTransform(p, [0.4, 1], [1.8, 1]); // the console comes in steeper and settles to its lean
   const dir = rtl ? -1 : 1;
   const ry = useTransform(() => (-TILT.y * dir + sx.get() * 7) * tiltK.get());
   const rx = useTransform(() => (TILT.x * rise.get() - sy.get() * 6) * tiltK.get());
@@ -330,13 +207,6 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
     </div>
   );
 
-  const inside = (
-    <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-4 pb-12 text-white sm:px-5 lg:px-8 lg:pb-16">
-      <p className="text-sm font-semibold text-brand-mint">{c.inside.eyebrow}</p>
-      <h2 className="h-scene mt-2 max-w-2xl [text-shadow:0_2px_30px_rgba(0,0,0,0.5)]">{c.inside.title}</h2>
-      <p className="mt-3 max-w-xl text-white/85 text-pretty sm:text-lg">{c.inside.lead}</p>
-    </div>
-  );
 
   /* ---- the network console ---- */
 
@@ -469,11 +339,6 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
           <Scrim />
           <div className="absolute inset-0 pt-20">{promise}</div>
         </div>
-        <div data-theme="dark" className="relative h-[85svh] min-h-[520px] overflow-hidden [container-type:size]">
-          <Interior c={c} />
-          <Scrim />
-          <div className="absolute inset-0">{inside}</div>
-        </div>
         <div data-theme="dark" className="relative min-h-[100svh] overflow-hidden">
           <CommandBackdrop />
           <div className="relative">{scene}</div>
@@ -486,11 +351,11 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
 
   return (
     <>
-    <section id="hero" ref={section} suppressHydrationWarning aria-labelledby="hero-title" className="relative h-[460svh] bg-deep lg:h-[620svh]">
+    <section id="hero" ref={section} suppressHydrationWarning aria-labelledby="hero-title" className="relative h-[393svh] bg-deep lg:h-[523svh]">
       {/* runs before first paint: a returning visitor, or a page restored part-way down, skips the opening */}
       <script dangerouslySetInnerHTML={{ __html: INTRO_GATE }} />
       {/* where "one order through MSG" begins: the first of the four stages, to the end of the hero */}
-      <div id="sellers" aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 top-[176svh] lg:top-[255svh]" />
+      <div id="sellers" aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 top-[109svh] lg:top-[158svh]" />
       <div
         ref={frame}
         data-theme="dark"
@@ -503,20 +368,12 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
         {/* the site's light falls through the walk-in too (it replaced the drifting dust) */}
         <RaysLayer className="z-[3]" />
 
-        <motion.div style={{ opacity: inOpacity }} className="absolute inset-0 z-[3]">
-          <Interior c={c} dark={inDark} scale={inScale} lamps={lamps} copy={inCopy} />
-        </motion.div>
-
         <motion.div style={{ opacity: cBack }} className="absolute inset-0 z-[4]"><CommandBackdrop stars={beat >= 2} /></motion.div>
 
         {/* scene copy */}
         <motion.div style={{ opacity: uiOut, y: uiY }} inert={beat !== 1} className="absolute inset-0 z-[5] pt-20">
           <Scrim />
           {promise}
-        </motion.div>
-        <motion.div style={{ opacity: inCopy, y: inCopyY }} className="pointer-events-none absolute inset-0 z-[5]">
-          <Scrim />
-          {inside}
         </motion.div>
         <motion.div style={{ opacity: cO, y: cLift, scale: cScale }} inert={beat !== 3} className="absolute inset-0 z-[6]">
           {scene}
@@ -543,51 +400,10 @@ function Scrim() {
   );
 }
 
-type C = (typeof heroCopy)["en"];
 
 const INTRO_GATE = `try{var s=document.currentScript.parentElement;if(sessionStorage.getItem("msg-intro")||window.scrollY>40)s.dataset.intro="skip";else sessionStorage.setItem("msg-intro","1")}catch(e){}`;
 
 
-function Interior({
-  c, dark, scale, lamps, copy,
-}: {
-  c: C; dark?: MotionValue<number>; scale?: MotionValue<number>; lamps?: MotionValue<number>; copy?: MotionValue<number>;
-}) {
-  return (
-    <motion.div className="absolute inset-0 overflow-hidden" style={{ scale }}>
-      {([["hidden landscape:block", INSIDE_WIDE], ["hidden portrait:block", INSIDE_TALL]] as const).map(([vis, v]) => (
-        <div key={v.src} className={`absolute inset-0 ${vis}`}>
-          <div className="absolute" style={cover(v.ar, 0.5, 0.5)}>
-            <Image src={v.src} alt={c.inside.alt} fill sizes="(max-aspect-ratio: 4/3) 134vh, 100vw" className="object-cover" />
-            {dark ? <motion.div aria-hidden="true" className="absolute inset-0 bg-[#020607]" style={{ opacity: dark }} /> : null}
-            {/* the overhead lights and the light they throw */}
-            <motion.div aria-hidden="true" className="absolute inset-0 mix-blend-screen" style={{ opacity: lamps }}>
-              {v.lamps.map((l, i) => (
-                <span key={i}>
-                  <span className="absolute size-[9%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(255,255,245,0.95),rgba(220,240,255,0.25)_45%,transparent)]" style={at(l)} />
-                  <span className="absolute h-[55%] w-[26%] -translate-x-1/2 bg-[linear-gradient(180deg,rgba(235,245,255,0.28),transparent_85%)] [clip-path:polygon(44%_0,56%_0,100%_100%,0_100%)]" style={at(l)} />
-                </span>
-              ))}
-            </motion.div>
-            {/* what happens where */}
-            <motion.div className="absolute inset-0" style={{ opacity: copy }}>
-              {(["storage", "sorting", "dispatch"] as const).map((k) => (
-                // labels open toward the middle of the picture so they never run off its edge
-                <span key={k} className={`absolute flex -translate-y-1/2 items-center gap-2 ${v.spots[k].x > 0.55 ? "-translate-x-[calc(100%-10px)] flex-row-reverse" : "-translate-x-[10px]"}`} style={at(v.spots[k])} dir="ltr">
-                  <span className="relative grid size-5 place-items-center">
-                    <span className="absolute inset-0 rounded-full bg-brand-bright/50 motion-safe:animate-ping" />
-                    <span className="relative size-2.5 rounded-full bg-brand-bright ring-2 ring-white" />
-                  </span>
-                  <span dir="auto" className="whitespace-nowrap rounded-full bg-black/55 px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/20 backdrop-blur">{c.inside.spots[k]}</span>
-                </span>
-              ))}
-            </motion.div>
-          </div>
-        </div>
-      ))}
-    </motion.div>
-  );
-}
 
 /** one layer of the copy column; the others wait, hidden and inert, in the same grid cell */
 function Panel({ on, children }: { on: boolean; children: React.ReactNode }) {
