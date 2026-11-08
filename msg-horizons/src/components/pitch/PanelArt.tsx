@@ -1,6 +1,6 @@
 import type { Locale } from "@/content/i18n";
 import { facts } from "@/content/facts";
-import { ACTIVE_LICENCES, licenceCopy } from "@/content/licences";
+import { LICENCES, licenceCopy } from "@/content/licences";
 import { CheckIcon } from "../ui/icons";
 
 /**
@@ -107,7 +107,7 @@ export function WinArt({ i, lang, bg }: { i: number; lang: Locale; bg: string })
     const lc = licenceCopy[lang];
     return (
       <div className="w-full max-w-[26rem] space-y-2 lg:max-w-[34rem] lg:space-y-3">
-        {ACTIVE_LICENCES.slice(0, 3).map((l, k) => {
+        {LICENCES.slice(0, 4).map((l, k) => {
           const it = lc.items[l.id];
           return (
             <div key={l.id} className="flex items-center gap-3 rounded-2xl bg-current/[0.08] p-3 ring-1 ring-current/25 backdrop-blur-sm lg:gap-4 lg:p-4" style={{ transform: `translateX(${(lang === "ar" ? -1 : 1) * k * 10}px)` }}>
@@ -120,7 +120,6 @@ export function WinArt({ i, lang, bg }: { i: number; lang: Locale; bg: string })
               </span>
               <span className="shrink-0 text-end">
                 <span className="num block font-mono text-[11px] font-semibold" dir="ltr">{l.number}</span>
-                <span className="mt-0.5 inline-flex items-center gap-1 text-[10px] font-semibold opacity-80"><CheckIcon className="size-3" />{lc.active}</span>
               </span>
             </div>
           );

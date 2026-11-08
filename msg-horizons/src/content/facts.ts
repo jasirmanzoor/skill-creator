@@ -62,21 +62,17 @@ export const facts = {
     categories: { mens: "https://perfmix.com/category/yNaZwD", unisex: "https://perfmix.com/category/voGnjo", alternatives: "https://perfmix.com/category/XRyxnY" },
   },
   partners: ["AJEX", "Keeta", "iMile", "Logistiq", "J&T Express", "Naqel", "Landmark"],
-  /**
-   * Official registrations and certificates, from the documents MSG supplied on 8 Nov 2026, with the dates printed
-   * on each. `active` marks only those valid on that date; the rest show their own validity and no "Active" badge.
-   * The CR extract is shown by its second page, which carries no personal details.
-   */
+  /** Official licences and certificates, as supplied by MSG on 8 Nov 2026, with the number and dates printed on each. */
   licences: [
-    { id: "cr", number: "7052688707", issued: "24/11/2025", active: true },
-    { id: "extract", number: "7052688707", issued: "26/11/2025", validTo: "23/11/2026", active: true },
-    { id: "vat", number: "314432187500003", issued: "01/12/2025", active: true },
-    { id: "chamber", number: "1219759", issued: "24/11/2025", validTo: "23/11/2026", active: true },
-    { id: "gosi", number: "105454077", issued: "25/11/2025", validTo: "05/07/1447 AH", active: false },
-    { id: "nitaqat", number: "204702-17117975", issued: "28/04/2026", validTo: "27/07/2026", active: false },
-    { id: "transport", number: "60/00017336", issued: "04/08/2026", validTo: "03/10/2026", active: false },
-    { id: "address", number: "1084425604", issued: "20/04/2026", validTo: "17/10/2026", active: false },
-  ] as { id: "cr" | "extract" | "vat" | "chamber" | "gosi" | "nitaqat" | "transport" | "address"; number: string; issued: string; validTo?: string; active: boolean }[],
+    { id: "cr", number: "7052688707", issued: "24/11/2025" },
+    { id: "vat", number: "314432187500003", issued: "01/12/2025" },
+    { id: "transport", number: "60/00017336", issued: "04/08/2026", validTo: "03/10/2026" },
+    { id: "chamber", number: "1219759", issued: "24/11/2025", validTo: "23/11/2026" },
+    { id: "gosi", number: "105454077", issued: "25/11/2025", validTo: "05/07/1447 AH" },
+    { id: "nitaqat", number: "204702-17117975", issued: "28/04/2026", validTo: "27/07/2026" },
+    { id: "address", number: "1084425604", issued: "20/04/2026", validTo: "17/10/2026" },
+    { id: "extract", number: "7052688707", issued: "26/11/2025", validTo: "23/11/2026" },
+  ] as { id: "cr" | "extract" | "vat" | "chamber" | "gosi" | "nitaqat" | "transport" | "address"; number: string; issued: string; validTo?: string }[],
 
 
   /** Services promoted on the website. Customs Clearance is excluded by project instruction. */

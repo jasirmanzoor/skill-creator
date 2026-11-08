@@ -37,5 +37,3 @@ export const licenceCopy: Record<Locale, {
 };
 
 export const LICENCES = facts.licences;
-/** the ones valid today, for places that say \"Active\" */
-export const ACTIVE_LICENCES = facts.licences.filter((l) => l.active);

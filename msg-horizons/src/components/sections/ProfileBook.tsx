@@ -126,7 +126,6 @@ function LicencePage({ id, k, total, lang, n }: { id: (typeof LICENCES)[number][
         <div><dt className="text-[#8a93a6]">{lc.number}</dt><dd className="mt-0.5 font-semibold tabular-nums" dir="ltr">{l.number}</dd></div>
         <div><dt className="text-[#8a93a6]">{lc.issued}</dt><dd className="mt-0.5 font-semibold tabular-nums" dir="ltr">{l.issued}</dd></div>
         {l.validTo ? <div><dt className="text-[#8a93a6]">{lc.validTo}</dt><dd className="mt-0.5 font-semibold tabular-nums" dir="ltr">{l.validTo}</dd></div> : null}
-        {l.active ? <div className="self-end"><dd className="inline-flex items-center gap-1 rounded-full bg-[#e5f3fe] px-2 py-0.5 font-semibold text-[#006bb6]">✓ {lc.active}</dd></div> : null}
       </dl>
       <Folio n={n} />
     </div>
