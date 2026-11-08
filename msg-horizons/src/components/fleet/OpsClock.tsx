@@ -32,7 +32,9 @@ export default function OpsClock({ now, running, sub, lang }: { now: string; run
         {Array.from({ length: 24 }, (_, i) => {
           const a = ((i / 24) * 360 - 90) * (Math.PI / 180);
           const r1 = i % 6 === 0 ? 72 : 77;
-          return <line key={i} x1={100 + r1 * Math.cos(a)} y1={100 + r1 * Math.sin(a)} x2={100 + 81 * Math.cos(a)} y2={100 + 81 * Math.sin(a)} stroke="var(--color-ink)" strokeOpacity={i % 6 === 0 ? 0.7 : 0.25} strokeWidth={i % 6 === 0 ? 2 : 1} />;
+          // rounded so the server and the browser draw the same numbers
+          const at = (r: number, f: (x: number) => number) => Math.round((100 + r * f(a)) * 100) / 100;
+          return <line key={i} x1={at(r1, Math.cos)} y1={at(r1, Math.sin)} x2={at(81, Math.cos)} y2={at(81, Math.sin)} stroke="var(--color-ink)" strokeOpacity={i % 6 === 0 ? 0.7 : 0.25} strokeWidth={i % 6 === 0 ? 2 : 1} />;
         })}
         {[0, 6, 12, 18].map((h) => {
           const a = ((h / 24) * 360 - 90) * (Math.PI / 180);

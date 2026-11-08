@@ -157,7 +157,9 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
     if (Math.abs(dv) > 1e-5) g.dir = Math.sign(dv);
     if (!staged || g.on) return;
     later();
-    if (g.touching || performance.now() < g.until || Math.abs(dv) < 1e-5) return;
+    // only a wheel the visitor has just turned starts it at once; a long scroll from code (a chapter link, the scroll bar,
+    // the End key) passes straight through, and the settle check catches anything that stops part-way
+    if (g.touching || performance.now() < g.until || performance.now() - g.input > 300 || Math.abs(dv) < 1e-5) return;
     const to = restFor(v);
     if (to !== null) glideTo(to);
   }
