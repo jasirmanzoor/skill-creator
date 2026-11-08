@@ -11,7 +11,7 @@ export const licenceCopy: Record<Locale, {
     number: "No.", issued: "Issued", validTo: "Valid to", active: "Active",
     items: {
       cr: { name: "Commercial Registration", issuer: "Ministry of Commerce" },
-      vat: { name: "VAT Registration", issuer: "Zakat, Tax and Customs Authority (ZATCA)" },
+      vat: { name: "VAT Registration", issuer: "ZATCA" },
       chamber: { name: "Chamber of Commerce membership", issuer: "Riyadh Chamber" },
       extract: { name: "Commercial Registration extract", issuer: "Ministry of Commerce" },
       gosi: { name: "GOSI certificate", issuer: "General Organization for Social Insurance" },
@@ -25,7 +25,7 @@ export const licenceCopy: Record<Locale, {
     number: "رقم", issued: "تاريخ الإصدار", validTo: "سارية حتى", active: "نشط",
     items: {
       cr: { name: "السجل التجاري", issuer: "وزارة التجارة" },
-      vat: { name: "شهادة التسجيل في ضريبة القيمة المضافة", issuer: "هيئة الزكاة والضريبة والجمارك" },
+      vat: { name: "شهادة التسجيل في ضريبة القيمة المضافة", issuer: "هيئة الزكاة والضريبة (ZATCA)" },
       chamber: { name: "عضوية الغرفة التجارية", issuer: "غرفة الرياض" },
       extract: { name: "مستخرج السجل التجاري", issuer: "وزارة التجارة" },
       gosi: { name: "شهادة التأمينات الاجتماعية", issuer: "المؤسسة العامة للتأمينات الاجتماعية" },
