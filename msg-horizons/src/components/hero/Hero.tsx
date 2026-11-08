@@ -107,29 +107,77 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   const p = useMotionValue(0);
   // how far through the four stages the scroll is (0 → 1), for the stage rail's fill
   const sp = useMotionValue(0);
-  const glide = useRef({ on: false, until: 0, last: 0 });
-  // between two resting places of the walk-in, a scroll in either direction carries on to the next one by itself
-  function snap(v: number) {
-    const g = glide.current, el = section.current;
-    const dv = v - g.last;
-    g.last = v;
-    if (!staged || !el || g.on || performance.now() < g.until || Math.abs(dv) < 1e-5) return;
+  const glide = useRef({ on: false, until: 0, last: 0, dir: 0, touching: false, settle: 0, to: -1, ended: 0, input: 0 });
+  // where the walk-in should come to rest from v: the next resting place in the direction of travel, or straight back
+  // to the one a glide has just reached when momentum carried the page a little past it (momentum only: a new wheel or
+  // touch after the glide is the visitor choosing to move on)
+  function restFor(v: number) {
+    const g = glide.current;
     const i = RESTS.findIndex((r, k) => k < RESTS.length - 1 && v > r + 0.004 && v < RESTS[k + 1] - 0.004);
-    if (i < 0) return;
-    const to = dv > 0 ? RESTS[i + 1] : RESTS[i];
+    if (i < 0) return null;
+    if (g.to >= 0 && g.input < g.ended && performance.now() - g.ended < 1400 && Math.abs(v - g.to) < 0.04) return g.to;
+    const a = RESTS[i], b = RESTS[i + 1];
+    return g.dir > 0 ? b : g.dir < 0 ? a : v - a < b - v ? a : b;
+  }
+  function glideTo(to: number) {
+    const g = glide.current, el = section.current;
+    if (!el) return;
     const top = el.getBoundingClientRect().top + window.scrollY;
     g.on = true;
     // while it glides, the visitor's own wheel, finger and trackpad momentum are held back (before the smooth
     // scroller sees them), so nothing fights the glide
-    const hold = (e: Event) => { e.preventDefault(); e.stopImmediatePropagation(); };
+    const hold = (e: Event) => { if (e.cancelable) e.preventDefault(); e.stopImmediatePropagation(); };
     const opts = { capture: true, passive: false } as const;
     for (const t of ["wheel", "touchmove"]) window.addEventListener(t, hold, opts);
     scrollToY(top + (el.offsetHeight - window.innerHeight) * to, { duration: GLIDE });
     window.setTimeout(() => {
       for (const t of ["wheel", "touchmove"]) window.removeEventListener(t, hold, opts);
-      g.on = false; g.until = performance.now() + 650; g.last = scrollYProgress.get();
+      Object.assign(g, { on: false, until: performance.now() + 650, last: scrollYProgress.get(), to, ended: performance.now() });
+      later();
     }, GLIDE * 1000 + 60);
   }
+  // once the page has come to a stop (no finger on the screen, no momentum left), it never stays part-way through the
+  // walk-in: it glides on to a resting place
+  function settle() {
+    const g = glide.current;
+    if (!staged || g.on || g.touching) return;
+    const to = restFor(scrollYProgress.get());
+    if (to !== null) glideTo(to);
+  }
+  function later() {
+    const g = glide.current;
+    window.clearTimeout(g.settle);
+    g.settle = window.setTimeout(settle, 170);
+  }
+  // a wheel or trackpad starts the glide at once; a finger is followed until it lifts and the page stops coasting
+  function snap(v: number) {
+    const g = glide.current;
+    const dv = v - g.last;
+    g.last = v;
+    if (Math.abs(dv) > 1e-5) g.dir = Math.sign(dv);
+    if (!staged || g.on) return;
+    later();
+    if (g.touching || performance.now() < g.until || Math.abs(dv) < 1e-5) return;
+    const to = restFor(v);
+    if (to !== null) glideTo(to);
+  }
+  useEffect(() => {
+    const g = glide.current;
+    const down = () => { g.touching = true; g.input = performance.now(); window.clearTimeout(g.settle); };
+    const wheel = () => { g.input = performance.now(); };
+    const up = () => { g.touching = false; g.until = 0; later(); };
+    window.addEventListener("touchstart", down, { passive: true });
+    window.addEventListener("touchend", up, { passive: true });
+    window.addEventListener("touchcancel", up, { passive: true });
+    window.addEventListener("wheel", wheel, { passive: true, capture: true });
+    return () => {
+      window.removeEventListener("wheel", wheel, { capture: true });
+      window.removeEventListener("touchstart", down);
+      window.removeEventListener("touchend", up);
+      window.removeEventListener("touchcancel", up);
+      window.clearTimeout(g.settle);
+    };
+  });
 
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     snap(v);
