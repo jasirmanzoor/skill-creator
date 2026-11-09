@@ -227,12 +227,13 @@ export default function ProfileBook({ t, lang }: { t: Dictionary; lang: Locale }
     </div>,
     // the Operations Director: portrait and line, as on MSG's own card
     <div key="director" className={`${PAGE} bg-[#1c2c51] text-white`}>
-      <img src="/leadership/coo.jpg" alt={leadershipCopy[lang].roles.coo} draggable={false} loading="lazy" className="absolute inset-0 h-full w-full object-cover [object-position:50%_20%]" />
+      <img src="/leadership/coo.jpg" alt={`Jasir Manzoor, ${leadershipCopy[lang].roles.coo}`} draggable={false} loading="lazy" className="absolute inset-0 h-full w-full object-cover [object-position:50%_20%]" />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,19,38,0)_45%,rgba(11,19,38,0.92)_100%)]" />
       <div className="absolute inset-x-8 bottom-14">
         <p className="font-display text-[24px] font-semibold leading-[1.15]">{leadershipCopy[lang].quotes.coo[0]} <span className="text-[#7fcbfb]">{leadershipCopy[lang].quotes.coo[1]}</span></p>
         <span className="mt-4 block h-[2px] w-10 bg-[#009df8]" />
-        <p className={`${label} mt-3 text-white/80`}>{leadershipCopy[lang].roles.coo}</p>
+        <p className="mt-3 font-display text-[20px] font-semibold" dir="ltr">Jasir Manzoor</p>
+        <p className={`${label} mt-1 text-white/80`}>{leadershipCopy[lang].roles.coo}</p>
       </div>
     </div>,
     // 11 · partners
