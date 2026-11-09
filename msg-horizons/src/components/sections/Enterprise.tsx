@@ -7,14 +7,14 @@ import { ArrowIcon } from "../ui/icons";
 import { facts } from "@/content/facts";
 import type { Dictionary, Locale } from "@/content/i18n";
 import { LEADERS } from "@/content/leadership";
-import { hasPublicFile } from "@/lib/photo-slot";
 import OrbitShowcase from "../ui/OrbitShowcase";
 import { provenCopy } from "@/content/proven";
 
 /** Enterprise evaluators, in Red Sea daylight glass. */
 export default function Enterprise({ t, lang }: { t: Dictionary; lang: Locale }) {
   // a leader joins the outro once their portrait is in public/leadership/
-  const leaders = LEADERS.filter((l) => hasPublicFile(l.photo)).map((l) => ({ id: l.id, photo: l.photo, name: l.name?.[lang] ?? null }));
+  // no portraits here: the Operations Director appears in the Who we are book
+  const leaders: { id: (typeof LEADERS)[number]["id"]; photo: string; name: string | null }[] = [];
   const e = t.enterprise;
   const wf = e.workforce;
   const pv = provenCopy[lang];
