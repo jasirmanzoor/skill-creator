@@ -139,19 +139,22 @@ export default function ArcCarousel({ cards, label, labels, rtl = false }: { car
         <div className="absolute left-1/2 top-6" style={{ width: 0, height: 0 }}>
           {ring.map((c, i) => {
             const on = flipped === i;
+            const toggle = () => { if (drag.current?.moved) return; if (on) setFlipped(null); else { glideTo(i); setFlipped(i); } };
             return (
               <div key={i} ref={(el) => { refs.current[i] = el; }} className="absolute" style={{ left: -cardW / 2, top: 0, width: cardW, height: cardH, perspective: 1200 }}>
-                <button
-                  type="button"
-                  onClick={() => { if (drag.current?.moved) return; if (on) setFlipped(null); else { glideTo(i); setFlipped(i); } }}
-                  aria-label={`${c.title}: ${on ? labels.back : labels.flip}`}
-                  aria-pressed={on}
-                  tabIndex={i < cards.length ? 0 : -1}
-                  className="relative size-full text-start transition-transform duration-[600ms] [transform-style:preserve-3d] ease-[cubic-bezier(0.4,0.1,0.2,1)]"
+                <div
+                  className="relative size-full transition-transform duration-[600ms] [transform-style:preserve-3d] ease-[cubic-bezier(0.4,0.1,0.2,1)]"
                   style={{ transform: on ? "rotateY(180deg)" : "none" }}
                 >
-                  {/* front */}
-                  <span className="absolute inset-0 overflow-hidden rounded-[1.4rem] bg-[#1c2c51] shadow-[0_24px_50px_-20px_rgba(0,0,0,0.6)] [backface-visibility:hidden]">
+                  {/* front: the whole face turns the card over */}
+                  <button
+                    type="button"
+                    onClick={toggle}
+                    aria-label={`${c.title}: ${labels.flip}`}
+                    aria-pressed={false}
+                    tabIndex={!on && i < cards.length ? 0 : -1}
+                    className="absolute inset-0 overflow-hidden rounded-[1.4rem] bg-[#1c2c51] text-start shadow-[0_24px_50px_-20px_rgba(0,0,0,0.6)] [backface-visibility:hidden]"
+                  >
                     {/* eslint-disable-next-line @next/next/no-img-element -- moved every frame; next/image adds nothing here */}
                     <img src={c.src} alt="" draggable={false} loading="lazy" className="absolute inset-0 size-full object-cover" style={{ objectPosition: c.pos ?? "50% 50%" }} />
                     <span className="absolute inset-x-0 bottom-0 h-1/2 bg-[linear-gradient(0deg,rgba(8,14,28,0.9),transparent)]" />
@@ -162,23 +165,24 @@ export default function ArcCarousel({ cards, label, labels, rtl = false }: { car
                     <span aria-hidden="true" className="absolute end-3 top-3 grid size-8 place-items-center rounded-full bg-white/85 text-[#1c2c51]">
                       <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3M18 3v4h-4M6 21v-4h4" /></svg>
                     </span>
-                  </span>
-                  {/* back */}
-                  <span className="absolute inset-0 flex flex-col justify-between overflow-hidden rounded-[1.4rem] bg-[#0f1f3d] p-5 text-white ring-1 ring-white/15 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                    <span>
+                  </button>
+                  {/* back: the face turns it back; the link sits beside it, not inside */}
+                  <div className="absolute inset-0 overflow-hidden rounded-[1.4rem] bg-[#0f1f3d] text-white ring-1 ring-white/15 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                    <button type="button" onClick={toggle} aria-label={`${c.title}: ${labels.back}`} aria-pressed={true} tabIndex={on ? 0 : -1}
+                      className="absolute inset-0 flex flex-col p-5 text-start">
                       {c.tag ? <span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#7fcbfb] rtl:tracking-normal">{c.tag}</span> : null}
                       <span className="mt-1 block font-display text-lg font-semibold leading-tight">{c.title}</span>
                       <span className="mt-3 block text-sm leading-relaxed text-white/80">{c.back}</span>
-                    </span>
+                    </button>
                     {c.href ? (
-                      <a href={c.href} target="_blank" rel="noopener" tabIndex={on ? 0 : -1} onClick={(e) => e.stopPropagation()}
-                        className="inline-flex min-h-10 items-center justify-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-[#1c2c51]">
+                      <a href={c.href} target="_blank" rel="noopener" tabIndex={on ? 0 : -1}
+                        className="absolute inset-x-5 bottom-5 inline-flex min-h-10 items-center justify-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-[#1c2c51]">
                         {c.cta}
                         <svg viewBox="0 0 24 24" className="size-4 rtl:-scale-x-100" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" /></svg>
                       </a>
                     ) : null}
-                  </span>
-                </button>
+                  </div>
+                </div>
               </div>
             );
           })}
