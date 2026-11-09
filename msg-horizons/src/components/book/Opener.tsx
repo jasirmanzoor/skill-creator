@@ -8,7 +8,7 @@ import ReelBackdrop from "../fx/ReelBackdrop";
 export const PLATE: Record<string, { src: string; pos: string; srcAr?: string }> = {
   why: { src: "/media/msg/hub-open.webp", pos: "50% 55%" },
   estimate: { src: "/media/photos/price-en.webp", srcAr: "/media/photos/price-ar.webp", pos: "50% 50%" }, // MSG's rate set against SMSA, Aramex and iMile (names only)
-  planner: { src: "/media/photos/plan-room.webp", pos: "50% 50%" }, // MSG control room over Riyadh, the Kingdom on the wall
+  planner: { src: "/media/photos/plan-fleet.webp", pos: "85% 30%" }, // MSG vans on a Riyadh highway, plan → dispatch → track → deliver (supplied by MSG)
   "live-tracking": { src: "/media/photos/van-desert.webp", pos: "74% 62%" }, // the van in the new livery, on the road out of town
   fleet: { src: "/media/msg/hub-aerial.webp", pos: "50% 50%" },
   proof: { src: "/media/msg/hub-team.webp", pos: "60% 55%" },
