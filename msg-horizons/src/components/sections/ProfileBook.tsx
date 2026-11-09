@@ -255,6 +255,7 @@ export default function ProfileBook({ t, lang }: { t: Dictionary; lang: Locale }
       <span className="relative font-display text-[40px] font-semibold leading-[1.02] tracking-[-0.02em] rtl:tracking-normal">{c.back}</span>
       <span className="relative mt-4 text-[14px] text-white/75">{c.backSub}</span>
       <span className="relative mt-1 text-[18px] font-semibold tabular-nums" dir="ltr">{facts.contact.phoneDisplay}</span>
+      <span className="relative text-[18px] font-semibold tabular-nums" dir="ltr">{facts.contact.phone2Display}</span>
       <span className="relative mt-5 text-[12px] font-semibold uppercase tracking-[0.2em] text-[#7fcbfb]" dir="ltr">www.msg-horizons.com</span>
     </div>,
   ];

@@ -35,6 +35,9 @@ export const facts = {
     // Enquiries and WhatsApp: 057 806 1556, confirmed by MSG (Sept 2026). Replaces the profile's 055 895 1422.
     phoneDisplay: "+966 57 806 1556",
     phoneE164: "+966578061556",
+    // a second company line, added by MSG on 9 Nov 2026
+    phone2Display: "+966 50 367 2932",
+    phone2E164: "+966503672932",
     whatsapp: "966578061556",
     email: "info@msg-horizons.com",
     street: "Al Malaz",

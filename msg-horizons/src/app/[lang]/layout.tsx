@@ -102,6 +102,14 @@ function jsonLd(lang: Locale) {
             areaServed: "SA",
             availableLanguage: ["en", "ar"],
           },
+          {
+            "@type": "ContactPoint",
+            telephone: facts.contact.phone2E164,
+            email: facts.contact.email,
+            contactType: "sales",
+            areaServed: "SA",
+            availableLanguage: ["en", "ar"],
+          },
         ],
         hasOfferCatalog: {
           "@type": "OfferCatalog",

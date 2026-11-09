@@ -72,6 +72,11 @@ export default function Footer({ t, lang }: { t: Dictionary; lang: Locale }) {
               </a>
             </li>
             <li>
+              <a className="inline-flex min-h-11 items-center hover:text-white" href={`tel:${facts.contact.phone2E164}`} dir="ltr">
+                {facts.contact.phone2Display}
+              </a>
+            </li>
+            <li>
               <a className="inline-flex min-h-11 items-center hover:text-white" href={`mailto:${facts.contact.email}`}>
                 {facts.contact.email}
               </a>

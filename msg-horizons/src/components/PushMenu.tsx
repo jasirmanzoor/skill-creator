@@ -227,6 +227,7 @@ export default function PushMenu({ t, lang, open, onClose }: { t: Dictionary; la
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45 rtl:tracking-normal">{t.nav.reach}</p>
               <a href={`tel:${facts.contact.phoneE164}`} className="mt-1.5 block text-white/85 hover:text-white" dir="ltr">{facts.contact.phoneDisplay}</a>
+              <a href={`tel:${facts.contact.phone2E164}`} className="block text-white/85 hover:text-white" dir="ltr">{facts.contact.phone2Display}</a>
               <a href={`mailto:${facts.contact.email}`} className="block text-white/85 hover:text-white">{facts.contact.email}</a>
             </div>
             <a href={`/${other}`} hrefLang={other} lang={other} aria-label={t.nav.langSwitchLabel} className="rounded-full px-3 py-1.5 text-white/85 ring-1 ring-white/20 hover:text-white">

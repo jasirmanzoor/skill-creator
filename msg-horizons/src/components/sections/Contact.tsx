@@ -41,6 +41,15 @@ export default function Contact({ t, lang }: { t: Dictionary; lang: Locale }) {
               </TrackedLink>
             </li>
             <li>
+              <TrackedLink href={`tel:${facts.contact.phone2E164}`} event="cta_click" props={{ cta: "call2", location: "contact" }} className={row}>
+                <span className="inline-flex size-10 items-center justify-center rounded-md bg-white/10"><PhoneIcon /></span>
+                <span>
+                  <span className="block text-sm text-white/65">{ch.call}</span>
+                  <span className="num block font-semibold" dir="ltr">{facts.contact.phone2Display}</span>
+                </span>
+              </TrackedLink>
+            </li>
+            <li>
               <TrackedLink href={`mailto:${facts.contact.email}`} event="cta_click" props={{ cta: "email", location: "contact" }} className={row}>
                 <span className="inline-flex size-10 items-center justify-center rounded-md bg-white/10"><MailIcon /></span>
                 <span>
