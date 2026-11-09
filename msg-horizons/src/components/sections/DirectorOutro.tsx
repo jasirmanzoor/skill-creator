@@ -6,16 +6,17 @@ import Logo from "../ui/Logo";
 import LanyardPass from "../ui/LanyardPass";
 
 const NAME = "Jasir Manzoor";
-const copy: Record<Locale, { eyebrow: string; role: string; roleShort: string; quote: [string, string]; label: string; flip: string; hint: string; tier: string }> = {
+const EMAIL = "abdullah@msg-horizons.com";
+const copy: Record<Locale, { eyebrow: string; role: string; roleShort: string; quote: [string, string]; label: string; flip: string; tier: string }> = {
   en: {
     eyebrow: "Leadership", role: "Operations Director, MSG Horizons", roleShort: "Operations Director",
     quote: ["Turning strategy into action.", "Delivering excellence every day."],
-    label: "Jasir Manzoor's MSG Horizons pass", flip: "Turn the pass over", hint: "Grab the pass and swing it, or click to turn it over.", tier: "Executive",
+    label: "Jasir Manzoor's MSG Horizons pass", flip: "Turn the pass over", tier: "Executive",
   },
   ar: {
     eyebrow: "القيادة", role: "مدير العمليات، ام اس جي هورايزونز", roleShort: "مدير العمليات",
     quote: ["نحوّل الاستراتيجية إلى عمل.", "ونقدّم التميّز كل يوم."],
-    label: "بطاقة Jasir Manzoor في ام اس جي هورايزونز", flip: "اقلب البطاقة", hint: "امسك البطاقة وأرجحها، أو اضغط لقلبها.", tier: "تنفيذي",
+    label: "بطاقة Jasir Manzoor في ام اس جي هورايزونز", flip: "اقلب البطاقة", tier: "تنفيذي",
   },
 };
 
@@ -42,7 +43,10 @@ export default function DirectorOutro({ lang }: { lang: Locale }) {
         <span className="mt-3 flex items-center gap-2">
           <span className="h-[3px] w-8 rounded-full bg-[#009df8]" />
           <span className="h-[3px] w-4 rounded-full bg-[#c9a24a]" />
-          <span className="ms-auto font-mono text-[10px] text-white/55" dir="ltr">msg-horizons.com</span>
+          <span className="ms-auto flex items-center gap-1.5 text-[10.5px] text-white/80" dir="ltr">
+            <svg viewBox="0 0 24 24" className="size-3.5 text-[#7fcbfb]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>
+            {EMAIL}
+          </span>
         </span>
       </span>
     </span>
@@ -69,7 +73,10 @@ export default function DirectorOutro({ lang }: { lang: Locale }) {
           </p>
           <h2 id="director-title" data-mask-skip className="mt-6 font-display text-xl font-semibold" dir="ltr">{NAME}</h2>
           <p className="mt-1 text-sm text-white/65">{c.role}</p>
-          <p className="mt-6 text-xs text-white/45">{c.hint}</p>
+          <a href={`mailto:${EMAIL}`} dir="ltr" className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-white/10 px-4 text-sm font-semibold text-white ring-1 ring-white/20 transition-colors hover:bg-white/20">
+            <svg viewBox="0 0 24 24" className="size-4 text-brand-mint" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>
+            {EMAIL}
+          </a>
         </div>
         <div className="order-1 h-[42rem] sm:h-[44rem] lg:order-2">
           <LanyardPass front={front} back={back} strapText={`MSG HORIZONS · ${NAME.toUpperCase()}`} label={c.label} flipLabel={c.flip} />
