@@ -50,6 +50,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         {c(3, <>
           <Pitch t={t} lang={lang} />
           <Depth><Services t={t} lang={lang} /></Depth>
+          <Perfmix lang={lang} />
         </>)}
         {c(4, <Depth><EstimatorSection t={t} lang={lang} /></Depth>)}
         {c(5, <Stage><Planner t={t} lang={lang} /></Stage>)}
@@ -59,7 +60,6 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         </>)}
         {c(7, <>
           <Depth><Proof t={t} /></Depth>
-          <Depth><Perfmix lang={lang} /></Depth>
         </>)}
         {c(8, <Depth><Enterprise t={t} lang={lang} /></Depth>)}
         {c(9, <Depth><Contact t={t} lang={lang} /></Depth>)}

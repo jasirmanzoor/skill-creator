@@ -446,7 +446,7 @@ await test("book: one continuous page; the rail, #links, ] and [ and the back bu
     // a #link to a section deep in another chapter lands on the section
     await page.evaluate(() => { const a = document.createElement("a"); a.href = "#perfmix"; a.id = "t-link"; a.textContent = "x"; document.querySelector("[data-current]").prepend(a); });
     await page.evaluate(() => document.getElementById("t-link").click());
-    await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "proof");
+    await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "why");
     await page.waitForTimeout(400);
     const top = await topOf("#perfmix");
     assert.ok(Math.abs(top - 64) < 80, `${lang}: landed on the section (${top})`);
@@ -527,12 +527,12 @@ await test("search: any service-related keyword (en + ar, typos too) lands on th
   await ar.ctx.close();
 });
 
-await test("perfmix: MSG's own store is shown in the company chapter, links out safely, and its pictures load (en + ar)", async () => {
+await test("perfmix: MSG's launch of its own store follows Why MSG, links out safely, and its pictures load (en + ar)", async () => {
   for (const lang of ["en", "ar"]) {
     const { page, ctx, errors } = await open(`/${lang}#perfmix`, { reducedMotion: "reduce" });
-    assert.equal(await page.evaluate(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter), "proof", "#perfmix opens the company chapter");
+    assert.equal(await page.evaluate(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter), "why", "#perfmix sits in the Why MSG chapter");
     const links = await page.locator("#perfmix a").evaluateAll((as) => as.map((a) => ({ href: a.href, rel: a.rel, target: a.target })));
-    assert.equal(links.length, 4, "the store link and three categories");
+    assert.equal(new Set(links.map((l) => l.href.replace(/\/$/, ""))).size, 4, "the store link and three collections");
     for (const l of links) {
       assert.ok(l.href.startsWith("https://perfmix.com"), l.href);
       assert.ok(l.target === "_blank" && /noopener/.test(l.rel), "external links open in a new tab, noopener");

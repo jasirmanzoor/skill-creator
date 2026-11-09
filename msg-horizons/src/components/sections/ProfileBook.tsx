@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element -- pages of a book, drawn at a fixed design size and scaled as one; the photos are already sized for it */
 "use client";
 
+import { leadershipCopy } from "@/content/leadership";
 import { LICENCES, licenceCopy } from "@/content/licences";
 import { facts, whatsappLink } from "@/content/facts";
 import type { Dictionary, Locale } from "@/content/i18n";
@@ -224,6 +225,16 @@ export default function ProfileBook({ t, lang }: { t: Dictionary; lang: Locale }
       </ol>
       <Folio n={10} dark />
     </div>,
+    // the Operations Director: portrait and line, as on MSG's own card
+    <div key="director" className={`${PAGE} bg-[#1c2c51] text-white`}>
+      <img src="/leadership/coo.jpg" alt={leadershipCopy[lang].roles.coo} draggable={false} loading="lazy" className="absolute inset-0 h-full w-full object-cover [object-position:50%_20%]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,19,38,0)_45%,rgba(11,19,38,0.92)_100%)]" />
+      <div className="absolute inset-x-8 bottom-14">
+        <p className="font-display text-[24px] font-semibold leading-[1.15]">{leadershipCopy[lang].quotes.coo[0]} <span className="text-[#7fcbfb]">{leadershipCopy[lang].quotes.coo[1]}</span></p>
+        <span className="mt-4 block h-[2px] w-10 bg-[#009df8]" />
+        <p className={`${label} mt-3 text-white/80`}>{leadershipCopy[lang].roles.coo}</p>
+      </div>
+    </div>,
     // 11 · partners
     <div key="partners" className={`${PAGE} flex flex-col bg-[#f8f9fb] p-9 text-[#111a33]`}>
       <span className={`${label} text-[#006bb6]`}>{t.proof.partnersTitle}</span>
@@ -232,10 +243,10 @@ export default function ProfileBook({ t, lang }: { t: Dictionary; lang: Locale }
           <li key={p} className="grid h-[68px] place-items-center rounded-2xl border border-[#e2e5ec] bg-white text-[17px] font-bold tracking-tight text-[#1c2c51]">{p}</li>
         ))}
       </ul>
-      <Folio n={11} />
+      <Folio n={12} />
     </div>,
     // the licences and certificates, one to a page
-    ...LICENCES.map((l, k) => <LicencePage key={`lic-${l.id}`} id={l.id} lang={lang} n={12 + k} />),
+    ...LICENCES.map((l, k) => <LicencePage key={`lic-${l.id}`} id={l.id} lang={lang} n={13 + k} />),
     // back cover
     <div key="back" className={`${PAGE} flex flex-col justify-end bg-[#1c2c51] p-9 text-white`}>
       <span aria-hidden="true" className="absolute -start-[30%] -top-[10%] h-[70%] w-[82%] bg-[#009df8]/90 [clip-path:polygon(0_0,40%_0,100%_100%)] rtl:-scale-x-100" />

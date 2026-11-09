@@ -7,7 +7,8 @@ import { facts } from "@/content/facts";
  * Achievements come only from facts.ts (verified). A leader appears only once their portrait is in
  * public/leadership/ (see `photo`); until then the outro shows the achievements alone.
  * Names are left empty until MSG confirms them. Portraits and quotes were supplied by MSG (12 Oct 2026); the
- * portraits are cropped from MSG's quote cards so the baked-in text does not show twice.
+ * portraits are cropped from MSG's quote cards so the baked-in text does not show twice. The Operations Director's
+ * portrait and line were supplied on 9 Nov 2026.
  */
 
 export type LeaderId = "ceo" | "coo";
@@ -47,10 +48,10 @@ export const leadershipCopy: Record<Locale, Copy> = {
       { v: `${facts.sabyaHub.areaM2.toLocaleString("en-US")} m²`, l: "Sabya hub" },
       { v: m.operations.display, l: "operations" },
     ],
-    roles: { ceo: "Chief Executive Officer", coo: "Chief Operating Officer" },
+    roles: { ceo: "Chief Executive Officer", coo: "Operations Director" },
     quotes: {
       ceo: ["Turn vision into", "meaningful progress."],
-      coo: ["Build with purpose,", "create lasting impact."],
+      coo: ["Turning strategy into action.", "Delivering excellence every day."],
     },
   },
   ar: {
@@ -68,10 +69,10 @@ export const leadershipCopy: Record<Locale, Copy> = {
       { v: `${facts.sabyaHub.areaM2.toLocaleString("en-US")} م²`, l: "مركز صبيا" },
       { v: m.operations.display, l: "تشغيل" },
     ],
-    roles: { ceo: "الرئيس التنفيذي", coo: "الرئيس التنفيذي للعمليات" },
+    roles: { ceo: "الرئيس التنفيذي", coo: "مدير العمليات" },
     quotes: {
       ceo: ["حوّل الرؤية إلى", "تقدّمٍ ذي معنى."],
-      coo: ["ابنِ بهدف،", "واصنع أثراً يدوم."],
+      coo: ["نحوّل الاستراتيجية إلى عمل.", "ونقدّم التميّز كل يوم."],
     },
   },
 };
