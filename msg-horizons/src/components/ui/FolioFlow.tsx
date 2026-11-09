@@ -131,12 +131,15 @@ export default function FolioFlow({
   singleBelow = 640,
   startPage = 1,
   endpaper = "#E7ECF4",
+  autoClose = false,
   className = "",
 }: {
   pages: React.ReactNode[];
   labels: FolioLabels;
   designWidth?: number; designHeight?: number; bookSize?: number; radius?: number; fold?: number; fanStep?: number; fanDepth?: number;
   fanAngle?: number; visible?: number; perspective?: number; dim?: number; singleBelow?: number; startPage?: number; endpaper?: string; className?: string;
+  /** closed until it comes into view; leaving view, it flips its pages back and closes */
+  autoClose?: boolean;
 }) {
   const root = useRef<HTMLDivElement>(null);
   const size = useSize(root);
@@ -152,11 +155,45 @@ export default function FolioFlow({
   const pos = useMotionValue(startPosition(startPage, n, single, last));
   const [index, setIndex] = useState(() => Math.round(pos.get()));
   useEffect(() => pos.on("change", (v) => { const r = clamp(Math.round(v), 0, last); setIndex((c) => (c === r ? c : r)); }), [pos, last]);
+  // closed: 0 is the open book, 1 the closed cover (the endpaper tucked behind it, the book centred)
+  const closed = useMotionValue(autoClose && !reduced ? 1 : 0);
+  const shift = useMotionValue(0);
+  useEffect(() => { shift.set(single ? 0 : fit.W / 2); }, [shift, single, fit.W]);
+  const bookX = useTransform([closed, shift], ([c, w]: number[]) => -w * c);
+  const run = useRef(0);
+  const open = useCallback(() => {
+    run.current++;
+    if (reduced) closed.set(0);
+    else animate(closed, 0, { type: "spring", stiffness: 120, damping: 20 });
+  }, [closed, reduced]);
   const go = useCallback((target: number) => {
     const t = clamp(Math.round(target), 0, last);
+    if (closed.get() > 0.01) open();
     if (reduced) pos.set(t);
     else animate(pos, t, { type: "spring", stiffness: 170, damping: 26, mass: 1 });
-  }, [last, reduced, pos]);
+  }, [last, reduced, pos, closed, open]);
+  // leaving view: the pages flip back one after another to the cover, then the book closes; coming back, it opens
+  useEffect(() => {
+    if (!autoClose) return;
+    const el = root.current;
+    if (!el) return;
+    const close = async () => {
+      const id = ++run.current;
+      if (reduced) { pos.set(0); closed.set(1); return; }
+      const from = pos.get();
+      if (from > 0.01) await animate(pos, 0, { duration: Math.min(2.2, 0.35 + from * 0.28), ease: [0.45, 0, 0.25, 1] });
+      if (id !== run.current) return;
+      await animate(closed, 1, { duration: 0.8, ease: [0.65, 0, 0.35, 1] });
+    };
+    let state: "open" | "closed" | null = null;
+    const io = new IntersectionObserver(([e]) => {
+      const r = e.intersectionRatio;
+      if (r >= 0.9 && state !== "open") { state = "open"; open(); }
+      else if (r < 0.7 && state !== "closed") { state = "closed"; void close(); }
+    }, { threshold: [0, 0.3, 0.5, 0.6, 0.69, 0.7, 0.8, 0.9, 0.95, 1] });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [autoClose, reduced, pos, closed, open]);
   // keep the same page open when switching between single pages and spreads
   const mode = useRef(single);
   useEffect(() => {
@@ -255,11 +292,13 @@ export default function FolioFlow({
         onClick={onClick}
         style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: fit.controlsSpace, perspective: fit.P, perspectiveOrigin: `calc(50% + ${fit.spineX}px) 50%`, touchAction: "pan-y", cursor: "grab" }}
       >
+        <motion.div style={{ position: "absolute", inset: 0, x: bookX, transformStyle: "preserve-3d" }}>
         {/* the book's shadow on the table */}
         <div aria-hidden="true" style={{ position: "absolute", left: "50%", top: "50%", width: fit.W * 2.6, height: fit.H * 0.16, marginLeft: -fit.W * 1.3 + fit.spineX, marginTop: fit.H / 2 - fit.H * 0.06, borderRadius: "50%", background: "radial-gradient(closest-side, rgba(0,0,0,0.5), rgba(0,0,0,0))", filter: "blur(8px)", pointerEvents: "none" }} />
         {leaves.map((leaf) => (
-          <LeafView key={leaf.key} order={leaf.order} pos={pos} geo={geo} fit={fit} radius={radius * fit.k} active={leaf.order === index || leaf.order === index - 1} front={renderPage(leaf.front)} back={renderPage(leaf.back)} />
+          <LeafView key={leaf.key} order={leaf.order} pos={pos} closed={closed} geo={geo} fit={fit} radius={radius * fit.k} active={leaf.order === index || leaf.order === index - 1} front={renderPage(leaf.front)} back={renderPage(leaf.back)} />
         ))}
+        </motion.div>
       </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center">
         <div className="pointer-events-auto flex items-center gap-1.5 rounded-full bg-white/10 p-1.5 text-white ring-1 ring-white/15 backdrop-blur-xl">
@@ -283,11 +322,12 @@ const rimStyle = (side: "front" | "back", r: number): React.CSSProperties => {
   return side === "front" ? { ...base, borderLeft: "none" } : { ...base, borderRight: "none" };
 };
 
-function LeafView({ order, pos, geo, fit, radius, active, front, back }: { order: number; pos: MotionValue<number>; geo: Geo; fit: Fit; radius: number; active: boolean; front: React.ReactNode; back: React.ReactNode }) {
+function LeafView({ order, pos, closed, geo, fit, radius, active, front, back }: { order: number; pos: MotionValue<number>; closed: MotionValue<number>; geo: Geo; fit: Fit; radius: number; active: boolean; front: React.ReactNode; back: React.ReactNode }) {
   const pose = (p: number) => leafPose(order, p, geo);
   const x = useTransform(pos, (p) => pose(p).x + fit.spineX);
-  const z = useTransform(pos, (p) => pose(p).z);
-  const rotateY = useTransform(pos, (p) => pose(p).rot);
+  const z = useTransform([pos, closed], ([p, c]: number[]) => (order < 0 ? mix(pose(p).z, -2, c) : pose(p).z));
+  // the endpaper leaf (order -1) swings across the spine and tucks behind the cover as the book closes
+  const rotateY = useTransform([pos, closed], ([p, c]: number[]) => (order < 0 ? mix(pose(p).rot, 0, smooth(c)) : pose(p).rot));
   const opacity = useTransform(pos, (p) => pose(p).opacity);
   const shade = useTransform(pos, (p) => pose(p).shade);
   const zIndex = useTransform(pos, (p) => pose(p).zIndex);

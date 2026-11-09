@@ -277,7 +277,7 @@ export default function ProfileBook({ t, lang }: { t: Dictionary; lang: Locale }
         </div>
         <div>
           <div className="h-[min(64svh,560px)] min-h-[420px] w-full lg:h-[min(82svh,740px)]">
-            <FolioFlow pages={pages} labels={{ region: c.region, prev: c.prev, next: c.next }} startPage={1} bookSize={98} fanStep={50} visible={4} />
+            <FolioFlow pages={pages} labels={{ region: c.region, prev: c.prev, next: c.next }} startPage={1} autoClose bookSize={98} fanStep={50} visible={4} />
           </div>
           <p className="mt-2 text-center text-xs text-white/55">{c.hint}</p>
         </div>
