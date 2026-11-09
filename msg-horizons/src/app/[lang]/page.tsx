@@ -22,6 +22,7 @@ import Depth from "@/components/spatial/Depth";
 import Perfmix from "@/components/sections/Perfmix";
 import Chapter from "@/components/book/Chapter";
 import RouteBook from "@/components/book/RouteBook";
+import DirectorOutro from "@/components/sections/DirectorOutro";
 import SideMap from "@/components/SideMap";
 import RouteRail from "@/components/book/RouteRail";
 import Stage from "@/components/book/Stage";
@@ -62,7 +63,10 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
           <Depth><Proof t={t} /></Depth>
         </>)}
         {c(8, <Depth><Enterprise t={t} lang={lang} /></Depth>)}
-        {c(9, <Depth><Contact t={t} lang={lang} /></Depth>)}
+        {c(9, <>
+          <Depth><Contact t={t} lang={lang} /></Depth>
+          <DirectorOutro lang={lang} />
+        </>)}
       </main>
       <div className="book-footer">
         <Footer t={t} lang={lang} />
