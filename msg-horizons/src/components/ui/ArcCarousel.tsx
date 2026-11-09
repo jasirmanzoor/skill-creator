@@ -167,7 +167,7 @@ export default function ArcCarousel({ cards, label, labels, rtl = false }: { car
                     </span>
                   </button>
                   {/* back: the face turns it back; the link sits beside it, not inside */}
-                  <div className="absolute inset-0 overflow-hidden rounded-[1.4rem] bg-[#0f1f3d] text-white ring-1 ring-white/15 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                  <div aria-hidden={!on} className="absolute inset-0 overflow-hidden rounded-[1.4rem] bg-[#0f1f3d] text-white ring-1 ring-white/15 [backface-visibility:hidden] [transform:rotateY(180deg)]">
                     <button type="button" onClick={toggle} aria-label={`${c.title}: ${labels.back}`} aria-pressed={true} tabIndex={on ? 0 : -1}
                       className="absolute inset-0 flex flex-col p-5 text-start">
                       {c.tag ? <span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#7fcbfb] rtl:tracking-normal">{c.tag}</span> : null}
@@ -176,7 +176,7 @@ export default function ArcCarousel({ cards, label, labels, rtl = false }: { car
                     </button>
                     {c.href ? (
                       <a href={c.href} target="_blank" rel="noopener" tabIndex={on ? 0 : -1}
-                        className="absolute inset-x-5 bottom-5 inline-flex min-h-10 items-center justify-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-[#1c2c51]">
+                        className="absolute inset-x-5 bottom-5 inline-flex min-h-10 items-center justify-center gap-2 rounded-full bg-[#ffffff] px-4 text-sm font-semibold text-[#1c2c51]">
                         {c.cta}
                         <svg viewBox="0 0 24 24" className="size-4 rtl:-scale-x-100" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" /></svg>
                       </a>
