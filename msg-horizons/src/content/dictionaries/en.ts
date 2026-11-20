@@ -61,7 +61,7 @@ export const en = {
     panelLive: "Operating 24/7",
     partnersLead: "Partners and clients we work with",
     eyebrow: "Last-mile delivery across Saudi Arabia · 1,000+ couriers · 100+ vehicles",
-    title: "You have something to sell. We already have the drivers.",
+    title: "You have something to sell. We already have the infrastructure.",
     caption: "Each grey dot is one MSG courier. Blue markers are vehicles on their routes.",
     lead: "MSG Horizons runs last-mile delivery, warehousing, land freight and people as one accountable operation, for online sellers, growing e-commerce brands and enterprises. From a first order to peak season. Based in Riyadh, operating 24/7.",
     forWhom: "For online sellers, growing stores and enterprises across the Kingdom.",

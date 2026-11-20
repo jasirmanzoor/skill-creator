@@ -67,7 +67,7 @@ type Copy = {
 export const heroCopy: Record<Locale, Copy> = {
   en: {
     live: "Operating now · Riyadh · 24/7",
-    title: ["You have something to sell.", "We already have the drivers."],
+    title: ["You have something to sell.", "We already have the infrastructure."],
     lead: "Have a product, an idea or a shop that should be selling online? MSG runs the storage, shipping and delivery, with the licences, compliance and people already in place. Price a delivery in ten seconds.",
     ctaPlan: "Build my logistics plan",
     ctaTalk: "Talk to MSG on WhatsApp",
@@ -166,7 +166,7 @@ export const heroCopy: Record<Locale, Copy> = {
   },
   ar: {
     live: "نعمل الآن · الرياض · على مدار الساعة",
-    title: ["لديك ما تبيعه.", "ولدينا المناديب بالفعل."],
+    title: ["لديك ما تبيعه.", "ولدينا البنية التحتية جاهزة."],
     lead: "لديك منتج أو فكرة أو متجر يجب أن يبيع أونلاين؟ ام اس جي تتولى التخزين والشحن والتوصيل، مع التراخيص والامتثال والفريق جاهزة مسبقاً. احسب تكلفة التوصيل في عشر ثوانٍ.",
     ctaPlan: "ابنِ خطتك اللوجستية",
     ctaTalk: "تحدث مع ام اس جي عبر واتساب",

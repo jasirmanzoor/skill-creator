@@ -4,24 +4,24 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * MSG Horizons design system — INDUSTRIAL INTELLIGENCE.
- * Swiss editorial structure on concrete paper and graphite: hairline rules, square corners, numbered sections, mono
+ * MSG Horizons design system — INDUSTRIAL INTELLIGENCE, in the brand's own colours (navy #1C2C51, blue #009DF8, white,
+ * and the guidelines' light grey). Swiss editorial structure: hairline rules, square corners, numbered sections, mono
  * data labels, real photographs of MSG's own hub. One signal colour (the brand blue) carries meaning: routes, live
  * states, the current step. No glass, no glow, no decorative gradients. Colours from the 2026 brand guidelines: navy #1C2C51 (grounds, type, the mark) and
  * blue #009DF8 (the arrow; accents on dark), with white. --color-brand is that blue deepened to #006BB6 so small text
  * on light grounds passes WCAG AA; the kit blue itself is --color-brand-bright / --color-brand-vivid.
  */
 @theme {
-  --color-paper: #f2f1ed; /* concrete */
-  --color-surface: #faf9f6;
-  --color-subtle: #e9e7e1;
-  --color-line: #d8d5cd;
-  --color-line-strong: #b9b5ab;
-  --color-ink: #0f141c; /* graphite */
-  --color-ink-2: #1a2130;
-  --color-ink-3: #2a3344;
-  --color-muted: #4f5763;
-  --color-faint: #5e646d;
+  --color-paper: #f1f1f0; /* the guidelines' light grey */
+  --color-surface: #ffffff;
+  --color-subtle: #e7e7e5;
+  --color-line: #dadad7;
+  --color-line-strong: #bdbdb8;
+  --color-ink: #1c2c51; /* brand navy: type and dark grounds */
+  --color-ink-2: #22345e;
+  --color-ink-3: #33456f;
+  --color-muted: #535c6e;
+  --color-faint: #5f6778;
   --color-brand: #006bb6;
   --color-brand-strong: #0a5a99;
   --color-brand-soft: #e3ecf4;
@@ -36,9 +36,9 @@
   --color-sand-900: #142240;
   --color-whatsapp: #128c4a;
   /* Red Sea glass: daylight Jeddah water */
-  --color-sea-50: #f6f5f1;
-  --color-sea-100: #e9e7e1;
-  --color-sea-200: #d3d0c7;
+  --color-sea-50: #f7f7f6;
+  --color-sea-100: #e7e7e5;
+  --color-sea-200: #d3d3cf;
   --color-sea-400: #5fb3ec;
   --color-teal: #0a5a99;
   --color-teal-deep: #1c2c51;
@@ -46,11 +46,11 @@
    * Dark grounds: graphite night. Blue-black ink lit by a warm sodium-lamp sand from the desert horizon, with MSG
    * green kept for what MSG does (checks, lines, live states). Used by the stages, the pitch, services and the menu.
    */
-  --color-deep: #121a28; /* graphite night */
+  --color-deep: #1c2c51; /* brand navy ground */
   --color-navy: #1c2c51; /* the brand navy: the mark and brand moments */
-  --color-graphite: #0f141c; /* a surface that stays dark in both themes (rate result, photo labels) */
-  --color-pitch: #0f1622;
-  --color-night: #0a0f18;
+  --color-graphite: #1c2c51; /* brand navy that stays dark in both themes (rate result, photo labels, rail) */
+  --color-pitch: #172447;
+  --color-night: #111b36;
   --color-silver: #c5ccd8;
   --color-danger: #b42318;
 
@@ -452,7 +452,7 @@ html[dir="rtl"].push-open .push-shift { translate: var(--push-w) 0; }
   }
   .btn-primary:active { transform: scale(0.97); transition-duration: 120ms; }
   /* Over dark sections the header button flips to white. */
-  .btn-primary.on-dark { background: #fff; color: #0f141c; box-shadow: none; }
+  .btn-primary.on-dark { background: #fff; color: #1c2c51; box-shadow: none; }
 }
 
 /* Underline grows from the inline start on hover; the active item keeps a full bar. */
@@ -610,25 +610,25 @@ body > header { view-transition-name: site-header; }
  */
 html.dark {
   color-scheme: dark;
-  --color-paper: #0c1017;
-  --color-surface: #131923;
-  --color-subtle: #1a2130;
-  --color-line: #262e3c;
-  --color-line-strong: #3a4352;
-  --color-ink: #ecebe6;
-  --color-ink-2: #dddcd6;
-  --color-ink-3: #c4c6c9;
-  --color-muted: #a3a8b0;
-  --color-faint: #8d939c;
+  --color-paper: #0f1830;
+  --color-surface: #16213d;
+  --color-subtle: #1c2848;
+  --color-line: #28365a;
+  --color-line-strong: #3a4a72;
+  --color-ink: #eef1f6;
+  --color-ink-2: #dce2ec;
+  --color-ink-3: #c3cbd9;
+  --color-muted: #a4aec2;
+  --color-faint: #8b96ad;
   --color-brand: #33aef9;
   --color-brand-strong: #009df8;
   --color-brand-soft: #0c2546;
   --color-brand-vivid: #4db8fa;
   --color-teal: #7fcbfb;
-  --color-teal-deep: #e2e4e8;
-  --color-sea-50: #11161f;
-  --color-sea-100: #171d28;
-  --color-sea-200: #222a38;
+  --color-teal-deep: #e2e8f2;
+  --color-sea-50: #121c36;
+  --color-sea-100: #18243f;
+  --color-sea-200: #22304f;
   --color-sea-400: #4db8fa;
   --color-danger: #ff8a7a;
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 24px 48px -28px rgba(0, 0, 0, 0.8);
@@ -638,7 +638,7 @@ html.dark {
 html.dark .bg-white { background-color: var(--color-surface); }
 html.dark .bg-ink { color: var(--color-paper); }
 html.dark .bg-teal-deep { background-color: #1c2c51; }
-html.dark .btn-primary:not(.on-dark) { background-color: #ecebe6; color: #0f141c; }
+html.dark .btn-primary:not(.on-dark) { background-color: #eef1f6; color: #1c2c51; }
 /* filled brand and teal controls keep their daylight depth, so white type on them stays legible */
 html.dark .bg-brand { background-color: #006bb6; }
 html.dark .bg-teal { background-color: #0a5a99; }
@@ -793,9 +793,9 @@ html[data-film] { scroll-behavior: auto !important; }
 }
 .btn-ind:hover { background: var(--color-ink-3); }
 .btn-ind:active { transform: scale(0.97); }
-.btn-ind.on-dark { background: #fff; color: #0f141c; }
+.btn-ind.on-dark { background: #fff; color: #1c2c51; }
 .btn-ind.on-dark:hover { background: #e9e7e1; }
-html.dark .btn-ind:not(.on-dark) { background: #ecebe6; color: #0f141c; }
+html.dark .btn-ind:not(.on-dark) { background: #eef1f6; color: #1c2c51; }
 html.dark .btn-ind:not(.on-dark):hover { background: #fff; }
 /* registration marks on a photographic plate: the corners of a technical sheet */
 .plate .reg { position: absolute; width: 18px; height: 18px; border-color: rgb(255 255 255 / 0.85); pointer-events: none; }
