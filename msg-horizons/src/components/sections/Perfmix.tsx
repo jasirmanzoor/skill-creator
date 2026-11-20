@@ -92,7 +92,7 @@ export default function Perfmix({ lang }: { lang: Locale }) {
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
           <div>
-            <p className="lbl idx text-brand-bright">{c.eyebrow}</p>
+            <p className="lbl idx text-brand-mint">{c.eyebrow}</p>
             <div className="mt-5 inline-flex items-center gap-3 rounded-2xl bg-white px-4 py-3">
               <Image src="/media/perfmix/wordmark.png" alt={S.name} width={500} height={78} priority className="h-6 w-auto" />
             </div>
@@ -110,7 +110,7 @@ export default function Perfmix({ lang }: { lang: Locale }) {
           <ol className="grid grid-cols-2 gap-3">
             {c.steps.map((s, i) => (
               <li key={s.t} className="relative rounded-2xl bg-white/[0.06] p-4 ring-1 ring-white/12">
-                <span className="num font-mono text-[11px] text-brand-bright" dir="ltr">{String(i + 1).padStart(2, "0")}</span>
+                <span className="num font-mono text-[11px] text-brand-mint" dir="ltr">{String(i + 1).padStart(2, "0")}</span>
                 <p className="mt-2 font-display text-lg font-semibold">{s.t}</p>
                 <p className="mt-1 text-sm text-white/70">{s.d}</p>
               </li>
@@ -130,7 +130,7 @@ export default function Perfmix({ lang }: { lang: Locale }) {
               <h3 className="font-display text-lg font-semibold">{x.title}</h3>
               <p className="mt-1.5 text-sm text-white/70 text-pretty">{x.back}</p>
               {x.href && x.cta ? (
-                <a href={x.href} target="_blank" rel="noopener" className="group/cta mt-auto inline-flex min-h-11 items-center gap-1.5 pt-3 text-sm font-semibold text-brand-bright">
+                <a href={x.href} target="_blank" rel="noopener" className="group/cta mt-auto inline-flex min-h-11 items-center gap-1.5 pt-3 text-sm font-semibold text-brand-mint">
                   {x.cta}
                   <span className="sr-only"> ({c.newTab})</span>
                   <svg viewBox="0 0 24 24" className="size-4 transition-transform duration-200 ease-out group-hover/cta:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover/cta:-translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>

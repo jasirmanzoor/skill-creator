@@ -82,7 +82,7 @@ export default function LiveTracking({ lang }: { lang: Locale }) {
                     </span>
                     <span>
                       <span className={`block font-display text-lg font-semibold leading-snug transition-colors duration-200 ${st === "todo" ? "text-white/60" : "text-white"}`}>{s.t}</span>
-                      <span className={`mt-0.5 block text-sm leading-relaxed transition-colors duration-200 ${st === "todo" ? "text-white/55" : "text-white/75"}`}>{s.d}</span>
+                      <span className={`mt-0.5 block text-sm leading-relaxed transition-colors duration-200 ${st === "todo" ? "text-white/70" : "text-white/80"}`}>{s.d}</span>
                     </span>
                   </li>
                 );

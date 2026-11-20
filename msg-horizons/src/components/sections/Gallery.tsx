@@ -17,7 +17,7 @@ export default function Gallery({ t, lang }: { t: Dictionary; lang: Locale }) {
         <div className="max-w-2xl">
           <p className="lbl idx text-brand">{t.gallery.eyebrow}</p>
           <h2 id="gallery-title" className="h-section mt-2 text-ink">{t.gallery.title}</h2>
-          <p className="mt-4 text-sm text-ink/60">{t.gallery.note}</p>
+          <p className="mt-4 text-sm text-ink/75">{t.gallery.note}</p>
         </div>
         <ul className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {items.map((m, i) => (
