@@ -59,8 +59,7 @@ export default function Proof({ t, lang = "en" }: { t: Dictionary; lang?: Locale
     <section id="proof" aria-labelledby="proof-title" className="scroll-mt-16 border-t border-line bg-paper text-ink">
       <div className="mx-auto grid max-w-[88rem] gap-x-12 gap-y-14 px-5 py-20 sm:px-8 lg:grid-cols-12 lg:px-10 lg:py-28">
         <div className="lg:col-span-4">
-          <p className="lbl idx text-brand">{c.idx}</p>
-          <h2 id="proof-title" className="mt-6 font-display text-[clamp(2rem,3.4vw,3.1rem)] font-semibold leading-[1.02] tracking-[-0.035em] text-balance rtl:leading-[1.3] rtl:tracking-normal">{c.title}</h2>
+          <h2 id="proof-title" className="font-display text-[clamp(2rem,3.4vw,3.1rem)] font-semibold leading-[1.02] tracking-[-0.035em] text-balance rtl:leading-[1.3] rtl:tracking-normal">{c.title}</h2>
           <p className="mt-5 max-w-md text-muted text-pretty">{c.lead}</p>
           <p className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold">
             <a href={`/${lang}/company-profile`} className="text-brand underline-offset-4 hover:underline">{c.profile} →</a>

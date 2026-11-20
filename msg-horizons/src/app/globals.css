@@ -816,3 +816,6 @@ html.dark .btn-ind:not(.on-dark):hover { background: #fff; }
   .net-name { font-size: 34px; }
   .net-coord { font-size: 22px; }
 }
+/* the dark theme has no light grounds: the mark is always the white one there */
+html.dark .logo-ink { opacity: 0 !important; }
+html.dark .logo-white { opacity: 1 !important; }

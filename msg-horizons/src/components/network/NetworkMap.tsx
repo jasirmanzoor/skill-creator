@@ -67,8 +67,7 @@ export default function NetworkMap({ lang }: { lang: Locale }) {
     <section id="network" aria-labelledby="network-title" className="scroll-mt-16 border-t border-line bg-paper text-ink">
       <div className="mx-auto grid max-w-[88rem] gap-x-12 gap-y-12 px-5 py-20 sm:px-8 lg:grid-cols-12 lg:px-10 lg:py-28">
         <div className="lg:col-span-4">
-          <p className="lbl idx text-brand">{u.idx}</p>
-          <h2 id="network-title" className="mt-6 font-display text-[clamp(2rem,3.4vw,3.1rem)] font-semibold leading-[1.02] tracking-[-0.035em] text-balance rtl:leading-[1.3] rtl:tracking-normal">{u.title}</h2>
+          <h2 id="network-title" className="font-display text-[clamp(2rem,3.4vw,3.1rem)] font-semibold leading-[1.02] tracking-[-0.035em] text-balance rtl:leading-[1.3] rtl:tracking-normal">{u.title}</h2>
           <p className="mt-5 max-w-md text-muted text-pretty">{u.lead}</p>
           <ol className="mt-10 border-t border-ink">
             {legs.map((leg, i) => (

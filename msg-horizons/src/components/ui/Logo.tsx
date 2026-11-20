@@ -20,8 +20,8 @@ export default function Logo({ className = "", inverted = false, variant = "hori
   const img = "block h-[var(--logo-h)] w-auto transition-opacity duration-200";
   return (
     <span className={`relative inline-flex items-center ${className}`} dir="ltr" style={{ ["--logo-h" as string]: `${height}px` }}>
-      <img src={`${f.src}.svg`} alt="MSG Horizons Logistics" width={width} height={height} className={`${img} ${inverted ? "opacity-0" : "opacity-100"}`} />
-      <img src={`${f.src}-white.svg`} alt="" aria-hidden="true" width={width} height={height} className={`absolute inset-0 ${img} ${inverted ? "opacity-100" : "opacity-0"}`} />
+      <img src={`${f.src}.svg`} alt="MSG Horizons Logistics" width={width} height={height} className={`logo-ink ${img} ${inverted ? "opacity-0" : "opacity-100"}`} />
+      <img src={`${f.src}-white.svg`} alt="" aria-hidden="true" width={width} height={height} className={`logo-white absolute inset-0 ${img} ${inverted ? "opacity-100" : "opacity-0"}`} />
     </span>
   );
 }
