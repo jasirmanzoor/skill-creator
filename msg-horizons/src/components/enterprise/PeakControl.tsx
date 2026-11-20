@@ -83,9 +83,9 @@ export default function PeakControl({ stages, labels, lang, leaders = [] }: { st
               src="/media/msg/hub-floor-soft.webp"
               alt=""
               className="absolute inset-0 size-full object-cover"
-              initial={reduce ? false : { scale: 1.12 }}
+              initial={reduce ? false : { scale: 1.04 }}
               animate={{ scale: 1 }}
-              transition={{ duration: 8, ease: EASE_OUT }}
+              transition={{ duration: 1.2, ease: EASE_OUT }}
             />
             <span className="absolute inset-0 bg-[linear-gradient(115deg,rgba(8,38,43,0.9)_0%,rgba(8,38,43,0.62)_50%,rgba(26,18,10,0.55)_100%)]" />
             <span className="absolute -start-24 -top-24 size-96 rounded-full bg-[radial-gradient(closest-side,rgba(230,196,140,0.18),transparent)]" />
@@ -202,7 +202,7 @@ const GOLD = "#e6c48c";
 const GLASS = "bg-white/[0.07] ring-1 ring-white/15 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_30px_60px_-34px_rgba(0,0,0,0.7)]";
 function Outro({ lang, leaders, reduce }: { lang: Locale; leaders: Leader[]; reduce: boolean }) {
   const o = leadershipCopy[lang];
-  const rise = (delay: number, y = 18) => (reduce ? {} : { initial: { opacity: 0, y }, animate: { opacity: 1, y: 0 }, transition: { delay, duration: 0.7, ease: EASE_OUT } });
+  const rise = (delay: number, y = 18) => (reduce ? {} : { initial: { opacity: 0, y }, animate: { opacity: 1, y: 0 }, transition: { delay: delay * 0.5, duration: 0.45, ease: EASE_OUT } });
   const people = leaders.length > 0;
   return (
     <motion.div
@@ -234,12 +234,12 @@ function Outro({ lang, leaders, reduce }: { lang: Locale; leaders: Leader[]; red
           {leaders.map((l, i) => (
             <motion.figure
               key={l.id}
-              {...(reduce ? {} : { initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 }, transition: { delay: 0.9 + i * 0.3, duration: 0.9, ease: EASE_OUT } })}
+              {...(reduce ? {} : { initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 }, transition: { delay: 0.35 + i * 0.1, duration: 0.5, ease: EASE_OUT } })}
               className="relative min-h-[380px] overflow-hidden rounded-2xl bg-[#14110d] ring-1 ring-white/20 shadow-[0_40px_80px_-40px_rgba(0,0,0,0.8)] lg:min-h-0"
             >
               <motion.div
                 className="absolute inset-0"
-                {...(reduce ? {} : { initial: { scale: 1.08 }, animate: { scale: 1 }, transition: { delay: 0.9 + i * 0.3, duration: 2.4, ease: EASE_OUT } })}
+                {...(reduce ? {} : { initial: { scale: 1.04 }, animate: { scale: 1 }, transition: { delay: 0.35 + i * 0.1, duration: 1, ease: EASE_OUT } })}
               >
                 <Image src={`/${l.photo}`} alt={l.name ? `${l.name}, ${o.roles[l.id]}` : o.roles[l.id]} fill sizes="(min-width: 1024px) 34vw, 90vw" className="object-cover [object-position:50%_20%]" />
               </motion.div>

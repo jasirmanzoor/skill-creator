@@ -1,11 +1,10 @@
 "use client";
 
-import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "motion/react";
-import { useRef } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import type { ServiceId } from "@/content/facts";
 import type { Locale } from "@/content/i18n";
 import { serviceHud } from "@/content/serviceHud";
-import { EASE_OUT, SPRING_SMOOTH } from "@/lib/motion";
+import { EASE_OUT } from "@/lib/motion";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 /** the photo for each service: everyday scenes of the work itself, and the long-haul truck in MSG's livery */
@@ -26,36 +25,18 @@ type Props = {
 
 /**
  * The side view of one service: MSG's photo wipes in under a slow push, a small live panel over it shows what
- * the service actually does, and the service's key fact rises in beneath. The card leans toward the pointer and
- * a soft light follows it, so the view feels held, not printed.
+ * the service actually does, playing once each time a service opens, and the service's key fact rises in beneath.
  */
 export default function ServiceView({ id, index, total, lang, name, fact, href }: Props) {
   const reduce = useReducedMotion();
   const h = serviceHud[lang];
-  const card = useRef<HTMLDivElement>(null);
-  const mx = useMotionValue(0), my = useMotionValue(0);
-  const sx = useSpring(mx, SPRING_SMOOTH), sy = useSpring(my, SPRING_SMOOTH);
-  const rotateY = useTransform(sx, [-0.5, 0.5], [-5, 5]);
-  const rotateX = useTransform(sy, [-0.5, 0.5], [4, -4]);
-  const onMove = (e: React.PointerEvent) => {
-    if (reduce || e.pointerType !== "mouse" || !card.current) return;
-    const r = card.current.getBoundingClientRect();
-    mx.set((e.clientX - r.left) / r.width - 0.5);
-    my.set((e.clientY - r.top) / r.height - 0.5);
-    card.current.style.setProperty("--sx", `${e.clientX - r.left}px`);
-    card.current.style.setProperty("--sy", `${e.clientY - r.top}px`);
-  };
   const p = PHOTO[id];
   const n = (k: number) => String(k).padStart(2, "0");
 
   return (
-    <div className="[perspective:1400px]">
-      <motion.div
-        ref={card}
-        onPointerMove={onMove}
-        onPointerLeave={() => { mx.set(0); my.set(0); }}
-        style={reduce ? undefined : { rotateX, rotateY }}
-        className="group/card relative overflow-hidden rounded-[1.4rem] bg-surface shadow-[0_40px_80px_-40px_rgba(28,44,81,0.55)] ring-1 ring-line"
+    <div>
+      <div
+        className="relative overflow-hidden rounded-[1.4rem] bg-surface shadow-[0_40px_80px_-40px_rgba(28,44,81,0.55)] ring-1 ring-line"
       >
         {/* the photo: each service wipes in over the last, under a slow push */}
         <div className="relative aspect-[4/3] overflow-hidden bg-deep">
@@ -64,8 +45,8 @@ export default function ServiceView({ id, index, total, lang, name, fact, href }
               key={id}
               className="absolute inset-0"
               initial={reduce ? { opacity: 0 } : { clipPath: "inset(0 0 0 100%)" }}
-              animate={reduce ? { opacity: 1 } : { clipPath: "inset(0 0 0 0%)", transition: { duration: 0.7, ease: [0.77, 0, 0.175, 1] } }}
-              exit={{ opacity: 0, transition: { delay: 0.7, duration: 0.01 } }}
+              animate={reduce ? { opacity: 1 } : { clipPath: "inset(0 0 0 0%)", transition: { duration: 0.5, ease: [0.77, 0, 0.175, 1] } }}
+              exit={{ opacity: 0, transition: { delay: 0.5, duration: 0.01 } }}
             >
               <motion.img
                 loading="lazy"
@@ -74,14 +55,12 @@ export default function ServiceView({ id, index, total, lang, name, fact, href }
                 decoding="async"
                 className="absolute inset-0 size-full object-cover"
                 style={{ objectPosition: p.pos }}
-                initial={reduce ? false : { scale: 1.18 }}
-                animate={{ scale: 1.02, transition: { duration: 6, ease: EASE_OUT } }}
+                initial={reduce ? false : { scale: 1.06 }}
+                animate={{ scale: 1, transition: { duration: 1.2, ease: EASE_OUT } }}
               />
             </motion.div>
           </AnimatePresence>
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(11,19,38,0.45)_0%,rgba(11,19,38,0)_28%,rgba(11,19,38,0)_50%,rgba(11,19,38,0.7)_100%)]" />
-          {/* light that follows the pointer */}
-          <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-0 mix-blend-soft-light transition-opacity duration-300 [background:radial-gradient(320px_circle_at_var(--sx,50%)_var(--sy,30%),rgba(255,255,255,0.55),transparent_65%)] group-hover/card:opacity-100" />
 
           <div className="absolute inset-x-4 top-4 flex items-center justify-between text-white">
             <span className="num rounded-full bg-black/35 px-2.5 py-1 text-[11px] font-semibold ring-1 ring-white/20 backdrop-blur" dir="ltr">
@@ -95,7 +74,7 @@ export default function ServiceView({ id, index, total, lang, name, fact, href }
             <motion.div
               key={id}
               initial={reduce ? false : { opacity: 0, y: 14, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1, transition: { delay: reduce ? 0 : 0.35, duration: 0.4, ease: EASE_OUT } }}
+              animate={{ opacity: 1, y: 0, scale: 1, transition: { delay: reduce ? 0 : 0.25, duration: 0.3, ease: EASE_OUT } }}
               exit={{ opacity: 0, y: 6, transition: { duration: 0.15 } }}
               className="absolute bottom-4 start-4 w-[min(17rem,calc(100%-2rem))] rounded-2xl bg-white/[0.94] p-3 text-teal-deep shadow-[0_20px_40px_-18px_rgba(0,0,0,0.6)] ring-1 ring-white/60"
             >
@@ -112,7 +91,7 @@ export default function ServiceView({ id, index, total, lang, name, fact, href }
               <motion.p
                 key={id}
                 initial={reduce ? false : { y: "105%" }}
-                animate={{ y: "0%", transition: { duration: 0.55, ease: EASE_OUT, delay: reduce ? 0 : 0.15 } }}
+                animate={{ y: "0%", transition: { duration: 0.4, ease: EASE_OUT, delay: reduce ? 0 : 0.1 } }}
                 exit={{ y: "-105%", transition: { duration: 0.18 } }}
                 className="num pb-1 font-display text-5xl font-semibold tracking-[-0.035em] text-ink sm:text-6xl rtl:tracking-normal"
               >
@@ -128,7 +107,7 @@ export default function ServiceView({ id, index, total, lang, name, fact, href }
             </a>
           ) : null}
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -144,12 +123,12 @@ function Head({ title }: { title: string }) {
   );
 }
 
-/** two lines of status that hand over to each other, on a loop */
+/** two lines of status: the first hands over to the second once the panel has played */
 function Swap({ a, b }: { a: string; b: string }) {
   return (
     <span className="relative mt-1 block h-4 overflow-hidden text-[11px] text-teal-deep/75">
-      <span className="absolute inset-0 motion-safe:animate-[svc-swap-a_4s_var(--ease-in-out)_infinite]">{a}</span>
-      <span className="absolute inset-0 font-semibold text-brand opacity-0 motion-safe:animate-[svc-swap-b_4s_var(--ease-in-out)_infinite] motion-reduce:opacity-100">✓ {b}</span>
+      <span className="absolute inset-0 motion-safe:animate-[svc-swap-a_0.4s_var(--ease-out)_1.6s_both]">{a}</span>
+      <span className="absolute inset-0 font-semibold text-brand opacity-0 motion-safe:animate-[svc-swap-b_0.4s_var(--ease-out)_1.6s_both] motion-reduce:opacity-100">✓ {b}</span>
     </span>
   );
 }
@@ -172,7 +151,7 @@ function Hud({ id, c }: { id: ServiceId; c: H }) {
             <path d={ROUTE} pathLength={1} fill="none" stroke="#009df8" strokeWidth="3" strokeLinecap="round" className="svc-draw" />
             <circle cx="14" cy="52" r="5" fill="#1c2c51" />
             <g transform="translate(196 24)"><circle r="9" fill="#009df8" className="svc-land" /><path d="M-3.5 0l2.5 2.5 4.5-5" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></g>
-            <circle r="4" fill="#009df8" className="motion-reduce:hidden"><animateMotion dur="4s" repeatCount="indefinite" path={ROUTE} keyPoints="0;1;1" keyTimes="0;0.55;1" calcMode="linear" /></circle>
+            <circle r="4" fill="#009df8" className="motion-reduce:hidden"><animateMotion dur="1.4s" repeatCount="1" fill="freeze" path={ROUTE} keyPoints="0;1" keyTimes="0;1" calcMode="spline" keySplines="0.77 0 0.175 1" /></circle>
           </svg>
           <Swap a={c.a} b={c.b} />
         </>
@@ -183,7 +162,7 @@ function Hud({ id, c }: { id: ServiceId; c: H }) {
           <Head title={c.title} />
           <div aria-hidden="true" className="mt-2.5 grid grid-cols-8 gap-1">
             {Array.from({ length: 24 }, (_, i) => (
-              <span key={i} className={`h-3 rounded-[3px] ${[3, 10, 21].includes(i) ? "bg-sea-200" : i % 7 === 5 ? "bg-sand-500/80" : "bg-teal"} ${[6, 13, 17].includes(i) ? "motion-safe:animate-[svc-pick_3.6s_var(--ease-in-out)_infinite]" : ""}`} style={{ animationDelay: `${(i % 3) * 1.2}s` }} />
+              <span key={i} className={`h-3 rounded-[3px] ${[3, 10, 21].includes(i) ? "bg-sea-200" : i % 7 === 5 ? "bg-sand-500/80" : "bg-teal"} ${[6, 13, 17].includes(i) ? "motion-safe:animate-[svc-pick_1s_var(--ease-in-out)_both]" : ""}`} style={{ animationDelay: `${0.3 + (i % 3) * 0.5}s` }} />
             ))}
           </div>
           <Swap a={c.a} b={c.b} />
@@ -194,10 +173,10 @@ function Hud({ id, c }: { id: ServiceId; c: H }) {
         <>
           <Head title={c.title} />
           <svg viewBox="0 0 210 60" className="mt-1 h-12 w-full" aria-hidden="true">
-            <path d="M18 44 Q 105 -6 192 40" fill="none" stroke="#c2dff6" strokeWidth="3" strokeDasharray="4 5" strokeLinecap="round" className="motion-safe:animate-[hero-flow_1.2s_linear_infinite]" />
+            <path d="M18 44 Q 105 -6 192 40" fill="none" stroke="#c2dff6" strokeWidth="3" strokeDasharray="4 5" strokeLinecap="round" />
             <circle cx="18" cy="44" r="6" fill="#1c2c51" />
             <circle cx="192" cy="40" r="6" fill="#fff" stroke="#1c2c51" strokeWidth="2.5" />
-            <rect x="-7" y="-5" width="14" height="10" rx="2.5" fill="#009df8" className="motion-reduce:hidden"><animateMotion dur="3.6s" repeatCount="indefinite" rotate="auto" path="M18 44 Q 105 -6 192 40" /></rect>
+            <rect x="-7" y="-5" width="14" height="10" rx="2.5" fill="#009df8" className="motion-reduce:hidden"><animateMotion dur="1.8s" repeatCount="1" fill="freeze" rotate="auto" path="M18 44 Q 105 -6 192 40" keyPoints="0;1" keyTimes="0;1" calcMode="spline" keySplines="0.77 0 0.175 1" /></rect>
           </svg>
           <p className="flex justify-between text-[11px] font-semibold text-teal-deep/80" dir="ltr"><span>{c.a}</span><span>{c.b}</span></p>
         </>
@@ -213,7 +192,7 @@ function Hud({ id, c }: { id: ServiceId; c: H }) {
             </svg>
             <ul className="space-y-1 text-[11px]">
               {[c.a, c.b].map((x, i) => (
-                <li key={x} className="flex items-center gap-1.5 opacity-0 motion-safe:animate-[svc-tick_4s_var(--ease-out)_infinite] motion-reduce:opacity-100" style={{ animationDelay: `${0.6 + i * 0.8}s` }}>
+                <li key={x} className="flex items-center gap-1.5 opacity-0 motion-safe:animate-[svc-tick_0.35s_var(--ease-out)_both] motion-reduce:opacity-100" style={{ animationDelay: `${0.9 + i * 0.25}s` }}>
                   <span className="grid size-3.5 place-items-center rounded-full bg-brand-vivid text-[8px] text-white">✓</span>{x}
                 </li>
               ))}
@@ -230,7 +209,7 @@ function Hud({ id, c }: { id: ServiceId; c: H }) {
               <div key={l} className="grid grid-cols-[5.5rem_1fr] items-center gap-2">
                 <span className={`truncate ${i === 2 ? "text-brand" : "text-teal-deep/75"}`}>{l}</span>
                 <span className="h-2 overflow-hidden rounded-full bg-sea-100">
-                  <span className={`block h-full origin-left rounded-full ${i === 2 ? "bg-brand-vivid" : "bg-teal"} ${w} motion-safe:animate-[svc-bar_4s_var(--ease-in-out)_infinite] rtl:origin-right`} style={{ animationDelay: d }} />
+                  <span className={`block h-full origin-left rounded-full ${i === 2 ? "bg-brand-vivid" : "bg-teal"} ${w} motion-safe:animate-[svc-bar_0.8s_var(--ease-out)_both] rtl:origin-right`} style={{ animationDelay: d }} />
                 </span>
               </div>
             ))}
@@ -244,8 +223,8 @@ function Hud({ id, c }: { id: ServiceId; c: H }) {
           <ol aria-hidden="true" className="mt-3 grid grid-cols-3 text-center text-[10px] font-semibold">
             {[c.a, c.b, c.c ?? ""].map((l, i) => (
               <li key={l} className="relative flex flex-col items-center gap-1.5">
-                {i ? <span className="absolute end-1/2 top-[7px] h-0.5 w-full bg-sea-100"><span className="block h-full origin-left bg-brand-vivid motion-safe:animate-[svc-bar_4.5s_var(--ease-in-out)_infinite] rtl:origin-right" style={{ animationDelay: `${i * 0.9}s` }} /></span> : null}
-                <span className="relative size-4 rounded-full bg-sea-100 ring-2 ring-white"><span className="absolute inset-0 rounded-full bg-brand-vivid opacity-0 motion-safe:animate-[svc-tick_4.5s_var(--ease-out)_infinite] motion-reduce:opacity-100" style={{ animationDelay: `${0.3 + i * 0.9}s` }} /></span>
+                {i ? <span className="absolute end-1/2 top-[7px] h-0.5 w-full bg-sea-100"><span className="block h-full origin-left bg-brand-vivid motion-safe:animate-[svc-bar_0.5s_var(--ease-out)_both] rtl:origin-right" style={{ animationDelay: `${i * 0.45}s` }} /></span> : null}
+                <span className="relative size-4 rounded-full bg-sea-100 ring-2 ring-white"><span className="absolute inset-0 rounded-full bg-brand-vivid opacity-0 motion-safe:animate-[svc-tick_0.35s_var(--ease-out)_both] motion-reduce:opacity-100" style={{ animationDelay: `${0.2 + i * 0.45}s` }} /></span>
                 <span className="leading-tight text-teal-deep/80">{l}</span>
               </li>
             ))}
@@ -257,8 +236,8 @@ function Hud({ id, c }: { id: ServiceId; c: H }) {
         <>
           <Head title={c.title} />
           <div className="mt-2 space-y-1.5 text-[11px]">
-            <p className="w-fit max-w-full rounded-2xl rounded-ss-sm bg-sea-50 px-3 py-1.5 opacity-0 ring-1 ring-sea-100 motion-safe:animate-[svc-tick_5s_var(--ease-out)_infinite] motion-reduce:opacity-100">{c.a}</p>
-            <p className="ms-auto w-fit rounded-2xl rounded-se-sm bg-teal-deep px-3 py-1.5 font-semibold text-white opacity-0 motion-safe:animate-[svc-tick_5s_var(--ease-out)_infinite] motion-reduce:opacity-100" style={{ animationDelay: "1.1s" }}>✓ {c.b}</p>
+            <p className="w-fit max-w-full rounded-2xl rounded-ss-sm bg-sea-50 px-3 py-1.5 opacity-0 ring-1 ring-sea-100 motion-safe:animate-[svc-tick_0.35s_var(--ease-out)_both] motion-reduce:opacity-100">{c.a}</p>
+            <p className="ms-auto w-fit rounded-2xl rounded-se-sm bg-teal-deep px-3 py-1.5 font-semibold text-white opacity-0 motion-safe:animate-[svc-tick_0.35s_var(--ease-out)_both] motion-reduce:opacity-100" style={{ animationDelay: "0.9s" }}>✓ {c.b}</p>
           </div>
         </>
       );

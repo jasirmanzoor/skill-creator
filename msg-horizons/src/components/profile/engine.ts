@@ -1,16 +1,14 @@
-import Lenis from "lenis";
-
 /**
- * The profile's motion engine, from the Selene template: one requestAnimationFrame loop for the whole page. Lenis
- * advances first, then every scroll-driven section reads its own rect and writes styles directly, so scrolling
- * never re-renders React. With `?film` in the URL there is no smooth scroll and no loop of its own: the film
+ * The profile's motion engine, from the Selene template: one requestAnimationFrame loop for the whole page. The page
+ * scrolls natively (no smooth-scroll library), and every scroll-driven section reads its own rect and writes styles
+ * directly, so scrolling never re-renders React. With `?film` in the URL there is no smooth scroll and no loop of its own: the film
  * renderer (reel/profile-film.mjs) scrolls the page and calls `window.__profileTick(time)` once per frame.
  */
 
 type Tick = (time: number) => void;
 
 const subscribers = new Set<Tick>();
-let lenis: Lenis | null = null;
+let reduce = false;
 
 export const isFilm = () => typeof window !== "undefined" && new URLSearchParams(window.location.search).has("film");
 
@@ -30,18 +28,15 @@ export function startScroll(reduced: boolean): () => void {
     });
     return off;
   }
-  if (!reduced) lenis = new Lenis({ lerp: 0.09, smoothWheel: true, wheelMultiplier: 0.9 });
+  reduce = reduced;
   let raf = 0;
   const loop = (time: number) => {
-    lenis?.raf(time);
     subscribers.forEach((fn) => fn(time));
     raf = requestAnimationFrame(loop);
   };
   raf = requestAnimationFrame(loop);
   return () => {
     cancelAnimationFrame(raf);
-    lenis?.destroy();
-    lenis = null;
   };
 }
 
@@ -56,9 +51,9 @@ export function onFrame(fn: Tick): () => void {
 export function scrollToHash(hash: string) {
   const target = hash === "#top" ? 0 : document.querySelector<HTMLElement>(hash);
   if (target === null) return;
-  if (lenis) lenis.scrollTo(target, { duration: 1.6 });
-  else if (typeof target === "number") window.scrollTo({ top: target });
-  else target.scrollIntoView();
+  const behavior: ScrollBehavior = reduce ? "auto" : "smooth";
+  if (typeof target === "number") window.scrollTo({ top: target, behavior });
+  else target.scrollIntoView({ behavior });
   history.replaceState(null, "", hash === "#top" ? " " : hash);
 }
 

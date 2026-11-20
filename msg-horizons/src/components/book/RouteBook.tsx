@@ -65,7 +65,7 @@ export default function RouteBook({ lang }: { lang: Locale }) {
       if (push) history.pushState({ chapter: n }, "", hash ? `#${hash}` : location.pathname + location.search);
       setSaid(fmt(c.opened, { n: n + 1, total, title: CHAPTERS[n]?.title[lang] ?? "" }));
       track("cta_click", { cta: "chapter", location: idOf(n) });
-      scrollToY(n === 0 && !target ? 0 : yOf(el), { immediate: immediate || reduce(), duration: 1.3, force: true });
+      scrollToY(n === 0 && !target ? 0 : yOf(el), { immediate: immediate || reduce(), duration: 0.8, force: true });
       if (focus) pages[n].focus({ preventScroll: true });
     };
 

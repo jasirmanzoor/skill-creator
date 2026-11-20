@@ -1,7 +1,7 @@
 "use client";
 
 import { goTo } from "@/lib/book";
-import { EASE_OUT, EASE_IN_OUT } from "@/lib/motion";
+import { EASE_OUT } from "@/lib/motion";
 import { motion } from "motion/react";
 import { roadmapCopy, SEGMENT_PERSONA, type Segment } from "@/content/roadmap";
 import { whatsappLink } from "@/content/facts";
@@ -51,15 +51,6 @@ export default function PlanCard({
       transition={{ duration: 0.3, ease: EASE_OUT }}
       className="relative"
     >
-      {!reduce ? (
-        <motion.span aria-hidden="true" initial={{ transform: "translateX(-50%)", opacity: 0 }}
-              animate={{ transform: ["translateX(-50%)", "translateX(110%)"], opacity: [0, 1, 1, 0] }}
-              transition={{ duration: 1.3, ease: EASE_IN_OUT }}
-              className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
-              <span className="absolute inset-y-0 start-0 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-brand-mint/20 to-transparent" />
-            </motion.span>
-      ) : null}
-
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal rtl:tracking-normal">{c.eyebrow}</p>

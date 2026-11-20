@@ -79,7 +79,7 @@ export default function DriverPhone({
                 <button
                   type="button"
                   onClick={onApprove}
-                  className="relative w-full rounded-2xl bg-brand py-3.5 text-[15px] font-semibold text-white shadow-[0_14px_28px_-14px_rgba(0,107,182,0.9)] transition-transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
+                  className="relative w-full rounded-2xl bg-brand py-3.5 text-[15px] font-semibold text-white shadow-[0_14px_28px_-14px_rgba(0,107,182,0.9)] transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.97] active:translate-y-0 active:scale-[0.98]"
                 >
                   {d.approve}
                 </button>

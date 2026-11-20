@@ -108,7 +108,7 @@ export default function EstimatorSection({ t, lang }: { t: Dictionary; lang: Loc
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => reply("yes")}
-                      className="inline-flex items-center gap-2 rounded-full bg-brand-bright px-5 py-3 font-semibold text-pitch transition-transform hover:-translate-y-0.5"
+                      className="inline-flex items-center gap-2 rounded-full bg-brand-bright px-5 py-3 font-semibold text-pitch transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.97]"
                     >
                       <WhatsAppIcon className="size-5" /> {c.welcome.yes}
                     </a>

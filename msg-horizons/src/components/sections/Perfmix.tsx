@@ -3,13 +3,11 @@
 import Image from "next/image";
 import { facts } from "@/content/facts";
 import type { Locale } from "@/content/i18n";
-import ArcCarousel, { type ArcCard } from "../ui/ArcCarousel";
 
 type Copy = {
   eyebrow: string; title: string; titleAccent: string; lead: string; visit: string; newTab: string;
   steps: { t: string; d: string }[];
-  next: string; nextCta: string; separate: string; hint: string;
-  labels: { prev: string; next: string; flip: string; back: string };
+  next: string; nextCta: string; separate: string;
   cards: { tag: string; title: string; back: string; cta?: string }[];
 };
 
@@ -30,8 +28,6 @@ const copy: Record<Locale, Copy> = {
     next: "Your brand could be next.",
     nextCta: "Build my plan",
     separate: "Perfmix is a separate store at perfmix.com; its product pictures are its own.",
-    hint: "Drag the arc, or click a card to turn it over.",
-    labels: { prev: "Previous card", next: "Next card", flip: "turn it over", back: "turn it back" },
     cards: [
       { tag: "Perfmix", title: "Men's perfumes", back: "One of Perfmix's collections, stocked, packed and delivered by MSG.", cta: "Shop men's perfumes" },
       { tag: "MSG hub", title: "On MSG's racks", back: "Perfmix's stock is stored at MSG's hub, counted and ready to pick the moment an order lands." },
@@ -58,8 +54,6 @@ const copy: Record<Locale, Copy> = {
     next: "علامتك قد تكون التالية.",
     nextCta: "ابنِ خطتي",
     separate: "بيرفمكس متجر مستقل على perfmix.com، وصور منتجاته من المتجر نفسه.",
-    hint: "اسحب القوس، أو اضغط على بطاقة لقلبها.",
-    labels: { prev: "البطاقة السابقة", next: "البطاقة التالية", flip: "اقلبها", back: "أعدها" },
     cards: [
       { tag: "بيرفمكس", title: "عطور رجالية", back: "إحدى مجموعات بيرفمكس، تُخزَّن وتُجهَّز وتُوصَّل مع ام اس جي.", cta: "تسوّق العطور الرجالية" },
       { tag: "مركز ام اس جي", title: "على رفوف ام اس جي", back: "مخزون بيرفمكس في مركز ام اس جي، معدود وجاهز للتجهيز لحظة وصول الطلب." },
@@ -86,20 +80,13 @@ const FRONT = [
 
 /**
  * Perfmix, MSG's own store, as MSG's launch story: what MSG put under it (stored, packed, delivered, tracked and
- * paid), then a fanned arc (ui/ArcCarousel, after Framer's "Flip Arc Carousel") mixing the store's collections with
- * MSG's hub, crews, fleet and outlet; each card turns over to say what MSG does there, and the store's cards link out
- * to that collection. It ends on the plan builder. No price, promotion or shipping claim of the store is repeated.
+ * paid), then a plain grid of cards mixing the store's collections with MSG's hub, crews, fleet and outlet. Each card
+ * says what MSG does there right on its face (nothing to drag or flip), and the store's cards link out to that
+ * collection. It ends on the plan builder. No price, promotion or shipping claim of the store is repeated.
  */
 export default function Perfmix({ lang }: { lang: Locale }) {
   const c = copy[lang];
-  const cards: ArcCard[] = c.cards.map((x, i) => ({
-    ...x,
-    src: FRONT[i].src,
-    pos: FRONT[i].pos,
-    alt: x.title,
-    href: FRONT[i].href,
-    cta: x.cta ? `${x.cta}` : undefined,
-  }));
+  const cards = c.cards.map((x, i) => ({ ...x, ...FRONT[i] }));
   return (
     <section id="perfmix" aria-labelledby="perfmix-title" data-theme="dark" className="relative isolate overflow-hidden bg-[#0b1730] py-24 text-white lg:py-32">
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(55%_50%_at_80%_10%,rgba(0,157,248,0.20),transparent_70%),radial-gradient(45%_45%_at_10%_90%,rgba(196,30,58,0.14),transparent_70%)]" />
@@ -114,7 +101,7 @@ export default function Perfmix({ lang }: { lang: Locale }) {
               {c.title} <span className="text-brand-mint">{c.titleAccent}</span>
             </h2>
             <p className="mt-5 max-w-xl text-lg text-white/75 text-pretty">{c.lead}</p>
-            <a href={S.url} target="_blank" rel="noopener" className="group mt-7 inline-flex min-h-12 items-center gap-3 rounded-full bg-white px-6 py-3 font-semibold text-[#0b1730] transition-transform hover:-translate-y-0.5">
+            <a href={S.url} target="_blank" rel="noopener" className="group mt-7 inline-flex min-h-12 items-center gap-3 rounded-full bg-white px-6 py-3 font-semibold text-[#0b1730] transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.97]">
               {c.visit}
               <span className="sr-only"> ({c.newTab})</span>
               <svg viewBox="0 0 24 24" className="size-5 rtl:-scale-x-100" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" /></svg>
@@ -133,10 +120,27 @@ export default function Perfmix({ lang }: { lang: Locale }) {
         </div>
       </div>
 
-      <div className="mt-14">
-        <ArcCarousel cards={cards} label={`${S.name} · ${c.eyebrow}`} labels={c.labels} rtl={lang === "ar"} />
-        <p className="mt-3 text-center text-xs text-white/55">{c.hint}</p>
-      </div>
+      <ul aria-label={`${S.name} · ${c.eyebrow}`} className="mx-auto mt-14 grid max-w-7xl gap-4 px-5 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
+        {cards.map((x) => (
+          <li key={x.title} className="flex flex-col overflow-hidden rounded-2xl bg-white/[0.06] ring-1 ring-white/12">
+            <div className="relative aspect-[4/3] bg-white/5">
+              <Image src={x.src} alt="" fill sizes="(min-width: 1024px) 300px, (min-width: 640px) 50vw, 100vw" className="object-cover" style={{ objectPosition: x.pos }} />
+              <span className="absolute start-3 top-3 rounded-full bg-black/45 px-2.5 py-1 text-[11px] font-semibold text-white ring-1 ring-white/20 backdrop-blur">{x.tag}</span>
+            </div>
+            <div className="flex flex-1 flex-col p-4">
+              <h3 className="font-display text-lg font-semibold">{x.title}</h3>
+              <p className="mt-1.5 text-sm text-white/70 text-pretty">{x.back}</p>
+              {x.href && x.cta ? (
+                <a href={x.href} target="_blank" rel="noopener" className="group/cta mt-auto inline-flex min-h-11 items-center gap-1.5 pt-3 text-sm font-semibold text-brand-bright">
+                  {x.cta}
+                  <span className="sr-only"> ({c.newTab})</span>
+                  <svg viewBox="0 0 24 24" className="size-4 transition-transform duration-200 ease-out group-hover/cta:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover/cta:-translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                </a>
+              ) : null}
+            </div>
+          </li>
+        ))}
+      </ul>
 
       <div className="mx-auto mt-14 flex max-w-7xl flex-col items-start justify-between gap-5 px-5 sm:flex-row sm:items-center lg:px-8">
         <p className="font-display text-2xl font-semibold sm:text-3xl">{c.next}</p>

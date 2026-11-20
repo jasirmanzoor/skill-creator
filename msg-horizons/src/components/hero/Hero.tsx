@@ -225,7 +225,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
         <span className="sm:hidden">{c.command.leadShort}</span><span className="max-sm:hidden">{c.command.lead}</span>
       </p>
       <div className="mt-4 flex flex-wrap items-center gap-2.5 sm:mt-6 sm:gap-3">
-        <a href="#hero-quote" onClick={openPrice} aria-haspopup="dialog" className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 font-semibold text-teal-deep shadow-[0_10px_40px_-10px_rgba(168,220,255,0.6)] transition-transform hover:-translate-y-0.5 sm:py-3.5">
+        <a href="#hero-quote" onClick={openPrice} aria-haspopup="dialog" className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 font-semibold text-teal-deep shadow-[0_10px_40px_-10px_rgba(168,220,255,0.6)] transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.97] sm:py-3.5">
           {c.command.ctaPrice}
           <svg viewBox="0 0 24 24" className="size-4 rtl:-scale-x-100" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
         </a>
@@ -242,7 +242,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   const priceChip = (
     <aside data-rate-card aria-label={c.command.price.t}>
       <button type="button" onClick={() => setPriceOpen(true)} aria-haspopup="dialog" aria-expanded={priceOpen}
-        className="group block w-[15.5rem] rounded-2xl bg-white p-3.5 text-start text-teal-deep shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)] ring-1 ring-black/5 transition-transform hover:-translate-y-0.5">
+        className="group block w-[15.5rem] rounded-2xl bg-white p-3.5 text-start text-teal-deep shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)] ring-1 ring-black/5 transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.97]">
         <span className="block text-[11px] font-semibold text-teal">{c.command.price.t}</span>
         <span className="mt-1 flex items-baseline gap-1.5 font-display font-semibold">
           <span className="text-base opacity-80">≈</span>
@@ -276,7 +276,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
           {staged
             ? NEED_STAGES.map((st, i) => (
                 <div key={st} aria-hidden={stage !== i || !inStage || undefined} className={`absolute inset-x-0 bottom-0 ${swap(inStage && stage === i)}`}>
-                  <div className="motion-safe:animate-[op-float_6s_var(--ease-ambient)_infinite_alternate] [&>div]:p-3.5 [&>div]:text-[13px] [&>div]:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)]">
+                  <div className="[&>div]:p-3.5 [&>div]:text-[13px] [&>div]:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)]">
                     <StageCard stage={st} c={n} guide={guide} />
                   </div>
                 </div>
@@ -381,7 +381,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
 
         <motion.p aria-hidden="true" style={{ opacity: hint }} className="pointer-events-none absolute inset-x-0 bottom-3 z-[7] hidden flex-col items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/80 lg:flex rtl:tracking-normal">
           <span className="hi hi-fade" style={{ ["--hi" as string]: "2.9s" }}>{c.facade.hint}</span>
-          <span className="hi hi-fade block h-7 w-px overflow-hidden bg-white/25" style={{ ["--hi" as string]: "2.9s" }}><span className="block h-3 w-px animate-[hero-drip_1.6s_var(--ease-ambient)_infinite] bg-white" /></span>
+          <span className="hi hi-fade block h-7 w-px overflow-hidden bg-white/25" style={{ ["--hi" as string]: "2.9s" }}><span className="block h-3 w-px motion-safe:animate-[hero-drip_1.6s_var(--ease-ambient)_3] bg-white" /></span>
         </motion.p>
       </div>
     </section>

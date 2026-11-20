@@ -34,8 +34,8 @@ function View({ cam, big, reduce }: { cam: Cam; big: boolean; reduce: boolean })
     <motion.div
       className="absolute inset-0"
       initial={{ scale: 1.08, x: "-1.5%" }}
-      animate={reduce || !big ? { scale: 1.08, x: "0%" } : { scale: [1.08, 1.16], x: ["-1.5%", "1.5%"] }}
-      transition={reduce || !big ? { duration: 0 } : { duration: 9, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
+      animate={reduce || !big ? { scale: 1.08, x: "0%" } : { scale: 1.04, x: "0%" }}
+      transition={reduce || !big ? { duration: 0 } : { duration: 1.2, ease: [0.23, 1, 0.32, 1] }}
     >
       <Image src={cam.src} alt="" fill sizes={big ? "(min-width:1024px) 640px, 90vw" : "160px"} className="object-cover [filter:saturate(0.85)_contrast(1.05)]" style={{ objectPosition: cam.pos }} />
     </motion.div>

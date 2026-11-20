@@ -95,7 +95,7 @@ export default function Estimator({
                 <button
                   type="button"
                   onClick={() => { setPhase("plan"); track("planner_complete", { model: "roadmap_estimator", modules: segment }); document.getElementById("estimator")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" }); }}
-                  className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-3.5 font-semibold text-ink shadow-[0_18px_40px_-18px_rgba(0,157,248,0.9)] transition-transform hover:-translate-y-0.5"
+                  className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-3.5 font-semibold text-ink shadow-[0_18px_40px_-18px_rgba(0,157,248,0.9)] transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.97]"
                 >
                   {e.build}
                 </button>

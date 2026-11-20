@@ -90,7 +90,7 @@ export default function Network({ c, lang }: { c: ProfileCopy; lang: string }) {
             <h2 id="network-title" className="pf-display mt-3 max-w-[22ch] text-white">{c.network.heading}</h2>
           </div>
           <p className="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-white/60 rtl:tracking-normal" aria-live="off">
-            {c.network.counterLabel} <span ref={kmRef} className="text-white tabular-nums" dir="ltr">0</span> {c.network.counterUnit}
+            {c.network.counterLabel} <span ref={kmRef} className="text-white tabular-nums" dir="ltr">{AREA.toLocaleString("en-US")}</span> {c.network.counterUnit}
           </p>
         </div>
 

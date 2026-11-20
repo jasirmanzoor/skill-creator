@@ -1,7 +1,5 @@
 "use client";
 
-import { motion } from "motion/react";
-import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { useState } from "react";
 
 type Stage = { t: string; d: string };
@@ -10,20 +8,10 @@ type Stage = { t: string; d: string };
 export default function WorkforcePipeline({ stages, site }: { stages: Stage[]; site: Stage }) {
   const all = [...stages, site];
   const [active, setActive] = useState(0);
-  const reduce = useReducedMotion();
   return (
     <div>
       <div className="relative hidden h-10 sm:block" aria-hidden="true">
         <div className="absolute inset-x-[10%] top-1/2 h-px bg-teal/25" />
-        {!reduce ? (
-          <motion.span
-            className="absolute inset-x-[10%] inset-y-0"
-            animate={{ transform: ["translateX(0%)", "translateX(100%)"] }}
-            transition={{ duration: 6, ease: "linear", repeat: Infinity }}
-          >
-            <span className="absolute start-0 top-1/2 -ms-1 size-2 -translate-y-1/2 rounded-full bg-teal shadow-[0_0_12px_rgba(10,90,153,0.6)]" />
-          </motion.span>
-        ) : null}
         {all.map((_, i) => (
           <span
             key={i}

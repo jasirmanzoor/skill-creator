@@ -17,7 +17,6 @@ import ProfileBook from "@/components/sections/ProfileBook";
 import Contact from "@/components/sections/Contact";
 import Footer from "@/components/Footer";
 import MobileBar from "@/components/MobileBar";
-import SmoothScroll from "@/components/spatial/SmoothScroll";
 import Depth from "@/components/spatial/Depth";
 import Perfmix from "@/components/sections/Perfmix";
 import Chapter from "@/components/book/Chapter";
@@ -26,7 +25,6 @@ import DirectorOutro from "@/components/sections/DirectorOutro";
 import SideMap from "@/components/SideMap";
 import RouteRail from "@/components/book/RouteRail";
 import Stage from "@/components/book/Stage";
-import MaskedHeadings from "@/components/fx/MaskedHeadings";
 
 export default async function Home({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
@@ -39,7 +37,6 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
   const c = (n: number, children: React.ReactNode) => <Chapter n={n} lang={lang}>{children}</Chapter>;
   return (
     <PlanProvider>
-      <SmoothScroll />
       <SiteHeader t={t} lang={lang} />
       <main id="main" className="push-shift overflow-x-clip">
         {c(0, <>
@@ -75,7 +72,6 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       <RouteRail lang={lang} />
       <SideMap lang={lang} />
       <RouteBook lang={lang} />
-      <MaskedHeadings lang={lang} />
     </PlanProvider>
   );
 }

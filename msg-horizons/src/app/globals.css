@@ -72,7 +72,7 @@
   --shadow-teal: 0 8px 20px -8px rgba(10,90,153, 0.9);
   --shadow-glow: 0 0 30px -6px rgba(0,157,248, 0.9);
   --shadow-chip: 0 8px 18px -8px rgba(28,44,81, 0.7);
-  --animate-rise: rise 0.8s var(--ease-out-expo) both;
+  --animate-rise: rise 0.5s var(--ease-out) both;
 
   @keyframes rise {
     from { opacity: 0; transform: translateY(12px); }
@@ -167,57 +167,25 @@ a { text-underline-offset: 0.2em; }
 .on-dark .label { color: var(--color-brand-bright); }
 
 
-/* Seller needs grid (components/sections/Needs.tsx) */
-.need-card {
-  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-  transform-style: preserve-3d;
-  transition: transform 0.35s var(--ease-out-expo), box-shadow 0.35s var(--ease-out-expo), border-color 0.35s var(--ease-out);
-  opacity: 0;
-  translate: 0 18px;
-}
-@media (hover: hover) and (pointer: fine) {
-  .need-card:hover { border-color: var(--color-line-strong); box-shadow: 0 30px 60px -30px rgba(17,26,51, 0.35); }
-}
-.needs-grid[data-inview] .need-card { animation: need-in 0.8s var(--ease-out-expo) var(--d, 0ms) forwards; }
-@keyframes need-in { to { opacity: 1; translate: 0 0; } }
+/* The seller-needs icons in the hero (components/operation/StageParts.tsx, NeedIcon): each plays once as its row comes
+   into view, then rests in its finished pose. Nothing on the page keeps moving for no reason. */
 .needs-grid [class^="nd-"], .needs-grid [class*=" nd-"] { animation-play-state: paused; }
 .needs-grid[data-inview] [class^="nd-"], .needs-grid[data-inview] [class*=" nd-"] { animation-play-state: running; }
-.nd-drop { animation: nd-drop 2.4s var(--ease-out-expo) infinite; }
-@keyframes nd-drop { 0% { transform: translateY(-6px); opacity: 0; } 20% { opacity: 1; } 55%, 100% { transform: translateY(12px); opacity: 0; } }
-.nd-slide { animation: nd-slide 2.2s var(--ease-ambient) infinite; }
-@keyframes nd-slide { 0%, 10% { transform: translateX(0); } 60%, 100% { transform: translateX(10px); opacity: 0.2; } }
-.nd-tape, .nd-tick, .nd-arc, .nd-flow { stroke-dasharray: 1; stroke-dashoffset: 1; animation: nd-draw 2.6s var(--ease-out-expo) infinite; }
-@keyframes nd-draw { 0% { stroke-dashoffset: 1; } 55%, 85% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 0; opacity: 0; } }
-.nd-pop { transform-box: fill-box; transform-origin: bottom; animation: nd-pop 2.8s var(--ease-out-expo) infinite; }
-@keyframes nd-pop { 0% { transform: scale(0.9); opacity: 0; } 20%, 85% { transform: none; opacity: 1; } 100% { opacity: 0; } }
-.nd-spin { transform-box: view-box; transform-origin: 17px 17px; animation: nd-spin 3.2s var(--ease-out-expo) infinite; }
-@keyframes nd-spin { to { transform: rotate(-360deg); } }
-.nd-pulse { animation: nd-pulse 2.4s var(--ease-ambient) infinite; }
+.nd-drop { animation: nd-drop 0.6s var(--ease-out) 0.2s both; }
+@keyframes nd-drop { from { transform: translateY(-6px); opacity: 0; } to { transform: none; opacity: 1; } }
+.nd-slide { animation: nd-slide 0.6s var(--ease-out) 0.2s both; }
+@keyframes nd-slide { from { transform: translateX(-8px); opacity: 0.2; } to { transform: none; opacity: 1; } }
+.nd-tape, .nd-tick, .nd-arc, .nd-flow { stroke-dasharray: 1; stroke-dashoffset: 1; animation: nd-draw 0.8s var(--ease-out) 0.2s both; }
+@keyframes nd-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.nd-pop { transform-box: fill-box; transform-origin: bottom; animation: nd-pop 0.4s var(--ease-out) 0.2s both; }
+@keyframes nd-pop { from { transform: scale(0.9); opacity: 0; } to { transform: none; opacity: 1; } }
+.nd-spin { transform-box: view-box; transform-origin: 17px 17px; animation: nd-spin 0.8s var(--ease-out) 0.2s both; }
+@keyframes nd-spin { from { transform: rotate(120deg); } to { transform: none; } }
+.nd-pulse { animation: nd-pulse 0.8s var(--ease-out) 0.2s both; }
 @keyframes nd-pulse { 50% { stroke: #009df8; } }
 
-/* Onboarding journey scenes (components/sections/Journey.tsx): play only on the active stage */
-.journey-card [class^="js-"], .journey-card [class*=" js-"] { animation-play-state: paused; }
-.journey-card[data-active] [class^="js-"], .journey-card[data-active] [class*=" js-"] { animation-play-state: running; }
-.js-photo { transform: scale(1.06); transition: transform 1.6s var(--ease-out-expo); }
-.journey-card[data-active] .js-photo { transform: scale(1); }
-.js-ui { opacity: 0; translate: 0 14px; transition: opacity 0.6s var(--ease-out-expo) 0.15s, translate 0.6s var(--ease-out-expo) 0.15s; }
-.journey-card[data-active] .js-ui { opacity: 1; translate: 0 0; }
-.js-sign { stroke-dasharray: 1; stroke-dashoffset: 1; animation: js-draw 2.6s var(--ease-out-expo) 0.4s infinite both; }
-@keyframes js-draw { 0% { stroke-dashoffset: 1; } 45%, 100% { stroke-dashoffset: 0; } }
-.js-bar { transform-origin: left; animation: js-bar 3s var(--ease-out-expo) infinite both; }
-[dir="rtl"] .js-bar { transform-origin: right; }
-@keyframes js-bar { 0% { transform: scaleX(0); } 30%, 100% { transform: none; } }
-.js-live { animation: js-live 1.4s var(--ease-ambient) infinite; }
-@keyframes js-live { 50% { opacity: 0.25; } }
-
-/* Partner constellation links carry light toward the hub */
-.partner-link { animation: partner-flow 1.6s linear infinite; }
-@keyframes partner-flow { to { stroke-dashoffset: -20; } }
-
 @media (prefers-reduced-motion: reduce) {
-  .need-card { opacity: 1; translate: none; }
-  [class^="nd-"], [class*=" nd-"], [class^="js-"], [class*=" js-"] { animation: none !important; opacity: 1; stroke-dashoffset: 0; transform: none; }
-  .js-ui { opacity: 1; translate: none; }
+  [class^="nd-"], [class*=" nd-"] { animation: none !important; opacity: 1; stroke-dashoffset: 0; transform: none; }
 }
 
 /* Glass system (roadmap / estimator) */
@@ -245,36 +213,28 @@ a { text-underline-offset: 0.2em; }
 .num { direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums; }
 
 /* Planner operating canvas — parcel journey animatics. */
-@keyframes plan-dash {
-  to { stroke-dashoffset: -32; }
-}
-.plan-dash {
-  animation: plan-dash 1.15s linear infinite;
-}
-/* the plan builder's console (components/sections/Planner.tsx): a light running round its edge, chips that switch on */
+/* the plan builder's console (components/sections/Planner.tsx): a still light on its edge, chips that switch on */
 @property --plan-a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
 .plan-glow {
   background: conic-gradient(from var(--plan-a), rgba(0,157,248, 0) 0deg, rgba(0,157,248, 0.75) 50deg, rgba(108, 195, 195, 0) 130deg, rgba(108, 195, 195, 0) 210deg, rgba(168,220,255, 0.5) 290deg, rgba(0,157,248, 0) 360deg);
-  animation: plan-spin 10s linear infinite;
+  opacity: 0.3;
 }
-@keyframes plan-spin { to { --plan-a: 360deg; } }
 @keyframes plan-chip { 0% { transform: scale(0.92); box-shadow: 0 0 0 0 rgba(0,157,248, 0.7); } 60% { box-shadow: 0 0 0 8px rgba(0,157,248, 0); } 100% { transform: scale(1); } }
 @keyframes opt-pop { 0% { transform: scale(0.4); } 70% { transform: scale(1.15); } 100% { transform: scale(1); } }
 @keyframes cam-scan { from { transform: translateY(-100%); } to { transform: translateY(500%); } }
-@media (prefers-reduced-motion: reduce) { .plan-glow { animation: none; } }
 
-/* the services' live panels (components/services/ServiceView.tsx): each loop shows the service doing its job */
-.svc-draw { stroke-dasharray: 1; animation: svc-draw 4s var(--ease-in-out) infinite; }
-@keyframes svc-draw { 0% { stroke-dashoffset: 1; } 55%, 85% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 0; opacity: 0; } }
-.svc-land { transform-box: fill-box; transform-origin: center; animation: svc-land 4s var(--ease-out) infinite; }
-@keyframes svc-land { 0%, 50% { transform: scale(0.4); opacity: 0.35; } 62% { transform: scale(1.2); opacity: 1; } 70%, 100% { transform: scale(1); opacity: 1; } }
-.svc-gauge { stroke-dasharray: 1; animation: svc-gauge 4s var(--ease-in-out) infinite; }
-@keyframes svc-gauge { 0% { stroke-dashoffset: 1; } 50%, 90% { stroke-dashoffset: 0.18; } 100% { stroke-dashoffset: 1; } }
-@keyframes svc-swap-a { 0%, 45% { transform: translateY(0); opacity: 1; } 55%, 90% { transform: translateY(-100%); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
-@keyframes svc-swap-b { 0%, 45% { transform: translateY(100%); opacity: 0; } 55%, 90% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(100%); opacity: 0; } }
-@keyframes svc-pick { 0%, 100% { transform: none; box-shadow: none; } 15%, 35% { transform: translateY(-3px) scale(1.15); box-shadow: 0 0 0 2px #fff, 0 0 0 4px #009df8; } 50% { transform: none; box-shadow: none; } }
-@keyframes svc-tick { 0% { opacity: 0; transform: translateY(6px) scale(0.96); } 12%, 85% { opacity: 1; transform: none; } 100% { opacity: 0; } }
-@keyframes svc-bar { 0% { transform: scaleX(0); } 45%, 85% { transform: scaleX(1); } 100% { transform: scaleX(1); opacity: 0.3; } }
+/* the services' live panels (components/services/ServiceView.tsx): each plays once when its service opens, and rests in its finished state */
+.svc-draw { stroke-dasharray: 1; animation: svc-draw 1.4s var(--ease-in-out) both; }
+@keyframes svc-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.svc-land { transform-box: fill-box; transform-origin: center; animation: svc-land 0.35s var(--ease-out) 1.3s both; }
+@keyframes svc-land { from { transform: scale(0.6); opacity: 0.35; } to { transform: none; opacity: 1; } }
+.svc-gauge { stroke-dasharray: 1; animation: svc-gauge 1s var(--ease-out) 0.2s both; }
+@keyframes svc-gauge { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0.18; } }
+@keyframes svc-swap-a { to { transform: translateY(-100%); opacity: 0; } }
+@keyframes svc-swap-b { from { transform: translateY(100%); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes svc-pick { 0%, 100% { transform: none; box-shadow: none; } 40% { transform: translateY(-2px); box-shadow: 0 0 0 2px #fff, 0 0 0 4px #009df8; } }
+@keyframes svc-tick { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes svc-bar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @media (prefers-reduced-motion: reduce) { .svc-draw, .svc-land, .svc-gauge { animation: none; stroke-dashoffset: 0; } }
 
 @keyframes plan-ping {
@@ -285,13 +245,6 @@ a { text-underline-offset: 0.2em; }
   animation: plan-ping 1.8s var(--ease-out-expo) infinite;
   transform-origin: center;
   transform-box: fill-box;
-}
-@keyframes plan-glow {
-  0%, 100% { opacity: 0.14; }
-  50% { opacity: 0.4; }
-}
-.plan-glow {
-  animation: plan-glow 2.6s var(--ease-ambient) infinite;
 }
 
 /*
@@ -391,14 +344,6 @@ a { text-underline-offset: 0.2em; }
 .seg-tile { transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transform-style: preserve-3d; }
 @media (prefers-reduced-motion: reduce) { .seg-tile { transform: none; } }
 
-/* Lenis momentum scroll */
-html.lenis, html.lenis body, html.lenis-on, html.lenis-on body { height: auto; }
-.lenis-smooth { scroll-behavior: auto !important; }
-.lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
-.lenis.lenis-autoToggle { transition-property: overflow; transition-duration: 1ms; transition-behavior: allow-discrete; }
-/* from the Lenis component: nested scrollers keep their own momentum, iframes don't swallow the wheel mid-glide */
-.lenis-on [data-lenis-prevent], .lenis-on [data-lenis-prevent-wheel], .lenis-on [data-lenis-prevent-touch] { overscroll-behavior: contain; }
-.lenis-smooth iframe { pointer-events: none; }
 /* push menu: the page moves aside while the site map slides in (curves from the Push Menu component) */
 :root { --push-w: min(440px, 84vw); }
 .push-shift { transition: translate 0.7s cubic-bezier(0.82, -0.01, 0.88, 0.77); }
@@ -566,49 +511,9 @@ body > header { view-transition-name: site-header; }
 .route-rail { view-transition-name: route-rail; }
 .mobile-bar { view-transition-name: mobile-bar; }
 
-/*
- * Turning the page. The open chapter is hinged on its spine (left in English, right in Arabic): it lifts, turns
- * away and darkens as it leaves the light, while the next chapter, lying underneath, comes up out of its shadow.
- * Turning back lays the previous page down over the open one.
- */
-:root[data-turn]::view-transition-group(root) { animation-duration: 0.95s; }
-:root[data-turn]::view-transition-old(root),
-:root[data-turn]::view-transition-new(root) { mix-blend-mode: normal; animation-duration: 0.95s; animation-fill-mode: both; }
-:root[data-turn="next"]::view-transition-old(root) { z-index: 2; transform-origin: left center; animation-name: page-lift; animation-timing-function: cubic-bezier(0.55, 0.06, 0.35, 1); }
-:root[data-turn="next"]::view-transition-new(root) { z-index: 1; animation-name: page-rise; animation-timing-function: cubic-bezier(0.3, 0.6, 0.3, 1); }
-:root[data-turn="prev"]::view-transition-new(root) { z-index: 2; transform-origin: left center; animation-name: page-lay; animation-timing-function: cubic-bezier(0.3, 0.7, 0.25, 1); }
-:root[data-turn="prev"]::view-transition-old(root) { z-index: 1; animation-name: page-sink; animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
-:root[dir="rtl"][data-turn="next"]::view-transition-old(root) { transform-origin: right center; animation-name: page-lift-rtl; }
-:root[dir="rtl"][data-turn="prev"]::view-transition-new(root) { transform-origin: right center; animation-name: page-lay-rtl; }
-
-@keyframes page-lift {
-  0% { transform: perspective(2400px) rotateY(0deg); filter: brightness(1); }
-  100% { transform: perspective(2400px) rotateY(-96deg); filter: brightness(0.5); }
-}
-@keyframes page-lift-rtl {
-  0% { transform: perspective(2400px) rotateY(0deg); filter: brightness(1); }
-  100% { transform: perspective(2400px) rotateY(96deg); filter: brightness(0.5); }
-}
-@keyframes page-lay {
-  0% { transform: perspective(2400px) rotateY(-96deg); filter: brightness(0.5); }
-  100% { transform: perspective(2400px) rotateY(0deg); filter: brightness(1); }
-}
-@keyframes page-lay-rtl {
-  0% { transform: perspective(2400px) rotateY(96deg); filter: brightness(0.5); }
-  100% { transform: perspective(2400px) rotateY(0deg); filter: brightness(1); }
-}
-@keyframes page-rise {
-  0% { transform: scale(0.965); filter: brightness(0.62); }
-  100% { transform: none; filter: brightness(1); }
-}
-@keyframes page-sink {
-  0% { transform: none; filter: brightness(1); }
-  100% { transform: scale(0.965); filter: brightness(0.62); }
-}
-
 /* The page-turn card at the end of a chapter, with a corner that lifts as you reach for it */
-.turn-card { transition: transform 0.6s var(--ease-out), box-shadow 0.6s var(--ease-out), border-color 0.3s; }
-.turn-card:hover { transform: translateY(-4px); box-shadow: 0 2px 4px rgba(17,26,51, 0.06), 0 40px 70px -36px rgba(17,26,51, 0.45); }
+.turn-card { transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out), border-color 0.2s var(--ease-out); }
+@media (hover: hover) and (pointer: fine) { .turn-card:hover { transform: translateY(-2px); box-shadow: 0 2px 4px rgba(17,26,51, 0.06), 0 40px 70px -36px rgba(17,26,51, 0.45); } }
 .turn-curl {
   position: absolute;
   inset-inline-end: 0;
@@ -619,7 +524,7 @@ body > header { view-transition-name: site-header; }
   background: linear-gradient(to top left, var(--color-ink) 0 50%, var(--color-line) 50%, var(--color-surface) 88%);
   border-start-start-radius: 0.75rem;
   filter: drop-shadow(-6px -6px 10px rgba(17,26,51, 0.18));
-  transition: width 0.6s var(--ease-out), height 0.6s var(--ease-out);
+  transition: width 0.25s var(--ease-out), height 0.25s var(--ease-out);
 }
 [dir="rtl"] .turn-curl {
   background: linear-gradient(to top right, var(--color-ink) 0 50%, var(--color-line) 50%, var(--color-surface) 88%);
@@ -641,10 +546,7 @@ body > header { view-transition-name: site-header; }
 .rail-track::-webkit-scrollbar { display: none; }
 .rail-light {
   background: radial-gradient(circle, rgba(0,157,248, 0.55) 0%, rgba(0,157,248, 0.18) 45%, transparent 70%);
-  animation: rail-breathe 2.8s var(--ease-ambient) infinite;
 }
-@keyframes rail-breathe { 50% { transform: scale(1.25); opacity: 0.7; } }
-@media (prefers-reduced-motion: reduce) { .rail-light { animation: none; } }
 /* the chrome shows its new state at once; its own motion (the rail's light, the bar) does the moving */
 ::view-transition-old(site-header), ::view-transition-old(route-rail), ::view-transition-old(mobile-bar) { display: none; }
 ::view-transition-new(site-header), ::view-transition-new(route-rail), ::view-transition-new(mobile-bar) { animation: none; }

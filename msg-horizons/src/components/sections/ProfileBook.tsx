@@ -6,12 +6,12 @@ import { LICENCES, licenceCopy } from "@/content/licences";
 import { facts, whatsappLink } from "@/content/facts";
 import type { Dictionary, Locale } from "@/content/i18n";
 import { liveCopy } from "@/content/liveTracking";
-import FolioFlow from "@/components/ui/FolioFlow";
+import PageStrip from "@/components/ui/PageStrip";
 import Logo from "@/components/ui/Logo";
 import { ServiceIcon } from "@/components/ui/icons";
 
 const copy: Record<Locale, {
-  eyebrow: string; title: string; lead: string; hint: string; talk: string; open: string; deck: string; pdf: string;
+  eyebrow: string; title: string; lead: string; talk: string; open: string; deck: string; pdf: string;
   region: string; prev: string; next: string;
   cover: string; year: string; coverSub: string; who: string; hq: string; hqValue: string; legal: string; legalValue: string;
   cr: string; sector: string; sectorValue: string; hub: string; hubSub: string; fleet: string; fleetSub: string; team: string; teamSub: string;
@@ -21,7 +21,6 @@ const copy: Record<Locale, {
     eyebrow: "Who we are",
     title: "Meet MSG Horizons.",
     lead: "MSG Horizons owns the vans, employs the drivers and runs the hub. Your stock is stored, delivered, tracked live and paid back by one accountable team, with the licences and compliance already in place.",
-    hint: "Drag the pages, swipe sideways or use the arrows to leaf through.",
     talk: "Talk to MSG",
     open: "Open the full profile",
     deck: "Flip through the deck",
@@ -55,7 +54,6 @@ const copy: Record<Locale, {
     eyebrow: "من نحن",
     title: "تعرّف على ام اس جي هورايزونز.",
     lead: "ام اس جي هورايزونز تملك المركبات، ومناديبها من فريقها، وتدير مركزها بنفسها. مخزونك يُخزَّن ويُوصَّل ويُتتبَّع مباشرة وتعود أمواله إليك عبر فريق واحد مسؤول، مع التراخيص والامتثال جاهزة مسبقاً.",
-    hint: "اسحب الصفحات أو مرّر جانبياً أو استخدم الأسهم للتصفّح.",
     talk: "تحدث مع ام اس جي",
     open: "افتح الملف التعريفي كاملًا",
     deck: "تصفّح الكتيّب",
@@ -87,7 +85,7 @@ const copy: Record<Locale, {
   },
 };
 
-/* the pages are designed at 420 x 560 and scaled as a whole by the book */
+/* the pages are designed at 420 x 560 and scaled as a whole by the strip */
 const PAGE = "relative h-[560px] w-[420px] overflow-hidden";
 const label = "text-[11px] font-semibold uppercase tracking-[0.22em] rtl:tracking-normal";
 
@@ -137,8 +135,8 @@ function FigurePage({ value, what, d, n, tone = "paper" }: { value: string; what
 }
 
 /**
- * Who MSG is, as a book (components/ui/FolioFlow, after Framer's Folio Flow): its pages turn around the spine while the
- * rest fan out in 3D on either side. The book opens on the brand cover, then who MSG is, the Sabya hub, the fleet, the
+ * Who MSG is, as the pages of its profile laid side by side (components/ui/PageStrip): a row that scrolls like any
+ * other, nothing to drag or turn. It opens on the brand cover, then who MSG is, the Sabya hub, the fleet, the
  * team and the figures, what MSG runs, live tracking, the partners and a back cover. Every figure and name comes from
  * facts.ts and the dictionaries; the photographs are MSG's own.
  */
@@ -265,7 +263,7 @@ export default function ProfileBook({ t, lang }: { t: Dictionary; lang: Locale }
       {/* the brand's light, falling on the table the book lies on */}
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(60%_55%_at_68%_48%,rgba(0,157,248,0.20)_0%,rgba(28,44,81,0)_60%),radial-gradient(40%_40%_at_10%_90%,rgba(127,203,251,0.10)_0%,rgba(28,44,81,0)_70%)]" />
       <div aria-hidden="true" className="absolute inset-0 -z-10 opacity-[0.18] [background-image:radial-gradient(rgba(255,255,255,0.5)_1px,transparent_1.3px)] [background-size:28px_28px] [mask-image:radial-gradient(70%_70%_at_60%_50%,#000,transparent)]" />
-      <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 pb-36 pt-24 lg:min-h-[100svh] lg:grid-cols-[0.66fr_1.34fr] lg:gap-2 lg:px-8 lg:pb-28">
+      <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 pb-36 pt-24 lg:grid-cols-[0.8fr_1.2fr] lg:gap-12 lg:px-8 lg:pb-28">
         <div className="max-w-xl">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-mint rtl:tracking-normal">{c.eyebrow}</p>
           <h2 id="profile-title" className="h-display mt-3 text-white">{c.title}</h2>
@@ -279,7 +277,7 @@ export default function ProfileBook({ t, lang }: { t: Dictionary; lang: Locale }
             ))}
           </dl>
           <div className="mt-8 flex flex-wrap gap-3">
-            <a href="#contact" className="inline-flex min-h-12 items-center rounded-full bg-white px-6 text-sm font-semibold text-deep transition-transform hover:-translate-y-0.5">{c.talk}</a>
+            <a href="#contact" className="inline-flex min-h-12 items-center rounded-full bg-white px-6 text-sm font-semibold text-deep transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.97]">{c.talk}</a>
             <a href={whatsappLink()} target="_blank" rel="noopener" className="inline-flex min-h-12 items-center rounded-full px-6 text-sm font-semibold text-white ring-1 ring-white/30 transition-colors hover:bg-white/10">{t.nav.whatsapp}</a>
           </div>
           <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-semibold">
@@ -288,11 +286,8 @@ export default function ProfileBook({ t, lang }: { t: Dictionary; lang: Locale }
             <a href={`/media/profile/MSG-Horizons-Company-Profile-${lang.toUpperCase()}.pdf`} download className="text-white/80 underline-offset-4 hover:text-white hover:underline">{c.pdf}</a>
           </div>
         </div>
-        <div>
-          <div className="h-[min(64svh,560px)] min-h-[420px] w-full lg:h-[min(82svh,740px)]">
-            <FolioFlow pages={pages} labels={{ region: c.region, prev: c.prev, next: c.next }} startPage={1} autoClose bookSize={98} fanStep={50} visible={4} />
-          </div>
-          <p className="mt-2 text-center text-xs text-white/55">{c.hint}</p>
+        <div className="min-w-0">
+          <PageStrip pages={pages} labels={{ region: c.region, prev: c.prev, next: c.next }} rtl={ar} />
         </div>
       </div>
     </section>

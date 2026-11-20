@@ -94,7 +94,7 @@ export default function RouteRail({ lang }: { lang: Locale }) {
           className="pointer-events-none absolute bottom-[calc(100%+0.75rem)] start-1/2 flex -translate-x-1/2 items-center gap-3 whitespace-nowrap rounded-full bg-ink px-4 py-2.5 text-paper shadow-[var(--shadow-float)] rtl:translate-x-1/2"
         >
           <span aria-hidden="true" className="relative grid h-7 w-[18px] place-items-start justify-center rounded-full border-2 border-paper/70 pt-1">
-            <span className="block h-1.5 w-1 rounded-full bg-brand-bright motion-safe:animate-[guide-wheel_1.4s_ease-in-out_infinite]" />
+            <span className="block h-1.5 w-1 rounded-full bg-brand-bright motion-safe:animate-[guide-wheel_1.4s_var(--ease-in-out)_3]" />
           </span>
           <span className="text-sm font-semibold">{c.guide}</span>
           <span className="hidden text-sm text-paper/65 sm:inline">{c.guideTap}</span>

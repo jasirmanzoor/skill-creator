@@ -1,24 +1,15 @@
-import type Lenis from "lenis";
-
 /**
- * One way to scroll the page from code. When momentum scrolling (Lenis) is running it must do the moving,
- * otherwise it would fight a native smooth scroll; without it we fall back to the browser's own.
+ * One way to scroll the page from code. The page scrolls natively (no smooth-scroll library), so this is the
+ * browser's own smooth scroll, or an instant jump when asked or when the visitor prefers reduced motion.
+ * `duration`, `force` and `easing` are accepted for older callers and ignored.
  */
-let lenis: Lenis | null = null;
-export const registerScroller = (l: Lenis | null) => { lenis = l; };
-
-const easeOutQuart = (t: number) => 1 - (1 - t) ** 4;
-
-/** `force` scrolls even while momentum scrolling is paused (a closing overlay may not have released it yet) */
-export function scrollToY(y: number, { immediate = false, duration = 1.15, force = false, easing = easeOutQuart }: { immediate?: boolean; duration?: number; force?: boolean; easing?: (t: number) => number } = {}) {
+export function scrollToY(y: number, { immediate = false }: { immediate?: boolean; duration?: number; force?: boolean; easing?: (t: number) => number } = {}) {
   const top = Math.max(0, Math.round(y));
-  if (lenis) lenis.scrollTo(top, { immediate, duration, easing, force });
-  else window.scrollTo({ top, behavior: immediate ? "auto" : "smooth" });
+  const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.scrollTo({ top, behavior: immediate || reduce ? "auto" : "smooth" });
 }
 
 /** freeze the page behind a full-screen overlay, and let it move again afterwards */
 export function lockScroll(lock: boolean) {
-  if (lock) lenis?.stop();
-  else lenis?.start();
   document.documentElement.style.overflow = lock ? "hidden" : "";
 }
