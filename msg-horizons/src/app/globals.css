@@ -521,7 +521,7 @@ html.book [data-chapter]:not([data-current]) { display: none; }
 /* the first-visit guide above the rail: a mouse's wheel rolling down */
 @keyframes guide-wheel { 0% { transform: translateY(0); opacity: 1; } 70% { transform: translateY(9px); opacity: 0; } 100% { transform: translateY(0); opacity: 0; } }
 [data-chapter]:focus { outline: none; }
-html.book:not([data-open-chapter="contact"]) .book-footer { display: none; }
+html.book:not([data-open-chapter="estimate"]) .book-footer { display: none; }
 
 /* Chrome that stays put while the page turns underneath it */
 body > header { view-transition-name: site-header; }

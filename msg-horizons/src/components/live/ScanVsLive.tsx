@@ -30,12 +30,12 @@ export default function ScanVsLive({ c }: { c: LiveCopy }) {
           {[0, 1, 2, 3].map((i) => (
             <span key={i} className="absolute top-1/2 -ms-[7px] size-3.5 -translate-y-1/2 rounded-full border-2 border-white/60 bg-deep" style={{ insetInlineStart: CELL(i) }} />
           ))}
-          <span className="absolute inset-x-[37.5%] top-[calc(50%+12px)] text-center text-[10px] font-medium text-white/50">{k.scan.gap}</span>
+          <span className="absolute inset-x-[37.5%] top-[calc(50%+12px)] text-center text-[10px] font-medium text-white/70">{k.scan.gap}</span>
         </div>
 
         {/* MSG live: one unbroken line with the driver moving along it */}
         <div className="lg:pt-1.5">
-          <p className="font-semibold text-brand-bright">{k.live.t}</p>
+          <p className="font-semibold text-brand-mint">{k.live.t}</p>
           <p className="mt-0.5 text-xs text-white/65">{k.live.d}</p>
         </div>
         <div className="relative h-8">

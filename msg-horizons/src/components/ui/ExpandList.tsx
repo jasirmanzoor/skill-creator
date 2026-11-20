@@ -31,7 +31,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
  * row's text stays in the page for search and screen readers; the row's title is a button that says whether it is
  * open.
  */
-export default function ExpandList({ items, label, rtl = false }: { items: ExpandItem[]; label: string; rtl?: boolean }) {
+export default function ExpandList({ items, label }: { items: ExpandItem[]; label: string; rtl?: boolean }) {
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(0);
   const rows = useRef<(HTMLLIElement | null)[]>([]);

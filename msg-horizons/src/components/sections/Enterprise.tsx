@@ -2,17 +2,13 @@ import Reveal from "../ui/Reveal";
 import CountUp from "../ui/CountUp";
 import TrackedLink from "../ui/TrackedLink";
 import WorkforcePipeline from "../enterprise/WorkforcePipeline";
-import PeakControl from "../enterprise/PeakControl";
+import DeploymentProtocol from "../enterprise/DeploymentProtocol";
 import { ArrowIcon } from "../ui/icons";
 import { facts } from "@/content/facts";
 import type { Dictionary, Locale } from "@/content/i18n";
-import { LEADERS } from "@/content/leadership";
 
-/** Enterprise evaluators, in Red Sea daylight glass. */
-export default function Enterprise({ t, lang }: { t: Dictionary; lang: Locale }) {
-  // a leader joins the outro once their portrait is in public/leadership/
-  // no portraits here: the Operations Director appears in the Who we are book
-  const leaders: { id: (typeof LEADERS)[number]["id"]; photo: string; name: string | null }[] = [];
+/** Enterprise evaluators: the workforce pipeline, the peak-deployment protocol and the governance behind both. */
+export default function Enterprise({ t }: { t: Dictionary; lang: Locale }) {
   const e = t.enterprise;
   const wf = e.workforce;
   return (
@@ -51,19 +47,14 @@ export default function Enterprise({ t, lang }: { t: Dictionary; lang: Locale })
           </div>
         </div>
 
-        {/* Peak demand: forecast → demobilise (scroll-driven) */}
-        <div className="mt-32">
+        {/* Peak demand: forecast → demobilise, as a protocol */}
+        <div className="mt-24">
           <Reveal className="max-w-2xl">
             <h3 className="font-display text-3xl font-semibold tracking-[-0.02em] sm:text-4xl rtl:tracking-normal">{e.peak.title}</h3>
-            <p className="mt-3 text-lg text-teal-deep/75">{e.peak.lead}</p>
+            <p className="mt-3 text-lg text-muted">{e.peak.lead}</p>
           </Reveal>
-          <div className="mt-6">
-            <PeakControl
-              stages={facts.peakStages.map((k) => e.peak.stages[k])}
-              labels={{ demand: e.peak.demand, capacity: e.peak.capacity, standby: e.peak.standby, illustrative: e.peak.illustrative }}
-              lang={lang}
-              leaders={leaders}
-            />
+          <div className="mt-10">
+            <DeploymentProtocol stages={facts.peakStages.map((k) => e.peak.stages[k])} />
           </div>
         </div>
 

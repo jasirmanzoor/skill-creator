@@ -97,7 +97,7 @@ export default function LiveTracking({ lang }: { lang: Locale }) {
                 <DriverPhone c={c} live={live} reduce={reduce} onApprove={approve} onReplay={replay} />
                 <p
                   aria-hidden={live}
-                  className={`absolute inset-x-0 top-[calc(100%-1.75rem)] text-center text-[13px] font-semibold text-brand-bright transition-opacity duration-200 ${live ? "opacity-0" : "opacity-100"}`}
+                  className={`absolute inset-x-0 top-[calc(100%-1.75rem)] text-center text-[13px] font-semibold text-brand-mint transition-opacity duration-200 ${live ? "opacity-0" : "opacity-100"}`}
                 >
                   {c.tryIt}
                 </p>

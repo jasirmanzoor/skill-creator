@@ -259,15 +259,18 @@ await test("estimator: locked until sign-in, then welcomes and asks to help (ans
   await ctx.close();
 });
 
-await test("peak control: the season ends on the record (outro), and hands back", async () => {
-  const { page, ctx, errors } = await open("/en");
-  const sec = page.locator("#enterprise");
-  await reach(page, "enterprise");
-  await sec.getByRole("button", { name: "Behind every peak" }).click();
-  await sec.getByText(/^The record(?: behind every peak|, and the people who keep it)\./).waitFor();
-  assert.ok(await sec.getByText("couriers on the network").isVisible());
-  await sec.getByRole("button", { name: "Replay the season" }).click();
-  await sec.getByText(/^The record(?: behind every peak|, and the people who keep it)\./).waitFor({ state: "detached" });
+await test("peak deployment: five stages from forecast to closeout, and no simulated volumes", async () => {
+  for (const lang of ["en", "ar"]) {
+    const { page, ctx, errors } = await open(`/${lang}`);
+    const sec = page.locator("#enterprise");
+    await reach(page, "enterprise");
+    assert.equal(await sec.locator("[data-protocol] li").count(), 5, `${lang}: five stages`);
+    assert.ok(await sec.locator("[data-protocol] li").first().isVisible(), `${lang}: the protocol is on the page`);
+    assert.ok(!/Illustrative profile|منحنى توضيحي/.test(await sec.innerText()), `${lang}: no illustrative demand curve`);
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  }
+});
   assert.deepEqual(errors, []);
   await ctx.close();
 });
