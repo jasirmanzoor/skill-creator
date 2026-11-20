@@ -1,9 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import RaysBackdrop from "@/components/fx/RaysBackdrop";
 import PerfGovernor from "@/components/fx/PerfGovernor";
 import { notFound } from "next/navigation";
 import Script from "next/script";
-import { Funnel_Sans, Readex_Pro } from "next/font/google";
+import { Funnel_Sans, IBM_Plex_Mono, Readex_Pro } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { LOCALES, dirOf, getDictionary, isLocale, type Locale } from "@/content/i18n";
@@ -13,6 +12,8 @@ import "../globals.css";
 // The brand typefaces (2026 brand guidelines): Funnel Sans for English, Readex Pro for Arabic
 const display = Funnel_Sans({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-display-latin", display: "swap" });
 const sans = Funnel_Sans({ subsets: ["latin"], variable: "--font-sans-latin", display: "swap" });
+// data labels, coordinates and figures: an engineering mono alongside the brand faces
+const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-mono-latin", display: "swap" });
 const arabic = Readex_Pro({
   subsets: ["arabic"],
   weight: ["400", "500", "600", "700"],
@@ -154,7 +155,7 @@ export default async function RootLayout({ children, params }: Props) {
     <html
       lang={lang}
       dir={dirOf(lang)}
-      className={`${display.variable} ${sans.variable} ${arabic.variable}`}
+      className={`${display.variable} ${sans.variable} ${mono.variable} ${arabic.variable}`}
       suppressHydrationWarning
     >
       <head>
@@ -162,7 +163,6 @@ export default async function RootLayout({ children, params }: Props) {
         <script dangerouslySetInnerHTML={{ __html: BOOT }} />
       </head>
       <body>
-        <RaysBackdrop />
         <PerfGovernor />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(lang) }} />
         {children}

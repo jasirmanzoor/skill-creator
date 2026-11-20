@@ -2,8 +2,6 @@
 
 import Image from "next/image";
 import type { Locale } from "@/content/i18n";
-import Logo from "../ui/Logo";
-import LanyardPass from "../ui/LanyardPass";
 
 const NAME = "Jasir Manzoor";
 const EMAIL = "abdullah@msg-horizons.com";
@@ -21,65 +19,31 @@ const copy: Record<Locale, { eyebrow: string; role: string; roleShort: string; q
 };
 
 /**
- * The outro before the footer: MSG's Operations Director on an MSG staff pass hanging from a branded lanyard
- * (ui/LanyardPass, after Kern's Lanyard Pass). The strap carries MSG and his name and title; the pass shows his
- * portrait, name and position, and turns over to his line.
+ * The outro before the footer: MSG's Operations Director, set as a plate and a line. His portrait, his words, his
+ * name, role and address; nothing swings or turns over.
  */
 export default function DirectorOutro({ lang }: { lang: Locale }) {
   const c = copy[lang];
-  const front = (
-    <span className="flex size-full flex-col bg-[#0b1730] text-white">
-      <span className="flex items-center justify-between px-5 pb-3 pt-6">
-        <Logo inverted variant="horizontal" height={22} />
-        <span className="rounded-full bg-[#c9a24a]/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#e6c77a] ring-1 ring-[#c9a24a]/50 rtl:tracking-normal">{c.tier}</span>
-      </span>
-      <span className="relative mx-5 flex-1 overflow-hidden rounded-xl">
-        <Image src="/leadership/coo.jpg" alt="" fill sizes="304px" className="object-cover [object-position:50%_18%]" draggable={false} />
-        <span className="absolute inset-x-0 bottom-0 h-1/3 bg-[linear-gradient(0deg,rgba(11,23,48,0.9),transparent)]" />
-      </span>
-      <span className="px-5 pb-5 pt-4">
-        <span className="block font-display text-[1.6rem] font-semibold leading-none tracking-[-0.02em]" dir="ltr">{NAME}</span>
-        <span className="mt-2 block text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7fcbfb] rtl:tracking-normal">{c.roleShort}</span>
-        <span className="mt-3 flex items-center gap-2">
-          <span className="h-[3px] w-8 rounded-full bg-[#009df8]" />
-          <span className="h-[3px] w-4 rounded-full bg-[#c9a24a]" />
-          <span className="ms-auto flex items-center gap-1.5 text-[10.5px] text-white/80" dir="ltr">
-            <svg viewBox="0 0 24 24" className="size-3.5 text-[#7fcbfb]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>
-            {EMAIL}
-          </span>
-        </span>
-      </span>
-    </span>
-  );
-  const back = (
-    <span className="flex size-full flex-col justify-between bg-[linear-gradient(160deg,#13264a,#070f1f)] p-6 text-white">
-      <Logo inverted variant="mark" height={34} />
-      <span>
-        <span className="block font-display text-2xl font-semibold leading-snug">{c.quote[0]} <span className="text-[#7fcbfb]">{c.quote[1]}</span></span>
-        <span className="mt-5 block h-[2px] w-10 bg-[#c9a24a]" />
-        <span className="mt-3 block font-semibold" dir="ltr">{NAME}</span>
-        <span className="block text-xs text-white/65">{c.role}</span>
-      </span>
-    </span>
-  );
   return (
-    <section aria-labelledby="director-title" data-theme="dark" className="relative overflow-hidden bg-[#0b1326] px-5 py-14 text-white lg:px-8 lg:py-16">
-      <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(45%_60%_at_70%_30%,rgba(0,157,248,0.16),transparent_70%)]" />
-      <div className="relative mx-auto grid max-w-6xl items-center gap-6 lg:grid-cols-[1fr_1fr]">
-        <div className="order-2 lg:order-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-bright rtl:tracking-normal">{c.eyebrow}</p>
-          <p className="mt-4 font-display text-[clamp(1.8rem,3.4vw,2.8rem)] font-semibold leading-[1.1] tracking-[-0.02em] text-balance rtl:tracking-normal">
-            {c.quote[0]} <span className="text-brand-mint">{c.quote[1]}</span>
+    <section aria-labelledby="director-title" data-theme="dark" className="border-t border-white/10 bg-night text-white">
+      <div className="mx-auto grid max-w-[88rem] items-end gap-10 px-5 py-16 sm:px-8 lg:grid-cols-12 lg:px-10 lg:py-20">
+        <figure className="lg:col-span-3">
+          <div className="plate relative aspect-[4/5] overflow-hidden bg-ink">
+            <Image src="/leadership/coo.jpg" alt={`${NAME}, ${c.roleShort}`} fill sizes="(min-width: 1024px) 320px, 60vw" className="object-cover [object-position:50%_18%]" />
+            <span aria-hidden="true" className="reg reg-ts" />
+            <span aria-hidden="true" className="reg reg-be" />
+          </div>
+        </figure>
+        <div className="lg:col-span-8 lg:col-start-5">
+          <p className="lbl idx text-brand-bright">{c.eyebrow}</p>
+          <p className="mt-6 font-display text-[clamp(1.8rem,3.4vw,3rem)] font-semibold leading-[1.08] tracking-[-0.03em] text-balance rtl:leading-[1.35] rtl:tracking-normal">
+            {c.quote[0]} <span className="text-white/60">{c.quote[1]}</span>
           </p>
-          <h2 id="director-title" data-mask-skip className="mt-6 font-display text-xl font-semibold" dir="ltr">{NAME}</h2>
-          <p className="mt-1 text-sm text-white/65">{c.role}</p>
-          <a href={`mailto:${EMAIL}`} dir="ltr" className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-white/10 px-4 text-sm font-semibold text-white ring-1 ring-white/20 transition-colors hover:bg-white/20">
-            <svg viewBox="0 0 24 24" className="size-4 text-brand-mint" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>
-            {EMAIL}
-          </a>
-        </div>
-        <div className="order-1 h-[42rem] sm:h-[44rem] lg:order-2">
-          <LanyardPass front={front} back={back} strapText={`MSG HORIZONS · ${NAME.toUpperCase()}`} label={c.label} flipLabel={c.flip} />
+          <div className="mt-8 flex flex-wrap items-baseline gap-x-8 gap-y-2 border-t border-white/15 pt-5">
+            <h2 id="director-title" className="font-display text-xl font-semibold" dir="ltr">{NAME}</h2>
+            <p className="lbl text-white/65">{c.role}</p>
+            <a href={`mailto:${EMAIL}`} dir="ltr" className="ms-auto text-sm font-semibold text-brand-bright underline-offset-4 hover:underline">{EMAIL}</a>
+          </div>
         </div>
       </div>
     </section>

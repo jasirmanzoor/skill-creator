@@ -4,25 +4,27 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * MSG Horizons design system — editorial / industrial.
- * Light, restrained, typographic. Colours from the 2026 brand guidelines: navy #1C2C51 (grounds, type, the mark) and
+ * MSG Horizons design system — INDUSTRIAL INTELLIGENCE.
+ * Swiss editorial structure on concrete paper and graphite: hairline rules, square corners, numbered sections, mono
+ * data labels, real photographs of MSG's own hub. One signal colour (the brand blue) carries meaning: routes, live
+ * states, the current step. No glass, no glow, no decorative gradients. Colours from the 2026 brand guidelines: navy #1C2C51 (grounds, type, the mark) and
  * blue #009DF8 (the arrow; accents on dark), with white. --color-brand is that blue deepened to #006BB6 so small text
  * on light grounds passes WCAG AA; the kit blue itself is --color-brand-bright / --color-brand-vivid.
  */
 @theme {
-  --color-paper: #f8f9fb;
-  --color-surface: #ffffff;
-  --color-subtle: #f2f2f0;
-  --color-line: #e2e5ec;
-  --color-line-strong: #c9cfdb;
-  --color-ink: #111a33;
-  --color-ink-2: #182544;
-  --color-ink-3: #26355c;
-  --color-muted: #556079;
-  --color-faint: #8a93a6;
+  --color-paper: #f2f1ed; /* concrete */
+  --color-surface: #faf9f6;
+  --color-subtle: #e9e7e1;
+  --color-line: #d8d5cd;
+  --color-line-strong: #b9b5ab;
+  --color-ink: #0f141c; /* graphite */
+  --color-ink-2: #1a2130;
+  --color-ink-3: #2a3344;
+  --color-muted: #4f5763;
+  --color-faint: #5e646d;
   --color-brand: #006bb6;
   --color-brand-strong: #0a5a99;
-  --color-brand-soft: #e5f3fe;
+  --color-brand-soft: #e3ecf4;
   --color-brand-bright: #009df8; /* on dark backgrounds only */
   --color-brand-mint: #7fcbfb; /* headline accent over photographs */
   --color-brand-vivid: #009df8; /* lines and glows drawn on light grounds */
@@ -34,9 +36,9 @@
   --color-sand-900: #142240;
   --color-whatsapp: #128c4a;
   /* Red Sea glass: daylight Jeddah water */
-  --color-sea-50: #f1f7fd;
-  --color-sea-100: #e1effb;
-  --color-sea-200: #c2dff6;
+  --color-sea-50: #f6f5f1;
+  --color-sea-100: #e9e7e1;
+  --color-sea-200: #d3d0c7;
   --color-sea-400: #5fb3ec;
   --color-teal: #0a5a99;
   --color-teal-deep: #1c2c51;
@@ -44,14 +46,25 @@
    * Dark grounds: graphite night. Blue-black ink lit by a warm sodium-lamp sand from the desert horizon, with MSG
    * green kept for what MSG does (checks, lines, live states). Used by the stages, the pitch, services and the menu.
    */
-  --color-deep: #1c2c51;
-  --color-pitch: #142240;
-  --color-night: #0b1326;
+  --color-deep: #121a28; /* graphite night */
+  --color-navy: #1c2c51; /* the brand navy: the mark and brand moments */
+  --color-pitch: #0f1622;
+  --color-night: #0a0f18;
   --color-silver: #c5ccd8;
   --color-danger: #b42318;
 
   --font-display: var(--font-display-latin), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-sans-latin), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-latin), ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /* square, engineered corners: Tailwind's rounded-* scale, flattened (rounded-full stays round for dots) */
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
+  --radius-2xl: 6px;
+  --radius-3xl: 8px;
+  --radius-4xl: 10px;
 
   /*
    * Motion. Entrances and feedback use --ease-out, movement that stays on screen uses --ease-in-out, slow ambient
@@ -66,11 +79,11 @@
   --default-transition-duration: 200ms;
 
   /* Elevation: a control that floats over the page, and a card lifted off a band. */
-  --shadow-float: 0 18px 40px -16px rgba(17,26,51, 0.45);
-  --shadow-card: 0 1px 2px rgba(17,26,51, 0.05), 0 24px 48px -28px rgba(17,26,51, 0.3);
-  --shadow-scene: 0 40px 100px -30px rgba(0, 0, 0, 0.6);
+  --shadow-float: 0 1px 0 rgba(15,20,28, 0.06), 0 12px 28px -18px rgba(15,20,28, 0.45);
+  --shadow-card: 0 1px 0 rgba(15,20,28, 0.06);
+  --shadow-scene: 0 24px 60px -30px rgba(0, 0, 0, 0.55);
   --shadow-teal: 0 8px 20px -8px rgba(10,90,153, 0.9);
-  --shadow-glow: 0 0 30px -6px rgba(0,157,248, 0.9);
+  --shadow-glow: 0 0 0 3px rgba(0,157,248, 0.25);
   --shadow-chip: 0 8px 18px -8px rgba(28,44,81, 0.7);
   --animate-rise: rise 0.5s var(--ease-out) both;
 
@@ -94,7 +107,7 @@ html {
   text-rendering: optimizeLegibility;
 }
 body {
-  background: transparent; /* the fixed light-rays backdrop (z -10) must paint above the body box */
+  background: var(--color-paper);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
@@ -140,6 +153,20 @@ a { text-underline-offset: 0.2em; }
   :lang(ar) .h-section,
   :lang(ar) .h-display,
   :lang(ar) .h-scene { line-height: 1.3; letter-spacing: 0; word-spacing: normal; }
+
+  /* Data label: mono, small caps-height, tracked. Coordinates, indices, units, captions on photographs. */
+  .lbl {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  :lang(ar) .lbl { font-family: var(--font-arabic); letter-spacing: 0; text-transform: none; font-size: 0.75rem; }
+  /* Section index: "02 — Solutions", the left margin of every section. */
+  .idx { display: flex; align-items: baseline; gap: 0.75rem; }
+  .idx::after { content: ""; flex: 1; height: 1px; background: currentColor; opacity: 0.2; transform: translateY(-0.25em); }
 
   /* Vertical rhythm: every band uses one of two paddings. */
   .sec { padding-block: 6rem; }
@@ -190,15 +217,8 @@ a { text-underline-offset: 0.2em; }
 
 /* Glass system (roadmap / estimator) */
 .glass {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.03));
+  background: #161e2d;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  -webkit-backdrop-filter: blur(22px) saturate(140%);
-  backdrop-filter: blur(22px) saturate(140%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 1px 2px rgba(0, 0, 0, 0.3),
-    0 24px 60px -24px rgba(0, 0, 0, 0.7),
-    0 60px 120px -60px rgba(0,157,248, 0.35);
 }
 .est-range { -webkit-appearance: none; appearance: none; height: 44px; margin-block: -10px; background: transparent; cursor: pointer; }
 .est-range::-webkit-slider-runnable-track { height: 4px; border-radius: 99px; background: rgba(10,90,153, 0.2); }
@@ -316,11 +336,8 @@ a { text-underline-offset: 0.2em; }
 
 /* ---------- Red Sea glass (network band, price band, peak flow) ---------- */
 .sea-band {
-  background:
-    radial-gradient(90% 60% at 85% 0%, rgba(196, 233, 231, 0.9), transparent 70%),
-    radial-gradient(70% 50% at 0% 100%, rgba(226, 244, 243, 0.95), transparent 70%),
-    linear-gradient(180deg, rgba(243, 251, 251, 0.78) 0%, rgba(255, 255, 255, 0.66) 100%);
-  color: var(--color-teal-deep);
+  background: var(--color-paper);
+  color: var(--color-ink);
 }
 .sea-band .label { color: var(--color-teal); }
 .sea-glass {
@@ -419,8 +436,8 @@ html[dir="rtl"].push-open .push-shift { translate: var(--push-w) 0; }
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    border-radius: 9999px;
-    background: var(--color-teal-deep);
+    border-radius: var(--radius-lg);
+    background: var(--color-ink);
     color: #fff;
     font-weight: 600;
     box-shadow: var(--shadow-cta);
@@ -759,4 +776,37 @@ html[data-film] { scroll-behavior: auto !important; }
 @media (min-width: 64rem) {
   .route-stop + section.sec, .route-stop + div > section.sec:first-child,
   .route-stop + section.sec-finale, .route-stop + div > section.sec-finale:first-child { padding-top: 4.5rem; }
+}
+
+/* ---------- Industrial Intelligence: primitives ---------- */
+/* the action: a square, solid graphite block with the arrow; white on dark grounds */
+.btn-ind {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem;
+  min-height: 3rem; padding: 0 1.4rem;
+  background: var(--color-ink); color: var(--color-paper);
+  font-weight: 600; border-radius: var(--radius-lg);
+  transition: background-color 150ms var(--ease-out), transform 150ms var(--ease-out);
+}
+.btn-ind:hover { background: var(--color-ink-3); }
+.btn-ind:active { transform: scale(0.97); }
+.btn-ind.on-dark { background: #fff; color: var(--color-ink); }
+.btn-ind.on-dark:hover { background: #e9e7e1; }
+/* registration marks on a photographic plate: the corners of a technical sheet */
+.plate .reg { position: absolute; width: 18px; height: 18px; border-color: rgb(255 255 255 / 0.85); pointer-events: none; }
+.plate .reg-ts { top: 10px; inset-inline-start: 10px; border-top: 1px solid; border-inline-start: 1px solid; }
+.plate .reg-te { top: 10px; inset-inline-end: 10px; border-top: 1px solid; border-inline-end: 1px solid; }
+.plate .reg-bs { bottom: 10px; inset-inline-start: 10px; border-bottom: 1px solid; border-inline-start: 1px solid; }
+.plate .reg-be { bottom: 10px; inset-inline-end: 10px; border-bottom: 1px solid; border-inline-end: 1px solid; }
+/* the network sheet: the line haul draws in as the map comes into view (components/network/NetworkMap) */
+.net-haul { stroke-dasharray: 1; stroke-dashoffset: 0; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .net-haul { animation: net-haul linear both; animation-timeline: view(); animation-range: entry 40% cover 55%; }
+  }
+}
+@keyframes net-haul { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+/* on a phone the sheet is a third of its drawn size: names and coordinates are set larger so they still read */
+@media (max-width: 40rem) {
+  .net-name { font-size: 34px; }
+  .net-coord { font-size: 22px; }
 }

@@ -99,9 +99,6 @@ export default function ExpandList({ items, label, rtl = false }: { items: Expan
                     onFocus={() => choose(i)}
                     className={`flex items-center gap-3 text-start font-display text-[clamp(1.55rem,3.2vw,2.75rem)] font-semibold leading-[1.08] tracking-[-0.03em] transition-colors duration-300 rtl:leading-[1.35] rtl:tracking-normal ${on ? "text-white" : "text-white/60 hover:text-white/85"}`}
                   >
-                    {it.icon ? (
-                      <span aria-hidden="true" className={`hidden size-10 shrink-0 place-items-center rounded-xl ring-1 transition-colors duration-300 sm:grid [&_svg]:size-5 ${on ? "bg-brand-bright/15 text-brand-bright ring-brand-bright/35" : "text-white/60 ring-white/15"}`}>{it.icon}</span>
-                    ) : null}
                     {it.title}
                   </button>
                 </h3>
@@ -126,7 +123,7 @@ export default function ExpandList({ items, label, rtl = false }: { items: Expan
                 </motion.div>
               </div>
 
-              {/* the photo card: swings in on a tilt as the row opens (wide screens) */}
+              {/* the photo: a plain plate that opens with the row (wide screens) */}
               <motion.div
                 aria-hidden="true"
                 className="relative hidden lg:block"
@@ -135,12 +132,12 @@ export default function ExpandList({ items, label, rtl = false }: { items: Expan
                 transition={t(FOLD)}
               >
                 <motion.div
-                  className="absolute start-2 top-1 h-[10.75rem] w-[16.5rem] overflow-hidden rounded-2xl bg-white/10 p-1.5 shadow-[0_30px_60px_-25px_rgba(0,0,0,0.9)] ring-1 ring-white/25"
+                  className="absolute start-2 top-1 h-[10.75rem] w-[16.5rem] overflow-hidden bg-night"
                   initial={false}
-                  animate={on ? { opacity: 1, rotate: rtl ? 5 : -5, x: 0, y: 0 } : { opacity: 0, rotate: rtl ? -66 : 66, x: rtl ? 156 : -156, y: 97 }}
-                  transition={on ? t(SWING) : t({ duration: 0.25 })}
+                  animate={on ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+                  transition={t({ duration: on ? 0.3 : 0.15, ease: [0.23, 1, 0.32, 1] })}
                 >
-                  <div className="relative size-full overflow-hidden rounded-xl">
+                  <div className="relative size-full overflow-hidden">
                     <Image src={it.image.src} alt="" fill sizes="264px" className="object-cover" style={{ objectPosition: it.image.pos ?? "50% 50%" }} />
                   </div>
                 </motion.div>
@@ -151,7 +148,7 @@ export default function ExpandList({ items, label, rtl = false }: { items: Expan
                 href={it.href}
                 tabIndex={on ? 0 : -1}
                 aria-label={`${it.cta}: ${it.title}`}
-                className={`grid size-10 shrink-0 place-items-center rounded-full transition-colors duration-300 sm:size-11 ${on ? "bg-brand-bright text-pitch" : "bg-white/[0.07] text-white/40"}`}
+                className={`grid size-10 shrink-0 place-items-center border transition-colors duration-200 sm:size-11 ${on ? "border-brand-bright bg-brand-bright text-pitch" : "border-white/15 text-white/40"}`}
               >
                 <motion.svg
                   viewBox="0 0 24 24"

@@ -203,7 +203,7 @@ await test("service landing pages: indexable, one h1, FAQ + Service schema, in s
 await test("experience: seller answers on the map, partner logos load", async () => {
   for (const lang of ["en", "ar"]) {
     const { page, ctx, errors } = await open(`/${lang}`);
-    assert.equal(await page.locator("#hero [data-stage-answers] li").count(), 9, `${lang}: nine seller answers across the four stages`);
+    assert.equal(await page.locator("#sellers [data-stage-answers] li").count(), 9, `${lang}: nine seller answers across the four stages`);
     await reach(page, "partners");
     await page.waitForTimeout(600);
     const logos = await page.locator("#partners img").evaluateAll((els) => els.map((e) => [e.getAttribute("alt"), e.complete && e.naturalWidth > 0]));
@@ -220,12 +220,12 @@ await test("one order on the map: the stage rail moves the hero through set up â
   await page.goto(`${BASE}/en#sellers`);
   const rail = page.getByRole("navigation", { name: "One order through MSG" });
   await rail.waitFor();
-  await page.locator('#hero [aria-current="step"]').waitFor({ timeout: 5000 });
-  assert.match(await page.locator('#hero [aria-current="step"]').innerText(), /Set up/);
+  await page.locator('#sellers [aria-current="step"]').waitFor({ timeout: 5000 });
+  assert.match(await page.locator('#sellers [aria-current="step"]').innerText(), /Set up/);
   // pressed from the keyboard (as keyboard visitors do): the hero keeps moving under a loaded test browser
   await rail.getByRole("button", { name: /Settle/ }).focus();
   await page.keyboard.press("Enter");
-  await page.waitForFunction(() => document.querySelector('#hero [aria-current="step"]')?.textContent?.includes("Settle"), null, { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelector('#sellers [aria-current="step"]')?.textContent?.includes("Settle"), null, { timeout: 5000 });
   assert.deepEqual(errors, []);
   await ctx.close();
 });
@@ -429,29 +429,29 @@ await test("book: one continuous page; the rail, #links, ] and [ and the back bu
     const { page, ctx, errors } = await open(`/${lang}`, { reducedMotion: "reduce" });
     const opened = () => page.evaluate(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter);
     const topOf = (sel) => page.locator(sel).evaluate((el) => el.getBoundingClientRect().top);
-    assert.equal(await page.locator("[data-chapter]").count(), 10, `${lang}: ten chapters in the HTML`);
+    assert.equal(await page.locator("[data-chapter]").count(), 6, `${lang}: six chapters in the HTML`);
     assert.equal(await opened(), "hero", `${lang}: opens at the start`);
     // one vertical page: every chapter is laid out, one under the other
     const tops = await page.$$eval("[data-chapter]", (els) => els.map((e) => e.getBoundingClientRect().top + scrollY));
     assert.ok(tops.every((t, i) => i === 0 || t > tops[i - 1]), `${lang}: chapters follow one another down the page`);
     const nav = page.getByRole("navigation", { name: rail });
-    await nav.locator('a[href="#estimate"]').click();
-    await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "estimate");
-    assert.equal(await nav.locator('[aria-current="step"]').getAttribute("href"), "#estimate", `${lang}: the rail lights the current chapter`);
-    assert.ok(Math.abs((await topOf("#estimate")) - 64) < 90, `${lang}: lands at the chapter's top`);
+    await nav.locator('a[href="#fleet"]').click();
+    await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "fleet");
+    assert.equal(await nav.locator('[aria-current="step"]').getAttribute("href"), "#fleet", `${lang}: the rail lights the current chapter`);
+    assert.ok(Math.abs((await topOf("#fleet")) - 64) < 90, `${lang}: lands at the chapter's top`);
     await page.keyboard.press("]");
-    await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "planner");
-    await page.keyboard.press("[");
     await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "estimate");
+    await page.keyboard.press("[");
+    await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "fleet");
     // a #link to a section deep in another chapter lands on the section
     await page.evaluate(() => { const a = document.createElement("a"); a.href = "#perfmix"; a.id = "t-link"; a.textContent = "x"; document.querySelector("[data-current]").prepend(a); });
     await page.evaluate(() => document.getElementById("t-link").click());
-    await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "why");
+    await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "fleet");
     await page.waitForTimeout(400);
     const top = await topOf("#perfmix");
     assert.ok(Math.abs(top - 64) < 80, `${lang}: landed on the section (${top})`);
     await page.goBack();
-    await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "estimate");
+    await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "fleet");
     assert.deepEqual(errors, []);
     await ctx.close();
   }
@@ -527,10 +527,10 @@ await test("search: any service-related keyword (en + ar, typos too) lands on th
   await ar.ctx.close();
 });
 
-await test("perfmix: MSG's launch of its own store follows Why MSG, links out safely, and its pictures load (en + ar)", async () => {
+await test("perfmix: MSG's launch of its own store sits with the infrastructure it ran on, links out safely, and its pictures load (en + ar)", async () => {
   for (const lang of ["en", "ar"]) {
     const { page, ctx, errors } = await open(`/${lang}#perfmix`, { reducedMotion: "reduce" });
-    assert.equal(await page.evaluate(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter), "why", "#perfmix sits in the Why MSG chapter");
+    assert.equal(await page.evaluate(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter), "fleet", "#perfmix sits in the Infrastructure chapter, as MSG's own case study");
     const links = await page.locator("#perfmix a").evaluateAll((as) => as.map((a) => ({ href: a.href, rel: a.rel, target: a.target })));
     assert.equal(new Set(links.map((l) => l.href.replace(/\/$/, ""))).size, 4, "the store link and three collections");
     for (const l of links) {

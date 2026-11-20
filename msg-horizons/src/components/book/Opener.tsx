@@ -14,9 +14,9 @@ export const PLATE: Record<string, { src: string; pos: string; srcAr?: string }>
 };
 
 /** chapters whose first section sits on a light ground: their stop is set on paper so the two read as one */
-const LIGHT = new Set(["estimate", "fleet", "proof", "enterprise"]);
+const LIGHT = new Set(["proof", "network", "fleet", "estimate"]);
 /** chapters whose first section opens on the same line as the hint: the stop leaves it out rather than say it twice */
-const SAID = new Set(["fleet", "proof", "enterprise", "contact"]);
+const SAID = new Set<string>();
 
 /**
  * A chapter opens on a stop of the route. The page is read as one delivery route with a stop per chapter: the marker

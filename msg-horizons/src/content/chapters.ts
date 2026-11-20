@@ -1,10 +1,11 @@
 import type { Locale } from "./i18n";
 
 /**
- * The homepage's chapters, in reading order. Each chapter is one page of the book (components/book) and holds one or
- * more of the sections that already exist; `id` is the anchor of its first section, so every existing #link keeps
- * working and lands in the right chapter. Order follows the visitor's decision: who MSG is, live tracking (MSG's difference), why
- * MSG, the price, the plan, then the proof that MSG can run it, and finally the conversation. Titles and hints reuse the sections' own wording.
+ * The homepage's six chapters, in reading order: who MSG is and what it costs (Start), the record (Scale), what MSG
+ * solves (Solutions), where and how it runs (Network), what it runs on (Infrastructure), and the configuration that
+ * ends in a conversation (Configure). Each chapter is one page of the book (components/book) and holds one or
+ * more of the sections; `id` is the anchor of its first section, and every older #link (#contact, #planner, #perfmix,
+ * #live-tracking, #services...) still lands inside the chapter that now holds it.
  */
 export type Chapter = {
   id: string;
@@ -14,15 +15,11 @@ export type Chapter = {
 
 export const CHAPTERS: Chapter[] = [
   { id: "hero", title: { en: "Start", ar: "ابدأ" }, hint: { en: "Price a delivery in ten seconds", ar: "سعّر توصيلتك في عشر ثوانٍ" } },
-  { id: "profile", title: { en: "Who we are", ar: "من نحن" }, hint: { en: "MSG Horizons, at a glance", ar: "ام اس جي هورايزونز في لمحة" } },
-  { id: "live-tracking", title: { en: "Live tracking", ar: "التتبع المباشر" }, hint: { en: "See your driver live, once they approve", ar: "شاهد مندوبك مباشرة بعد موافقته" } },
-  { id: "why", title: { en: "Why MSG", ar: "لماذا ام اس جي" }, hint: { en: "Six hard problems, already solved", ar: "ست مشكلات صعبة، محلولة مسبقاً" } },
-  { id: "estimate", title: { en: "Your price", ar: "سعرك" }, hint: { en: "An approximate cost per order", ar: "تكلفة تقريبية لكل طلب" } },
-  { id: "planner", title: { en: "Your plan", ar: "خطتك" }, hint: { en: "Four steps to a setup that fits", ar: "أربع خطوات إلى منظومة تناسبك" } },
-  { id: "fleet", title: { en: "Fleet & hubs", ar: "الأسطول والمراكز" }, hint: { en: "Always ready. Always moving.", ar: "جاهزون دائمًا. في حركة دائمة." } },
-  { id: "proof", title: { en: "Proof", ar: "الإثبات" }, hint: { en: "Scale you can see, standards you can trust", ar: "حجم تراه ومعايير تثق بها" } },
-  { id: "enterprise", title: { en: "Enterprise", ar: "للشركات الكبرى" }, hint: { en: "Capability you can inspect", ar: "قدرات يمكنك فحصها" } },
-  { id: "contact", title: { en: "Talk to MSG", ar: "تحدث مع ام اس جي" }, hint: { en: "Let's move what matters", ar: "لننقل ما يهمك" } },
+  { id: "proof", title: { en: "Scale", ar: "الحجم" }, hint: { en: "Licensed, registered, already running", ar: "مرخّصون ومسجّلون ونعمل بالفعل" } },
+  { id: "why", title: { en: "Solutions", ar: "الحلول" }, hint: { en: "Six hard problems, seven services, one partner", ar: "ست مشكلات صعبة، سبع خدمات، شريك واحد" } },
+  { id: "network", title: { en: "Network", ar: "الشبكة" }, hint: { en: "Riyadh to the far south, and one order through it", ar: "من الرياض إلى أقصى الجنوب، وطلب واحد عبرها" } },
+  { id: "fleet", title: { en: "Infrastructure", ar: "البنية" }, hint: { en: "The hub, the fleet, the people, a store launched on them", ar: "المركز والأسطول والفريق، ومتجر انطلق عليها" } },
+  { id: "estimate", title: { en: "Configure", ar: "خطّط" }, hint: { en: "Your price, your plan, then MSG", ar: "سعرك، خطتك، ثم ام اس جي" } },
 ];
 
 export const chapterIndex = (id: string) => CHAPTERS.findIndex((c) => c.id === id);

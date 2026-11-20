@@ -32,50 +32,50 @@ export default function QuoteCard({
     <aside
       data-rate-card
       aria-labelledby={`${id}-q`}
-      className={`relative overflow-hidden rounded-3xl border border-white/70 bg-white/90 p-5 text-teal-deep shadow-[0_40px_80px_-30px_rgba(0,0,0,0.6)] backdrop-blur-xl ${className}`}
+      className={`relative border border-ink/15 bg-surface p-5 text-ink sm:p-6 ${className}`}
     >
-      <div className="relative grid gap-4 sm:grid-cols-[1.1fr_1fr] sm:items-start">
+      <div className="relative grid gap-5">
         <div>
-          <p id={`${id}-q`} className="font-display text-lg font-semibold">{c.quote.title}</p>
-          <div role="radiogroup" aria-label={c.quote.title} className="mt-3 grid grid-cols-3 gap-1 rounded-full bg-sea-100 p-1">
+          <p id={`${id}-q`} className="lbl flex items-center justify-between text-muted"><span>{c.quote.title}</span><span aria-hidden="true" className="num" dir="ltr">MSG / RATE CARD</span></p>
+          <div role="radiogroup" aria-label={c.quote.title} className="mt-4 grid grid-cols-3 border border-ink/15">
             {(["intra", "inter", "sabya"] as const).map((k) => (
               <button key={k} type="button" role="radio" aria-checked={lane === k}
                 onClick={() => { onLane(k); track("planner_step", { step: "hero_quote", value: k }); }}
-                className="tap relative rounded-full px-2 py-2 text-[12px] font-semibold leading-tight">
-                {lane === k ? <motion.span layoutId={`${id}-lane`} transition={{ type: "spring", ...SPRING_UI }} className="absolute inset-0 rounded-full bg-white shadow-[0_4px_14px_-6px_rgba(28,44,81,0.5)]" /> : null}
-                <span className={`relative ${lane === k ? "text-teal-deep" : "text-teal-deep/70"}`}>{c.quote.lanes[k]}</span>
+                className="tap relative border-s border-ink/15 px-2 py-2.5 text-[12px] font-semibold leading-tight first:border-s-0">
+                {lane === k ? <motion.span layoutId={`${id}-lane`} transition={{ type: "spring", ...SPRING_UI }} className="absolute inset-0 bg-ink" /> : null}
+                <span className={`relative ${lane === k ? "text-paper" : "text-muted"}`}>{c.quote.lanes[k]}</span>
               </button>
             ))}
           </div>
-          <label htmlFor={`${id}-n`} className="mt-4 flex items-baseline justify-between text-sm text-teal-deep/80">
+          <label htmlFor={`${id}-n`} className="mt-5 flex items-baseline justify-between text-sm text-muted">
             {c.quote.orders}
-            <output htmlFor={`${id}-n`} className="num font-display text-lg font-semibold text-teal-deep">{orders.toLocaleString("en-US")}</output>
+            <output htmlFor={`${id}-n`} className="num font-display text-lg font-semibold text-ink">{orders.toLocaleString("en-US")}</output>
           </label>
           <input id={`${id}-n`} type="range" min={0} max={1000} value={toSlider(orders)} dir="ltr"
             onChange={(e) => onOrders(toOrders(Number(e.target.value)))} className="est-range mt-1 w-full" />
         </div>
 
         <div>
-          <div className="grid grid-cols-2 gap-3 rounded-2xl bg-teal-deep p-4 text-white">
-            <div>
-              <p className="text-[11px] text-white/70">{c.quote.perOrder}</p>
+          <div className="grid grid-cols-2 bg-ink text-white">
+            <div className="p-4">
+              <p className="lbl text-white/70">{c.quote.perOrder}</p>
               <p data-hero-rate={rate} className="num mt-0.5 font-display text-3xl font-semibold">
                 <Money cur={c.quote.cur} ar={lang === "ar"} approx>{reduce ? rate : <NumberFlow value={rate} locales="en-US" />}</Money>
               </p>
             </div>
-            <div>
-              <p className="text-[11px] text-white/70">{c.quote.monthly}</p>
-              <p className="num mt-1.5 font-display text-xl font-semibold text-brand-mint">
+            <div className="border-s border-white/15 p-4">
+              <p className="lbl text-white/70">{c.quote.monthly}</p>
+              <p className="num mt-1.5 font-display text-xl font-semibold text-white">
                 <Money cur={c.quote.cur} ar={lang === "ar"}>{reduce ? monthly.toLocaleString("en-US") : <NumberFlow value={monthly} locales="en-US" format={{ useGrouping: true }} />}</Money>
               </p>
             </div>
           </div>
           <TrackedLink href={wa} target="_blank" rel="noopener noreferrer" event="whatsapp_click" props={{ location: "hero_quote" }}
-            className="mt-3 flex items-center justify-center gap-2 min-h-11 rounded-xl bg-brand px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-strong">
+            className="mt-px flex min-h-12 items-center justify-center gap-2 bg-brand px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-strong">
             <WhatsAppIcon className="size-4" /> {c.quote.cta}
           </TrackedLink>
         </div>
-        <p className="text-[11px] leading-snug text-teal-deep/70 sm:col-span-2">{c.quote.note}</p>
+        <p className="text-xs leading-snug text-muted">{c.quote.note}</p>
       </div>
     </aside>
   );

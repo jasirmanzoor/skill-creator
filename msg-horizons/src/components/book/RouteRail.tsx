@@ -6,7 +6,6 @@ import { fmt, type Locale } from "@/content/i18n";
 import { bookCopy, CHAPTERS } from "@/content/chapters";
 import { bookState, chapterProgress, onBookState } from "@/lib/book";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
-import Glass, { useGlass } from "../fx/Glass";
 import { MOBILE_BAR_ATTR, MOBILE_BAR_EVENT } from "../MobileBar";
 
 const onBar = (cb: () => void) => { window.addEventListener(MOBILE_BAR_EVENT, cb); return () => window.removeEventListener(MOBILE_BAR_EVENT, cb); };
@@ -67,56 +66,16 @@ export default function RouteRail({ lang }: { lang: Locale }) {
 
   const prev = CHAPTERS[active - 1];
   const next = CHAPTERS[active + 1];
-  const glass = useGlass();
 
-  // the first visit: a short guide above the rail says how the page works, until the visitor scrolls or taps
-  const [guide, setGuide] = useState(false);
-  useEffect(() => {
-    let seen = false;
-    try { seen = localStorage.getItem("msg-guide") === "1"; } catch {}
-    if (seen) return;
-    let shown = false;
-    const close = () => {
-      setGuide(false);
-      try { localStorage.setItem("msg-guide", "1"); } catch {}
-      off();
-    };
-    const onScroll = () => { if (shown && window.scrollY > window.innerHeight * 1.2) close(); };
-    // a visitor who is already scrolling through the page has found how it works: no guide for them
-    const show = window.setTimeout(() => { if (window.scrollY > window.innerHeight * 1.2) return close(); shown = true; setGuide(true); }, 1600);
-    const hide = window.setTimeout(close, 14000);
-    const off = () => { window.clearTimeout(show); window.clearTimeout(hide); window.removeEventListener("scroll", onScroll); window.removeEventListener("pointerdown", onTap); };
-    const onTap = (e: PointerEvent) => { if ((e.target as HTMLElement | null)?.closest?.(".route-rail")) close(); };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("pointerdown", onTap);
-    return off;
-  }, []);
 
   return (
     <nav
       aria-label={c.rail}
       onFocusCapture={() => setTucked(false)}
-      className={`route-rail fixed inset-x-3 z-40 transition-[bottom,translate,opacity] duration-300 ease-out ${tucked && !guide ? "pointer-events-none translate-y-[calc(100%+1.5rem)] opacity-0" : ""} mx-auto flex max-w-[60rem] items-center gap-1 rounded-full border border-line p-1.5 shadow-[var(--shadow-float)] ${glass ? "bg-surface/70" : "bg-surface/85 backdrop-blur-xl"} duration-300 lg:inset-x-6 lg:bottom-5 ${
+      className={`route-rail fixed inset-x-3 z-40 transition-[bottom,translate,opacity] duration-300 ease-out ${tucked ? "pointer-events-none translate-y-[calc(100%+1.5rem)] opacity-0" : ""} mx-auto flex max-w-[60rem] items-center gap-1 rounded-[4px] border border-ink/15 bg-surface p-1 shadow-[var(--shadow-float)] duration-300 lg:inset-x-6 lg:bottom-5 ${
         docked ? "bottom-[5.4rem]" : "bottom-3"
       }`}
     >
-      <Glass radius={28} />
-      {guide ? (
-        <motion.div
-          role="status"
-          initial={reduce ? false : { opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, ease: [0.23, 1, 0.32, 1] }}
-          className="pointer-events-none absolute bottom-[calc(100%+0.75rem)] start-1/2 flex -translate-x-1/2 items-center gap-3 whitespace-nowrap rounded-full bg-ink px-4 py-2.5 text-paper shadow-[var(--shadow-float)] rtl:translate-x-1/2"
-        >
-          <span aria-hidden="true" className="relative grid h-7 w-[18px] place-items-start justify-center rounded-full border-2 border-paper/70 pt-1">
-            <span className="block h-1.5 w-1 rounded-full bg-brand-bright motion-safe:animate-[guide-wheel_1.4s_var(--ease-in-out)_3]" />
-          </span>
-          <span className="text-sm font-semibold">{c.guide}</span>
-          <span className="hidden text-sm text-paper/65 sm:inline">{c.guideTap}</span>
-          <span aria-hidden="true" className="absolute -bottom-1.5 start-1/2 size-3 -translate-x-1/2 rotate-45 bg-ink rtl:translate-x-1/2" />
-        </motion.div>
-      ) : null}
       <EndButton href={prev ? `#${prev.id}` : undefined} label={c.previous} dir="prev" />
       <ol ref={track} className="rail-track relative flex min-w-0 flex-1 items-center overflow-x-auto overscroll-x-contain px-6">
         {CHAPTERS.map((ch, i) => {

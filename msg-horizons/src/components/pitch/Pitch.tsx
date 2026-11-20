@@ -15,7 +15,6 @@ export default function Pitch({ t, lang }: { t: Dictionary; lang: Locale }) {
   const c = pitchCopy[lang];
   return (
     <section id="why" data-theme="dark" aria-labelledby="why-title" className="on-dark relative isolate scroll-mt-16 bg-pitch pb-16 pt-24 text-white lg:pb-24 lg:pt-28">
-      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(60%_40%_at_80%_0%,rgba(0,157,248,0.16),transparent_70%)]" />
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-bright rtl:tracking-normal">{c.eyebrow}</p>
         <div className="mt-3 grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:items-end">

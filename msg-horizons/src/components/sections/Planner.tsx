@@ -486,7 +486,6 @@ function Option({
           : "border-line-strong/70 hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-[var(--shadow-card)]"
       }`}
     >
-      <span aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-300 [background:radial-gradient(140px_circle_at_var(--mx,50%)_var(--my,50%),rgba(10,90,153,0.13),transparent_70%)] group-hover:opacity-100" />
       <span className={`inline-flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors ${
         checked ? "bg-brand text-white" : "bg-subtle text-ink-3 group-hover:bg-ink group-hover:text-white"
       }`}>

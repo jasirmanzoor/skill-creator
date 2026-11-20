@@ -89,7 +89,6 @@ export default function Perfmix({ lang }: { lang: Locale }) {
   const cards = c.cards.map((x, i) => ({ ...x, ...FRONT[i] }));
   return (
     <section id="perfmix" aria-labelledby="perfmix-title" data-theme="dark" className="relative isolate overflow-hidden bg-[#0b1730] py-24 text-white lg:py-32">
-      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(55%_50%_at_80%_10%,rgba(0,157,248,0.20),transparent_70%),radial-gradient(45%_45%_at_10%_90%,rgba(196,30,58,0.14),transparent_70%)]" />
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
           <div>
