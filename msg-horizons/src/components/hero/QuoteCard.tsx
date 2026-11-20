@@ -42,8 +42,8 @@ export default function QuoteCard({
               <button key={k} type="button" role="radio" aria-checked={lane === k}
                 onClick={() => { onLane(k); track("planner_step", { step: "hero_quote", value: k }); }}
                 className="tap relative border-s border-ink/15 px-2 py-2.5 text-[12px] font-semibold leading-tight first:border-s-0">
-                {lane === k ? <motion.span layoutId={`${id}-lane`} transition={{ type: "spring", ...SPRING_UI }} className="absolute inset-0 bg-ink" /> : null}
-                <span className={`relative ${lane === k ? "text-paper" : "text-muted"}`}>{c.quote.lanes[k]}</span>
+                {lane === k ? <motion.span layoutId={`${id}-lane`} transition={{ type: "spring", ...SPRING_UI }} className="absolute inset-0 bg-graphite" /> : null}
+                <span className={`relative ${lane === k ? "text-white" : "text-muted"}`}>{c.quote.lanes[k]}</span>
               </button>
             ))}
           </div>
@@ -56,7 +56,7 @@ export default function QuoteCard({
         </div>
 
         <div>
-          <div className="grid grid-cols-2 bg-ink text-white">
+          <div className="grid grid-cols-2 bg-graphite text-white">
             <div className="p-4">
               <p className="lbl text-white/70">{c.quote.perOrder}</p>
               <p data-hero-rate={rate} className="num mt-0.5 font-display text-3xl font-semibold">

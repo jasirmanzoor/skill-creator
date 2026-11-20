@@ -85,10 +85,10 @@ export default function OrderSequence({ lang }: { lang: Locale }) {
                   <span aria-hidden="true" className="reg reg-bs" />
                   <span aria-hidden="true" className="reg reg-be" />
                   <figcaption className="lbl absolute start-5 top-5 flex flex-wrap gap-2 sm:start-7 sm:top-7">
-                    <span className="bg-ink px-2 py-1 text-white">CAM {v.cam}</span>
-                    <span className="bg-ink/80 px-2 py-1 text-white">{u.hub} · {v.where[lang]}</span>
+                    <span className="bg-graphite px-2 py-1 text-white">CAM {v.cam}</span>
+                    <span className="bg-graphite/80 px-2 py-1 text-white">{u.hub} · {v.where[lang]}</span>
                   </figcaption>
-                  <span className="lbl absolute bottom-5 end-5 bg-ink/80 px-2 py-1 text-white/80 sm:bottom-7 sm:end-7">{u.photo}</span>
+                  <span className="lbl absolute bottom-5 end-5 bg-graphite/80 px-2 py-1 text-white/80 sm:bottom-7 sm:end-7">{u.photo}</span>
                 </figure>
                 <div className="mt-8 flex items-baseline justify-between gap-6 border-b border-white/15 pb-4">
                   <p className="font-display text-2xl font-semibold tracking-[-0.02em] rtl:tracking-normal">

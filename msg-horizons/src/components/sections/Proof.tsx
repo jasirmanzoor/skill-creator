@@ -92,7 +92,7 @@ export default function Proof({ t, lang = "en" }: { t: Dictionary; lang?: Locale
 
           <blockquote className="mt-14 border-s-2 border-brand ps-5">
             <p className="font-display text-xl font-medium leading-snug text-ink text-pretty sm:text-2xl">“{t.proof.vision}”</p>
-            <footer className="lbl mt-3 text-muted">{t.proof.vision2030}</footer>
+            <p className="lbl mt-3 text-muted">{t.proof.vision2030}</p>
           </blockquote>
         </div>
       </div>

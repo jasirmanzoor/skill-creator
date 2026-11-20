@@ -3,13 +3,13 @@ import type { ServiceId } from "@/content/facts";
 
 /** a photo for each service: everyday scenes of the work itself, and the long-haul truck in MSG's livery */
 const PHOTO: Record<ServiceId, { src: string; pos?: string }> = {
-  "last-mile": { src: "/media/photos/lastmile.webp", pos: "55% 50%" },
-  warehousing: { src: "/media/photos/warehousing.webp", pos: "55% 50%" },
+  "last-mile": { src: "/media/msg/fleet-hub-side.webp", pos: "45% 60%" },
+  warehousing: { src: "/media/msg/hub-racks.webp", pos: "50% 60%" },
   "land-freight": { src: "/media/msg/land-freight-truck.webp", pos: "40% 55%" },
   fleet: { src: "/media/msg/fleet-hub.webp", pos: "50% 60%" },
-  manpower: { src: "/media/photos/manpower.webp", pos: "50% 45%" },
-  tracking: { src: "/media/photos/courier-route.webp", pos: "30% 55%" },
-  account: { src: "/media/photos/account.webp", pos: "50% 50%" },
+  manpower: { src: "/media/msg/hub-team.webp", pos: "60% 55%" },
+  tracking: { src: "/media/msg/hub-team-scan.webp", pos: "50% 45%" },
+  account: { src: "/media/msg/outlet-counter.webp", pos: "50% 50%" },
 };
 
 export default function ServiceScene({ id }: { id: ServiceId }) {

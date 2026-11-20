@@ -116,7 +116,7 @@ export default function ExpandList({ items, label }: { items: ExpandItem[]; labe
                   <div className="relative mt-5 aspect-[16/10] overflow-hidden rounded-2xl ring-1 ring-white/15 lg:hidden">
                     <Image src={it.image.src} alt="" fill sizes="90vw" className="object-cover" style={{ objectPosition: it.image.pos ?? "50% 50%" }} />
                   </div>
-                  <a href={it.href} className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-teal-deep transition-transform duration-200 hover:-translate-y-0.5">
+                  <a href={it.href} className="btn-ind on-dark mt-5 min-h-11 text-sm">
                     {it.cta}
                     <svg viewBox="0 0 24 24" className="size-4 rtl:-scale-x-100" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
                   </a>

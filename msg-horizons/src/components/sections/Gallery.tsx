@@ -15,7 +15,7 @@ export default function Gallery({ t, lang }: { t: Dictionary; lang: Locale }) {
     <section id="gallery" aria-labelledby="gallery-title" className="scroll-mt-24 border-t border-line bg-surface/[0.62] sec">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div className="max-w-2xl">
-          <p className="text-sm font-semibold text-teal">{t.gallery.eyebrow}</p>
+          <p className="lbl idx text-brand">{t.gallery.eyebrow}</p>
           <h2 id="gallery-title" className="h-section mt-2 text-ink">{t.gallery.title}</h2>
           <p className="mt-4 text-sm text-ink/60">{t.gallery.note}</p>
         </div>

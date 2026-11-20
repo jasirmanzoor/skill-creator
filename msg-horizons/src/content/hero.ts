@@ -128,7 +128,7 @@ export const heroCopy: Record<Locale, Copy> = {
         { v: 1000, suffix: "+", l: "couriers on the network" },
         { v: 100, suffix: "+", l: "vehicles in the fleet" },
         { v: 20, pre: "SAR ", suffix: "M+", l: "annual revenue" },
-        { v: 1000, suffix: " m²", l: "Sabya hub" },
+        { v: 1000, suffix: "", unit: "m²", l: "Sabya hub" },
         { v: 24, suffix: "/7", l: "operations" },
       ],
       hint: "Scroll into the network",

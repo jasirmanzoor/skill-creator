@@ -16,9 +16,9 @@ export default function Pitch({ t, lang }: { t: Dictionary; lang: Locale }) {
   return (
     <section id="why" data-theme="dark" aria-labelledby="why-title" className="on-dark relative isolate scroll-mt-16 bg-pitch pb-16 pt-24 text-white lg:pb-24 lg:pt-28">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-bright rtl:tracking-normal">{c.eyebrow}</p>
+        <p className="lbl idx text-brand-bright">{c.eyebrow}</p>
         <div className="mt-3 grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:items-end">
-          <h2 id="why-title" className="h-scene">{c.title}</h2>
+          <h2 id="why-title" className="h-section">{c.title}</h2>
           <p className="max-w-xl text-lg leading-relaxed text-white/80 text-pretty lg:justify-self-end">{c.lead}</p>
         </div>
       </div>
@@ -56,14 +56,14 @@ export default function Pitch({ t, lang }: { t: Dictionary; lang: Locale }) {
         </ol>
       </div>
 
-      <div className="mx-auto mt-10 max-w-7xl px-5 lg:px-8">
-        <div className="flex flex-col gap-6 rounded-3xl bg-white p-6 text-teal-deep ring-1 ring-white sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+      <div className="mx-auto mt-14 max-w-7xl px-5 lg:px-8">
+        <div className="flex flex-col gap-6 border-t border-white/25 pt-8 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="font-display text-2xl font-semibold leading-tight tracking-[-0.02em] sm:text-3xl rtl:tracking-normal">{c.close}</p>
-            <p className="mt-2 text-teal-deep/75">{c.closeLead}</p>
+            <p className="font-display text-2xl font-semibold leading-tight tracking-[-0.02em] text-white sm:text-3xl rtl:tracking-normal">{c.close}</p>
+            <p className="mt-2 text-white/70">{c.closeLead}</p>
           </div>
           <TrackedLink href={whatsappLink(t.wa.general)} target="_blank" rel="noopener noreferrer" event="whatsapp_click" props={{ location: "pitch" }}
-            className="inline-flex min-h-12 shrink-0 items-center gap-2 self-start rounded-full px-5 py-3.5 font-semibold text-teal-deep ring-1 ring-teal/25 transition-colors hover:bg-sea-50 lg:self-auto">
+            className="btn-ind on-dark shrink-0 self-start lg:self-auto">
             <WhatsAppIcon className="size-5 text-whatsapp" /> {c.talk}
           </TrackedLink>
         </div>

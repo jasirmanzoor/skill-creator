@@ -88,19 +88,19 @@ export default function Perfmix({ lang }: { lang: Locale }) {
   const c = copy[lang];
   const cards = c.cards.map((x, i) => ({ ...x, ...FRONT[i] }));
   return (
-    <section id="perfmix" aria-labelledby="perfmix-title" data-theme="dark" className="relative isolate overflow-hidden bg-[#0b1730] py-24 text-white lg:py-32">
+    <section id="perfmix" aria-labelledby="perfmix-title" data-theme="dark" className="relative isolate overflow-hidden bg-deep py-24 text-white lg:py-32">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-bright rtl:tracking-normal">{c.eyebrow}</p>
+            <p className="lbl idx text-brand-bright">{c.eyebrow}</p>
             <div className="mt-5 inline-flex items-center gap-3 rounded-2xl bg-white px-4 py-3">
               <Image src="/media/perfmix/wordmark.png" alt={S.name} width={500} height={78} priority className="h-6 w-auto" />
             </div>
             <h2 id="perfmix-title" data-mask-skip className="h-section mt-6 text-balance">
-              {c.title} <span className="text-brand-mint">{c.titleAccent}</span>
+              {c.title} {c.titleAccent}
             </h2>
             <p className="mt-5 max-w-xl text-lg text-white/75 text-pretty">{c.lead}</p>
-            <a href={S.url} target="_blank" rel="noopener" className="group mt-7 inline-flex min-h-12 items-center gap-3 rounded-full bg-white px-6 py-3 font-semibold text-[#0b1730] transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.97]">
+            <a href={S.url} target="_blank" rel="noopener" className="btn-ind on-dark mt-7">
               {c.visit}
               <span className="sr-only"> ({c.newTab})</span>
               <svg viewBox="0 0 24 24" className="size-5 rtl:-scale-x-100" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" /></svg>
@@ -120,9 +120,9 @@ export default function Perfmix({ lang }: { lang: Locale }) {
       </div>
 
       <ul aria-label={`${S.name} · ${c.eyebrow}`} tabIndex={0} className="mx-auto mt-14 flex max-w-7xl snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain px-5 pb-2 [scrollbar-width:none] sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-4 lg:px-8">
-        {cards.map((x) => (
-          <li key={x.title} className="flex w-[78%] shrink-0 snap-start flex-col overflow-hidden rounded-2xl sm:w-auto bg-white/[0.06] ring-1 ring-white/12">
-            <div className="relative aspect-[4/3] bg-white/5">
+        {cards.map((x, i) => (
+          <li key={x.title} className={`flex w-[78%] shrink-0 snap-start flex-col overflow-hidden rounded-2xl ${i === 0 ? "lg:col-span-2" : ""} sm:w-auto bg-white/[0.06] ring-1 ring-white/12`}>
+            <div className={`relative bg-white/5 ${i === 0 ? "aspect-[4/3] lg:aspect-[8/3]" : "aspect-[4/3]"}`}>
               <Image src={x.src} alt="" fill sizes="(min-width: 1024px) 300px, (min-width: 640px) 50vw, 100vw" className="object-cover" style={{ objectPosition: x.pos }} />
               <span className="absolute start-3 top-3 rounded-full bg-black/45 px-2.5 py-1 text-[11px] font-semibold text-white ring-1 ring-white/20 backdrop-blur">{x.tag}</span>
             </div>

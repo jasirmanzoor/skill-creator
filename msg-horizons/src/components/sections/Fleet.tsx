@@ -23,7 +23,7 @@ export default function Fleet({ t, lang }: { t: Dictionary; lang: Locale }) {
 
         {/* MSG's own fleet, as captioned plates: one large, two beside it */}
         <div className="mt-16 grid gap-4 lg:grid-cols-12">
-          {[0, 4, 6].map((k, i) => {
+          {[2, 4, 6].map((k, i) => {
             const x = msgFleet.scenes[k];
             return (
               <figure key={x.src} className={i === 0 ? "lg:col-span-8 lg:row-span-2" : "lg:col-span-4"}>

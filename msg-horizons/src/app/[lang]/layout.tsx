@@ -10,7 +10,7 @@ import { SITE_URL, facts } from "@/content/facts";
 import "../globals.css";
 
 // The brand typefaces (2026 brand guidelines): Funnel Sans for English, Readex Pro for Arabic
-const display = Funnel_Sans({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-display-latin", display: "swap" });
+const display = Funnel_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-display-latin", display: "swap" });
 const sans = Funnel_Sans({ subsets: ["latin"], variable: "--font-sans-latin", display: "swap" });
 // data labels, coordinates and figures: an engineering mono alongside the brand faces
 const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-mono-latin", display: "swap" });

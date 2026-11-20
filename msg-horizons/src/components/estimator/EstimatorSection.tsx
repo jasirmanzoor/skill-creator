@@ -77,7 +77,7 @@ export default function EstimatorSection({ t, lang }: { t: Dictionary; lang: Loc
       <div className="relative mx-auto max-w-7xl px-4 sm:px-5 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-2 lg:items-end">
           <div>
-            <p className="text-sm font-semibold text-teal">{c.eyebrow}</p>
+            <p className="lbl idx text-brand">{c.eyebrow}</p>
             <h2 id="estimate-title" className="h-section mt-2 text-balance">{c.title}</h2>
           </div>
           <p className="max-w-xl text-lg text-teal-deep/75 text-pretty lg:justify-self-end">{c.lead}</p>

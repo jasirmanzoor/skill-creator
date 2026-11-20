@@ -271,9 +271,6 @@ await test("peak deployment: five stages from forecast to closeout, and no simul
     await ctx.close();
   }
 });
-  assert.deepEqual(errors, []);
-  await ctx.close();
-});
 
 await test("shared plan link opens directly on the result", async () => {
   const { page, ctx } = await open("/ar?plan=platform~people~high~peaks#planner");

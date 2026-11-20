@@ -58,7 +58,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
               className="mt-7 font-display text-[clamp(2.6rem,6.2vw,6rem)] font-semibold leading-[0.96] tracking-[-0.045em] text-ink text-balance rtl:leading-[1.25] rtl:tracking-normal"
             >
               <span className="block">{c.title[0]}</span>
-              <span className="block text-brand">{c.title[1]}</span>
+              <span className="block font-normal text-ink-3">{c.title[1]}</span>
             </h1>
             <p className="mt-8 max-w-[34rem] text-lg leading-relaxed text-muted text-pretty">{c.lead}</p>
             <div className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-4">
@@ -93,12 +93,12 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
           <span aria-hidden="true" className="reg reg-te" />
           <span aria-hidden="true" className="reg reg-bs" />
           <span aria-hidden="true" className="reg reg-be" />
-          <span className="lbl absolute start-5 top-5 bg-ink px-2 py-1 text-white sm:start-7 sm:top-7">{p.where}</span>
+          <span className="lbl absolute start-5 top-5 bg-graphite px-2 py-1 text-white sm:start-7 sm:top-7">{p.where}</span>
           <span className="lbl absolute bottom-5 start-5 max-w-[70%] text-white sm:bottom-7 sm:start-7">{p.what}</span>
         </div>
         <figcaption className="lbl mt-3 flex justify-between gap-4 text-muted">
           <span>{p.fig}</span>
-          <span className="num" dir="ltr">{facts.sabyaHub.areaM2.toLocaleString("en-US")} m²</span>
+          <span className="num normal-case" dir="ltr">{facts.sabyaHub.areaM2.toLocaleString("en-US")} m²</span>
         </figcaption>
       </figure>
 
@@ -109,7 +109,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
             <div key={s.l} className={`border-b border-line py-6 pe-4 lg:border-b-0 lg:pe-6 ${i ? "lg:border-s lg:ps-6" : ""}`}>
               <dd className="font-display text-[clamp(1.9rem,8vw,2.4rem)] font-semibold leading-none whitespace-nowrap tracking-[-0.035em] text-ink lg:text-5xl rtl:tracking-normal" dir={ar ? "rtl" : "ltr"}>
                 <span className="num" dir="ltr">{`${s.pre ?? ""}${s.v.toLocaleString("en-US")}${s.suffix}`}</span>
-                {s.unit ? <span className="ms-1 text-lg font-medium text-muted">{s.unit}</span> : null}
+                {s.unit ? <span className="ms-1.5 text-[0.55em] font-medium text-muted">{s.unit}</span> : null}
               </dd>
               <dt className="lbl mt-3 text-muted">{s.l}</dt>
             </div>

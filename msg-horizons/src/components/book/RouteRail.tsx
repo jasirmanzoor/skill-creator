@@ -92,18 +92,10 @@ export default function RouteRail({ lang }: { lang: Locale }) {
                 className={`group relative flex items-center rounded-full outline-offset-2 ${on ? "" : "px-1 py-2"}`}
               >
                 <span className="relative grid size-5 shrink-0 place-items-center">
-                  {on ? (
-                    <motion.span
-                      layoutId="rail-light"
-                      transition={reduce ? { duration: 0 } : SPRING}
-                      aria-hidden="true"
-                      className="rail-light absolute inset-[-7px] rounded-full"
-                    />
-                  ) : null}
                   <span
                     aria-hidden="true"
-                    className={`relative block rounded-full transition-all duration-500 ${
-                      on ? "size-2.5 bg-brand-bright shadow-[var(--shadow-glow)]" : done ? "size-2 bg-brand" : "size-2 border border-line-strong bg-surface group-hover:border-brand"
+                    className={`relative block transition-colors duration-200 ${
+                      on ? "size-2.5 bg-brand" : done ? "size-2 bg-brand" : "size-2 border border-line-strong bg-surface group-hover:border-brand"
                     }`}
                   />
                 </span>
@@ -113,7 +105,7 @@ export default function RouteRail({ lang }: { lang: Locale }) {
                     initial={reduce ? false : { width: 18, opacity: 0.4 }}
                     animate={{ width: "auto", opacity: 1 }}
                     transition={reduce ? { duration: 0 } : { width: { ...SPRING, delay: 0.05 }, opacity: { duration: 0.2 } }}
-                    className="relative ms-2 block overflow-hidden rounded-full bg-ink text-paper"
+                    className="relative ms-2 block overflow-hidden rounded-[3px] bg-graphite text-white"
                   >
                     <motion.span
                       initial={reduce ? false : { opacity: 0, filter: "blur(6px)", y: 4 }}
@@ -121,9 +113,9 @@ export default function RouteRail({ lang }: { lang: Locale }) {
                       transition={{ duration: 0.35, delay: reduce ? 0 : 0.22, ease: [0.23, 1, 0.32, 1] }}
                       className="flex items-center gap-2.5 whitespace-nowrap py-2 pe-4 ps-3"
                     >
-                      <span className="font-display text-xs font-semibold tabular-nums text-brand-bright dark:text-[#006bb6]">{num(i)}</span>
+                      <span className="font-mono text-xs tabular-nums text-brand-bright">{num(i)}</span>
                       <span className="text-sm font-semibold">{ch.title[lang]}</span>
-                      <span className="hidden text-xs text-paper/60 xl:inline">{ch.hint[lang]}</span>
+                      <span className="hidden text-xs text-white/60 xl:inline">{ch.hint[lang]}</span>
                     </motion.span>
                     <motion.span aria-hidden="true" style={{ transform: fill }} className="absolute inset-x-3 bottom-1 h-px origin-left rounded-full bg-brand-bright/80 rtl:origin-right" />
                   </motion.span>
@@ -147,10 +139,10 @@ function EndButton({ href, label, dir }: { href?: string; label: string; dir: "p
       <path d="M5 12h14M13 6l6 6-6 6" />
     </svg>
   );
-  const base = "grid size-10 shrink-0 place-items-center rounded-full transition-colors";
+  const base = "grid size-10 shrink-0 place-items-center rounded-[3px] transition-colors";
   if (!href) return <span aria-hidden="true" className={`${base} text-line-strong`}>{icon}</span>;
   return (
-    <a href={href} aria-label={label} title={label} className={`${base} ${dir === "next" ? "bg-ink text-paper hover:bg-ink-2" : "text-muted hover:bg-subtle hover:text-ink"}`}>
+    <a href={href} aria-label={label} title={label} className={`${base} ${dir === "next" ? "bg-graphite text-white hover:bg-ink-3" : "text-muted hover:bg-subtle hover:text-ink"}`}>
       {icon}
     </a>
   );
