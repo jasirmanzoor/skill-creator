@@ -3,12 +3,15 @@ import CountUp from "../ui/CountUp";
 import TrackedLink from "../ui/TrackedLink";
 import WorkforcePipeline from "../enterprise/WorkforcePipeline";
 import DeploymentProtocol from "../enterprise/DeploymentProtocol";
+import OrbitShowcase from "../ui/OrbitShowcase";
+import { provenCopy } from "@/content/proven";
 import { ArrowIcon } from "../ui/icons";
 import { facts } from "@/content/facts";
 import type { Dictionary, Locale } from "@/content/i18n";
 
 /** Enterprise evaluators: the workforce pipeline, the peak-deployment protocol and the governance behind both. */
-export default function Enterprise({ t }: { t: Dictionary; lang: Locale }) {
+export default function Enterprise({ t, lang }: { t: Dictionary; lang: Locale }) {
+  const pv = provenCopy[lang];
   const e = t.enterprise;
   const wf = e.workforce;
   return (
@@ -22,6 +25,18 @@ export default function Enterprise({ t }: { t: Dictionary; lang: Locale }) {
           </div>
           <p className="max-w-xl text-lg text-teal-deep/75 text-pretty lg:justify-self-end">{e.lead}</p>
         </Reveal>
+
+        {/* for businesses already running: what MSG has in place today, on an orbit */}
+        <div data-theme="dark" className="mt-16 overflow-hidden rounded-[2.5rem] bg-[radial-gradient(80%_70%_at_50%_30%,#0f2d55_0%,#06142a_60%,#040c1a_100%)] px-4 py-12 text-white ring-1 ring-white/10 sm:px-10 sm:py-16">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-bright rtl:tracking-normal">{pv.eyebrow}</p>
+            <h3 className="mt-3 font-display text-3xl font-semibold tracking-[-0.02em] text-balance sm:text-4xl rtl:tracking-normal">{pv.title}</h3>
+            <p className="mt-3 text-lg text-white/75 text-pretty">{pv.lead}</p>
+          </div>
+          <div className="mt-10">
+            <OrbitShowcase items={pv.items} label={pv.label} labels={{ prev: pv.prev, next: pv.next }} rtl={lang === "ar"} />
+          </div>
+        </div>
 
         {/* Workforce: source → site */}
         <div className="mt-16">
