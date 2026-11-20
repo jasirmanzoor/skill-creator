@@ -332,7 +332,7 @@ export default function FolioFlow({
               return (
                 <li key={p} className="shrink-0">
                   <button type="button" onClick={() => go(leafOf(p))} aria-label={`${labels.page ?? "Page"} ${p + 1}`} aria-current={on ? "page" : undefined}
-                    className={`relative block h-12 w-9 overflow-hidden rounded-[2px] bg-white ring-1 transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 ${on ? "ring-2 ring-[#009df8]" : "ring-white/20 opacity-70 hover:opacity-100"}`}>
+                    className={`relative block h-12 w-9 overflow-hidden rounded-[2px] bg-white ring-1 transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 ${on ? "ring-2 ring-[#009df8] ring-offset-2 ring-offset-[#1c2c51]" : "ring-white/25 hover:ring-white/70"}`}>
                     <span aria-hidden="true" style={{ position: "absolute", left: 0, top: 0, width: designWidth, height: designHeight, transform: `scale(${36 / designWidth})`, transformOrigin: "0 0", pointerEvents: "none" }}>{pages[p]}</span>
                   </button>
                 </li>
