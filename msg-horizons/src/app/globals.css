@@ -819,3 +819,8 @@ html.dark .btn-ind:not(.on-dark):hover { background: #fff; }
 /* the dark theme has no light grounds: the mark is always the white one there */
 html.dark .logo-ink { opacity: 0 !important; }
 html.dark .logo-white { opacity: 1 !important; }
+
+/* a long chapter jump cross-fades (RouteBook): quick, and only the page itself; the rail and header stay put */
+::view-transition-group(root) { animation-duration: 0.32s; }
+::view-transition-old(root), ::view-transition-new(root) { animation-timing-function: var(--ease-out); }
+@media (prefers-reduced-motion: reduce) { ::view-transition-group(root) { animation-duration: 0.01ms; } }

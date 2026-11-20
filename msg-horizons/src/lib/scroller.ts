@@ -6,7 +6,7 @@
 export function scrollToY(y: number, { immediate = false }: { immediate?: boolean; duration?: number; force?: boolean; easing?: (t: number) => number } = {}) {
   const top = Math.max(0, Math.round(y));
   const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  window.scrollTo({ top, behavior: immediate || reduce ? "auto" : "smooth" });
+  window.scrollTo({ top, behavior: immediate || reduce ? "instant" : "smooth" }); // "instant", not "auto": the page's CSS scroll-behavior is smooth
 }
 
 /** freeze the page behind a full-screen overlay, and let it move again afterwards */

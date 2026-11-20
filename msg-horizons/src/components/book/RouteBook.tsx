@@ -65,7 +65,12 @@ export default function RouteBook({ lang }: { lang: Locale }) {
       if (push) history.pushState({ chapter: n }, "", hash ? `#${hash}` : location.pathname + location.search);
       setSaid(fmt(c.opened, { n: n + 1, total, title: CHAPTERS[n]?.title[lang] ?? "" }));
       track("cta_click", { cta: "chapter", location: idOf(n) });
-      scrollToY(n === 0 && !target ? 0 : yOf(el), { immediate: immediate || reduce(), duration: 0.8, force: true });
+      const y = n === 0 && !target ? 0 : yOf(el);
+      // a long jump (more than three screens) cross-fades instead of whizzing past ten screens of content; a short one glides
+      const far = Math.abs(y - window.scrollY) > window.innerHeight * 3;
+      const vt = (document as Document & { startViewTransition?: (cb: () => void) => unknown }).startViewTransition;
+      if (far && !immediate && !reduce() && typeof vt === "function") vt.call(document, () => scrollToY(y, { immediate: true, force: true }));
+      else scrollToY(y, { immediate: immediate || reduce(), duration: 0.8, force: true });
       if (focus) pages[n].focus({ preventScroll: true });
     };
 

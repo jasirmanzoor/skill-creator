@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { experience, NEED_STAGES, NEEDS_BY_STAGE } from "@/content/experience";
 import { heroCopy } from "@/content/hero";
 import type { Locale } from "@/content/i18n";
@@ -14,9 +14,9 @@ const VIEW = [
   { src: "/media/msg/hub-sorting.webp", pos: "50% 55%", cam: "04", where: { en: "Sorting", ar: "الفرز" } },
 ];
 
-const ui: Record<Locale, { idx: string; hub: string; photo: string }> = {
-  en: { idx: "MSG Control", hub: "Sabya hub", photo: "MSG photograph · not a live feed" },
-  ar: { idx: "تحكّم ام اس جي", hub: "مركز صبيا", photo: "صورة من ام اس جي · ليست بثاً مباشراً" },
+const ui: Record<Locale, { idx: string; hub: string; photo: string; swipe: string }> = {
+  en: { idx: "MSG Control", hub: "Sabya hub", photo: "MSG photograph · not a live feed", swipe: "Swipe through the four stages" },
+  ar: { idx: "تحكّم ام اس جي", hub: "مركز صبيا", photo: "صورة من ام اس جي · ليست بثاً مباشراً", swipe: "اسحب بين المراحل الأربع" },
 };
 
 /**
@@ -30,6 +30,7 @@ export default function OrderSequence({ lang }: { lang: Locale }) {
   const c = heroCopy[lang];
   const u = ui[lang];
   const [stage, setStage] = useState(0);
+  const touch = useRef<{ x: number; y: number } | null>(null);
   const total = NEED_STAGES.length;
   const pad = (k: number) => String(k).padStart(2, "0");
   const onKey = (e: React.KeyboardEvent, i: number) => {
@@ -72,7 +73,22 @@ export default function OrderSequence({ lang }: { lang: Locale }) {
           </nav>
         </div>
 
-        <div className="lg:col-span-8">
+        <div
+          className="touch-pan-y lg:col-span-8"
+          onTouchStart={(e) => { touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }}
+          onTouchEnd={(e) => {
+            const t0 = touch.current; touch.current = null;
+            if (!t0) return;
+            const dx = e.changedTouches[0].clientX - t0.x, dy = e.changedTouches[0].clientY - t0.y;
+            if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+            const fwd = (dx < 0) !== (lang === "ar");
+            setStage((k) => Math.max(0, Math.min(total - 1, k + (fwd ? 1 : -1))));
+          }}
+        >
+          <p className="lbl mb-3 flex items-center justify-between text-white/55 lg:hidden">
+            <span>{u.swipe}</span>
+            <span aria-hidden="true" className="flex gap-1.5">{NEED_STAGES.map((st, k) => <span key={st} className={`h-0.5 w-6 ${k === stage ? "bg-brand-bright" : "bg-white/25"}`} />)}</span>
+          </p>
           {NEED_STAGES.map((st, i) => {
             const v = VIEW[i];
             const on = i === stage;

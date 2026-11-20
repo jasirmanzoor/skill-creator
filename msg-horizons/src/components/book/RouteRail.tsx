@@ -64,6 +64,7 @@ export default function RouteRail({ lang }: { lang: Locale }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const swipe = useRef<{ x: number; y: number } | null>(null);
   const prev = CHAPTERS[active - 1];
   const next = CHAPTERS[active + 1];
 
@@ -72,6 +73,16 @@ export default function RouteRail({ lang }: { lang: Locale }) {
     <nav
       aria-label={c.rail}
       onFocusCapture={() => setTucked(false)}
+      onTouchStart={(e) => { swipe.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }}
+      onTouchEnd={(e) => {
+        const s0 = swipe.current; swipe.current = null;
+        if (!s0) return;
+        const dx = e.changedTouches[0].clientX - s0.x, dy = e.changedTouches[0].clientY - s0.y;
+        if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+        const ahead = (dx < 0) !== (document.documentElement.dir === "rtl");
+        const to = ahead ? next : prev;
+        if (to) window.dispatchEvent(new CustomEvent("msg-book-go", { detail: { id: to.id } }));
+      }}
       className={`route-rail fixed inset-x-3 z-40 transition-[bottom,translate,opacity] duration-300 ease-out ${tucked ? "pointer-events-none translate-y-[calc(100%+1.5rem)] opacity-0" : ""} mx-auto flex max-w-[60rem] items-center gap-1 rounded-[4px] border border-ink/15 bg-surface p-1 shadow-[var(--shadow-float)] duration-300 lg:inset-x-6 lg:bottom-5 ${
         docked ? "bottom-[5.4rem]" : "bottom-3"
       }`}
