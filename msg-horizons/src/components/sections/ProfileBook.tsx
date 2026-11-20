@@ -90,7 +90,7 @@ const PAGE = "relative h-[560px] w-[420px] overflow-hidden";
 const label = "text-[11px] font-semibold uppercase tracking-[0.22em] rtl:tracking-normal";
 
 function Folio({ n, dark = false }: { n: number; dark?: boolean }) {
-  return <span className={`absolute bottom-7 end-8 text-[11px] font-semibold tabular-nums ${dark ? "text-white/50" : "text-[#8a93a6]"}`} dir="ltr">{String(n).padStart(2, "0")}</span>;
+  return <span className={`absolute bottom-7 end-8 text-[11px] font-semibold tabular-nums ${dark ? "text-white/50" : "text-[#5d677d]"}`} dir="ltr">{String(n).padStart(2, "0")}</span>;
 }
 
 /** a full-bleed photograph page with its caption over a scrim */
@@ -165,7 +165,7 @@ export default function ProfileBook({ t, lang }: { t: Dictionary; lang: Locale }
       <dl className="mt-auto grid grid-cols-2 gap-x-6 gap-y-5 border-t border-[#e2e5ec] pt-6 text-[13px]">
         {[[c.hq, c.hqValue], [c.legal, c.legalValue], [c.cr, facts.corporate.commercialRegistration], [c.sector, c.sectorValue]].map(([k, v]) => (
           <div key={k}>
-            <dt className="text-[#8a93a6]">{k}</dt>
+            <dt className="text-[#5d677d]">{k}</dt>
             <dd className="mt-1 font-semibold leading-snug" dir={/^\d+$/.test(v) ? "ltr" : undefined}>{v}</dd>
           </div>
         ))}

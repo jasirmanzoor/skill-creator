@@ -24,8 +24,8 @@ export default function ServicePageView({ t, lang, slug }: { t: Dictionary; lang
             <a href={`/${other}/services/${slug}`} hrefLang={other} className="rounded px-2 py-1 text-sm text-muted hover:text-ink">
               {c.langSwitch}
             </a>
-            <a href={planHref} className="rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink-3">
-              {t.nav.cta}
+            <a href={planHref} className="whitespace-nowrap rounded-full bg-ink px-4 py-2 text-sm font-medium text-white transition-[background-color,transform] duration-150 ease-out hover:bg-ink-3 active:scale-[0.97]">
+              <span className="sm:hidden">{t.nav.ctaShort}</span><span className="hidden sm:inline">{t.nav.cta}</span>
             </a>
           </nav>
         </div>

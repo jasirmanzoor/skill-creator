@@ -120,9 +120,9 @@ export default function Perfmix({ lang }: { lang: Locale }) {
         </div>
       </div>
 
-      <ul aria-label={`${S.name} · ${c.eyebrow}`} className="mx-auto mt-14 grid max-w-7xl gap-4 px-5 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
+      <ul aria-label={`${S.name} · ${c.eyebrow}`} tabIndex={0} className="mx-auto mt-14 flex max-w-7xl snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain px-5 pb-2 [scrollbar-width:none] sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-4 lg:px-8">
         {cards.map((x) => (
-          <li key={x.title} className="flex flex-col overflow-hidden rounded-2xl bg-white/[0.06] ring-1 ring-white/12">
+          <li key={x.title} className="flex w-[78%] shrink-0 snap-start flex-col overflow-hidden rounded-2xl sm:w-auto bg-white/[0.06] ring-1 ring-white/12">
             <div className="relative aspect-[4/3] bg-white/5">
               <Image src={x.src} alt="" fill sizes="(min-width: 1024px) 300px, (min-width: 640px) 50vw, 100vw" className="object-cover" style={{ objectPosition: x.pos }} />
               <span className="absolute start-3 top-3 rounded-full bg-black/45 px-2.5 py-1 text-[11px] font-semibold text-white ring-1 ring-white/20 backdrop-blur">{x.tag}</span>

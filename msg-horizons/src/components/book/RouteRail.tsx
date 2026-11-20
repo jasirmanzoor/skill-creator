@@ -50,6 +50,21 @@ export default function RouteRail({ lang }: { lang: Locale }) {
     return () => window.clearTimeout(late);
   }, [active, reduce]);
 
+  // out of the way while reading: the rail tucks under the screen's edge as the page scrolls down, and returns the
+  // moment the reader scrolls back up, nears the top, or moves focus into it
+  const [tucked, setTucked] = useState(false);
+  useEffect(() => {
+    let last = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY, d = y - last;
+      if (Math.abs(d) < 8) return;
+      last = y;
+      setTucked(d > 0 && y > window.innerHeight * 0.6);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const prev = CHAPTERS[active - 1];
   const next = CHAPTERS[active + 1];
   const glass = useGlass();
@@ -80,7 +95,8 @@ export default function RouteRail({ lang }: { lang: Locale }) {
   return (
     <nav
       aria-label={c.rail}
-      className={`route-rail fixed inset-x-3 z-40 mx-auto flex max-w-[60rem] items-center gap-1 rounded-full border border-line p-1.5 shadow-[var(--shadow-float)] transition-[bottom] ${glass ? "bg-surface/70" : "bg-surface/85 backdrop-blur-xl"} duration-300 lg:inset-x-6 lg:bottom-5 ${
+      onFocusCapture={() => setTucked(false)}
+      className={`route-rail fixed inset-x-3 z-40 transition-[bottom,translate,opacity] duration-300 ease-out ${tucked && !guide ? "pointer-events-none translate-y-[calc(100%+1.5rem)] opacity-0" : ""} mx-auto flex max-w-[60rem] items-center gap-1 rounded-full border border-line p-1.5 shadow-[var(--shadow-float)] ${glass ? "bg-surface/70" : "bg-surface/85 backdrop-blur-xl"} duration-300 lg:inset-x-6 lg:bottom-5 ${
         docked ? "bottom-[5.4rem]" : "bottom-3"
       }`}
     >

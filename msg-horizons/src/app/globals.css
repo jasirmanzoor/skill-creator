@@ -660,32 +660,6 @@ html.dark aside.text-sand-900 :is(.bg-white\/70, .bg-white\/75, .bg-white\/80, .
 html.dark aside.text-sand-900 .bg-white { background-color: #fff; }
 .turn-num::before { content: attr(data-num); }
 
-/* the pitch's own clock: how long until the scene turns over by itself (components/pitch) */
-.pitch-timer { animation: pitch-timer linear both; }
-@keyframes pitch-timer { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-
-/* ---------- React Bits: ScrollExpand (components/fx) ---------- */
-.scroll-expand { position: relative; width: 100%; }
-.scroll-expand__track { position: relative; }
-.scroll-expand__stage { position: sticky; top: 0; display: grid; place-items: center; overflow: hidden; }
-.scroll-expand__frame { position: absolute; inset: 0; overflow: hidden; will-change: clip-path; }
-.scroll-expand__media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: transform; }
-.scroll-expand__shade { position: absolute; inset: 0; background: radial-gradient(70% 60% at 50% 50%, rgb(8 11 16 / 0.5), rgb(8 11 16 / 0.15)); pointer-events: none; }
-.scroll-expand__scrim { position: absolute; inset: 0; opacity: 0; pointer-events: none; background: linear-gradient(180deg, rgb(8 11 16 / 0.55), rgb(8 11 16 / 0.92)); }
-.scroll-expand__overlay { position: absolute; inset: 0; opacity: 0; }
-.scroll-expand__title { position: relative; z-index: 2; display: grid; place-items: center; }
-.scroll-expand__hint {
-  position: absolute; bottom: 11.5rem; inset-inline: 0; z-index: 2; text-align: center; pointer-events: none;
-  font-size: 0.75rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: rgb(255 255 255 / 0.7);
-}
-:lang(ar) .scroll-expand__hint { letter-spacing: 0; }
-@media (min-width: 64rem) { .scroll-expand__hint { bottom: 7.5rem; } }
-
-/* MaskedHeading on the headings (components/fx/MaskedHeadings): the real text stays in place, see-through, under its mask */
-[data-masked] { -webkit-text-fill-color: transparent; }
-.mask-host { position: absolute; inset: 0; -webkit-text-fill-color: initial; text-align: inherit; }
-.mask-host .masked-heading { text-wrap: inherit; }
-
 /* ---------- The background: React Bits' LightRays (components/fx/RaysBackdrop) ---------- */
 .rays-backdrop { background: var(--color-paper); }
 html.dark .rays-backdrop { background: radial-gradient(120% 90% at 0% 0%, #16233f 0%, var(--color-night) 60%); }
@@ -766,3 +740,23 @@ html[data-film] .pf-root .animate-bounce, html[data-film] .pf-root [class*="pf-l
 html[data-film] .pf-root * { transition-duration: 0s !important; }
 html[data-film] { scroll-behavior: auto !important; }
 @keyframes orbit-progress { to { stroke-dashoffset: 0; } }
+
+/* ---------- Route stops: the chapter markers (components/book/Opener) ---------- */
+/* the leg into this stop draws as the stop enters the screen; elsewhere it is simply there */
+.route-leg { transform-origin: left center; }
+[dir="rtl"] .route-leg { transform-origin: right center; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .route-leg { animation: route-leg linear both; animation-timeline: view(); animation-range: entry 30% cover 45%; }
+    .route-here { animation: route-here linear both; animation-timeline: view(); animation-range: cover 38% cover 46%; }
+  }
+}
+@keyframes route-leg { from { transform: scaleX(0); } to { transform: none; } }
+@keyframes route-here { from { transform: scale(0.4); opacity: 0.4; } to { transform: none; opacity: 1; } }
+/* the first section after a stop already has its heading close by: it starts nearer, and drops the hairline */
+.route-stop + section.sec, .route-stop + div > section.sec:first-child,
+.route-stop + section.sec-finale, .route-stop + div > section.sec-finale:first-child { padding-top: 3rem; border-top-color: transparent; }
+@media (min-width: 64rem) {
+  .route-stop + section.sec, .route-stop + div > section.sec:first-child,
+  .route-stop + section.sec-finale, .route-stop + div > section.sec-finale:first-child { padding-top: 4.5rem; }
+}

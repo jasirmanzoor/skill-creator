@@ -4,47 +4,15 @@ import type { Dictionary, Locale } from "@/content/i18n";
 import { pitchCopy } from "@/content/pitch";
 import { whatsappLink } from "@/content/facts";
 import TrackedLink from "../ui/TrackedLink";
-import ScrollTimeline, { type TimelinePanel } from "../ui/ScrollTimeline";
-import { CheckIcon, WhatsAppIcon } from "../ui/icons";
-import { OwnArt, WinArt } from "./PanelArt";
-
-/** on your own: one charcoal ground; with MSG: the brand's own colours, in turn */
-const OWN = { bg: "#16191f", fg: "#ece7e1" };
-const WIN = [
-  { bg: "#009df8", fg: "#0b1730" },
-  { bg: "#e5f3fe", fg: "#142240" },
-  { bg: "#1c2c51", fg: "#7fcbfb" },
-];
-
-const cross = (
-  <span className="grid size-6 shrink-0 place-items-center rounded-full bg-[#e5735c]/25 text-[#ffb3a3] ring-1 ring-[#e5735c]/50">
-    <svg viewBox="0 0 24 24" className="size-3" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><path d="M7 7l10 10M17 7 7 17" /></svg>
-  </span>
-);
-const check = (
-  <span className="grid size-6 shrink-0 place-items-center rounded-full bg-current/15 ring-1 ring-current/40">
-    <CheckIcon className="size-3.5" />
-  </span>
-);
+import { WhatsAppIcon } from "../ui/icons";
 
 /**
- * Why MSG, as a scroll timeline (Framer's "Scrolltimeline"): the six hard parts of selling online, each first as it is
- * on your own (charcoal, the problem and one big word) and then wiped over by MSG's answer in the brand's colours, a
- * seam of light running along the wipe. Each side holds still for a moment, so it reads as before and after, not a
- * scrub. The close and the WhatsApp line follow.
+ * Why MSG, as one comparison read in a single pass: the six hard parts of selling online, each as it is on your own
+ * (muted) and, across a leg of the route that draws in as the row arrives, as it is with MSG (the answer, led by its
+ * one word). Nothing to scrub through; the close and the WhatsApp line follow.
  */
 export default function Pitch({ t, lang }: { t: Dictionary; lang: Locale }) {
   const c = pitchCopy[lang];
-  const total = String(c.rows.length).padStart(2, "0");
-  const panels: TimelinePanel[] = c.rows.flatMap((r, i) => {
-    // the count stays "01 / 06" in Arabic too (isolated left to right)
-    const n = `\u2066${String(i + 1).padStart(2, "0")} / ${total}\u2069`;
-    return [
-      { eyebrow: `${n} · ${c.toggle[0]}`, mark: cross, desc: r.pain, big: r.own, art: <OwnArt i={i} />, ...OWN },
-      { eyebrow: `${n} · ${c.toggle[1]}`, mark: check, desc: r.fix, big: r.win, glow: true, art: <WinArt i={i} lang={lang} bg={WIN[i % WIN.length].bg} />, ...WIN[i % WIN.length] },
-    ];
-  });
-
   return (
     <section id="why" data-theme="dark" aria-labelledby="why-title" className="on-dark relative isolate scroll-mt-16 bg-pitch pb-16 pt-24 text-white lg:pb-24 lg:pt-28">
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(60%_40%_at_80%_0%,rgba(0,157,248,0.16),transparent_70%)]" />
@@ -54,14 +22,39 @@ export default function Pitch({ t, lang }: { t: Dictionary; lang: Locale }) {
           <h2 id="why-title" className="h-scene">{c.title}</h2>
           <p className="max-w-xl text-lg leading-relaxed text-white/80 text-pretty lg:justify-self-end">{c.lead}</p>
         </div>
-        <p className="mt-8 flex items-center gap-2 text-sm font-semibold text-white/60">
-          <svg viewBox="0 0 24 24" className="size-4 animate-bounce" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M6 13l6 6 6-6" /></svg>
-          {c.scrollHint}
-        </p>
       </div>
 
-      <div className="mx-auto mt-6 max-w-[96rem] px-3 lg:px-6">
-        <ScrollTimeline panels={panels} rtl={lang === "ar"} label={c.toggleLabel} />
+      <div className="mx-auto mt-12 max-w-7xl px-5 lg:mt-16 lg:px-8">
+        <div aria-hidden="true" className="hidden grid-cols-[3.5rem_1fr_5rem_1.25fr] border-b border-white/15 pb-3 text-xs font-semibold uppercase tracking-[0.16em] text-white/50 md:grid rtl:tracking-normal">
+          <span />
+          <span>{c.toggle[0]}</span>
+          <span />
+          <span className="text-brand-bright">{c.toggle[1]}</span>
+        </div>
+        <ol aria-label={c.toggleLabel}>
+          {c.rows.map((r, i) => (
+            <li key={r.win} className="grid grid-cols-[2.5rem_1fr] gap-x-4 gap-y-3 border-b border-white/10 py-6 md:grid-cols-[3.5rem_1fr_5rem_1.25fr] md:items-center md:gap-x-0 md:py-7">
+              <span className="num pt-0.5 font-mono text-sm text-white/55 md:pt-0" dir="ltr">{String(i + 1).padStart(2, "0")}</span>
+              <p className="text-white/55">
+                <span className="sr-only">{c.toggle[0]}: </span>
+                {r.pain}
+              </p>
+              {/* the leg from the problem to MSG's answer */}
+              <span aria-hidden="true" className="relative col-start-2 hidden h-px md:col-start-auto md:mx-3 md:block">
+                <span className="absolute inset-0 bg-white/15" />
+                <span className="route-leg absolute inset-0 bg-brand-bright" />
+                <span className="absolute -end-0.5 top-1/2 size-1.5 -translate-y-1/2 rounded-full bg-brand-bright" />
+              </span>
+              <div className="col-start-2 md:col-start-auto">
+                <p className="font-display text-2xl font-semibold leading-none tracking-[-0.02em] text-white rtl:leading-snug rtl:tracking-normal">
+                  <span className="sr-only">{c.toggle[1]}: </span>
+                  {r.win}
+                </p>
+                <p className="mt-2 text-white/80">{r.fix}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
       </div>
 
       <div className="mx-auto mt-10 max-w-7xl px-5 lg:px-8">
