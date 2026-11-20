@@ -824,3 +824,55 @@ html.dark .logo-white { opacity: 1 !important; }
 ::view-transition-group(root) { animation-duration: 0.32s; }
 ::view-transition-old(root), ::view-transition-new(root) { animation-timing-function: var(--ease-out); }
 @media (prefers-reduced-motion: reduce) { ::view-transition-group(root) { animation-duration: 0.01ms; } }
+
+/* =====================================================================================================================
+   V2.1 MOTION SYSTEM: three kinds of movement, combined rather than scroll effects everywhere.
+   NARRATIVE (linked to scroll progress, CSS scroll-driven: off the main thread, never takes the scroll, reverses
+   naturally, and does nothing where unsupported) · INTERACTION (Motion for React, in the components) · AMBIENT (slow
+   loops that say the system is live). Everything here sits inside prefers-reduced-motion: no-preference.
+   Only transform and clip-path animate, never opacity on text, so every frame stays readable and passes contrast.
+   ===================================================================================================================== */
+
+/* ---- the hero headline: a choreographed word-by-word rise through a mask (pure CSS: plays without JavaScript) ---- */
+.kw { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+.kw > span { display: inline-block; }
+@media (prefers-reduced-motion: no-preference) {
+  .kw > span { animation: kw-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(0.12s + var(--i, 0) * 0.07s); }
+  .kw-late > span { animation-delay: calc(0.55s + var(--i, 0) * 0.07s); }
+  .hero-after { animation: hero-after 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: var(--d, 0.9s); }
+}
+@keyframes kw-rise { from { transform: translateY(105%) rotate(2deg); } }
+@keyframes hero-after { from { transform: translateY(18px); clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+
+/* ---- AMBIENT: a live system ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .live-dot { position: relative; }
+  .live-dot::after { content: ""; position: absolute; inset: -4px; border: 1px solid currentColor; animation: live-ring 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite; }
+  .hub-ring { transform-box: fill-box; transform-origin: center; animation: hub-ring 3.2s cubic-bezier(0.16, 1, 0.3, 1) infinite; }
+  .hub-ring-2 { animation-delay: 1.6s; }
+  .plate-drift { animation: plate-drift 26s ease-in-out infinite alternate; }
+}
+@keyframes live-ring { from { transform: scale(0.6); opacity: 0.9; } to { transform: scale(2.4); opacity: 0; } }
+@keyframes hub-ring { from { transform: scale(1); opacity: 0.7; } to { transform: scale(4.2); opacity: 0; } }
+@keyframes plate-drift { from { transform: scale(1.04) translate3d(-0.6%, 0, 0); } to { transform: scale(1.08) translate3d(0.6%, -0.8%, 0); } }
+
+/* ---- NARRATIVE: sections and photographs enter as you arrive (scroll-driven; static where unsupported) ---- */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* headings rise out of their own line */
+    main .h-section, main h2.font-display { animation: sec-rise linear both; animation-timeline: view(); animation-range: entry 0% entry 55%; }
+    /* photographic plates open from the bottom edge, and the picture settles inside them */
+    main .plate { animation: plate-open linear both; animation-timeline: view(); animation-range: entry 0% entry 70%; }
+    /* inside the frame the photograph moves a little slower than the page: depth without moving the layout */
+    main .plate img { animation: plate-depth linear both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
+    /* spec rows, list rows and figures arrive one after another as their block enters */
+    main dl > div, main ol > li, main [data-protocol] > li { animation: row-in linear both; animation-timeline: view(); animation-range: entry 0% entry 40%; }
+    /* Build My Plan and the estimator are approved as they are: nothing here touches them */
+    #planner *, #estimate *, #hero-quote *, #ask * { animation-timeline: auto; }
+    #planner dl > div, #planner ol > li, #estimate dl > div, #estimate ol > li, #ask ol > li, #hero-quote dl > div { animation: none; }
+  }
+}
+@keyframes sec-rise { from { transform: translateY(0.45em); clip-path: inset(0 0 100% 0); } to { transform: none; clip-path: inset(0 0 -0.2em 0); } }
+@keyframes plate-open { from { clip-path: inset(18% 0 0 0); transform: translateY(24px); } to { clip-path: inset(0 0 0 0); transform: none; } }
+@keyframes plate-depth { from { transform: scale(1.12) translateY(-3.5%); } to { transform: scale(1.12) translateY(3.5%); } }
+@keyframes row-in { from { transform: translateY(14px); } to { transform: none; } }

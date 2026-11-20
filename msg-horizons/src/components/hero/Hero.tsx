@@ -10,6 +10,21 @@ import { usePlan } from "../PlanContext";
 import TrackedLink from "../ui/TrackedLink";
 import { WhatsAppIcon } from "../ui/icons";
 import QuoteCard from "./QuoteCard";
+import CountUp from "../ui/CountUp";
+
+/** a line set as words, each rising through its own mask in turn (globals.css .kw): runs in CSS, so it plays before hydration */
+function Kinetic({ text, late = false, offset = 0 }: { text: string; late?: boolean; offset?: number }) {
+  const words = text.split(" ");
+  return (
+    <>
+      {words.map((w, i) => (
+        <span key={i} className={`kw ${late ? "kw-late" : ""}`} style={{ ["--i" as string]: i + offset }}>
+          <span>{w}</span>{i < words.length - 1 ? "\u00a0" : null}
+        </span>
+      ))}
+    </>
+  );
+}
 
 const RATE_LANE: Record<HeroLane, Lane> = { intra: "intra", inter: "inter", sabya: "sabyaMajor" };
 
@@ -50,18 +65,18 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
         <div className="grid gap-x-12 gap-y-12 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <p className="lbl flex items-center gap-2.5 text-muted">
-              <span aria-hidden="true" className="size-1.5 bg-brand" />
+              <span aria-hidden="true" className="live-dot size-1.5 bg-brand text-brand" />
               {c.live}
             </p>
             <h1
               id="hero-title"
               className="mt-7 font-display text-[clamp(2.6rem,6.2vw,6rem)] font-semibold leading-[0.96] tracking-[-0.045em] text-ink text-balance rtl:leading-[1.25] rtl:tracking-normal"
             >
-              <span className="block">{c.title[0]}</span>
-              <span className="block font-normal text-ink-3">{c.title[1]}</span>
+              <span className="block"><Kinetic text={c.title[0]} /></span>
+              <span className="block font-normal text-ink-3"><Kinetic text={c.title[1]} late /></span>
             </h1>
-            <p className="mt-8 max-w-[34rem] text-lg leading-relaxed text-muted text-pretty">{c.lead}</p>
-            <div className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-4">
+            <p className="hero-after mt-8 max-w-[34rem] text-lg leading-relaxed text-muted text-pretty" style={{ ["--d" as string]: "1.05s" }}>{c.lead}</p>
+            <div className="hero-after mt-10 flex flex-wrap items-center gap-x-7 gap-y-4" style={{ ["--d" as string]: "1.2s" }}>
               <a href="#hero-quote" className="btn-ind">
                 {c.command.ctaPrice}
                 <svg viewBox="0 0 24 24" className="size-4 rtl:-scale-x-100" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
@@ -78,7 +93,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
               </TrackedLink>
             </div>
           </div>
-          <div id="hero-quote" className="scroll-mt-24 lg:col-span-5 lg:pt-12">
+          <div id="hero-quote" className="hero-after scroll-mt-24 lg:col-span-5 lg:pt-12" style={{ ["--d" as string]: "0.85s" }}>
             <QuoteCard lang={L} reduce={reduce} lane={lane} onLane={(l) => setQuote({ lane: RATE_LANE[l] })} orders={orders} onOrders={(n) => setQuote({ orders: n })} />
           </div>
         </div>
@@ -108,7 +123,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
           {c.command.strengths.map((s, i) => (
             <div key={s.l} className={`border-b border-line py-6 pe-4 lg:border-b-0 lg:pe-6 ${i ? "lg:border-s lg:ps-6" : ""}`}>
               <dd className="font-display text-[clamp(1.9rem,8vw,2.4rem)] font-semibold leading-none whitespace-nowrap tracking-[-0.035em] text-ink lg:text-5xl rtl:tracking-normal" dir={ar ? "rtl" : "ltr"}>
-                <span className="num" dir="ltr">{`${s.pre ?? ""}${s.v.toLocaleString("en-US")}${s.suffix}`}</span>
+                <CountUp value={`${s.pre ?? ""}${s.v.toLocaleString("en-US")}${s.suffix}`} className="num" />
                 {s.unit ? <span className="ms-1.5 text-[0.55em] font-medium text-muted">{s.unit}</span> : null}
               </dd>
               <dt className="lbl mt-3 text-muted">{s.l}</dt>

@@ -259,6 +259,41 @@ await test("estimator: locked until sign-in, then welcomes and asks to help (ans
   await ctx.close();
 });
 
+await test("who we are: the company profile is a book again, with thumbnails, a counter, full screen, and pages that turn right to left in Arabic", async () => {
+  for (const lang of ["en", "ar"]) {
+    const { page, ctx, errors } = await open(`/${lang}`);
+    await reach(page, "profile");
+    const book = page.getByRole("region", { name: lang === "en" ? "MSG Horizons company profile" : "الملف التعريفي لام اس جي هورايزونز" });
+    await book.waitFor();
+    assert.ok(await book.locator('ol button[aria-label]').count() >= 15, `${lang}: page thumbnails`);
+    await book.locator("ol button[aria-label]").nth(6).click();
+    await page.waitForTimeout(900);
+    assert.match(await book.locator("[aria-live=polite]").innerText(), /\b(6|7)\b/, `${lang}: the counter follows a thumbnail jump`);
+    assert.equal(await page.getByRole("heading", { level: 2, name: lang === "en" ? "Meet MSG Horizons." : "تعرّف على ام اس جي هورايزونز." }).count(), 1);
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  }
+});
+
+await test("ask MSG: topics switch, search finds questions across topics, and every answer is one already on the site", async () => {
+  const { page, ctx, errors } = await open("/en");
+  await reach(page, "ask");
+  const sec = page.locator("#ask");
+  assert.equal(await sec.getByRole("tab").count(), 7, "seven topics");
+  await sec.getByRole("tab", { name: /COD and returns/ }).click();
+  await sec.locator("article h3", { hasText: "How do I get paid on cash orders?" }).waitFor();
+  await sec.getByRole("searchbox").fill("track");
+  await sec.locator("article h3", { hasText: "Can my customers track their parcels?" }).waitFor();
+  await sec.getByRole("searchbox").fill("");
+  await sec.getByRole("tab", { name: /Delivery and coverage/ }).click();
+  await sec.getByRole("button", { name: /What vehicles does MSG use\?/ }).first().click();
+  const answer = await sec.locator("article p").first().innerText();
+  const service = await (await fetch(`${BASE}/en/services/land-freight-saudi-arabia`)).text();
+  assert.ok(service.includes(answer.slice(0, 40)), "the answer is the one on the land-freight service page");
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
 await test("peak deployment: five stages from forecast to closeout, and no simulated volumes", async () => {
   for (const lang of ["en", "ar"]) {
     const { page, ctx, errors } = await open(`/${lang}`);
@@ -429,7 +464,7 @@ await test("book: one continuous page; the rail, #links, ] and [ and the back bu
     const { page, ctx, errors } = await open(`/${lang}`, { reducedMotion: "reduce" });
     const opened = () => page.evaluate(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter);
     const topOf = (sel) => page.locator(sel).evaluate((el) => el.getBoundingClientRect().top);
-    assert.equal(await page.locator("[data-chapter]").count(), 6, `${lang}: six chapters in the HTML`);
+    assert.equal(await page.locator("[data-chapter]").count(), 8, `${lang}: eight chapters in the HTML`);
     assert.equal(await opened(), "hero", `${lang}: opens at the start`);
     // one vertical page: every chapter is laid out, one under the other
     const tops = await page.$$eval("[data-chapter]", (els) => els.map((e) => e.getBoundingClientRect().top + scrollY));
@@ -440,7 +475,7 @@ await test("book: one continuous page; the rail, #links, ] and [ and the back bu
     assert.equal(await nav.locator('[aria-current="step"]').getAttribute("href"), "#fleet", `${lang}: the rail lights the current chapter`);
     assert.ok(Math.abs((await topOf("#fleet")) - 64) < 90, `${lang}: lands at the chapter's top`);
     await page.keyboard.press("]");
-    await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "estimate");
+    await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "profile");
     await page.keyboard.press("[");
     await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "fleet");
     // a #link to a section deep in another chapter lands on the section

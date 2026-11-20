@@ -18,6 +18,8 @@ import MobileBar from "@/components/MobileBar";
 import Perfmix from "@/components/sections/Perfmix";
 import Chapter from "@/components/book/Chapter";
 import NetworkMap from "@/components/network/NetworkMap";
+import ProfileBook from "@/components/sections/ProfileBook";
+import AskMSG from "@/components/ask/AskMSG";
 import OrderSequence from "@/components/operation/OrderSequence";
 import RouteBook from "@/components/book/RouteBook";
 import DirectorOutro from "@/components/sections/DirectorOutro";
@@ -29,8 +31,8 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
   if (!isLocale(lang)) notFound();
   const t = getDictionary(lang);
 
-  // Six chapters (content/chapters.ts) down one page, steered from the route rail: Start, Scale, Solutions, Network,
-  // Infrastructure, Configure. The company's longer story lives on its own page (/company-profile).
+  // Eight chapters (content/chapters.ts) down one page, steered from the route rail: Start, Scale, Solutions, Network,
+  // Infrastructure, Who we are, Ask MSG, Configure.
   const c = (n: number, children: React.ReactNode) => <Chapter n={n} lang={lang}>{children}</Chapter>;
   return (
     <PlanProvider>
@@ -53,7 +55,9 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
           <Perfmix lang={lang} />
           <Enterprise t={t} lang={lang} />
         </>)}
-        {c(5, <>
+        {c(5, <ProfileBook t={t} lang={lang} />)}
+        {c(6, <AskMSG t={t} lang={lang} />)}
+        {c(7, <>
           <EstimatorSection t={t} lang={lang} />
           <Stage><Planner t={t} lang={lang} /></Stage>
           <Contact t={t} lang={lang} />

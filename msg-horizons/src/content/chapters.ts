@@ -1,9 +1,9 @@
 import type { Locale } from "./i18n";
 
 /**
- * The homepage's six chapters, in reading order: who MSG is and what it costs (Start), the record (Scale), what MSG
- * solves (Solutions), where and how it runs (Network), what it runs on (Infrastructure), and the configuration that
- * ends in a conversation (Configure). Each chapter is one page of the book (components/book) and holds one or
+ * The homepage's eight chapters, in reading order: what it costs (Start), the record (Scale), what MSG solves
+ * (Solutions), where and how it runs (Network), what it runs on (Infrastructure), the company itself as a book (Who we
+ * are), every question answered (Ask MSG), and the configuration that ends in a conversation (Configure). Each chapter is one page of the book (components/book) and holds one or
  * more of the sections; `id` is the anchor of its first section, and every older #link (#contact, #planner, #perfmix,
  * #live-tracking, #services...) still lands inside the chapter that now holds it.
  */
@@ -19,6 +19,8 @@ export const CHAPTERS: Chapter[] = [
   { id: "why", title: { en: "Solutions", ar: "الحلول" }, hint: { en: "Six hard problems, seven services, one partner", ar: "ست مشكلات صعبة، سبع خدمات، شريك واحد" } },
   { id: "network", title: { en: "Network", ar: "الشبكة" }, hint: { en: "Riyadh to the far south, and one order through it", ar: "من الرياض إلى أقصى الجنوب، وطلب واحد عبرها" } },
   { id: "fleet", title: { en: "Infrastructure", ar: "البنية" }, hint: { en: "The hub, the fleet, the people, a store launched on them", ar: "المركز والأسطول والفريق، ومتجر انطلق عليها" } },
+  { id: "profile", title: { en: "Who we are", ar: "من نحن" }, hint: { en: "MSG's company profile, as a book", ar: "الملف التعريفي لام اس جي، ككتاب" } },
+  { id: "ask", title: { en: "Ask MSG", ar: "اسأل ام اس جي" }, hint: { en: "Every question, answered as MSG answers it", ar: "كل سؤال، بإجابة ام اس جي" } },
   { id: "estimate", title: { en: "Configure", ar: "خطّط" }, hint: { en: "Your price, your plan, then MSG", ar: "سعرك، خطتك، ثم ام اس جي" } },
 ];
 

@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { motion, useScroll, useTransform, type MotionValue } from "motion/react";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { facts } from "@/content/facts";
 import type { Locale } from "@/content/i18n";
 import { profileCopy } from "@/content/profile";
@@ -15,6 +17,11 @@ const OUTLINE = `M${KSA.map((p) => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join("
 /** the area MSG states it reaches from Sabya, drawn as a circle of equal area (about 2.2 km a unit on this map) */
 const REACH = Math.sqrt(facts.sabyaHub.coverageKm2 / Math.PI) / 2.22;
 const HAUL = `M${R.x} ${R.y} C ${R.x - 40} ${R.y + 190}, ${S.x + 170} ${S.y - 230}, ${S.x} ${S.y}`;
+/** the last mile, fanning out from the hub across the area MSG states it reaches (the company profile draws the same five) */
+const ring = (deg: number, r: number) => ({ x: S.x + r * Math.sin((deg * Math.PI) / 180), y: S.y - r * Math.cos((deg * Math.PI) / 180) });
+const FAN = [20, 75, 130, 300, 340].map((d) => { const a = ring(d, 16), b = ring(d, REACH * 0.92); return `M${a.x.toFixed(1)} ${a.y.toFixed(1)} L${b.x.toFixed(1)} ${b.y.toFixed(1)}`; });
+/** one stretch of the map's scroll: 0 before it, rising to 1 across it */
+const useStep = (p: MotionValue<number>, from: number, to: number, still: boolean) => useTransform(p, (v) => (still ? 1 : Math.min(1, Math.max(0, (v - from) / (to - from)))));
 
 const ui: Record<Locale, { idx: string; title: string; lead: string; hq: string; hub: string; water: [string, string]; note: string; area: string }> = {
   en: {
@@ -52,6 +59,14 @@ export default function NetworkMap({ lang }: { lang: Locale }) {
   const u = ui[lang];
   const legs = profileCopy[lang].network.legs;
   const [on, setOn] = useState<Part>(null);
+  // NARRATIVE: as the sheet crosses the screen the operation draws itself in order: headquarters, the line haul south,
+  // the hub, the last mile fanning out, then the area it reaches. Scrolling back undraws it; nothing is pinned.
+  const sheet = useRef<HTMLElement>(null);
+  const still = useReducedMotion();
+  const { scrollYProgress: p } = useScroll({ target: sheet, offset: ["start end", "end start"] });
+  const hq = useStep(p, 0.2, 0.28, still), haul = useStep(p, 0.27, 0.43, still), hub = useStep(p, 0.42, 0.48, still);
+  const fan = useStep(p, 0.47, 0.56, still), reach = useStep(p, 0.54, 0.66, still);
+  const reachR = useTransform(reach, (v) => REACH * (0.04 + 0.96 * v));
   const dim = (k: Exclude<Part, null>) => (on !== null && on !== k ? "opacity-35" : "opacity-100");
   const hot = (k: Exclude<Part, null>) => on === k;
   const bind = (k: Exclude<Part, null>) => ({
@@ -64,7 +79,7 @@ export default function NetworkMap({ lang }: { lang: Locale }) {
   const latLines = [18, 20, 22, 24, 26, 28, 30, 32];
 
   return (
-    <section id="network" aria-labelledby="network-title" className="scroll-mt-16 border-t border-line bg-paper text-ink">
+    <section ref={sheet} id="network" aria-labelledby="network-title" className="scroll-mt-16 border-t border-line bg-paper text-ink">
       <div className="mx-auto grid max-w-[88rem] gap-x-12 gap-y-12 px-5 py-20 sm:px-8 lg:grid-cols-12 lg:px-10 lg:py-28">
         <div className="lg:col-span-4">
           <h2 id="network-title" className="font-display text-[clamp(2rem,3.4vw,3.1rem)] font-semibold leading-[1.02] tracking-[-0.035em] text-balance rtl:leading-[1.3] rtl:tracking-normal">{u.title}</h2>
@@ -117,29 +132,42 @@ export default function NetworkMap({ lang }: { lang: Locale }) {
               <path d={OUTLINE} className="fill-paper stroke-ink" strokeWidth="1.6" strokeLinejoin="round" />
               {/* coverage from Sabya, hatched, inside the border */}
               <g clipPath="url(#ksa-clip)" className={`transition-opacity duration-200 ${dim(3)} ${hot(3) ? "text-brand" : "text-brand/45"}`}>
-                <circle cx={S.x} cy={S.y} r={REACH} fill="url(#hatch)" />
-                <circle cx={S.x} cy={S.y} r={REACH} fill="none" stroke="currentColor" strokeWidth="1.2" strokeDasharray="5 5" />
+                <motion.circle cx={S.x} cy={S.y} r={reachR} fill="url(#hatch)" />
+                <motion.circle cx={S.x} cy={S.y} r={reachR} fill="none" stroke="currentColor" strokeWidth="1.2" strokeDasharray="5 5" />
+              </g>
+              {/* the last mile, fanning out from the hub */}
+              <g className={`transition-opacity duration-200 ${dim(3)}`}>
+                {FAN.map((d) => <motion.path key={d} d={d} fill="none" className="stroke-brand" strokeWidth="1.6" strokeDasharray="1 0" style={{ pathLength: fan }} />)}
               </g>
               {/* the line haul */}
               <g className={`transition-opacity duration-200 ${dim(1)}`}>
                 <path d={HAUL} fill="none" className="stroke-ink/15" strokeWidth="5" />
-                <path d={HAUL} pathLength={1} fill="none" className={`net-haul ${hot(1) ? "stroke-brand" : "stroke-ink"}`} strokeWidth={hot(1) ? 3.5 : 2.5} />
+                <motion.path d={HAUL} fill="none" className={hot(1) ? "stroke-brand" : "stroke-ink"} strokeWidth={hot(1) ? 3.5 : 2.5} style={{ pathLength: haul }} />
+                {/* AMBIENT: one vehicle on the line haul, all the time: the network is running */}
+                {still ? null : (
+                  <motion.g style={{ opacity: haul }} className="net-van">
+                    <circle r="6" className="fill-brand"><animateMotion dur="7s" repeatCount="indefinite" path={HAUL} keyPoints="0;1" keyTimes="0;1" calcMode="spline" keySplines="0.45 0 0.55 1" /></circle>
+                  </motion.g>
+                )}
               </g>
               {/* headquarters */}
-              <g className={`transition-opacity duration-200 ${dim(0)}`}>
+              <motion.g style={{ opacity: hq }} className={`transition-opacity duration-200 ${dim(0)}`}>
                 <rect x={R.x - 9} y={R.y - 9} width="18" height="18" className={hot(0) ? "fill-brand" : "fill-ink"} />
                 <line x1={R.x + 9} y1={R.y} x2={R.x + 34} y2={R.y} className="stroke-ink" strokeWidth="1" />
                 <text x={R.x + 40} y={R.y - 4} className="net-name fill-ink font-display" fontSize="19" fontWeight="600">{u.hq}</text>
                 <text x={R.x + 40} y={R.y + 16} className="net-coord fill-muted font-mono" fontSize="12.5" letterSpacing="0.06em" direction="ltr">24.71°N 46.72°E</text>
-              </g>
+              </motion.g>
               {/* the hub */}
-              <g className={`transition-opacity duration-200 ${dim(2)}`}>
+              <motion.g style={{ opacity: hub }} className={`transition-opacity duration-200 ${dim(2)}`}>
+                {/* AMBIENT: the hub breathes */}
+                <circle cx={S.x} cy={S.y} r="11" className="hub-ring fill-none stroke-brand" strokeWidth="1.5" />
+                <circle cx={S.x} cy={S.y} r="11" className="hub-ring hub-ring-2 fill-none stroke-brand" strokeWidth="1.5" />
                 <circle cx={S.x} cy={S.y} r="11" className={hot(2) ? "fill-brand" : "fill-ink"} />
                 <circle cx={S.x} cy={S.y} r="4" className="fill-paper" />
                 <line x1={S.x + 11} y1={S.y} x2={S.x + 190} y2={S.y} className="stroke-ink" strokeWidth="1" />
                 <text x={S.x + 196} y={S.y - 4} className="net-name fill-ink font-display" fontSize="19" fontWeight="600">{u.hub}</text>
                 <text x={S.x + 196} y={S.y + 16} className="net-coord fill-muted font-mono" fontSize="12.5" letterSpacing="0.06em" direction="ltr">17.15°N 42.63°E · {facts.sabyaHub.areaM2.toLocaleString("en-US")} m²</text>
-              </g>
+              </motion.g>
             </svg>
             {/* the stated reach, as a reading */}
             <div className="absolute end-4 top-4 border border-ink/15 bg-paper px-4 py-3 sm:end-6 sm:top-6">
