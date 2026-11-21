@@ -10,6 +10,7 @@ import { usePlan } from "../PlanContext";
 import TrackedLink from "../ui/TrackedLink";
 import { WhatsAppIcon } from "../ui/icons";
 import QuoteCard from "./QuoteCard";
+import HeroFilm from "./HeroFilm";
 import CountUp from "../ui/CountUp";
 
 /** a line set as words, each rising through its own mask in turn (globals.css .kw): runs in CSS, so it plays before hydration */
@@ -44,10 +45,9 @@ const plate: Record<Locale, { alt: string; where: string; what: string; fig: str
 };
 
 /**
- * The first screen, set as an editorial page: the promise in large type, the ten-second price beside it as a spec
- * panel (price first, story second), then MSG's own fleet at the Sabya hub as a full-width plate with its caption,
- * and the verified figures under a hairline. Nothing is pinned, nothing plays on its own: the page reads at once,
- * with or without motion. "One order through MSG" lives in the network chapter (operation/OrderSequence).
+ * The first screen: MSG's brand film full bleed behind the promise (muted, one sound button), the headline rising
+ * word by word, and the ten-second price beside it as a spec panel (price first, story second). Below, MSG's own
+ * fleet at the Sabya hub as a captioned plate, and the verified figures under a hairline. Nothing is pinned. "One order through MSG" lives in the network chapter (operation/OrderSequence).
  */
 export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   const L: Locale = lang ?? "en";
@@ -61,23 +61,26 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
 
   return (
     <section id="hero" aria-labelledby="hero-title" className="relative bg-paper text-ink">
-      <div className="mx-auto max-w-[88rem] px-5 pt-28 sm:px-8 lg:px-10 lg:pt-36">
+      {/* the first screen: MSG's brand film, full bleed, with the promise and the price over it */}
+      <div data-theme="dark" className="relative flex min-h-[100svh] items-end text-white">
+      <HeroFilm lang={L} />
+      <div className="relative mx-auto w-full max-w-[88rem] px-5 pb-16 pt-32 sm:px-8 lg:px-10 lg:pb-24 lg:pt-40">
         <div className="grid gap-x-12 gap-y-12 lg:grid-cols-12">
           <div className="lg:col-span-7">
-            <p className="lbl flex items-center gap-2.5 text-muted">
-              <span aria-hidden="true" className="live-dot size-1.5 bg-brand text-brand" />
+            <p className="lbl flex items-center gap-2.5 text-white/85">
+              <span aria-hidden="true" className="live-dot size-1.5 bg-brand-bright text-brand-bright" />
               {c.live}
             </p>
             <h1
               id="hero-title"
-              className="mt-7 font-display text-[clamp(2.6rem,6.2vw,6rem)] font-semibold leading-[0.96] tracking-[-0.045em] text-ink text-balance rtl:leading-[1.25] rtl:tracking-normal"
+              className="mt-7 font-display text-[clamp(2.6rem,6.2vw,6rem)] font-semibold leading-[0.96] tracking-[-0.045em] text-white text-balance [text-shadow:0_2px_24px_rgba(17,27,54,0.35)] rtl:leading-[1.25] rtl:tracking-normal"
             >
               <span className="block"><Kinetic text={c.title[0]} /></span>
-              <span className="block font-normal text-ink-3"><Kinetic text={c.title[1]} late /></span>
+              <span className="block font-normal text-white/80"><Kinetic text={c.title[1]} late /></span>
             </h1>
-            <p className="hero-after mt-8 max-w-[34rem] text-lg leading-relaxed text-muted text-pretty" style={{ ["--d" as string]: "1.05s" }}>{c.lead}</p>
+            <p className="hero-after mt-8 max-w-[34rem] text-lg leading-relaxed text-white/85 text-pretty" style={{ ["--d" as string]: "1.05s" }}>{c.lead}</p>
             <div className="hero-after mt-10 flex flex-wrap items-center gap-x-7 gap-y-4" style={{ ["--d" as string]: "1.2s" }}>
-              <a href="#hero-quote" className="btn-ind">
+              <a href="#hero-quote" className="btn-ind on-dark">
                 {c.command.ctaPrice}
                 <svg viewBox="0 0 24 24" className="size-4 rtl:-scale-x-100" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
               </a>
@@ -87,9 +90,9 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
                 rel="noopener noreferrer"
                 event="whatsapp_click"
                 props={{ location: "hero" }}
-                className="inline-flex min-h-12 items-center gap-2 font-semibold text-ink underline decoration-line-strong decoration-1 underline-offset-[0.4em] transition-colors hover:decoration-ink"
+                className="inline-flex min-h-12 items-center gap-2 font-semibold text-white underline decoration-white/40 decoration-1 underline-offset-[0.4em] transition-colors hover:decoration-white"
               >
-                <WhatsAppIcon className="size-5 text-whatsapp" /> {c.ctaTalk}
+                <WhatsAppIcon className="size-5 text-whatsapp-bright" /> {c.ctaTalk}
               </TrackedLink>
             </div>
           </div>
@@ -97,6 +100,8 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
             <QuoteCard lang={L} reduce={reduce} lane={lane} onLane={(l) => setQuote({ lane: RATE_LANE[l] })} orders={orders} onOrders={(n) => setQuote({ orders: n })} />
           </div>
         </div>
+      </div>
+
       </div>
 
       {/* the plate: MSG's own fleet at its own hub, captioned like a figure */}
