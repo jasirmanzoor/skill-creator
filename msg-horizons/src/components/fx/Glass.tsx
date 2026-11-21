@@ -37,4 +37,7 @@ export default function Glass({ radius = 0, frost = 0.6 }: { radius?: number; fr
   );
 }
 
-export const useGlass = () => !useLowPower();
+// The refracting glass recomputes an SVG displacement filter over the moving page on every scrolled frame, three
+// bars at once: it was the largest single cost while scrolling. The bars' own frosted fallback (blur + tint) looks
+// nearly the same and is far cheaper, so it is now used everywhere. GlassSurface stays for a later, static use.
+export const useGlass = () => { useLowPower(); return false; };

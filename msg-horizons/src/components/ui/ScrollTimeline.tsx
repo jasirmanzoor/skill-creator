@@ -23,7 +23,7 @@ export type TimelinePanel = {
 /** the original's feel: a firm spring toward the scroll position */
 const SPRING = { stiffness: 450, damping: 50, mass: 1 };
 /** of each step, how much is the wipe; the rest is the panel holding still */
-const MOVE = 0.72;
+const MOVE = 0.6;
 
 /**
  * A scroll timeline, after Framer's "Scrolltimeline": a sticky frame of full-bleed panels, each wiping across the one
@@ -32,7 +32,7 @@ const MOVE = 0.72;
  * changes: a timeline, or a before and after. In Arabic the wipe and the tip run the other way. Every panel's text
  * stays in the page in order for search and screen readers; under reduced motion the panels are a plain list.
  */
-export default function ScrollTimeline({ panels, rtl = false, label, step = 50 }: { panels: TimelinePanel[]; rtl?: boolean; label: string; step?: number }) {
+export default function ScrollTimeline({ panels, rtl = false, label, step = 80 }: { panels: TimelinePanel[]; rtl?: boolean; label: string; step?: number }) {
   const reduce = useReducedMotion();
   const wrap = useRef<HTMLDivElement>(null);
   const els = useRef<(HTMLElement | null)[]>([]);

@@ -37,8 +37,8 @@ export default function Opener({ n, lang }: { n: number; lang: Locale }) {
       startRadius={28}
       shape="hex"
       mediaZoom={1.25}
-      scrollDistance={0.45}
-      holdDistance={0.08}
+      scrollDistance={1}
+      holdDistance={0.45}
       overlayScrim={0.5}
       className="chapter-plate"
       backdrop={<ReelBackdrop />}
