@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import PerfGovernor from "@/components/fx/PerfGovernor";
+import RaysBackdrop from "@/components/fx/RaysBackdrop";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import { Funnel_Sans, IBM_Plex_Mono, Readex_Pro } from "next/font/google";
@@ -163,6 +164,7 @@ export default async function RootLayout({ children, params }: Props) {
         <script dangerouslySetInnerHTML={{ __html: BOOT }} />
       </head>
       <body>
+        <RaysBackdrop />
         <PerfGovernor />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(lang) }} />
         {children}

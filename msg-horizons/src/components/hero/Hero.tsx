@@ -73,6 +73,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
             </p>
             <h1
               id="hero-title"
+              data-mask-skip
               className="mt-7 font-display text-[clamp(2.6rem,6.2vw,6rem)] font-semibold leading-[0.96] tracking-[-0.045em] text-white text-balance [text-shadow:0_2px_24px_rgba(17,27,54,0.35)] rtl:leading-[1.25] rtl:tracking-normal"
             >
               <span className="block"><Kinetic text={c.title[0]} /></span>

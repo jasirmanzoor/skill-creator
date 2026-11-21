@@ -385,7 +385,7 @@ export default function Planner({ t, lang }: { t: Dictionary; lang: Locale }) {
   );
 
   return (
-    <section id="planner" aria-labelledby="planner-title" className="relative scroll-mt-16 py-8 text-white lg:py-10">
+    <section id="planner" data-mask-skip aria-labelledby="planner-title" className="relative scroll-mt-16 py-8 text-white lg:py-10">
       <div className="mx-auto max-w-[88rem] px-5 lg:px-8">
         <div className="grid gap-4 lg:grid-cols-[1fr_1fr] lg:items-end">
           <div>

@@ -1,5 +1,6 @@
 import { fmt, type Locale } from "@/content/i18n";
 import { bookCopy, CHAPTERS } from "@/content/chapters";
+import ReelBackdrop from "../fx/ReelBackdrop";
 
 /** each chapter's photograph (public/media/msg): used by the menu and the side map, not by the chapter itself */
 export const PLATE: Record<string, { src: string; pos: string; srcAr?: string }> = {
@@ -14,7 +15,7 @@ export const PLATE: Record<string, { src: string; pos: string; srcAr?: string }>
 };
 
 /** chapters whose first section sits on a light ground: their stop is set on paper so the two read as one */
-const LIGHT = new Set(["proof", "network", "fleet", "estimate"]);
+const LIGHT = new Set<string>(); // every stop opens on the film now (see below)
 /** chapters whose first section opens on the same line as the hint: the stop leaves it out rather than say it twice */
 const SAID = new Set<string>();
 
@@ -35,8 +36,10 @@ export default function Opener({ n, lang }: { n: number; lang: Locale }) {
     ? { band: "bg-paper text-ink", rail: "bg-ink/12", done: "bg-brand", here: "bg-brand ring-brand/20", todo: "bg-ink/25", num: "text-brand", hint: "text-muted" }
     : { band: "bg-deep text-white", rail: "bg-white/15", done: "bg-brand-bright", here: "bg-brand-bright ring-brand-bright/25", todo: "bg-white/30", num: "text-brand-bright", hint: "text-white/65" };
   return (
-    <div className={`route-stop relative ${tone.band}`} data-theme={light ? undefined : "dark"}>
-      <div className="mx-auto max-w-7xl px-5 pb-2 pt-12 lg:px-8 lg:pb-4 lg:pt-16">
+    <div className={`route-stop relative overflow-hidden ${tone.band}`} data-theme={light ? undefined : "dark"}>
+      {/* the base layer: MSG's brand film runs behind every chapter's opening, as on the live site */}
+      {light ? null : <ReelBackdrop dim={0.8} />}
+      <div className="relative mx-auto max-w-7xl px-5 pb-10 pt-12 lg:px-8 lg:pb-14 lg:pt-16">
         {/* the route: one dot a chapter, the passed legs solid, this leg drawing in */}
         <div aria-hidden="true" className="route-line relative flex items-center justify-between" dir={lang === "ar" ? "rtl" : "ltr"}>
           <span className={`absolute inset-x-0 top-1/2 h-px -translate-y-1/2 ${tone.rail}`} />

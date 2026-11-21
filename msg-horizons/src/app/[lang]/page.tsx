@@ -20,6 +20,7 @@ import Chapter from "@/components/book/Chapter";
 import NetworkMap from "@/components/network/NetworkMap";
 import ProfileBook from "@/components/sections/ProfileBook";
 import AskMSG from "@/components/ask/AskMSG";
+import MaskedHeadings from "@/components/fx/MaskedHeadings";
 import OrderSequence from "@/components/operation/OrderSequence";
 import RouteBook from "@/components/book/RouteBook";
 import DirectorOutro from "@/components/sections/DirectorOutro";
@@ -70,6 +71,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       <MobileBar t={t} />
       <RouteRail lang={lang} />
       <RouteBook lang={lang} />
+      <MaskedHeadings lang={lang} />
     </PlanProvider>
   );
 }
