@@ -108,7 +108,7 @@ html {
   text-rendering: optimizeLegibility;
 }
 body {
-  background: var(--color-paper);
+  background: transparent; /* the brand film (HeroFilm, fixed at z -10) plays behind the whole site */
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
@@ -876,3 +876,9 @@ html.dark .logo-white { opacity: 1 !important; }
 @keyframes plate-open { from { clip-path: inset(18% 0 0 0); transform: translateY(24px); } to { clip-path: inset(0 0 0 0); transform: none; } }
 @keyframes plate-depth { from { transform: scale(1.12) translateY(-3.5%); } to { transform: scale(1.12) translateY(3.5%); } }
 @keyframes row-in { from { transform: translateY(14px); } to { transform: none; } }
+
+/* ---------- The brand film behind the whole site: every section scrolls over it ---------- */
+html { background: var(--color-navy); }
+main section.bg-paper, main .sea-band, main section.bg-surface\/\[0\.62\] { background-color: rgb(241 241 240 / 0.9); }
+main section.bg-deep, main section.bg-pitch, main section.bg-night, main .route-stop.bg-deep { background-color: rgb(28 44 81 / 0.8); }
+html.dark main section.bg-paper, html.dark main .sea-band { background-color: rgb(15 24 48 / 0.85); }
