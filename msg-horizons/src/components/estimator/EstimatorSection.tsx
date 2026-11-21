@@ -73,7 +73,7 @@ export default function EstimatorSection({ t, lang }: { t: Dictionary; lang: Loc
   };
 
   return (
-    <section id="estimate" data-mask-skip aria-labelledby="estimate-title" className="sea-band relative scroll-mt-16 overflow-hidden sec text-teal-deep">
+    <section id="estimate" aria-labelledby="estimate-title" className="sea-band relative scroll-mt-16 overflow-hidden sec text-teal-deep">
       <div className="relative mx-auto max-w-7xl px-4 sm:px-5 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-2 lg:items-end">
           <div>

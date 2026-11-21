@@ -50,7 +50,7 @@ export default function AskMSG({ t, lang }: { t: Dictionary; lang: Locale }) {
       : <a href="#planner" data-plan-open className="btn-ind on-dark">{u.ctas.plan} <span aria-hidden="true" className="rtl:-scale-x-100">→</span></a>;
 
   return (
-    <section id="ask" aria-labelledby="ask-title" data-theme="dark" data-mask-skip className="scroll-mt-16 bg-deep text-white">
+    <section id="ask" aria-labelledby="ask-title" data-theme="dark" className="scroll-mt-16 bg-deep text-white">
       <div className="mx-auto max-w-[88rem] px-5 py-20 sm:px-8 lg:px-10 lg:py-28">
         <div className="grid gap-6 lg:grid-cols-12 lg:items-end">
           <div className="lg:col-span-6">
