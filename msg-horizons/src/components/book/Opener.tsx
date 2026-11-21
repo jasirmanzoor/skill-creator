@@ -12,7 +12,7 @@ export const PLATE: Record<string, { src: string; pos: string; srcAr?: string }>
   "live-tracking": { src: "/media/photos/van-desert.webp", pos: "74% 62%" }, // the van in the new livery, on the road out of town
   fleet: { src: "/media/msg/hub-aerial.webp", pos: "50% 50%" },
   proof: { src: "/media/msg/hub-team.webp", pos: "60% 55%" },
-  enterprise: { src: "/media/photos/sorting.webp", pos: "50% 50%" },
+  enterprise: { src: "/media/msg/hub-sorting.webp", pos: "50% 55%" },
   contact: { src: "/media/msg/facade.jpg", pos: "50% 45%" },
 };
 
@@ -31,12 +31,12 @@ export default function Opener({ n, lang }: { n: number; lang: Locale }) {
     <ScrollExpand
       src={lang === "ar" && plate.srcAr ? plate.srcAr : plate.src}
       mediaPosition={plate.pos}
-      startWidth={50}
-      startHeight={58}
-      mobileStart={[86, 50]}
-      startRadius={28}
-      shape="hex"
-      mediaZoom={1.25}
+      startWidth={72}
+      startHeight={62}
+      mobileStart={[88, 46]}
+      startRadius={32}
+      shape="rounded"
+      mediaZoom={1.12}
       scrollDistance={1}
       holdDistance={0.45}
       overlayScrim={0.5}
