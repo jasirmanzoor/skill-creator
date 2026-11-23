@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { heroCopy, type HeroLane } from "@/content/hero";
 import type { Lane } from "@/content/redsea";
 import { facts, whatsappLink } from "@/content/facts";
@@ -10,34 +9,23 @@ import { usePlan } from "../PlanContext";
 import TrackedLink from "../ui/TrackedLink";
 import { WhatsAppIcon } from "../ui/icons";
 import QuoteCard from "./QuoteCard";
+import HeroPlate from "./HeroPlate";
 
 const RATE_LANE: Record<HeroLane, Lane> = { intra: "intra", inter: "inter", sabya: "sabyaMajor" };
 
-const plate: Record<Locale, { alt: string; where: string; what: string; fig: string }> = {
-  en: {
-    alt: "MSG Horizons vans in MSG livery parked in front of the Sabya hub, its Arabic sign above the open door",
-    where: "Sabya hub · Jazan",
-    what: "MSG-owned Toyota Hiace vans · in-house drivers",
-    fig: "Fig. 01 — MSG's own photograph",
-  },
-  ar: {
-    alt: "مركبات ام اس جي هورايزونز أمام مركز صبيا، ولوحة الشركة فوق الباب المفتوح",
-    where: "مركز صبيا · جازان",
-    what: "مركبات تويوتا هايس مملوكة لام اس جي · سائقون من فريقنا",
-    fig: "الشكل 01 — صورة من ام اس جي",
-  },
-};
-
 /**
  * The first screen, set as an editorial page: the promise in large type, the ten-second price beside it as a spec
- * panel (price first, story second), then MSG's own fleet at the Sabya hub as a full-width plate with its caption,
- * and the verified figures under a hairline. Nothing is pinned, nothing plays on its own: the page reads at once,
- * with or without motion. "One order through MSG" lives in the network chapter (operation/OrderSequence).
+ * panel (price first, story second), then MSG's own fleet at the Sabya hub as a plate that opens to full width as the
+ * page scrolls (HeroPlate), and the verified figures under a hairline.
+ *
+ * The signature opening runs in CSS (globals.css, "V3 hero"), so it plays before the page hydrates and never holds
+ * a control back: (1) the status line arrives, (2) the two clauses of the promise rise through their masks, one after
+ * the other, (3) the lead, the actions and the rate card settle in. About 1.6 seconds, once; every link and the rate
+ * card work from the first frame. With reduced motion everything is simply there.
  */
 export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
   const L: Locale = lang ?? "en";
   const c = heroCopy[L];
-  const p = plate[L];
   const ar = L === "ar";
   const reduce = useReducedMotion();
   const { quote, setQuote } = usePlan();
@@ -49,7 +37,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
       <div className="mx-auto max-w-[88rem] px-5 pt-28 sm:px-8 lg:px-10 lg:pt-36">
         <div className="grid gap-x-12 gap-y-12 lg:grid-cols-12">
           <div className="lg:col-span-7">
-            <p className="lbl flex items-center gap-2.5 text-muted">
+            <p className="v3-in lbl flex items-center gap-2.5 text-muted" style={{ ["--d" as string]: "0s" }}>
               <span aria-hidden="true" className="size-1.5 bg-brand" />
               {c.live}
             </p>
@@ -57,11 +45,11 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
               id="hero-title"
               className="mt-7 font-display text-[clamp(2.6rem,6.2vw,6rem)] font-semibold leading-[0.96] tracking-[-0.045em] text-ink text-balance rtl:leading-[1.25] rtl:tracking-normal"
             >
-              <span className="block">{c.title[0]}</span>
-              <span className="block font-normal text-ink-3">{c.title[1]}</span>
+              <span className="v3-line"><span style={{ ["--d" as string]: "0.18s" }}>{c.title[0]}</span></span>
+              <span className="v3-line font-normal text-ink-3"><span style={{ ["--d" as string]: "0.42s" }}>{c.title[1]}</span></span>
             </h1>
-            <p className="mt-8 max-w-[34rem] text-lg leading-relaxed text-muted text-pretty">{c.lead}</p>
-            <div className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-4">
+            <p className="v3-in mt-8 max-w-[34rem] text-lg leading-relaxed text-muted text-pretty" style={{ ["--d" as string]: "0.85s" }}>{c.lead}</p>
+            <div className="v3-in mt-10 flex flex-wrap items-center gap-x-7 gap-y-4" style={{ ["--d" as string]: "0.98s" }}>
               <a href="#hero-quote" className="btn-ind">
                 {c.command.ctaPrice}
                 <svg viewBox="0 0 24 24" className="size-4 rtl:-scale-x-100" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
@@ -78,29 +66,14 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
               </TrackedLink>
             </div>
           </div>
-          <div id="hero-quote" className="scroll-mt-24 lg:col-span-5 lg:pt-12">
+          <div id="hero-quote" className="v3-in scroll-mt-24 lg:col-span-5 lg:pt-12" style={{ ["--d" as string]: "1.05s" }}>
             <QuoteCard lang={L} reduce={reduce} lane={lane} onLane={(l) => setQuote({ lane: RATE_LANE[l] })} orders={orders} onOrders={(n) => setQuote({ orders: n })} />
           </div>
         </div>
       </div>
 
-      {/* the plate: MSG's own fleet at its own hub, captioned like a figure */}
-      <figure className="mx-auto mt-16 max-w-[88rem] px-5 sm:px-8 lg:mt-24 lg:px-10">
-        <div className="plate relative aspect-[4/3] overflow-hidden bg-ink sm:aspect-[16/9] lg:aspect-[2.35/1]">
-          <Image src="/media/msg/fleet-hub.webp" alt={p.alt} fill priority sizes="(min-width: 1408px) 1328px, 100vw" className="object-cover" style={{ objectPosition: "50% 64%" }} />
-          <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/55 to-transparent" />
-          <span aria-hidden="true" className="reg reg-ts" />
-          <span aria-hidden="true" className="reg reg-te" />
-          <span aria-hidden="true" className="reg reg-bs" />
-          <span aria-hidden="true" className="reg reg-be" />
-          <span className="lbl absolute start-5 top-5 bg-graphite px-2 py-1 text-white sm:start-7 sm:top-7">{p.where}</span>
-          <span className="lbl absolute bottom-5 start-5 max-w-[70%] text-white sm:bottom-7 sm:start-7">{p.what}</span>
-        </div>
-        <figcaption className="lbl mt-3 flex justify-between gap-4 text-muted">
-          <span>{p.fig}</span>
-          <span className="num normal-case" dir="ltr">{facts.sabyaHub.areaM2.toLocaleString("en-US")} m²</span>
-        </figcaption>
-      </figure>
+      {/* the plate: MSG's own fleet at its own hub, opening to full width on scroll */}
+      <HeroPlate lang={L} />
 
       {/* the verified figures */}
       <div className="mx-auto max-w-[88rem] px-5 pb-20 pt-12 sm:px-8 lg:px-10 lg:pb-28">
