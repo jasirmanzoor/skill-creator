@@ -27,6 +27,7 @@ import SideMap from "@/components/SideMap";
 import RouteRail from "@/components/book/RouteRail";
 import Stage from "@/components/book/Stage";
 import MaskedHeadings from "@/components/fx/MaskedHeadings";
+import ChapterStack from "@/components/book/ChapterStack";
 
 export default async function Home({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
@@ -76,6 +77,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       <SideMap lang={lang} />
       <RouteBook lang={lang} />
       <MaskedHeadings lang={lang} />
+      <ChapterStack />
     </PlanProvider>
   );
 }
