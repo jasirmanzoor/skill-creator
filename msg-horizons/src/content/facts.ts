@@ -99,6 +99,10 @@ export const facts = {
 
 export type ServiceId = (typeof facts.services)[number];
 
+/** Logistics quote request (Google Form, owned by MSG). Responses land in MSG's sheet and info@msg-horizons.com. */
+export const QUOTE_FORM_URL =
+  "https://docs.google.com/forms/d/e/1FAIpQLSdIKBKX-wQrfaTEchUbs8Lv2alzDun1J4GTRLPmmKOhvFi-oQ/viewform";
+
 export const whatsappLink = (text?: string) =>
   `https://wa.me/${facts.contact.whatsapp}${text ? `?text=${encodeURIComponent(text)}` : ""}`;
 

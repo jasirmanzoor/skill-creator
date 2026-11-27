@@ -2,8 +2,8 @@ import ContactForm from "./ContactForm";
 import RaysLayer from "../fx/RaysLayer";
 import Reveal from "../ui/Reveal";
 import TrackedLink from "../ui/TrackedLink";
-import { MailIcon, PhoneIcon, PinIcon, WhatsAppIcon } from "../ui/icons";
-import { facts, whatsappLink } from "@/content/facts";
+import { FormIcon, MailIcon, PhoneIcon, PinIcon, WhatsAppIcon } from "../ui/icons";
+import { facts, QUOTE_FORM_URL, whatsappLink } from "@/content/facts";
 import type { Dictionary, Locale } from "@/content/i18n";
 
 /** Arrives at night: set directly on the night sky, with the form as a lit card. */
@@ -22,6 +22,15 @@ export default function Contact({ t, lang }: { t: Dictionary; lang: Locale }) {
           <p className="mt-6 max-w-md text-lg text-white/75">{c.lead}</p>
 
           <ul className="mt-10 border-t border-white/15">
+            <li>
+              <TrackedLink href={QUOTE_FORM_URL} target="_blank" rel="noopener noreferrer" event="cta_click" props={{ cta: "quote_form", location: "contact" }} className={`${row} hover:text-white`}>
+                <span className="inline-flex size-10 items-center justify-center rounded-md bg-white text-night"><FormIcon /></span>
+                <span className="flex-1">
+                  <span className="block font-semibold">{ch.quote}</span>
+                  <span className="text-sm text-white/65">{ch.quoteD}</span>
+                </span>
+              </TrackedLink>
+            </li>
             <li>
               <TrackedLink href={whatsappLink(t.wa.general)} target="_blank" rel="noopener noreferrer" event="whatsapp_click" props={{ location: "contact" }} className={`${row} hover:text-white`}>
                 <span className="inline-flex size-10 items-center justify-center rounded-md bg-whatsapp-bright text-white"><WhatsAppIcon /></span>

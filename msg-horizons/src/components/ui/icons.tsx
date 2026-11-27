@@ -22,6 +22,12 @@ export const MailIcon = ({ className = "size-5" }: P) => (
     <path d="m3 7 9 6 9-6" />
   </svg>
 );
+export const FormIcon = ({ className = "size-5" }: P) => (
+  <svg viewBox="0 0 24 24" className={className} aria-hidden="true" {...base}>
+    <rect x="5" y="3" width="14" height="18" rx="2" />
+    <path d="M9 3.5h6v2.5H9zM8.5 11h7M8.5 14.5h7M8.5 18h4" />
+  </svg>
+);
 export const PinIcon = ({ className = "size-5" }: P) => (
   <svg viewBox="0 0 24 24" className={className} aria-hidden="true" {...base}>
     <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z" />

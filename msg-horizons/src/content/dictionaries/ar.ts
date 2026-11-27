@@ -374,6 +374,8 @@ export const ar: Dictionary = {
     channels: {
       whatsapp: "واتساب",
       whatsappD: "أسرع استجابة",
+      quote: "اطلب عرض سعر",
+      quoteD: "نموذج خلال دقيقة، ونرد خلال 24 ساعة",
       call: "اتصال",
       email: "البريد الإلكتروني",
       visit: "المقر الرئيسي",

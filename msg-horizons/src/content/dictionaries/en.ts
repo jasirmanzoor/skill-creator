@@ -377,6 +377,8 @@ export const en = {
     channels: {
       whatsapp: "WhatsApp",
       whatsappD: "Fastest response",
+      quote: "Request a quote",
+      quoteD: "1-minute form, reply within 24 hours",
       call: "Call",
       email: "Email",
       visit: "Headquarters",
