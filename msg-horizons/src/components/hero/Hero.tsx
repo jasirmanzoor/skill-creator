@@ -344,7 +344,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
           <div className="relative">{scene}</div>
         </div>
         <div id="sellers" className="relative scroll-mt-16 bg-white py-16"><StagesStacked lang={L} /></div>
-        <div id="hero-quote" className="scroll-mt-20 px-4 pb-12 pt-2 lg:hidden"><QuoteCard lang={L} reduce={reduce} lane={lane} onLane={setLane} orders={orders} onOrders={setOrders} /></div>
+        <div id="hero-quote" className="scroll-mt-20 bg-[linear-gradient(180deg,#0d1730_0%,#0d1730_30%,var(--color-paper)_78%)] px-4 pb-12 pt-8 lg:hidden"><QuoteCard lang={L} reduce={reduce} lane={lane} onLane={setLane} orders={orders} onOrders={setOrders} /></div>
       </section>
     );
   }
@@ -368,7 +368,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
         {/* the site's light falls through the walk-in too (it replaced the drifting dust) */}
         <RaysLayer className="z-[3]" />
 
-        <motion.div style={{ opacity: cBack }} className="absolute inset-0 z-[4]"><CommandBackdrop stars={beat >= 2} /></motion.div>
+        <motion.div style={{ opacity: cBack }} className="absolute inset-0 z-[4]"><CommandBackdrop /></motion.div>
 
         {/* scene copy */}
         <motion.div style={{ opacity: uiOut, y: uiY }} inert={beat !== 1} className="absolute inset-0 z-[5] pt-20">
@@ -386,7 +386,7 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
       </div>
     </section>
     {/* on phones the ten-second price follows the hero */}
-    <div id="hero-quote" className="relative scroll-mt-20 bg-white px-4 pb-12 pt-8 lg:hidden">
+    <div id="hero-quote" className="relative scroll-mt-20 bg-[linear-gradient(180deg,#0d1730_0%,#0d1730_30%,var(--color-paper)_78%)] px-4 pb-12 pt-8 lg:hidden">
       <QuoteCard lang={L} reduce={reduce} lane={lane} onLane={setLane} orders={orders} onOrders={setOrders} />
     </div>
     </>
@@ -411,7 +411,7 @@ function Panel({ on, children }: { on: boolean; children: React.ReactNode }) {
     <div
       aria-hidden={on ? undefined : true}
       inert={!on}
-      className={`[grid-area:s] transition-[opacity,translate] duration-700 ease-[cubic-bezier(.2,.7,.2,1)] ${on ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"}`}
+      className={`[grid-area:s] transition-[opacity,translate] ease-[cubic-bezier(.2,.7,.2,1)] ${on ? "translate-y-0 opacity-100 duration-500 delay-200" : "pointer-events-none -translate-y-2 opacity-0 duration-200 delay-0"}`}
     >
       {children}
     </div>

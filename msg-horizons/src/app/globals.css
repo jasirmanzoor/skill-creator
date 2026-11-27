@@ -922,3 +922,9 @@ html.chapter-stack .book-footer { position: relative; z-index: 1; background: va
   *, *::before, *::after { will-change: auto !important; }
   * { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 }
+
+/* Phones: one bar at the foot of the screen ("Build my plan" with WhatsApp). The chapter bar stays on larger screens;
+   on a phone every chapter is in the Menu's site map. */
+@media (max-width: 900px) {
+  .route-rail { display: none !important; }
+}

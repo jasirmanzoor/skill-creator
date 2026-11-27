@@ -458,9 +458,11 @@ await test("book: a shared link opens on its chapter, and the footer closes the 
   await ctx.close();
 });
 
-await test("book: on a phone the rail turns to a chapter, and the theme toggle switches to dark and remembers", async () => {
+await test("book: on a phone the Menu's site map turns to a chapter (one bar at the foot), and the theme toggle switches to dark and remembers", async () => {
   const { page, ctx, errors } = await open("/en", { viewport: { width: 390, height: 844 }, reducedMotion: "reduce", isMobile: true, hasTouch: true });
-  await page.getByRole("navigation", { name: "Chapters" }).locator('a[href="#services"], a[href="#why"]').first().click();
+  assert.ok(!(await page.locator(".route-rail").isVisible()), "no chapter bar on a phone");
+  await page.getByRole("button", { name: "Menu" }).click();
+  await page.getByRole("navigation", { name: "Site map" }).locator('a[href="#why"]').click();
   await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "why");
   await page.getByRole("button", { name: "Dark theme" }).click();
   assert.ok(await page.evaluate(() => document.documentElement.classList.contains("dark")), "dark on");

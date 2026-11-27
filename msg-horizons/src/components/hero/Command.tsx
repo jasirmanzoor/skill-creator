@@ -9,7 +9,6 @@ import { facts } from "@/content/facts";
 import type { Locale } from "@/content/i18n";
 import { EASE_OUT, SPRING_UI } from "@/lib/motion";
 import CameraWall from "./CameraWall";
-import { StarfieldBackground } from "../ui/starfield-hero";
 
 /*
  * The opening screen's parts: MSG's network shown as the console a seller would run it from.
@@ -20,21 +19,20 @@ import { StarfieldBackground } from "../ui/starfield-hero";
 type C = (typeof heroCopy)["en"];
 
 /**
- * The night the console sits in: MSG's Sabya hub, toned down, a field of points in MSG green that scatter from
- * the cursor and settle back, and a floor of light receding under it. `stars` mounts the field only when the scene
- * is about to be seen, so it costs nothing during the walk-in.
+ * The night the console sits in: brand navy over MSG's Sabya hub, toned down, one soft light behind the console and
+ * a faint floor of light receding under it. Nothing else moves or glows, so the console window is what you look at.
  */
-export function CommandBackdrop({ stars = true }: { stars?: boolean }) {
+export function CommandBackdrop() {
   return (
-    <div aria-hidden="true" className="absolute inset-0 overflow-hidden bg-[#03161a]">
+    <div aria-hidden="true" className="absolute inset-0 overflow-hidden bg-[#0d1730]">
       <div className="absolute inset-0 motion-safe:animate-[hero-breathe_24s_var(--ease-ambient)_infinite_alternate]">
         <Image src="/media/msg/hub-aerial.webp" alt="" fill priority sizes="100vw" className="object-cover object-[50%_40%] opacity-[0.22] [filter:grayscale(1)_contrast(1.15)]" />
       </div>
-      <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_72%_42%,rgba(0,157,248,0.20),transparent_70%),radial-gradient(50%_40%_at_10%_100%,rgba(0,107,182,0.16),transparent_70%),linear-gradient(180deg,rgba(8,11,16,0.7)_0%,rgba(8,11,16,0.35)_40%,rgba(8,11,16,0.92)_100%)]" />
-      {stars ? <StarfieldBackground particleCount={420} interactionRadius={170} particleColor="#6ee79a" activeColor="#e6fff0" speed={0.5} className="mix-blend-screen" /> : null}
+      {/* brand navy with one soft light behind the console: the window is the only thing to look at */}
+      <div className="absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_30%,rgba(0,157,248,0.14),transparent_70%),linear-gradient(180deg,rgba(13,23,48,0.75)_0%,rgba(13,23,48,0.45)_45%,rgba(13,23,48,0.95)_100%)] lg:bg-[radial-gradient(55%_55%_at_72%_42%,rgba(0,157,248,0.14),transparent_70%),linear-gradient(180deg,rgba(13,23,48,0.75)_0%,rgba(13,23,48,0.45)_45%,rgba(13,23,48,0.95)_100%)]" />
       {/* the floor: lines run toward the viewer, the network never stops */}
       <div className="absolute inset-x-[-30%] bottom-0 h-[55%] origin-bottom [transform:perspective(520px)_rotateX(62deg)] [mask-image:linear-gradient(0deg,#000_10%,transparent_85%)]">
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(108,195,195,0.16)_1px,transparent_1px),linear-gradient(0deg,rgba(108,195,195,0.16)_1px,transparent_1px)] bg-[size:64px_64px] motion-safe:animate-[cmd-floor_3.2s_linear_infinite]" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,157,248,0.10)_1px,transparent_1px),linear-gradient(0deg,rgba(0,157,248,0.10)_1px,transparent_1px)] bg-[size:64px_64px] motion-safe:animate-[cmd-floor_3.2s_linear_infinite]" />
       </div>
     </div>
   );
