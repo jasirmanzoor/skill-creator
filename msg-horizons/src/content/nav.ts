@@ -13,7 +13,6 @@ export type NavId =
   | "fleet"
   | "proof"
   | "gallery"
-  | "enterprise"
   | "contact";
 
 export type NavItem = {
@@ -25,7 +24,6 @@ export type NavItem = {
 export const PRIMARY_NAV = [
   { id: "services", href: "#services" },
   { id: "fleet", href: "#fleet" },
-  { id: "enterprise", href: "#enterprise" },
   { id: "contact", href: "#contact" },
 ] as const satisfies readonly NavItem[];
 
@@ -37,7 +35,6 @@ export const OBSERVED_SECTIONS: readonly NavId[] = [
   "fleet",
   "proof",
   "gallery",
-  "enterprise",
   "contact",
 ] as const;
 
@@ -45,7 +42,6 @@ export const FOOTER_NAV = {
   services: [
     { id: "services", href: "#services" },
     { id: "fleet", href: "#fleet" },
-    { id: "enterprise", href: "#enterprise" },
   ] as const,
   company: [
     { id: "sellers", href: "#sellers" },

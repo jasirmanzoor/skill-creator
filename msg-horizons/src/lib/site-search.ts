@@ -53,7 +53,6 @@ export function buildSearchIndex(t: Dictionary, lang?: Locale): SearchHit[] {
     { id: "sellers", href: "#sellers", title: t.nav.sellers, description: t.search.desc.sellers, group: t.search.groups.who },
     { id: "services", href: "#services", title: t.nav.services, description: t.search.desc.services, group: t.search.groups.services },
     { id: "fleet", href: "#fleet", title: t.nav.fleet, description: t.search.desc.fleet, group: t.search.groups.operations },
-    { id: "enterprise", href: "#enterprise", title: t.nav.enterprise, description: t.search.desc.enterprise, group: t.search.groups.operations },
     { id: "contact", href: "#contact", title: t.nav.contact, description: t.search.desc.contact, group: t.search.groups.company },
     { id: "proof", href: "#proof", title: t.nav.proof, description: t.search.desc.proof, group: t.search.groups.company },
   ];
@@ -63,7 +62,7 @@ export function buildSearchIndex(t: Dictionary, lang?: Locale): SearchHit[] {
     const desc = t.planner.services[id].desc;
     hits.push({
       id: `service-${id}`,
-      href: id === "fleet" || id === "manpower" ? (id === "fleet" ? "#fleet" : "#enterprise") : "#services",
+      href: id === "fleet" || id === "manpower" ? (id === "fleet" ? "#fleet" : "#services") : "#services",
       title: name,
       description: desc,
       group: t.search.groups.services,

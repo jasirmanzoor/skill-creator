@@ -32,7 +32,6 @@ export const STOPS: Stop[] = [
   { id: "fleet", for: ["enterprise"], title: { en: "Fleet & operations", ar: "الأسطول والعمليات" }, hint: { en: "Always ready. Always moving.", ar: "جاهزون دائمًا. في حركة دائمة." } },
   { id: "partners", for: ["seller", "brand", "enterprise"], title: { en: "Partners", ar: "الشركاء" }, hint: { en: "Trusted by the names that move the Kingdom", ar: "موثوقون من الأسماء التي تحرّك المملكة" } },
   { id: "proof", for: ["brand", "enterprise"], title: { en: "Proof", ar: "الإثبات" }, hint: { en: "Scale you can see, standards you can trust", ar: "حجم تراه ومعايير تثق بها" } },
-  { id: "enterprise", for: ["enterprise"], title: { en: "For enterprise", ar: "للشركات الكبرى" }, hint: { en: "Capability you can inspect", ar: "قدرات يمكنك فحصها" } },
   { id: "contact", for: ["seller", "brand", "enterprise"], title: { en: "Talk to MSG", ar: "تحدث مع ام اس جي" }, hint: { en: "Let's move what matters", ar: "لننقل ما يهمك" } },
 ];
 

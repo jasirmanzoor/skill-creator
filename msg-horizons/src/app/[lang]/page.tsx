@@ -10,7 +10,6 @@ import Pitch from "@/components/pitch/Pitch";
 import EstimatorSection from "@/components/estimator/EstimatorSection";
 import Services from "@/components/sections/Services";
 import Fleet from "@/components/sections/Fleet";
-import Enterprise from "@/components/sections/Enterprise";
 import Proof from "@/components/sections/Proof";
 import Gallery from "@/components/sections/Gallery";
 import ProfileBook from "@/components/sections/ProfileBook";
@@ -63,8 +62,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         {c(7, <>
           <Depth><Proof t={t} /></Depth>
         </>)}
-        {c(8, <Depth><Enterprise t={t} lang={lang} /></Depth>)}
-        {c(9, <>
+        {c(8, <>
           <Depth><Contact t={t} lang={lang} /></Depth>
           <DirectorOutro lang={lang} />
         </>)}

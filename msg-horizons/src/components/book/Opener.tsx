@@ -12,7 +12,6 @@ export const PLATE: Record<string, { src: string; pos: string; srcAr?: string }>
   "live-tracking": { src: "/media/photos/van-desert.webp", pos: "74% 62%" }, // the van in the new livery, on the road out of town
   fleet: { src: "/media/msg/hub-aerial.webp", pos: "50% 50%" },
   proof: { src: "/media/msg/hub-team.webp", pos: "60% 55%" },
-  enterprise: { src: "/media/photos/sorting.webp", pos: "50% 50%" },
   contact: { src: "/media/msg/facade.jpg", pos: "50% 45%" },
 };
 

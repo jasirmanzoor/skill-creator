@@ -259,19 +259,6 @@ await test("estimator: locked until sign-in, then welcomes and asks to help (ans
   await ctx.close();
 });
 
-await test("peak control: the season ends on the record (outro), and hands back", async () => {
-  const { page, ctx, errors } = await open("/en");
-  const sec = page.locator("#enterprise");
-  await reach(page, "enterprise");
-  await sec.getByRole("button", { name: "Behind every peak" }).click();
-  await sec.getByText(/^The record(?: behind every peak|, and the people who keep it)\./).waitFor();
-  assert.ok(await sec.getByText("couriers on the network").isVisible());
-  await sec.getByRole("button", { name: "Replay the season" }).click();
-  await sec.getByText(/^The record(?: behind every peak|, and the people who keep it)\./).waitFor({ state: "detached" });
-  assert.deepEqual(errors, []);
-  await ctx.close();
-});
-
 await test("shared plan link opens directly on the result", async () => {
   const { page, ctx } = await open("/ar?plan=platform~people~high~peaks#planner");
   await page.getByRole("heading", { name: "شريك الطاقة الاستيعابية" }).waitFor({ timeout: 5000 });
@@ -429,7 +416,7 @@ await test("book: one continuous page; the rail, #links, ] and [ and the back bu
     const { page, ctx, errors } = await open(`/${lang}`, { reducedMotion: "reduce" });
     const opened = () => page.evaluate(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter);
     const topOf = (sel) => page.locator(sel).evaluate((el) => el.getBoundingClientRect().top);
-    assert.equal(await page.locator("[data-chapter]").count(), 10, `${lang}: ten chapters in the HTML`);
+    assert.equal(await page.locator("[data-chapter]").count(), 9, `${lang}: nine chapters in the HTML`);
     assert.equal(await opened(), "hero", `${lang}: opens at the start`);
     // one vertical page: every chapter is laid out, one under the other
     const tops = await page.$$eval("[data-chapter]", (els) => els.map((e) => e.getBoundingClientRect().top + scrollY));

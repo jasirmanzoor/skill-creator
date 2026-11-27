@@ -21,7 +21,6 @@ export const CHAPTERS: Chapter[] = [
   { id: "planner", title: { en: "Your plan", ar: "خطتك" }, hint: { en: "Four steps to a setup that fits", ar: "أربع خطوات إلى منظومة تناسبك" } },
   { id: "fleet", title: { en: "Fleet & hubs", ar: "الأسطول والمراكز" }, hint: { en: "Always ready. Always moving.", ar: "جاهزون دائمًا. في حركة دائمة." } },
   { id: "proof", title: { en: "Proof", ar: "الإثبات" }, hint: { en: "Scale you can see, standards you can trust", ar: "حجم تراه ومعايير تثق بها" } },
-  { id: "enterprise", title: { en: "Enterprise", ar: "للشركات الكبرى" }, hint: { en: "Capability you can inspect", ar: "قدرات يمكنك فحصها" } },
   { id: "contact", title: { en: "Talk to MSG", ar: "تحدث مع ام اس جي" }, hint: { en: "Let's move what matters", ar: "لننقل ما يهمك" } },
 ];
 

@@ -40,7 +40,6 @@ export const ALIASES: Record<Locale, Record<string, string[]>> = {
     contact: ["contact", "call", "phone", "whatsapp", "email", "address", "location", "office", "talk to", "speak", "sales", "enquiry", "inquiry", "demo", "meeting"],
     proof: ["about", "about us", "company", "who are you", "partners", "clients", "customers", "vision 2030", "imile", "profile", "trusted", "reviews", "licence", "license"],
     fleet: ["operations", "24/7", "round the clock", "always on"],
-    enterprise: ["enterprise", "corporate", "large business", "b2b", "workforce supply", "pipeline", "deployment"],
   },
   ar: {
     "page-last-mile-delivery-saudi-arabia": [
@@ -69,7 +68,6 @@ export const ALIASES: Record<Locale, Record<string, string[]>> = {
     contact: ["تواصل", "اتصال", "اتصل", "واتساب", "واتس اب", "رقم", "جوال", "هاتف", "ايميل", "بريد", "عنوان", "موقع", "مكتب", "مبيعات", "استفسار", "طلب خدمة", "اجتماع"],
     proof: ["من نحن", "عن الشركة", "عنا", "شركاء", "عملاء", "رؤية 2030", "ايميل", "تقييم", "ترخيص"],
     fleet: ["عمليات", "على مدار الساعة", "٢٤"],
-    enterprise: ["شركات", "قطاع الاعمال", "مؤسسات", "نشر"],
   },
 };
 

@@ -15,7 +15,6 @@ import type { Dictionary, Locale } from "@/content/i18n";
 const NAV_LABEL: Record<(typeof PRIMARY_NAV)[number]["id"], keyof Dictionary["nav"]> = {
   services: "services",
   fleet: "fleet",
-  enterprise: "enterprise",
   contact: "contact",
 };
 

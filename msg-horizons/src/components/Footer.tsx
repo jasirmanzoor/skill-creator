@@ -7,7 +7,6 @@ import { SERVICE_SLUGS, servicePages } from "@/content/servicePages";
 const LABEL: Record<string, keyof Dictionary["nav"]> = {
   services: "services",
   fleet: "fleet",
-  enterprise: "enterprise",
   sellers: "sellers",
   planner: "planFull",
   proof: "proof",
