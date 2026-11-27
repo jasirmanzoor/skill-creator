@@ -570,7 +570,7 @@ await test("company profile deck: pages turn by key, the counter follows, and th
 await test("performance: few film-filled headings at once, none on a weak device, and later chapters' photos wait", async () => {
   const seen = [];
   const full = await open("/en?perf=full", { reducedMotion: "no-preference" });
-  full.page.on("response", (r) => /\.(webp|jpg|png)/.test(r.url()) && seen.push(r.url()));
+  full.page.on("response", (r) => /\.(webp|jpg|png)/.test(r.url()) && seen.push(decodeURIComponent(r.url())));
   await full.page.reload({ waitUntil: "networkidle" });
   await full.page.waitForTimeout(2500);
   const drawn = await full.page.evaluate(() => document.querySelectorAll("[data-masked]").length);

@@ -12,6 +12,7 @@
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
+import { fit } from "@/lib/img";
 
 const VERT = `
 attribute vec2 aPos;
@@ -205,7 +206,7 @@ export default function FocusReveal({ src, alt, pos = "50% 50%", blur = 320, cla
   return (
     <div ref={box} className={cn("absolute inset-0", className)}>
       {/* eslint-disable-next-line @next/next/no-img-element -- the shader samples this same file */}
-      <img src={src} alt={alt} loading="lazy" decoding="async" className={cn("absolute inset-0 size-full object-cover", imgClassName)} style={{ objectPosition: pos }} />
+      <img src={src} {...fit(src, "(max-width: 900px) 100vw, 50vw")} alt={alt} loading="lazy" decoding="async" className={cn("absolute inset-0 size-full object-cover", imgClassName)} style={{ objectPosition: pos }} />
       <canvas ref={canvas} aria-hidden="true" className="pointer-events-none absolute inset-0 size-full opacity-0" />
     </div>
   );

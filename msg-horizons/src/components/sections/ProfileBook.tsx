@@ -9,6 +9,7 @@ import { liveCopy } from "@/content/liveTracking";
 import FolioFlow from "@/components/ui/FolioFlow";
 import Logo from "@/components/ui/Logo";
 import { ServiceIcon } from "@/components/ui/icons";
+import { fit } from "@/lib/img";
 
 const copy: Record<Locale, {
   eyebrow: string; title: string; lead: string; hint: string; talk: string; open: string; deck: string; pdf: string;
@@ -99,7 +100,7 @@ function Folio({ n, dark = false }: { n: number; dark?: boolean }) {
 function PhotoPage({ src, pos = "50% 50%", title, sub, n }: { src: string; pos?: string; title: string; sub: string; n: number }) {
   return (
     <div className={`${PAGE} bg-[#1c2c51]`}>
-      <img src={src} alt="" draggable={false} loading="lazy" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: pos }} />
+      <img src={src} {...fit(src, "(max-width: 900px) 90vw, 560px")} alt="" draggable={false} loading="lazy" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: pos }} />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,19,38,0)_40%,rgba(11,19,38,0.86)_100%)]" />
       <div className="absolute inset-x-8 bottom-16 text-white">
         <p className="font-display text-[30px] font-semibold leading-[1.05] tracking-[-0.02em] rtl:tracking-normal">{title}</p>
@@ -114,7 +115,7 @@ function PhotoPage({ src, pos = "50% 50%", title, sub, n }: { src: string; pos?:
 function LicencePage({ id, lang, n }: { id: (typeof LICENCES)[number]["id"]; lang: "en" | "ar"; n: number }) {
   return (
     <div className={`${PAGE} grid place-items-center bg-white p-5`}>
-      <img src={`/media/licences/${id}.webp`} alt={licenceCopy[lang].items[id].name} draggable={false} loading="lazy" className="max-h-full max-w-full object-contain" />
+      <img src={`/media/licences/${id}.webp`} {...fit(`/media/licences/${id}.webp`, "(max-width: 900px) 40vw, 280px")} alt={licenceCopy[lang].items[id].name} draggable={false} loading="lazy" className="max-h-full max-w-full object-contain" />
       <Folio n={n} />
     </div>
   );
@@ -227,7 +228,7 @@ export default function ProfileBook({ t, lang }: { t: Dictionary; lang: Locale }
     </div>,
     // the Operations Director: portrait and line, as on MSG's own card
     <div key="director" className={`${PAGE} bg-[#1c2c51] text-white`}>
-      <img src="/leadership/coo.jpg" alt={`Jasir Manzoor, ${leadershipCopy[lang].roles.coo}`} draggable={false} loading="lazy" className="absolute inset-0 h-full w-full object-cover [object-position:50%_20%]" />
+      <img src="/leadership/coo.jpg" {...fit("/leadership/coo.jpg", "(max-width: 900px) 90vw, 560px")} alt={`Jasir Manzoor, ${leadershipCopy[lang].roles.coo}`} draggable={false} loading="lazy" className="absolute inset-0 h-full w-full object-cover [object-position:50%_20%]" />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,19,38,0)_45%,rgba(11,19,38,0.92)_100%)]" />
       <div className="absolute inset-x-8 bottom-14">
         <p className="font-display text-[24px] font-semibold leading-[1.15]">{leadershipCopy[lang].quotes.coo[0]} <span className="text-[#7fcbfb]">{leadershipCopy[lang].quotes.coo[1]}</span></p>

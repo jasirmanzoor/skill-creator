@@ -911,3 +911,14 @@ html.chapter-stack .book-footer { position: relative; z-index: 1; background: va
   html.chapter-stack [data-chapter] + [data-chapter]::before { top: -19px; height: 20px; border-start-start-radius: 20px; border-start-end-radius: 20px; }
 }
 @media (prefers-reduced-motion: reduce) { .chapter-shade { display: none; } }
+
+/* ---------- Phones: same design, lighter machinery ----------
+   A phone tab has a fixed graphics budget, and Safari reloads the page when it runs out (what visitors saw as a
+   "crash" while scrolling). On phones only:
+   - no element asks to be kept as a ready-made graphics layer ahead of time (will-change): the browser still lifts
+     whatever is actually moving, for as long as it moves, instead of holding dozens of screen-sized layers at once;
+   - frosted glass keeps its tint but not its blur, the costliest effect on a phone GPU. */
+@media (pointer: coarse) and (max-width: 900px) {
+  *, *::before, *::after { will-change: auto !important; }
+  * { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+}

@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element -- MSG's own photography, local files */
+import { fit } from "@/lib/img";
 
 type Tone = "teal" | "forest" | "sand";
 
@@ -52,6 +53,7 @@ export default function EmbeddedPhoto({
       <div aria-hidden="true" className="absolute inset-0" style={{ background: BASE[tone] }} />
       <img
         src={src}
+        {...fit(src, "100vw")}
         alt={alt}
         decoding="async"
         className="absolute inset-0 size-full object-cover [filter:grayscale(1)_contrast(1.15)_brightness(1.05)]"
@@ -61,6 +63,7 @@ export default function EmbeddedPhoto({
         <img
           aria-hidden="true"
           src={src}
+          {...fit(src, "100vw")}
           alt=""
           loading="lazy"
           decoding="async"

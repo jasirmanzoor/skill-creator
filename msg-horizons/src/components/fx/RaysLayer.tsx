@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import { useLowPower } from "@/lib/perf";
+import { useLowPower, usePhone } from "@/lib/perf";
 import { layerClosed, layerOpened } from "@/lib/rays-store";
 
 const LightRays = dynamic(() => import("./LightRays"), { ssr: false });
@@ -17,13 +17,14 @@ export default function RaysLayer({ className = "" }: { className?: string }) {
   const box = useRef<HTMLDivElement>(null);
   const [on, setOn] = useState(false);
   const low = useLowPower();
+  const phone = usePhone();
 
   useEffect(() => {
-    if (low || !box.current) return;
+    if (low || phone || !box.current) return;
     const io = new IntersectionObserver(([e]) => setOn(e.isIntersecting), { rootMargin: "120px" });
     io.observe(box.current);
     return () => io.disconnect();
-  }, [low]);
+  }, [low, phone]);
 
   useEffect(() => {
     if (!on) return;
@@ -33,7 +34,8 @@ export default function RaysLayer({ className = "" }: { className?: string }) {
 
   return (
     <div ref={box} aria-hidden="true" className={`pointer-events-none absolute inset-0 mix-blend-screen ${className}`}>
-      {on && !low ? <LightRays
+      {/* on a phone: the same light from the top left, as a still glow (no WebGL) */}
+      {phone ? <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_0%_0%,rgba(191,227,255,0.28),transparent_60%)]" /> : on && !low ? <LightRays
         raysOrigin="top-left"
         raysColor="#bfe3ff"
         raysSpeed={1}

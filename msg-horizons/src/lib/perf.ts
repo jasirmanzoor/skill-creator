@@ -50,6 +50,25 @@ export function isTouch(): boolean {
 
 if (typeof window !== "undefined") mark();
 
+/**
+ * A phone: a touch screen no wider than a small tablet. Phones get the same design with lighter machinery (one film
+ * player at a time, the light as a still glow, no frosted blur), because a phone tab has a fixed graphics budget and
+ * Safari reloads the page when it runs out. Desktop and tablets keep everything.
+ */
+const PHONE = "(pointer: coarse) and (max-width: 900px)";
+export function isPhone(): boolean {
+  return typeof window !== "undefined" && window.matchMedia(PHONE).matches;
+}
+const subscribePhone = (cb: () => void) => {
+  const mq = window.matchMedia(PHONE);
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+};
+/** `isPhone()` as a React value: false on the server, the real answer once on the client */
+export function usePhone(): boolean {
+  return useSyncExternalStore(subscribePhone, isPhone, () => false);
+}
+
 const subscribe = (cb: () => void) => {
   listeners.add(cb);
   return () => { listeners.delete(cb); };

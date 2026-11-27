@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useInView, useMotionValueEvent, useScroll } from "motion/react";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { fit } from "@/lib/img";
 
 export type HelixItem = { src: string; pos?: string; alt: string; caption: string };
 
@@ -134,7 +135,7 @@ export default function HelixSpiral({ items, label, labels }: { items: HelixItem
                 }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- transformed every frame; next/image adds nothing here */}
-                <img src={it.src} alt="" draggable={false} loading="lazy" decoding="async" className="size-full object-cover" style={{ objectPosition: it.pos ?? "50% 50%" }} />
+                <img src={it.src} {...fit(it.src, "(max-width: 900px) 50vw, 320px")} alt="" draggable={false} loading="lazy" decoding="async" className="size-full object-cover" style={{ objectPosition: it.pos ?? "50% 50%" }} />
               </button>
             );
           })}

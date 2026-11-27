@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { fit } from "@/lib/img";
 
 export type ArcCard = { src: string; pos?: string; alt: string; title: string; tag?: string; back: string; href?: string; cta?: string };
 
@@ -156,7 +157,7 @@ export default function ArcCarousel({ cards, label, labels, rtl = false }: { car
                     className="absolute inset-0 overflow-hidden rounded-[1.4rem] bg-[#1c2c51] text-start shadow-[0_24px_50px_-20px_rgba(0,0,0,0.6)] [backface-visibility:hidden]"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element -- moved every frame; next/image adds nothing here */}
-                    <img src={c.src} alt="" draggable={false} loading="lazy" className="absolute inset-0 size-full object-cover" style={{ objectPosition: c.pos ?? "50% 50%" }} />
+                    <img src={c.src} {...fit(c.src, "(max-width: 900px) 70vw, 420px")} alt="" draggable={false} loading="lazy" className="absolute inset-0 size-full object-cover" style={{ objectPosition: c.pos ?? "50% 50%" }} />
                     <span className="absolute inset-x-0 bottom-0 h-1/2 bg-[linear-gradient(0deg,rgba(8,14,28,0.9),transparent)]" />
                     <span className="absolute inset-x-4 bottom-4 text-white">
                       {c.tag ? <span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#7fcbfb] rtl:tracking-normal">{c.tag}</span> : null}

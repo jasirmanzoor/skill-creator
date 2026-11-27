@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element -- local, pre-optimised webp from MSG's company profile */
 import type { ServiceId } from "@/content/facts";
+import { fit } from "@/lib/img";
 
 /** a photo for each service: everyday scenes of the work itself, and the long-haul truck in MSG's livery */
 const PHOTO: Record<ServiceId, { src: string; pos?: string }> = {
@@ -16,7 +17,7 @@ export default function ServiceScene({ id }: { id: ServiceId }) {
   const p = PHOTO[id];
   return (
     <div className="relative aspect-[16/9] overflow-hidden bg-subtle">
-      <img src={p.src} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: p.pos }} />
+      <img src={p.src} {...fit(p.src, "(max-width: 900px) 100vw, 50vw")} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: p.pos }} />
     </div>
   );
 }

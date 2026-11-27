@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useSyncExternalStore } from "react";
-import { useLowPower } from "@/lib/perf";
+import { useLowPower, usePhone } from "@/lib/perf";
 import { layersOpen, subscribeLayers } from "@/lib/rays-store";
 
 const LightRays = dynamic(() => import("./LightRays"), { ssr: false });
@@ -24,9 +24,11 @@ export default function RaysBackdrop() {
   const dark = useSyncExternalStore(subscribe, () => document.documentElement.classList.contains("dark"), () => false);
   const covered = useSyncExternalStore(subscribeLayers, layersOpen, () => false);
   const still = useLowPower();
+  const phone = usePhone();
   return (
     <div aria-hidden="true" className="rays-backdrop pointer-events-none fixed inset-0 -z-10">
-      {covered ? null : <LightRays
+      {/* on a phone the light is a still glow from the same corner: no WebGL context, no graphics memory */}
+      {phone ? (covered ? null : <div className={`absolute inset-0 ${dark ? "bg-[radial-gradient(120%_80%_at_0%_0%,rgba(191,227,255,0.18),transparent_60%)]" : "bg-[radial-gradient(120%_80%_at_0%_0%,rgba(0,107,182,0.07),transparent_60%)]"}`} />) : covered ? null : <LightRays
         key={`${dark ? "night" : "day"}${still ? "-still" : ""}`}
         raysOrigin="top-left"
         raysColor="#bfe3ff"

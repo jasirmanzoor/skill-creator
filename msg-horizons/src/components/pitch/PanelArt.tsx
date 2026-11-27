@@ -2,6 +2,7 @@ import type { Locale } from "@/content/i18n";
 import { facts } from "@/content/facts";
 import { LICENCES, licenceCopy } from "@/content/licences";
 import { CheckIcon } from "../ui/icons";
+import { fit } from "@/lib/img";
 
 /**
  * The art that fills each panel of Why MSG. On your own: a tangle of broken routes and dead ends (no words). With
@@ -110,7 +111,7 @@ export function WinArt({ i, lang, bg }: { i: number; lang: Locale; bg: string })
         {LICENCES.map((l) => (
           <div key={l.id} className="grid aspect-[3/4] place-items-center overflow-hidden rounded-lg bg-white p-1 shadow-[0_10px_24px_-12px_rgba(17,26,51,0.45)] ring-1 ring-current/20">
             {/* eslint-disable-next-line @next/next/no-img-element -- small document scans, already sized */}
-            <img src={`/media/licences/${l.id}.webp`} alt={lc.items[l.id].name} loading="lazy" className="max-h-full max-w-full object-contain" />
+            <img src={`/media/licences/${l.id}.webp`} {...fit(`/media/licences/${l.id}.webp`, "160px")} alt={lc.items[l.id].name} loading="lazy" className="max-h-full max-w-full object-contain" />
           </div>
         ))}
       </div>

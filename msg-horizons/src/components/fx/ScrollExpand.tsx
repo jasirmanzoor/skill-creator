@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
+import { fit } from "@/lib/img";
 
 const clamp = (v: number, a: number, b: number) => (v < a ? a : v > b ? b : v);
 const smoothstep = (edge0: number, edge1: number, x: number) => {
@@ -190,7 +191,7 @@ export default function ScrollExpand({
           {backdrop}
           <div ref={frameRef} className="scroll-expand__frame">
             {/* eslint-disable-next-line @next/next/no-img-element -- transformed every frame; next/image adds nothing here */}
-            <img ref={mediaRef} className="scroll-expand__media" src={src} alt={alt} draggable={false} loading="lazy" decoding="async" style={{ objectPosition: mediaPosition }} />
+            <img ref={mediaRef} className="scroll-expand__media" src={src} {...fit(src, "100vw")} alt={alt} draggable={false} loading="lazy" decoding="async" style={{ objectPosition: mediaPosition }} />
             <div className="scroll-expand__shade" />
             <div ref={scrimRef} className="scroll-expand__scrim" />
             {children ? (
