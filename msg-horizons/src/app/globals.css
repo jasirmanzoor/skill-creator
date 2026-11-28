@@ -928,3 +928,14 @@ html.chapter-stack .book-footer { position: relative; z-index: 1; background: va
 @media (max-width: 900px) {
   .route-rail { display: none !important; }
 }
+
+/* ---------- Build My Plan configurator (components/configurator) ---------- */
+.lbl-cfg { font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; }
+:lang(ar) .lbl-cfg { letter-spacing: 0; text-transform: none; font-size: 12px; }
+.cfg-range { -webkit-appearance: none; appearance: none; height: 28px; background: transparent; cursor: pointer; }
+.cfg-range::-webkit-slider-runnable-track { height: 3px; border-radius: 99px; background: rgb(255 255 255 / 0.18); }
+.cfg-range::-moz-range-track { height: 3px; border-radius: 99px; background: rgb(255 255 255 / 0.18); }
+.cfg-range::-webkit-slider-thumb { -webkit-appearance: none; margin-top: -9px; width: 21px; height: 21px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 5px rgb(0 157 248 / 0.35); transition: box-shadow 150ms var(--ease-out); }
+.cfg-range::-moz-range-thumb { width: 21px; height: 21px; border: 0; border-radius: 50%; background: #fff; box-shadow: 0 0 0 5px rgb(0 157 248 / 0.35); }
+.cfg-range:active::-webkit-slider-thumb { box-shadow: 0 0 0 8px rgb(0 157 248 / 0.35); }
+.cfg-range:focus-visible { outline: 2px solid #009df8; outline-offset: 4px; border-radius: 6px; }

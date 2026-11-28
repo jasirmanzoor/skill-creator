@@ -119,15 +119,17 @@ async function resultText(page) {
 await test("planner: build a plan, share it, carry it into the contact form", async () => {
   const { page, ctx, errors } = await open("/en");
   await toPlan(page);
+  // chapter 1: the business profile moves straight on to the volume
   await page.getByRole("radio", { name: /Growing e-commerce brand/ }).click();
-  await page.getByRole("checkbox", { name: /Orders to customers/ }).click();
-  await page.getByRole("checkbox", { name: /Stock that needs a home/ }).click();
-  // live preview reacts before the plan is finished
-  assert.ok(await page.locator("aside[aria-label='Your configuration, live']").getByText("Warehousing & Inventory").isVisible());
-  await page.getByRole("button", { name: /Continue/ }).click();
-  // step 3: the network sizer — ~730 orders a day lands in the "scaling" band
+  // chapter 2: the volume — the slider at 600 lands in the "scaling" band
   await page.locator("#plan-window input[type=range]").first().fill("600");
-  await page.getByRole("button", { name: /Continue/ }).click();
+  await page.getByRole("button", { name: /Continue/ }).click(); // chapter 3: route (the profile's preset)
+  await page.getByRole("button", { name: /Continue/ }).click(); // chapter 4: speed
+  await page.getByRole("button", { name: /Continue/ }).click(); // chapter 5: services
+  assert.equal(await page.getByRole("checkbox", { name: "Orders to customers" }).getAttribute("aria-checked"), "true", "delivery to customers is on by default");
+  await page.getByRole("checkbox", { name: "Stock that needs a home" }).click();
+  // the live configuration on the stage reacts before the plan is finished
+  assert.ok(await page.locator("aside[aria-label='Your configuration, live']").getByText("Warehousing & Inventory").isVisible());
   await page.getByRole("checkbox", { name: /Live tracking/ }).click();
   await page.getByRole("checkbox", { name: /Handling peaks/ }).click();
   await page.getByRole("button", { name: /Build my plan/ }).last().click();
@@ -154,29 +156,36 @@ await test("planner: priorities are capped at three", async () => {
   const { page, ctx } = await open("/en?plan=");
   await toPlan(page);
   await page.getByRole("radio", { name: /New startup/ }).click();
-  await page.getByRole("button", { name: /Continue/ }).click();
-  await page.getByRole("button", { name: /Continue/ }).click();
+  for (let i = 0; i < 3; i++) await page.getByRole("button", { name: /Continue/ }).click();
   for (const n of ["Fast execution", "On-time delivery", "Live tracking"])
     await page.getByRole("checkbox", { name: n }).click();
-  assert.equal(await page.locator('#plan-window [role=checkbox][aria-checked="true"]').count(), 3);
+  const matters = page.locator("#plan-window").getByRole("group", { name: "What matters most?" });
+  assert.equal(await matters.locator('[role=checkbox][aria-checked="true"]').count(), 3);
   assert.equal(await page.getByRole("checkbox", { name: "Shipment security" }).getAttribute("aria-disabled"), "true");
   await ctx.close();
 });
 
 await test("volume step: the quote follows the numbers, and no operating matrix is shown", async () => {
+  // a service page's ?persona= opens on the volume chapter
   const { page, ctx, errors } = await open("/en?persona=seller#planner");
-  await page.getByRole("button", { name: /Continue/ }).click();
   const quote = page.locator("#plan-window aside[data-rate-card]:visible");
   await quote.waitFor();
+  await page.getByRole("button", { name: /Continue/ }).click(); // route
   const before = await quote.innerText();
   await page.locator("#plan-window").getByRole("radio", { name: "Across the Kingdom" }).click();
-  assert.notEqual(await quote.innerText(), before, "the quote changes with where the orders go");
+  // the figure rolls to its new value; wait for it to settle rather than read it mid-roll
+  let after = before;
+  for (let i = 0; i < 20 && after === before; i++) { await page.waitForTimeout(150); after = await quote.innerText(); }
+  assert.notEqual(after, before, "the quote changes with where the orders go");
   const text = await page.locator("#plan-window").innerText();
   const hit = text.match(/Daily routes|Couriers on|Peak-only|Calculated live/i);
   assert.ok(!hit, `routes and courier counts are not shown to the client (${hit})`);
-  for (const s of ["Price quote", "Proof of delivery", "Live tracking", "Cash on delivery, on time"]) assert.ok(text.includes(s), `missing ${s}`);
-  await page.getByRole("button", { name: /Continue/ }).click();
+  await page.getByRole("button", { name: /Continue/ }).click(); // speed
+  await page.getByRole("button", { name: /Continue/ }).click(); // services
   await page.getByRole("button", { name: /Build my plan/ }).last().click();
+  // the blueprint lists what every plan covers
+  const covered = await page.locator("#plan-tabpanel").innerText();
+  for (const s of ["Price quote", "Proof of delivery", "Live tracking", "Cash on delivery, on time"]) assert.ok(covered.includes(s), `missing ${s}`);
   await page.locator("#plan-window").getByRole("tab", { name: "Services" }).click();
   assert.ok(await page.locator("#plan-window").getByText("Land Freight", { exact: true }).first().isVisible());
   assert.deepEqual(errors, []);
@@ -346,13 +355,17 @@ async function toConsole(page) {
     await page.evaluate(() => document.querySelector("#plan-window [data-lenis-prevent]").scrollBy(0, 450));
     await page.waitForTimeout(400);
   }
-  // the map only animates while it is on screen, so bring it fully into view
-  await page.locator("#plan-window .maplibregl-canvas, #plan-window canvas[role=img]").first().scrollIntoViewIfNeeded();
+  // the map only animates while it is on screen, so bring it fully into view (the real map may be swapped for the
+  // flat fallback while this runs, so try again on the canvas that replaced it)
+  for (let k = 0; k < 3; k++) {
+    try { await page.locator("#plan-window .maplibregl-canvas, #plan-window canvas[role=img]").first().scrollIntoViewIfNeeded({ timeout: 5000 }); break; }
+    catch { await page.waitForTimeout(500); }
+  }
   await page.waitForTimeout(500);
 }
 
 await test("route console: the camera flies the route on a real map (stand-in map services)", async () => {
-  const { page, ctx, errors } = await open("/en?build=1#planner", {}, installFakeMap);
+  const { page, ctx, errors } = await open("/en?plan=ecommerce~parcels~scaling~#planner", {}, installFakeMap);
   await toConsole(page);
   const host = page.locator("#plan-window [data-cam]");
   await host.waitFor({ state: "attached", timeout: 20000 });
@@ -382,7 +395,7 @@ await test("route console: falls back to the flat map when the map services cann
   const page = await ctx.newPage();
   const crashed = [];
   page.on("pageerror", (e) => crashed.push(e.message));
-  await page.goto(BASE + "/en?build=1#planner", { waitUntil: "networkidle" });
+  await page.goto(BASE + "/en?plan=ecommerce~parcels~scaling~#planner", { waitUntil: "networkidle" });
   await toConsole(page);
   await page.locator("#plan-window canvas[role=img]").waitFor({ state: "attached", timeout: 25000 });
   assert.equal(await page.locator("#plan-window .maplibregl-canvas").count(), 0, "no broken map left behind");
