@@ -90,14 +90,14 @@ export const searchCopy: Record<Locale, { popular: string; fallbackTitle: string
     popular: "Popular searches",
     fallbackTitle: "We may not use that exact word, but MSG can help.",
     fallbackLead: "Tell us what you need moved, stored or staffed and MSG will come back with a plan.",
-    planTitle: "Build your logistics plan",
+    planTitle: "Build my plan & quote",
     contactTitle: "Talk to MSG",
   },
   ar: {
     popular: "عمليات بحث شائعة",
     fallbackTitle: "قد لا نستخدم هذه الكلمة بالضبط، لكن ام اس جي تستطيع مساعدتك.",
     fallbackLead: "أخبرنا بما تريد نقله أو تخزينه أو توفير العمالة له، وسترد ام اس جي بخطة.",
-    planTitle: "ابنِ خطتك اللوجستية",
+    planTitle: "ابنِ خطتي واحصل على السعر",
     contactTitle: "تحدث مع ام اس جي",
   },
 };
