@@ -98,7 +98,7 @@ export const profileCopy: Record<Locale, ProfileCopy> = {
       note: "Use one service, or combine all seven.",
       items: [
         { name: "Sellers", who: "Individual sellers and new startups", lines: ["Your first orders, delivered reliably", "Real-time tracking on every shipment", "Grow without switching partners"], cta: "Start on WhatsApp" },
-        { name: "Brands", who: "Growing e-commerce brands", lines: ["Last-mile delivery at volume", "Warehousing with smart inventory control", "Peak capacity planned ahead"], cta: "Plan my operation", featured: true },
+        { name: "Brands", who: "Growing e-commerce brands", lines: ["Last-mile delivery at volume", "Warehousing with smart inventory control", "Peak capacity planned ahead"], cta: "Discuss my operation", featured: true },
         { name: "Enterprise", who: "Enterprises, retailers and platforms", lines: ["Couriers, drivers and hub teams on demand", "Seven roles, deployed under governance", "One dedicated account team"], cta: "Discuss requirements" },
       ],
       servicesTitle: "The seven services",
@@ -211,7 +211,7 @@ export const profileCopy: Record<Locale, ProfileCopy> = {
       note: "استخدم خدمة واحدة، أو اجمع الخدمات السبع.",
       items: [
         { name: "البائعون", who: "البائعون الأفراد والشركات الناشئة", lines: ["طلباتك الأولى، بتوصيل موثوق", "تتبع مباشر لكل شحنة", "انمُ دون تغيير شريكك"], cta: "ابدأ على واتساب" },
-        { name: "العلامات", who: "علامات التجارة الإلكترونية المتنامية", lines: ["توصيل الميل الأخير بأحجام كبيرة", "تخزين مع تحكم ذكي في المخزون", "سعة مخططة مسبقًا لمواسم الذروة"], cta: "خطّط لعملياتي", featured: true },
+        { name: "العلامات", who: "علامات التجارة الإلكترونية المتنامية", lines: ["توصيل الميل الأخير بأحجام كبيرة", "تخزين مع تحكم ذكي في المخزون", "سعة مخططة مسبقًا لمواسم الذروة"], cta: "ناقش عملياتي", featured: true },
         { name: "الشركات", who: "الشركات وتجار التجزئة والمنصات", lines: ["مناديب وسائقون وفرق مراكز عند الطلب", "سبعة أدوار، بانتشار منضبط", "فريق حساب مخصص"], cta: "ناقش متطلباتك" },
       ],
       servicesTitle: "الخدمات السبع",

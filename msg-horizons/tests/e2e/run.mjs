@@ -99,87 +99,81 @@ await test("no forbidden claims in rendered copy", async () => {
   }
 });
 
-// the plan builder opens in its own window from its chapter's launcher
+// the plan studio opens in its own window from its chapter's launcher
 async function toPlan(page) {
   await reach(page, "planner");
-  await page.locator("#planner").getByRole("button", { name: /Start building my plan/ }).click();
+  await page.locator("#planner").getByRole("button", { name: /Open the plan builder/ }).click();
   await page.locator("#plan-window").waitFor();
   await page.waitForTimeout(400);
 }
-// the result keeps its detail in tabs; read them all
-async function resultText(page) {
-  let all = "";
-  for (const name of ["Your quote", "We handle", "Services", "Next steps"]) {
-    await page.locator("#plan-window").getByRole("tab", { name }).click();
-    all += "\n" + (await page.locator("#plan-tabpanel").innerText());
-  }
-  return all;
-}
+const studio = (page) => page.locator("#plan-window");
+const ledger = (page) => page.locator("#plan-window aside[data-rate-card]");
 
-await test("planner: build a plan, share it, carry it into the contact form", async () => {
+await test("plan studio: one screen reprices live, itemises each lane and shares the plan", async () => {
   const { page, ctx, errors } = await open("/en");
   await toPlan(page);
-  await page.getByRole("radio", { name: /Growing e-commerce brand/ }).click();
-  await page.getByRole("checkbox", { name: /Orders to customers/ }).click();
-  await page.getByRole("checkbox", { name: /Stock that needs a home/ }).click();
-  // live preview reacts before the plan is finished
-  assert.ok(await page.locator("aside[aria-label='Your configuration, live']").getByText("Warehousing & Inventory").isVisible());
-  await page.getByRole("button", { name: /Continue/ }).click();
-  // step 3: the network sizer â€” ~730 orders a day lands in the "scaling" band
-  await page.locator("#plan-window input[type=range]").first().fill("600");
-  await page.getByRole("button", { name: /Continue/ }).click();
-  await page.getByRole("checkbox", { name: /Live tracking/ }).click();
-  await page.getByRole("checkbox", { name: /Handling peaks/ }).click();
-  await page.getByRole("button", { name: /Build my plan/ }).last().click();
-  await page.getByRole("heading", { name: "Growth Engine" }).waitFor();
-  const result = await resultText(page);
-  for (const s of ["Shipping & Last-Mile Delivery", "Warehousing & Inventory", "Real-Time Tracking & Support", "Manpower & Peak Support", "Dedicated Account Management", "Price quote", "Proof of delivery", "Live tracking", "Cash on delivery, on time", "ZATCA", "Licences"])
-    assert.ok(result.includes(s), `missing ${s}`);
-  assert.ok(!/Daily routes|Couriers on|peak-only|1 courier, every day/i.test(result), "no operating matrix in the client's result");
-  assert.ok(await page.locator("#plan-window [data-rate-card]").count() >= 0);
-  assert.match(decodeURIComponent(page.url()), /[?&]plan=ecommerce~parcels\.storage~scaling~visibility\.peaks/);
-  const wa = await page.getByRole("link", { name: /Send on WhatsApp/ }).getAttribute("href");
+  const w = studio(page);
+  await w.getByRole("radio", { name: /Growing e-commerce brand/ }).click();
+  await w.getByRole("heading", { name: "Growth Engine" }).waitFor();
+  await w.getByRole("checkbox", { name: /Stock that needs a home/ }).click();
+  assert.ok(await w.getByText("Warehousing & Inventory").first().isVisible(), "the services follow the answers");
+  const before = await ledger(page).innerText();
+  await w.getByRole("textbox", { name: "Orders on a normal day" }).fill("730");
+  await w.getByRole("textbox", { name: "Orders on a normal day" }).blur();
+  const mixed = await ledger(page).innerText();
+  assert.notEqual(mixed, before, "the quote follows the numbers");
+  for (const s of ["Same city", "City to city", "Cash on delivery", "Confirmed by MSG", "Volume rate"]) assert.ok(mixed.includes(s), `quote missing ${s}`);
+  await w.getByRole("radio", { name: "Other cities" }).click();
+  const away = await ledger(page).innerText();
+  assert.ok(away.includes("City to city") && !away.includes("Same city"), "each lane is priced from where the orders go");
+  const text = await w.innerText();
+  assert.ok(!/Daily routes|Couriers on|peak-only/i.test(text), "no operating matrix in the client's view");
+  for (const s of ["Price quote", "Proof of delivery", "Live tracking", "Cash on delivery, on time"]) assert.ok(text.includes(s), `missing ${s}`);
+  await page.waitForTimeout(400);
+  assert.match(decodeURIComponent(page.url()), /[?&]plan=ecommerce~parcels\.storage~scaling~/);
+  const wa = await w.getByRole("link", { name: "WhatsApp" }).first().getAttribute("href");
   assert.match(wa, /^https:\/\/wa\.me\/966578061556\?text=/);
   assert.match(decodeURIComponent(wa), /Growth Engine/);
-  assert.match(decodeURIComponent(wa), /Orders a day: [\d,]{3,}/);
-
-  await page.getByRole("button", { name: /Send this plan to MSG/ }).click();
-  await page.getByText("Your logistics plan is attached").waitFor();
-  assert.equal(await page.locator("#lead-interest").inputValue(), "ecommerce");
+  assert.match(decodeURIComponent(wa), /Quote reference: MSG-[0-9A-Z]{6}/);
+  assert.match(decodeURIComponent(wa), /to be confirmed by MSG/);
   assert.deepEqual(errors, []);
   await ctx.close();
 });
 
-await test("planner: priorities are capped at three", async () => {
-  const { page, ctx } = await open("/en?plan=");
-  await toPlan(page);
-  await page.getByRole("radio", { name: /New startup/ }).click();
-  await page.getByRole("button", { name: /Continue/ }).click();
-  await page.getByRole("button", { name: /Continue/ }).click();
-  for (const n of ["Fast execution", "On-time delivery", "Live tracking"])
-    await page.getByRole("checkbox", { name: n }).click();
-  assert.equal(await page.locator('#plan-window [role=checkbox][aria-checked="true"]').count(), 3);
-  assert.equal(await page.getByRole("checkbox", { name: "Shipment security" }).getAttribute("aria-disabled"), "true");
+await test("plan studio: shipping from Sabya prices the Sabya lanes", async () => {
+  const { page, ctx } = await open("/en?build=1#planner");
+  await studio(page).getByRole("radio", { name: "Sabya hub" }).click();
+  assert.ok((await ledger(page).innerText()).includes("Inside Sabya"));
   await ctx.close();
 });
 
-await test("volume step: the quote follows the numbers, and no operating matrix is shown", async () => {
-  const { page, ctx, errors } = await open("/en?persona=seller#planner");
-  await page.getByRole("button", { name: /Continue/ }).click();
-  const quote = page.locator("#plan-window aside[data-rate-card]:visible");
-  await quote.waitFor();
-  const before = await quote.innerText();
-  await page.locator("#plan-window").getByRole("radio", { name: "Across the Kingdom" }).click();
-  assert.notEqual(await quote.innerText(), before, "the quote changes with where the orders go");
-  const text = await page.locator("#plan-window").innerText();
-  const hit = text.match(/Daily routes|Couriers on|Peak-only|Calculated live/i);
-  assert.ok(!hit, `routes and courier counts are not shown to the client (${hit})`);
-  for (const s of ["Price quote", "Proof of delivery", "Live tracking", "Cash on delivery, on time"]) assert.ok(text.includes(s), `missing ${s}`);
-  await page.getByRole("button", { name: /Continue/ }).click();
-  await page.getByRole("button", { name: /Build my plan/ }).last().click();
-  await page.locator("#plan-window").getByRole("tab", { name: "Services" }).click();
-  assert.ok(await page.locator("#plan-window").getByText("Land Freight", { exact: true }).first().isVisible());
+await test("plan studio: lock this quote sends the plan and its reference to MSG", async () => {
+  const { page, ctx, errors } = await open("/en?persona=startup#planner");
+  const posts = [];
+  page.on("request", (r) => { if (r.url().endsWith("/api/lead") && r.method() === "POST") posts.push(JSON.parse(r.postData() || "{}")); });
+  const w = studio(page);
+  await w.getByRole("button", { name: /Lock this quote/ }).click();
+  await w.getByRole("button", { name: "Send to MSG" }).click();
+  assert.ok(await w.getByText("Please fill this in.").first().isVisible(), "validation");
+  await w.getByLabel("Your name").fill("Test Seller");
+  await w.getByLabel("Mobile").fill("0551234567");
+  await w.getByLabel(/MSG may contact me/).check();
+  await w.getByRole("button", { name: "Send to MSG" }).click();
+  await w.getByText(/Quote MSG-[0-9A-Z]{6} is with MSG/).waitFor();
+  assert.equal(posts[0]?.interest, "quote_locked");
+  assert.equal(posts[0]?.phone, "+966551234567");
+  assert.match(posts[0]?.plan, /^startup~/);
+  assert.match(posts[0]?.message, /Approximate quote/);
   assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+await test("plan studio: priorities are capped at three", async () => {
+  const { page, ctx } = await open("/en?build=1#planner");
+  const w = studio(page);
+  for (const n of ["Fast execution", "On-time delivery", "Live tracking"]) await w.getByRole("checkbox", { name: n }).click();
+  assert.equal(await w.locator('[role=group] [role=checkbox][aria-checked="true"]').filter({ hasText: /Fast execution|On-time delivery|Live tracking/ }).count(), 3);
+  assert.equal(await w.getByRole("checkbox", { name: "Shipment security" }).getAttribute("aria-disabled"), "true");
   await ctx.close();
 });
 
@@ -226,35 +220,6 @@ await test("one order on the map: the stage rail moves the hero through set up â
   await rail.getByRole("button", { name: /Settle/ }).focus();
   await page.keyboard.press("Enter");
   await page.waitForFunction(() => document.querySelector('#hero [aria-current="step"]')?.textContent?.includes("Settle"), null, { timeout: 5000 });
-  assert.deepEqual(errors, []);
-  await ctx.close();
-});
-
-await test("estimator: locked until sign-in, then welcomes and asks to help (answer reaches MSG)", async () => {
-  const { page, ctx, errors } = await open("/en");
-  const posts = [];
-  page.on("request", (r) => { if (r.url().endsWith("/api/lead") && r.method() === "POST") posts.push(JSON.parse(r.postData() || "{}")); });
-  const sec = page.locator("#estimate");
-  await reach(page, "estimate");
-  assert.ok(await sec.locator("#estimator").evaluate((el) => !!el.closest("[inert]")), "estimator is out of reach before sign-in");
-  await sec.getByRole("button", { name: "Open the estimator" }).click();
-  assert.ok(await sec.getByText("This field is required").first().isVisible(), "validation");
-  await page.fill("#est-name", "Test Seller");
-  await page.fill("#est-phone", "0551234567");
-  await page.check("#est-consent");
-  await sec.getByRole("button", { name: "Open the estimator" }).click();
-  await sec.getByText("Welcome, Test. We're happy to see you here.").waitFor();
-  assert.equal(await sec.locator("#estimator").evaluate((el) => !!el.closest("[inert]")), false, "estimator opens");
-  assert.equal(posts[0]?.interest, "estimator_signin");
-  assert.equal(posts[0]?.phone, "+966551234567");
-  await sec.getByRole("button", { name: "No thanks, I'll browse" }).click();
-  await sec.getByText("Need help later? Chat with MSG on WhatsApp.").waitFor();
-  await page.waitForTimeout(300);
-  assert.equal(posts[1]?.interest, "estimator_help_no");
-  // the same device goes straight in next time
-  await page.reload();
-  await reach(page, "estimate");
-  await page.locator("#estimate").getByText("Welcome, Test.", { exact: false }).waitFor();
   assert.deepEqual(errors, []);
   await ctx.close();
 });
@@ -356,7 +321,7 @@ async function toConsole(page) {
   await page.locator("#plan-window").waitFor();
   for (let k = 0; k < 12; k++) {
     if (await page.locator("#plan-window .maplibregl-canvas, #plan-window canvas[role=img]").count()) break;
-    await page.evaluate(() => document.querySelector("#plan-window [data-lenis-prevent]").scrollBy(0, 450));
+    await page.evaluate(() => document.querySelector("#plan-window [data-col=plan]").scrollBy(0, 450));
     await page.waitForTimeout(400);
   }
   // the map only animates while it is on screen, so bring it fully into view
@@ -429,20 +394,20 @@ await test("book: one continuous page; the rail, #links, ] and [ and the back bu
     const { page, ctx, errors } = await open(`/${lang}`, { reducedMotion: "reduce" });
     const opened = () => page.evaluate(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter);
     const topOf = (sel) => page.locator(sel).evaluate((el) => el.getBoundingClientRect().top);
-    assert.equal(await page.locator("[data-chapter]").count(), 10, `${lang}: ten chapters in the HTML`);
+    assert.equal(await page.locator("[data-chapter]").count(), 9, `${lang}: nine chapters in the HTML`);
     assert.equal(await opened(), "hero", `${lang}: opens at the start`);
     // one vertical page: every chapter is laid out, one under the other
     const tops = await page.$$eval("[data-chapter]", (els) => els.map((e) => e.getBoundingClientRect().top + scrollY));
     assert.ok(tops.every((t, i) => i === 0 || t > tops[i - 1]), `${lang}: chapters follow one another down the page`);
     const nav = page.getByRole("navigation", { name: rail });
-    await nav.locator('a[href="#estimate"]').click();
-    await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "estimate");
-    assert.equal(await nav.locator('[aria-current="step"]').getAttribute("href"), "#estimate", `${lang}: the rail lights the current chapter`);
-    assert.ok(Math.abs((await topOf("#estimate")) - 64) < 90, `${lang}: lands at the chapter's top`);
-    await page.keyboard.press("]");
+    await nav.locator('a[href="#planner"]').click();
     await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "planner");
+    assert.equal(await nav.locator('[aria-current="step"]').getAttribute("href"), "#planner", `${lang}: the rail lights the current chapter`);
+    assert.ok(Math.abs((await topOf("#planner")) - 64) < 90, `${lang}: lands at the chapter's top`);
+    await page.keyboard.press("]");
+    await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "fleet");
     await page.keyboard.press("[");
-    await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "estimate");
+    await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "planner");
     // a #link to a section deep in another chapter lands on the section
     await page.evaluate(() => { const a = document.createElement("a"); a.href = "#perfmix"; a.id = "t-link"; a.textContent = "x"; document.querySelector("[data-current]").prepend(a); });
     await page.evaluate(() => document.getElementById("t-link").click());
@@ -451,7 +416,7 @@ await test("book: one continuous page; the rail, #links, ] and [ and the back bu
     const top = await topOf("#perfmix");
     assert.ok(Math.abs(top - 64) < 80, `${lang}: landed on the section (${top})`);
     await page.goBack();
-    await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "estimate");
+    await page.waitForFunction(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter === "planner");
     assert.deepEqual(errors, []);
     await ctx.close();
   }

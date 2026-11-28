@@ -14,7 +14,7 @@ import type { Dictionary, Locale } from "@/content/i18n";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { usePlan } from "../PlanContext";
 import TrackedLink from "../ui/TrackedLink";
-import { WhatsAppIcon } from "../ui/icons";
+import { ArrowIcon, WhatsAppIcon } from "../ui/icons";
 import { STAGE_COUNT } from "./HeroMap";
 import { NeedIcon, StageCard } from "../operation/StageParts";
 import QuoteCard from "./QuoteCard";
@@ -196,6 +196,10 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
           </a>
         </aside>
         <div className="hi hi-rise mt-6 flex flex-wrap items-center gap-3" style={{ ["--hi" as string]: "2.05s" }}>
+          <TrackedLink href="#planner" data-plan-open event="cta_click" props={{ cta: "plan", location: "hero" }}
+            className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3.5 font-semibold text-teal-deep shadow-[0_10px_40px_-10px_rgba(168,220,255,0.6)] transition-transform hover:-translate-y-0.5">
+            {c.ctaPlan} <ArrowIcon />
+          </TrackedLink>
           <TrackedLink href={whatsappLink(t.wa.general)} target="_blank" rel="noopener noreferrer" event="whatsapp_click" props={{ location: "hero" }}
             className="inline-flex items-center gap-2 rounded-full bg-white/10 px-5 py-3.5 font-semibold text-white ring-1 ring-white/30 backdrop-blur transition-colors hover:bg-white/20">
             <WhatsAppIcon className="size-5 text-brand-bright" /> {c.ctaTalk}
@@ -229,6 +233,10 @@ export default function Hero({ t, lang }: { t: Dictionary; lang?: Locale }) {
           {c.command.ctaPrice}
           <svg viewBox="0 0 24 24" className="size-4 rtl:-scale-x-100" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
         </a>
+        <TrackedLink href="#planner" data-plan-open event="cta_click" props={{ cta: "plan", location: "hero_console" }}
+          className="inline-flex items-center gap-2 rounded-full bg-brand-bright/15 px-5 py-3 font-semibold text-white ring-1 ring-brand-bright/50 transition-colors hover:bg-brand-bright/25 sm:py-3.5">
+          {c.ctaPlan}
+        </TrackedLink>
         <TrackedLink href={whatsappLink(t.wa.general)} target="_blank" rel="noopener noreferrer" event="whatsapp_click" props={{ location: "hero_console" }}
           aria-label={c.ctaTalk}
           className="inline-flex items-center gap-2 rounded-full bg-white/[0.08] px-5 py-3 font-semibold text-white ring-1 ring-white/25 transition-colors hover:bg-white/15 sm:py-3.5">

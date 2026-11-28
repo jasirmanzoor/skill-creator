@@ -1,14 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { facts } from "@/content/facts";
+import { facts, whatsappLink } from "@/content/facts";
 import type { Locale } from "@/content/i18n";
 import ArcCarousel, { type ArcCard } from "../ui/ArcCarousel";
 
 type Copy = {
   eyebrow: string; title: string; titleAccent: string; lead: string; visit: string; newTab: string;
   steps: { t: string; d: string }[];
-  next: string; nextCta: string; separate: string; hint: string;
+  next: string; nextCta: string; nextWa: string; separate: string; hint: string;
   labels: { prev: string; next: string; flip: string; back: string };
   cards: { tag: string; title: string; back: string; cta?: string }[];
 };
@@ -28,7 +28,8 @@ const copy: Record<Locale, Copy> = {
       { t: "Tracked & paid", d: "Live tracking, cash collected" },
     ],
     next: "Your brand could be next.",
-    nextCta: "Build my plan",
+    nextCta: "Launch my brand with MSG",
+    nextWa: "Hello MSG Horizons, I would like to launch my brand on MSG's infrastructure.",
     separate: "Perfmix is a separate store at perfmix.com; its product pictures are its own.",
     hint: "Drag the arc, or click a card to turn it over.",
     labels: { prev: "Previous card", next: "Next card", flip: "turn it over", back: "turn it back" },
@@ -56,7 +57,8 @@ const copy: Record<Locale, Copy> = {
       { t: "تتبّع وتحصيل", d: "تتبّع مباشر وتحصيل النقد" },
     ],
     next: "علامتك قد تكون التالية.",
-    nextCta: "ابنِ خطتي",
+    nextCta: "أطلق علامتي مع ام اس جي",
+    nextWa: "مرحباً ام اس جي هورايزونز، أرغب في إطلاق علامتي التجارية على بنية ام اس جي.",
     separate: "بيرفمكس متجر مستقل على perfmix.com، وصور منتجاته من المتجر نفسه.",
     hint: "اسحب القوس، أو اضغط على بطاقة لقلبها.",
     labels: { prev: "البطاقة السابقة", next: "البطاقة التالية", flip: "اقلبها", back: "أعدها" },
@@ -140,7 +142,7 @@ export default function Perfmix({ lang }: { lang: Locale }) {
 
       <div className="mx-auto mt-14 flex max-w-7xl flex-col items-start justify-between gap-5 px-5 sm:flex-row sm:items-center lg:px-8">
         <p className="font-display text-2xl font-semibold sm:text-3xl">{c.next}</p>
-        <button type="button" data-plan-open className="btn-primary on-dark px-6 py-3.5">{c.nextCta}</button>
+        <a href={whatsappLink(c.nextWa)} target="_blank" rel="noopener noreferrer" className="btn-primary on-dark px-6 py-3.5">{c.nextCta}</a>
       </div>
       <p className="mx-auto mt-8 max-w-7xl px-5 text-xs text-white/50 lg:px-8">{c.separate}</p>
     </section>

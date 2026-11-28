@@ -12,10 +12,12 @@ import type { Persona, Volume } from "@/lib/planner";
 export const AREAS = ["riyadh", "multi", "kingdom"] as const;
 export const WINDOWS = ["sameday", "nextday", "scheduled"] as const;
 export const PROFILES = ["small", "mixed", "bulky"] as const;
+export const ORIGINS = ["riyadh", "sabya"] as const;
 
 export type Area = (typeof AREAS)[number];
 export type DeliveryWindow = (typeof WINDOWS)[number];
 export type Profile = (typeof PROFILES)[number];
+export type Origin = (typeof ORIGINS)[number];
 
 export type SizerInput = {
   orders: number; // average orders or shipments a day
@@ -25,6 +27,10 @@ export type SizerInput = {
   profile: Profile;
   stock: boolean; // holds stock that MSG should store
   cod: number; // % of orders paid in cash at the door (0–100)
+  /** share of orders that leave the origin city (0–100); used when area is "multi". Older links have none (50). */
+  split?: number;
+  /** where shipments start: MSG's Riyadh network or the Sabya hub. Older links have none (Riyadh). */
+  origin?: Origin;
 };
 
 /** Planning assumptions. Shown to the visitor verbatim; MSG confirms real figures on the call. */
@@ -169,7 +175,10 @@ export function size(raw: SizerInput, persona?: Persona | null): Structure {
 
 /** Compact URL segment, e.g. o120_p2_ariyadh_wnextday_fsmall_s0_c30. */
 export function encodeSizer(i: SizerInput): string {
-  return ["o" + i.orders, "p" + i.peak, "a" + i.area, "w" + i.window, "f" + i.profile, "s" + (i.stock ? 1 : 0), "c" + i.cod].join("_");
+  const parts = ["o" + i.orders, "p" + i.peak, "a" + i.area, "w" + i.window, "f" + i.profile, "s" + (i.stock ? 1 : 0), "c" + i.cod];
+  if (i.split != null) parts.push("x" + i.split);
+  if (i.origin && i.origin !== "riyadh") parts.push("g" + i.origin);
+  return parts.join("_");
 }
 
 export function decodeSizer(s: string | null | undefined): SizerInput | null {
@@ -185,6 +194,8 @@ export function decodeSizer(s: string | null | undefined): SizerInput | null {
     else if (k === "f" && (PROFILES as readonly string[]).includes(v)) out.profile = v as Profile;
     else if (k === "s") out.stock = v === "1";
     else if (k === "c" && Number.isFinite(+v)) out.cod = clamp(Math.round(+v), 0, 100);
+    else if (k === "x" && v !== "" && Number.isFinite(+v)) out.split = clamp(Math.round(+v), 0, 100);
+    else if (k === "g" && (ORIGINS as readonly string[]).includes(v)) out.origin = v as Origin;
   }
   return out;
 }

@@ -12,9 +12,9 @@ import { useReveals } from "./useReveals";
 
 const HEX = "M-40 0 L-20 -34.6 L20 -34.6 L40 0 L20 34.6 L-20 34.6 Z";
 
-export default function Paths({ c, lang }: { c: ProfileCopy; lang: string }) {
+export default function Paths({ c }: { c: ProfileCopy; lang: string }) {
   const ref = useReveals<HTMLElement>();
-  const href = (i: number) => (i === 0 ? whatsappLink(c.paths.items[0].cta) : i === 1 ? `/${lang}?build=1#planner` : "#contact");
+  const href = (i: number) => (i === 0 ? whatsappLink(c.paths.items[0].cta) : i === 1 ? whatsappLink(c.paths.items[1].cta) : "#contact");
   return (
     <section ref={ref} id="paths" aria-labelledby="paths-title" className="relative bg-[#05070c] px-4 py-28 sm:px-6 md:px-[6vw] md:py-40">
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between" data-reveal>
@@ -54,7 +54,7 @@ export default function Paths({ c, lang }: { c: ProfileCopy; lang: string }) {
             </ul>
             <a
               href={href(i)}
-              {...(i === 0 ? { target: "_blank", rel: "noopener" } : {})}
+              {...(i < 2 ? { target: "_blank", rel: "noopener" } : {})}
               className={`mt-10 rounded-[4px] px-5 py-3.5 text-center font-mono text-[0.6875rem] uppercase tracking-[0.16em] transition-colors rtl:tracking-normal ${
                 m.featured ? "bg-[#009df8] text-[#05070c] hover:bg-white" : "text-white ring-1 ring-white/25 hover:bg-white hover:text-[#05070c]"
               }`}

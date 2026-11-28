@@ -12,7 +12,7 @@ export const en = {
   nav: {
     skip: "Skip to content",
     plan: "Build a plan",
-    planFull: "Build my logistics plan",
+    planFull: "Plan & quote builder",
     sellers: "Who we serve",
     services: "Services",
     fleet: "Fleet & operations",
@@ -22,7 +22,7 @@ export const en = {
     home: "Home",
     youAreHere: "You are here",
     cta: "Build my logistics plan",
-    ctaShort: "Build my plan",
+    ctaShort: "Plan & quote",
     talk: "Talk to MSG",
     whatsapp: "WhatsApp",
     langSwitch: "العربية",
@@ -68,7 +68,7 @@ export const en = {
     nextStep: "Enter your numbers. Get a price quote and everything your plan covers.",
     ctaMicro: "No sign-up. MSG confirms scope and pricing once they see your volumes.",
     proofBeside: "1,000+ couriers · 100+ vehicles · 24/7 · AJEX · Keeta · iMile · Logistiq · J&T Express · Naqel · Landmark",
-    ctaPlan: "Build my logistics plan",
+    ctaPlan: "Build my plan & quote",
     ctaTalk: "Talk to MSG on WhatsApp",
     legend: { courier: "1 dot = 1 courier", vehicle: "Vehicles on route", sweep: "Operating 24/7" },
     stats: [
@@ -85,7 +85,7 @@ export const en = {
   planner: {
     eyebrow: "Build your logistics",
     title: "What are you trying to move?",
-    lead: "Four steps: who you are, what you move, your numbers and what matters. You get a price quote and a plan that shows everything covered. Under a minute, no sign-up.",
+    lead: "One screen: who you are, what you move, your numbers and what matters. You get a price quote and a plan that shows everything covered. Under a minute, no sign-up.",
     stepOf: "Step {n} of {total}",
     steps: {
       persona: {
@@ -232,7 +232,7 @@ export const en = {
     eyebrow: "One accountable partner",
     title: "Seven services. One partner accountable for all of them.",
     lead: "End-to-end services designed around control, speed and a single accountable partner. Use one, or combine them.",
-    explore: "Add to my plan",
+    explore: "Talk to MSG",
     featuredPoints: ["Fast, accurate, reliable delivery to the door", "Real-time tracking on every shipment", "Round-the-clock shipping and distribution", "Backed by 1,000+ couriers"],
   },
   fleet: {
@@ -397,7 +397,7 @@ export const en = {
     hq: "Headquarters",
     rights: "All rights reserved.",
   },
-  mobileBar: { plan: "Build my plan", whatsapp: "WhatsApp" },
+  mobileBar: { plan: "Plan & quote", whatsapp: "WhatsApp" },
   wa: {
     general: "Hello MSG Horizons, I'd like to talk about delivery and logistics for my business.",
     planIntro: "Hello MSG Horizons, here is my logistics plan:",

@@ -25,7 +25,7 @@ export default function ServicePageView({ t, lang, slug }: { t: Dictionary; lang
               {c.langSwitch}
             </a>
             <a href={planHref} className="rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink-3">
-              {t.nav.cta}
+              {t.nav.ctaShort}
             </a>
           </nav>
         </div>
@@ -50,9 +50,6 @@ export default function ServicePageView({ t, lang, slug }: { t: Dictionary; lang
             </h1>
             <p className="mt-6 max-w-xl text-lg text-muted text-pretty">{pg.lead}</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <a href={planHref} className="inline-flex items-center justify-center gap-2 rounded-md bg-ink px-6 py-3.5 font-medium text-white hover:bg-ink-3">
-                {c.plan} <ArrowIcon />
-              </a>
               <a
                 href={whatsappLink(c.waIntro(pg.h1))}
                 target="_blank"
@@ -159,8 +156,8 @@ export default function ServicePageView({ t, lang, slug }: { t: Dictionary; lang
               <h2 className="font-display text-3xl font-semibold tracking-[-0.02em] rtl:tracking-normal">{c.ctaTitle}</h2>
               <p className="mt-3 text-white/70">{c.ctaBody}</p>
             </div>
-            <a href={planHref} className="inline-flex items-center justify-center gap-2 rounded-md bg-white px-6 py-3.5 font-medium text-ink hover:bg-white/90">
-              {c.plan} <ArrowIcon />
+            <a href={whatsappLink(c.waIntro(pg.h1))} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-md bg-white px-6 py-3.5 font-medium text-ink hover:bg-white/90">
+              <WhatsAppIcon className="size-5 text-whatsapp" /> {c.whatsapp}
             </a>
           </div>
         </section>

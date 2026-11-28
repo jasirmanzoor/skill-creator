@@ -7,7 +7,6 @@ import Planner from "@/components/sections/Planner";
 import TrustBar from "@/components/sections/TrustBar";
 import LiveTracking from "@/components/live/LiveTracking";
 import Pitch from "@/components/pitch/Pitch";
-import EstimatorSection from "@/components/estimator/EstimatorSection";
 import Services from "@/components/sections/Services";
 import Fleet from "@/components/sections/Fleet";
 import Enterprise from "@/components/sections/Enterprise";
@@ -34,8 +33,8 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
   const t = getDictionary(lang);
 
   // The page is a run of chapters (content/chapters.ts), one after another down a single page, steered from the route
-  // rail. The order follows the visitor's decision: who MSG is, live tracking (MSG's difference), why MSG, the price,
-  // the plan, the fleet and hubs, the proof, then MSG.
+  // rail. The order follows the visitor's decision: who MSG is, live tracking (MSG's difference), why MSG, the plan
+  // and its price, the fleet and hubs, the proof, then MSG.
   const c = (n: number, children: React.ReactNode) => <Chapter n={n} lang={lang}>{children}</Chapter>;
   return (
     <PlanProvider>
@@ -53,17 +52,16 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
           <Depth><Services t={t} lang={lang} /></Depth>
           <Perfmix lang={lang} />
         </>)}
-        {c(4, <Depth><EstimatorSection t={t} lang={lang} /></Depth>)}
-        {c(5, <Stage><Planner t={t} lang={lang} /></Stage>)}
-        {c(6, <>
+        {c(4, <Stage><Planner t={t} lang={lang} /></Stage>)}
+        {c(5, <>
           <Depth><Fleet t={t} lang={lang} /></Depth>
           <Depth><Gallery t={t} lang={lang} /></Depth>
         </>)}
-        {c(7, <>
+        {c(6, <>
           <Depth><Proof t={t} /></Depth>
         </>)}
-        {c(8, <Depth><Enterprise t={t} lang={lang} /></Depth>)}
-        {c(9, <>
+        {c(7, <Depth><Enterprise t={t} lang={lang} /></Depth>)}
+        {c(8, <>
           <Depth><Contact t={t} lang={lang} /></Depth>
           <DirectorOutro lang={lang} />
         </>)}

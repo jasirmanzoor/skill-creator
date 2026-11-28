@@ -32,7 +32,7 @@ export default function Services({ t, lang }: { t: Dictionary; lang: Locale }) {
         </p>
       ),
       image: { src: PHOTO[id].src, pos: PHOTO[id].pos, alt: svc.name },
-      href: slug ? `/${lang}/services/${slug}` : "#planner",
+      href: slug ? `/${lang}/services/${slug}` : "#contact",
       cta: slug ? h.details : s.explore,
     };
   });

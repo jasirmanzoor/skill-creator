@@ -27,6 +27,7 @@ const SUBJECT: Record<string, string> = {
   estimator_signin: "Estimator sign-in",
   estimator_help_yes: "Wants help now (estimator)",
   estimator_help_no: "Browsing on their own (estimator)",
+  quote_locked: "Quote locked in the plan builder",
 };
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);

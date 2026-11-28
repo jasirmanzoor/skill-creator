@@ -27,7 +27,6 @@ import { AnimatePresence, motion } from "motion/react";
 import { facts, whatsappLink } from "@/content/facts";
 import type { Dictionary, Locale } from "@/content/i18n";
 import { goTo } from "@/lib/book";
-import { openPlanner } from "@/lib/deck";
 import { lockScroll } from "@/lib/scroller";
 import { track } from "@/lib/analytics";
 import { useActiveSection } from "@/lib/use-active-section";
@@ -215,11 +214,8 @@ export default function PushMenu({ t, lang, open, onClose }: { t: Dictionary; la
         </nav>
 
         <div className="grid gap-5 border-t border-white/10 px-6 py-6 sm:px-8" style={{ ...row(n), transform: open ? "translateY(0)" : "translateY(16px)", opacity: open ? 1 : 0 }}>
-          <div className="grid grid-cols-2 gap-2.5">
-            <a href="#planner" onClick={(e) => { e.preventDefault(); onClose(); track("cta_click", { cta: "plan", location: "site_map" }); window.setTimeout(openPlanner, 60); }} className="rounded-full bg-white px-4 py-3 text-center text-sm font-semibold text-teal-deep">
-              {t.nav.ctaShort}
-            </a>
-            <a href={whatsappLink(t.wa.general)} target="_blank" rel="noopener noreferrer" onClick={() => track("whatsapp_click", { location: "site_map" })} className="rounded-full px-4 py-3 text-center text-sm font-semibold text-white ring-1 ring-white/25">
+          <div className="grid gap-2.5">
+            <a href={whatsappLink(t.wa.general)} target="_blank" rel="noopener noreferrer" onClick={() => track("whatsapp_click", { location: "site_map" })} className="rounded-full bg-white px-4 py-3 text-center text-sm font-semibold text-teal-deep">
               {t.nav.whatsapp}
             </a>
           </div>
