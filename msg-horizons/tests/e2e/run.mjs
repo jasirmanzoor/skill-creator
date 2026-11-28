@@ -302,7 +302,7 @@ await test("mobile: no horizontal overflow, CTA bar appears after the hero", asy
     // smooth scrolling eases toward the target: wait until the page is past the hero rather than a fixed time
     await page.waitForFunction(() => window.scrollY > window.innerHeight * 0.8, null, { timeout: 5000 });
     await page.waitForTimeout(400);
-    assert.ok(await page.getByRole("link", { name: lang === "en" ? "Build my plan" : "ابنِ خطتك" }).last().isVisible());
+    assert.ok(await page.getByRole("link", { name: lang === "en" ? "Plan & quote" : "الخطة والسعر" }).last().isVisible());
     await ctx.close();
   }
 });
@@ -324,8 +324,12 @@ async function toConsole(page) {
     await page.evaluate(() => document.querySelector("#plan-window [data-col=plan]").scrollBy(0, 450));
     await page.waitForTimeout(400);
   }
-  // the map only animates while it is on screen, so bring it fully into view
-  await page.locator("#plan-window .maplibregl-canvas, #plan-window canvas[role=img]").first().scrollIntoViewIfNeeded();
+  // the map only animates while it is on screen, so bring it fully into view (the real map may be swapped for the
+  // flat fallback while this runs, so try again on the canvas that replaced it)
+  for (let k = 0; k < 3; k++) {
+    try { await page.locator("#plan-window .maplibregl-canvas, #plan-window canvas[role=img]").first().scrollIntoViewIfNeeded({ timeout: 5000 }); break; }
+    catch { await page.waitForTimeout(500); }
+  }
   await page.waitForTimeout(500);
 }
 
@@ -497,9 +501,10 @@ await test("perfmix: MSG's launch of its own store follows Why MSG, links out sa
     const { page, ctx, errors } = await open(`/${lang}#perfmix`, { reducedMotion: "reduce" });
     assert.equal(await page.evaluate(() => document.querySelector("[data-chapter][data-current]")?.dataset.chapter), "why", "#perfmix sits in the Why MSG chapter");
     const links = await page.locator("#perfmix a").evaluateAll((as) => as.map((a) => ({ href: a.href, rel: a.rel, target: a.target })));
-    assert.equal(new Set(links.map((l) => l.href.replace(/\/$/, ""))).size, 4, "the store link and three collections");
+    const store = links.filter((l) => l.href.startsWith("https://perfmix.com"));
+    assert.equal(new Set(store.map((l) => l.href.replace(/\/$/, ""))).size, 4, "the store link and three collections");
     for (const l of links) {
-      assert.ok(l.href.startsWith("https://perfmix.com"), l.href);
+      assert.ok(l.href.startsWith("https://perfmix.com") || l.href.startsWith("https://wa.me/"), l.href);
       assert.ok(l.target === "_blank" && /noopener/.test(l.rel), "external links open in a new tab, noopener");
     }
     await page.locator("#perfmix img").last().scrollIntoViewIfNeeded();
