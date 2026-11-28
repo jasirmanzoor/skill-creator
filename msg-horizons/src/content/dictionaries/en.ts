@@ -21,7 +21,7 @@ export const en = {
     proof: "Company snapshot",
     home: "Home",
     youAreHere: "You are here",
-    cta: "Build my logistics plan",
+    cta: "Build my plan & quote",
     ctaShort: "Plan & quote",
     talk: "Talk to MSG",
     whatsapp: "WhatsApp",

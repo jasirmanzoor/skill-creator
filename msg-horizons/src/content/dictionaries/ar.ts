@@ -20,7 +20,7 @@ export const ar: Dictionary = {
     proof: "لمحة عن الشركة",
     home: "الرئيسية",
     youAreHere: "أنت هنا",
-    cta: "ابنِ خطتك اللوجستية",
+    cta: "ابنِ خطتي واحصل على السعر",
     ctaShort: "الخطة والسعر",
     talk: "تحدث مع ام اس جي",
     whatsapp: "واتساب",

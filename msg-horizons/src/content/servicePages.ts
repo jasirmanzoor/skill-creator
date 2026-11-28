@@ -57,7 +57,7 @@ export const pageChrome: Record<Locale, Chrome> = {
   en: {
     home: "Home",
     services: "Services",
-    plan: "Build my logistics plan",
+    plan: "Build my plan & quote",
     whatsapp: "Talk to MSG on WhatsApp",
     includedTitle: "What's included",
     forTitle: "Built for",
@@ -84,7 +84,7 @@ export const pageChrome: Record<Locale, Chrome> = {
   ar: {
     home: "الرئيسية",
     services: "الخدمات",
-    plan: "ابنِ خطتك اللوجستية",
+    plan: "ابنِ خطتي واحصل على السعر",
     whatsapp: "تحدث مع MSG عبر واتساب",
     includedTitle: "ما الذي تشمله الخدمة",
     forTitle: "مصممة لـ",
